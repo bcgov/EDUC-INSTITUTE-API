@@ -31,11 +31,11 @@ public class IndependentAuthorityEntity {
   @Column(name = "email")
   private String email;
   @Basic
+  @Column(name = "supplier_number")
+  private String supplierNumber;
+  @Basic
   @Column(name = "display_name")
   private String displayName;
-  @Basic
-  @Column(name = "asset_number")
-  private String assetNumber;
   @Basic
   @Column(name = "authority_group_code")
   private String authorityGroupCode;

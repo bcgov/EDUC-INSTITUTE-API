@@ -11,32 +11,30 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.util.List;
 
+/**
+ * The type Student.
+ */
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class School implements Serializable {
+public class AddressHistory implements Serializable {
   /**
    * The constant serialVersionUID.
    */
   private static final long serialVersionUID = 1L;
+
+  private String addressHistoryId;
+
+  private String addressId;
 
   private String schoolId;
 
   private String districtId;
 
   private String independentAuthorityId;
-
-  @Size(max = 5)
-  @NotNull(message = "schoolNumber can not be null.")
-  private String schoolNumber;
-
-  @Size(max = 10)
-  private String faxNumber;
 
   @Size(max = 10)
   private String phoneNumber;
@@ -46,41 +44,32 @@ public class School implements Serializable {
   private String email;
 
   @Size(max = 255)
-  private String website;
+  @NotNull(message = "addressLine1 cannot be null")
+  private String addressLine1;
 
   @Size(max = 255)
-  @NotNull(message = "displayName cannot be null")
-  private String displayName;
+  private String addressLine2;
+
+  @Size(max = 255)
+  @NotNull(message = "city cannot be null")
+  private String city;
+
+  @Size(max = 255)
+  @NotNull(message = "postal cannot be null")
+  private String postal;
 
   @Size(max = 10)
-  private String assetNumber;
+  @NotNull(message = "addressTypeCode cannot be null")
+  private String addressTypeCode;
 
   @Size(max = 10)
-  @NotNull(message = "schoolOrganizationCode cannot be null")
-  private String schoolOrganizationCode;
+  @NotNull(message = "provinceCode cannot be null")
+  private String provinceCode;
 
   @Size(max = 10)
-  @NotNull(message = "schoolCategoryCode cannot be null")
-  private String schoolCategoryCode;
-
-  @Size(max = 10)
-  @NotNull(message = "facilityTypeCode cannot be null")
-  private String facilityTypeCode;
-
-  @Size(max = 10)
-  @NotNull(message = "openedDate cannot be null")
-  private LocalDateTime openedDate;
-
-  @Size(max = 10)
-  private LocalDateTime closedDate;
+  @NotNull(message = "countryCode cannot be null")
+  private String countryCode;
 
   @Null(message = "Create Date Should be null")
   private String createDate;
-
-  private List<Contact> contacts;
-
-  private List<Address> addresses;
-
-  private List<Address> notes;
-
 }

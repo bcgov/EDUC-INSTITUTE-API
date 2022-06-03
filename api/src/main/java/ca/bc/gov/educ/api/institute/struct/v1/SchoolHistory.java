@@ -19,11 +19,13 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class School implements Serializable {
+public class SchoolHistory implements Serializable {
   /**
    * The constant serialVersionUID.
    */
   private static final long serialVersionUID = 1L;
+
+  private String schoolHistoryId;
 
   private String schoolId;
 

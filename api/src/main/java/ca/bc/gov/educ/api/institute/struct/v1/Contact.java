@@ -11,19 +11,22 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.util.List;
 
+/**
+ * The type Student.
+ */
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class School implements Serializable {
+public class Contact implements Serializable {
   /**
    * The constant serialVersionUID.
    */
   private static final long serialVersionUID = 1L;
+
+  private String contactId;
 
   private String schoolId;
 
@@ -36,9 +39,6 @@ public class School implements Serializable {
   private String schoolNumber;
 
   @Size(max = 10)
-  private String faxNumber;
-
-  @Size(max = 10)
   private String phoneNumber;
 
   @Size(max = 255)
@@ -46,41 +46,17 @@ public class School implements Serializable {
   private String email;
 
   @Size(max = 255)
-  private String website;
+  @NotNull(message = "firstName cannot be null")
+  private String firstName;
 
   @Size(max = 255)
-  @NotNull(message = "displayName cannot be null")
-  private String displayName;
+  @NotNull(message = "lastName cannot be null")
+  private String lastName;
 
   @Size(max = 10)
-  private String assetNumber;
-
-  @Size(max = 10)
-  @NotNull(message = "schoolOrganizationCode cannot be null")
-  private String schoolOrganizationCode;
-
-  @Size(max = 10)
-  @NotNull(message = "schoolCategoryCode cannot be null")
-  private String schoolCategoryCode;
-
-  @Size(max = 10)
-  @NotNull(message = "facilityTypeCode cannot be null")
-  private String facilityTypeCode;
-
-  @Size(max = 10)
-  @NotNull(message = "openedDate cannot be null")
-  private LocalDateTime openedDate;
-
-  @Size(max = 10)
-  private LocalDateTime closedDate;
+  @NotNull(message = "contactTypeCode cannot be null")
+  private String contactTypeCode;
 
   @Null(message = "Create Date Should be null")
   private String createDate;
-
-  private List<Contact> contacts;
-
-  private List<Address> addresses;
-
-  private List<Address> notes;
-
 }
