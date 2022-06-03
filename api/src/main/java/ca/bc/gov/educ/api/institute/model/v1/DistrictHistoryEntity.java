@@ -10,22 +10,20 @@ import java.util.UUID;
 
 @Data
 @Entity
-@Table(name = "SCHOOL")
-public class SchoolEntity {
+@Table(name = "DISTRICT_HISTORY")
+public class DistrictHistoryEntity {
   @Id
   @GeneratedValue(generator = "UUID")
   @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator", parameters = {
     @org.hibernate.annotations.Parameter(name = "uuid_gen_strategy_class", value = "org.hibernate.id.uuid.CustomVersionOneStrategy")})
-  private UUID schoolId;
+  @Column(name = "district_history_id")
+  private UUID districtHistoryId;
   @Basic
   @Column(name = "district_id")
   private Object districtId;
   @Basic
-  @Column(name = "independent_authority_id")
-  private Object independentAuthorityId;
-  @Basic
-  @Column(name = "school_number")
-  private String schoolNumber;
+  @Column(name = "district_number")
+  private String districtNumber;
   @Basic
   @Column(name = "fax_number")
   private String faxNumber;
@@ -42,17 +40,8 @@ public class SchoolEntity {
   @Column(name = "display_name")
   private String displayName;
   @Basic
-  @Column(name = "asset_number")
-  private String assetNumber;
-  @Basic
-  @Column(name = "school_organization_code")
-  private String schoolOrganizationCode;
-  @Basic
-  @Column(name = "school_category_code")
-  private String schoolCategoryCode;
-  @Basic
-  @Column(name = "facility_type_code")
-  private String facilityTypeCode;
+  @Column(name = "district_region_code")
+  private String districtRegionCode;
   @Basic
   @Column(name = "opened_date")
   private LocalDateTime openedDate;
@@ -60,14 +49,13 @@ public class SchoolEntity {
   @Column(name = "closed_date")
   private LocalDateTime closedDate;
   @Column(name = "CREATE_USER", updatable = false)
-  String createUser;
+  private String createUser;
   @PastOrPresent
   @Column(name = "CREATE_DATE", updatable = false)
-  LocalDateTime createDate;
+  private LocalDateTime createDate;
   @Column(name = "update_user")
-  String updateUser;
+  private String updateUser;
   @PastOrPresent
   @Column(name = "update_date")
-  LocalDateTime updateDate;
-
+  private LocalDateTime updateDate;
 }

@@ -10,22 +10,20 @@ import java.util.UUID;
 
 @Data
 @Entity
-@Table(name = "SCHOOL")
-public class SchoolEntity {
+@Table(name = "INDEPENDENT_AUTHORITY_HISTORY")
+public class IndependentAuthorityHistoryEntity {
   @Id
   @GeneratedValue(generator = "UUID")
   @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator", parameters = {
     @org.hibernate.annotations.Parameter(name = "uuid_gen_strategy_class", value = "org.hibernate.id.uuid.CustomVersionOneStrategy")})
-  private UUID schoolId;
-  @Basic
-  @Column(name = "district_id")
-  private Object districtId;
+  @Column(name = "independent_authority_history_id")
+  private UUID independentAuthorityHistoryId;
   @Basic
   @Column(name = "independent_authority_id")
-  private Object independentAuthorityId;
+  private UUID independentAuthorityId;
   @Basic
-  @Column(name = "school_number")
-  private String schoolNumber;
+  @Column(name = "authority_number")
+  private String authorityNumber;
   @Basic
   @Column(name = "fax_number")
   private String faxNumber;
@@ -36,23 +34,17 @@ public class SchoolEntity {
   @Column(name = "email")
   private String email;
   @Basic
-  @Column(name = "website")
-  private String website;
-  @Basic
   @Column(name = "display_name")
   private String displayName;
   @Basic
   @Column(name = "asset_number")
   private String assetNumber;
   @Basic
-  @Column(name = "school_organization_code")
-  private String schoolOrganizationCode;
+  @Column(name = "authority_group_code")
+  private String authorityGroupCode;
   @Basic
-  @Column(name = "school_category_code")
-  private String schoolCategoryCode;
-  @Basic
-  @Column(name = "facility_type_code")
-  private String facilityTypeCode;
+  @Column(name = "authority_type_code")
+  private String authorityTypeCode;
   @Basic
   @Column(name = "opened_date")
   private LocalDateTime openedDate;
@@ -60,14 +52,13 @@ public class SchoolEntity {
   @Column(name = "closed_date")
   private LocalDateTime closedDate;
   @Column(name = "CREATE_USER", updatable = false)
-  String createUser;
+  private String createUser;
   @PastOrPresent
   @Column(name = "CREATE_DATE", updatable = false)
-  LocalDateTime createDate;
+  private LocalDateTime createDate;
   @Column(name = "update_user")
-  String updateUser;
+  private String updateUser;
   @PastOrPresent
   @Column(name = "update_date")
-  LocalDateTime updateDate;
-
+  private LocalDateTime updateDate;
 }

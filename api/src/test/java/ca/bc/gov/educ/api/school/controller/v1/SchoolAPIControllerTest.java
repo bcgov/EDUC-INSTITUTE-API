@@ -1,8 +1,6 @@
 package ca.bc.gov.educ.api.institute.controller.v1;
 
 import ca.bc.gov.educ.api.institute.InstituteApiResourceApplication;
-import ca.bc.gov.educ.api.institute.model.v1.Mincode;
-import ca.bc.gov.educ.api.institute.model.v1.SchoolEntity;
 import ca.bc.gov.educ.api.institute.repository.v1.SchoolRepository;
 import ca.bc.gov.educ.api.institute.service.v1.SchoolService;
 import com.fasterxml.jackson.databind.ObjectMapper;

@@ -10,19 +10,23 @@ import java.util.UUID;
 
 @Data
 @Entity
-@Table(name = "SCHOOL")
-public class SchoolEntity {
+@Table(name = "SCHOOL_HISTORY")
+public class SchoolHistoryEntity {
   @Id
   @GeneratedValue(generator = "UUID")
   @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator", parameters = {
     @org.hibernate.annotations.Parameter(name = "uuid_gen_strategy_class", value = "org.hibernate.id.uuid.CustomVersionOneStrategy")})
+  @Column(name = "school_history_id")
+  private UUID schoolHistoryId;
+  @Basic
+  @Column(name = "school_id")
   private UUID schoolId;
   @Basic
   @Column(name = "district_id")
-  private Object districtId;
+  private UUID districtId;
   @Basic
   @Column(name = "independent_authority_id")
-  private Object independentAuthorityId;
+  private UUID independentAuthorityId;
   @Basic
   @Column(name = "school_number")
   private String schoolNumber;
@@ -60,14 +64,13 @@ public class SchoolEntity {
   @Column(name = "closed_date")
   private LocalDateTime closedDate;
   @Column(name = "CREATE_USER", updatable = false)
-  String createUser;
+  private String createUser;
   @PastOrPresent
   @Column(name = "CREATE_DATE", updatable = false)
-  LocalDateTime createDate;
+  private LocalDateTime createDate;
   @Column(name = "update_user")
-  String updateUser;
+  private String updateUser;
   @PastOrPresent
   @Column(name = "update_date")
-  LocalDateTime updateDate;
-
+  private LocalDateTime updateDate;
 }
