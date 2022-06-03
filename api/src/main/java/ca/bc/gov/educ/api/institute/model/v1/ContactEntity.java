@@ -18,15 +18,19 @@ public class ContactEntity {
     @org.hibernate.annotations.Parameter(name = "uuid_gen_strategy_class", value = "org.hibernate.id.uuid.CustomVersionOneStrategy")})
   @Column(name = "contact_id")
   private UUID contactId;
-  @Basic
-  @Column(name = "school_id")
-  private UUID schoolId;
-  @Basic
-  @Column(name = "district_id")
-  private UUID districtId;
-  @Basic
-  @Column(name = "independent_authority_id")
-  private UUID independentAuthorityId;
+
+  @ManyToOne(optional = true, targetEntity = SchoolEntity.class)
+  @JoinColumn(name = "school_id", referencedColumnName = "school_id")
+  SchoolEntity schoolEntity;
+
+  @ManyToOne(optional = true, targetEntity = DistrictEntity.class)
+  @JoinColumn(name = "district_id", referencedColumnName = "district_id")
+  DistrictEntity districtEntity;
+
+  @ManyToOne(optional = true, targetEntity = IndependentAuthorityEntity.class)
+  @JoinColumn(name = "independent_authority_id", referencedColumnName = "independent_authority_id")
+  IndependentAuthorityEntity independentAuthorityEntity;
+
   @Basic
   @Column(name = "first_name")
   private String firstName;

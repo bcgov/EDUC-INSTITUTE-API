@@ -1,11 +1,14 @@
 package ca.bc.gov.educ.api.institute.model.v1;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import javax.validation.constraints.PastOrPresent;
 import java.time.LocalDateTime;
+import java.util.Set;
 import java.util.UUID;
 
 @Data
@@ -19,10 +22,10 @@ public class SchoolEntity {
   private UUID schoolId;
   @Basic
   @Column(name = "district_id")
-  private Object districtId;
+  private UUID districtId;
   @Basic
   @Column(name = "independent_authority_id")
-  private Object independentAuthorityId;
+  private UUID independentAuthorityId;
   @Basic
   @Column(name = "school_number")
   private String schoolNumber;
@@ -70,4 +73,28 @@ public class SchoolEntity {
   @Column(name = "update_date")
   LocalDateTime updateDate;
 
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
+  @OneToMany(mappedBy = "schoolEntity", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = ContactEntity.class)
+  private Set<ContactEntity> contacts;
+
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
+  @OneToMany(mappedBy = "schoolEntity", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = AddressEntity.class)
+  private Set<AddressEntity> addresses;
+
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
+  @OneToMany(mappedBy = "schoolEntity", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = NoteEntity.class)
+  private Set<NoteEntity> notes;
+
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
+  @OneToMany(mappedBy = "schoolEntity", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = SchoolGradeEntity.class)
+  private Set<SchoolGradeEntity> grades;
+
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
+  @OneToMany(mappedBy = "schoolEntity", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = NeighborhoodLearningEntity.class)
+  private Set<NeighborhoodLearningEntity> neighborhoodLearning;
 }

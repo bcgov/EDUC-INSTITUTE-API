@@ -18,9 +18,11 @@ public class SchoolGradeEntity {
     @org.hibernate.annotations.Parameter(name = "uuid_gen_strategy_class", value = "org.hibernate.id.uuid.CustomVersionOneStrategy")})
   @Column(name = "school_grade_id")
   private UUID schoolGradeId;
-  @Basic
-  @Column(name = "school_id")
-  private UUID schoolId;
+
+  @ManyToOne(optional = true, targetEntity = SchoolEntity.class)
+  @JoinColumn(name = "school_id", referencedColumnName = "school_id")
+  SchoolEntity schoolEntity;
+
   @Basic
   @Column(name = "school_grade_code")
   private String schoolGradeCode;

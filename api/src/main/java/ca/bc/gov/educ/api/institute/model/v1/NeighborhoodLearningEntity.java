@@ -18,9 +18,11 @@ public class NeighborhoodLearningEntity {
     @org.hibernate.annotations.Parameter(name = "uuid_gen_strategy_class", value = "org.hibernate.id.uuid.CustomVersionOneStrategy")})
   @Column(name = "neighborhood_learning_id")
   private UUID neighborhoodLearningId;
-  @Basic
-  @Column(name = "school_id")
-  private UUID schoolId;
+
+  @ManyToOne(optional = true, targetEntity = SchoolEntity.class)
+  @JoinColumn(name = "school_id", referencedColumnName = "school_id")
+  SchoolEntity schoolEntity;
+
   @Basic
   @Column(name = "neighborhood_learning_type_code")
   private String neighborhoodLearningTypeCode;
