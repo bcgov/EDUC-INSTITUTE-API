@@ -1,13 +1,18 @@
 package ca.bc.gov.educ.api.institute.model.v1;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.PastOrPresent;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Entity
 @Table(name = "AUTHORITY_TYPE_CODE")
 public class AuthorityTypeCodeEntity {
@@ -26,10 +31,10 @@ public class AuthorityTypeCodeEntity {
   private Integer displayOrder;
   @Basic
   @Column(name = "effective_date")
-  private Timestamp effectiveDate;
+  private LocalDateTime effectiveDate;
   @Basic
   @Column(name = "expiry_date")
-  private Timestamp expiryDate;
+  private LocalDateTime expiryDate;
   @Column(name = "CREATE_USER", updatable = false)
   private String createUser;
   @PastOrPresent

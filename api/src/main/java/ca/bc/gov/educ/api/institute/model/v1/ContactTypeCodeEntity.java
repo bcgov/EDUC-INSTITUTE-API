@@ -1,12 +1,15 @@
 package ca.bc.gov.educ.api.institute.model.v1;
 
-import lombok.Data;
+import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.PastOrPresent;
 import java.time.LocalDateTime;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Entity
 @Table(name = "CONTACT_TYPE_CODE")
 public class ContactTypeCodeEntity {

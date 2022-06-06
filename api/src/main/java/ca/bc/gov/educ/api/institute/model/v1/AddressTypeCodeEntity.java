@@ -1,13 +1,15 @@
 package ca.bc.gov.educ.api.institute.model.v1;
 
-import lombok.Data;
+import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.PastOrPresent;
-import java.math.BigInteger;
 import java.time.LocalDateTime;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Entity
 @Table(name = "ADDRESS_TYPE_CODE")
 public class AddressTypeCodeEntity {
@@ -22,7 +24,7 @@ public class AddressTypeCodeEntity {
   private String description;
   @Basic
   @Column(name = "display_order")
-  private BigInteger displayOrder;
+  private Integer displayOrder;
   @Basic
   @Column(name = "effective_date")
   private LocalDateTime effectiveDate;

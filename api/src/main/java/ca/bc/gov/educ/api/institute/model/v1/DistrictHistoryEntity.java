@@ -1,6 +1,6 @@
 package ca.bc.gov.educ.api.institute.model.v1;
 
-import lombok.Data;
+import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -9,6 +9,9 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Entity
 @Table(name = "DISTRICT_HISTORY")
 public class DistrictHistoryEntity {
@@ -16,11 +19,11 @@ public class DistrictHistoryEntity {
   @GeneratedValue(generator = "UUID")
   @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator", parameters = {
     @org.hibernate.annotations.Parameter(name = "uuid_gen_strategy_class", value = "org.hibernate.id.uuid.CustomVersionOneStrategy")})
-  @Column(name = "district_history_id")
+  @Column(name = "district_history_id", unique = true, updatable = false, columnDefinition = "BINARY(16)")
   private UUID districtHistoryId;
   @Basic
   @Column(name = "district_id")
-  private Object districtId;
+  private UUID districtId;
   @Basic
   @Column(name = "district_number")
   private String districtNumber;

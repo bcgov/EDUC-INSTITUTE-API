@@ -1,6 +1,6 @@
 package ca.bc.gov.educ.api.institute.model.v1;
 
-import lombok.Data;
+import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -9,6 +9,9 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Entity
 @Table(name = "CONTACT")
 public class ContactEntity {
@@ -16,7 +19,7 @@ public class ContactEntity {
   @GeneratedValue(generator = "UUID")
   @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator", parameters = {
     @org.hibernate.annotations.Parameter(name = "uuid_gen_strategy_class", value = "org.hibernate.id.uuid.CustomVersionOneStrategy")})
-  @Column(name = "contact_id")
+  @Column(name = "contact_id", unique = true, updatable = false, columnDefinition = "BINARY(16)")
   private UUID contactId;
 
   @ManyToOne(optional = true, targetEntity = SchoolEntity.class)
