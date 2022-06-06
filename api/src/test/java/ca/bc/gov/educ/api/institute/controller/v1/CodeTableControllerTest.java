@@ -1,8 +1,7 @@
-package ca.bc.gov.educ.api.school.controller.v1;
+package ca.bc.gov.educ.api.institute.controller.v1;
 
 import ca.bc.gov.educ.api.institute.InstituteApiResourceApplication;
 import ca.bc.gov.educ.api.institute.constants.v1.URL;
-import ca.bc.gov.educ.api.institute.controller.v1.CodeTableAPIController;
 import ca.bc.gov.educ.api.institute.mapper.v1.CodeTableMapper;
 import ca.bc.gov.educ.api.institute.model.v1.*;
 import ca.bc.gov.educ.api.institute.repository.v1.*;
@@ -189,10 +188,100 @@ public class CodeTableControllerTest {
   }
 
   @Test
-  public void testGetGenderCodes_ShouldReturnCodes() throws Exception {
+  public void testGetAddressTypeCodes_ShouldReturnCodes() throws Exception {
     final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_INSTITUTE_CODES";
     final var mockAuthority = oidcLogin().authorities(grantedAuthority);
     this.mockMvc.perform(get(URL.BASE_URL + URL.ADDRESS_TYPE_CODES).with(mockAuthority)).andDo(print()).andExpect(status().isOk())
         .andExpect(MockMvcResultMatchers.jsonPath("$[0].addressTypeCode").value("MAILING"));
   }
+
+  @Test
+  public void testGetSchoolCategoryCodes_ShouldReturnCodes() throws Exception {
+    final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_INSTITUTE_CODES";
+    final var mockAuthority = oidcLogin().authorities(grantedAuthority);
+    this.mockMvc.perform(get(URL.BASE_URL + URL.CATEGORY_CODES).with(mockAuthority)).andDo(print()).andExpect(status().isOk())
+      .andExpect(MockMvcResultMatchers.jsonPath("$[0].schoolCategoryCode").value("PUB_SCHL"));
+  }
+
+  @Test
+  public void testGetSchoolOrganizationCodes_ShouldReturnCodes() throws Exception {
+    final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_INSTITUTE_CODES";
+    final var mockAuthority = oidcLogin().authorities(grantedAuthority);
+    this.mockMvc.perform(get(URL.BASE_URL + URL.ORGANIZATION_CODES).with(mockAuthority)).andDo(print()).andExpect(status().isOk())
+      .andExpect(MockMvcResultMatchers.jsonPath("$[0].schoolOrganizationCode").value("TWO_SEM"));
+  }
+
+  @Test
+  public void testGetSchoolGradeCodes_ShouldReturnCodes() throws Exception {
+    final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_INSTITUTE_CODES";
+    final var mockAuthority = oidcLogin().authorities(grantedAuthority);
+    this.mockMvc.perform(get(URL.BASE_URL + URL.GRADE_CODES).with(mockAuthority)).andDo(print()).andExpect(status().isOk())
+      .andExpect(MockMvcResultMatchers.jsonPath("$[0].schoolGradeCode").value("01"));
+  }
+
+  @Test
+  public void testGetNeighborhoodLearningTypeCodes_ShouldReturnCodes() throws Exception {
+    final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_INSTITUTE_CODES";
+    final var mockAuthority = oidcLogin().authorities(grantedAuthority);
+    this.mockMvc.perform(get(URL.BASE_URL + URL.NEIGHBORHOOD_LEARNING_CODES).with(mockAuthority)).andDo(print()).andExpect(status().isOk())
+      .andExpect(MockMvcResultMatchers.jsonPath("$[0].neighborhoodLearningTypeCode").value("COMM_USE"));
+  }
+
+  @Test
+  public void testGetCountryCodes_ShouldReturnCodes() throws Exception {
+    final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_INSTITUTE_CODES";
+    final var mockAuthority = oidcLogin().authorities(grantedAuthority);
+    this.mockMvc.perform(get(URL.BASE_URL + URL.COUNTRY_CODES).with(mockAuthority)).andDo(print()).andExpect(status().isOk())
+      .andExpect(MockMvcResultMatchers.jsonPath("$[0].countryCode").value("CAN"));
+  }
+
+  @Test
+  public void testGetProvinceCodes_ShouldReturnCodes() throws Exception {
+    final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_INSTITUTE_CODES";
+    final var mockAuthority = oidcLogin().authorities(grantedAuthority);
+    this.mockMvc.perform(get(URL.BASE_URL + URL.PROVINCE_CODES).with(mockAuthority)).andDo(print()).andExpect(status().isOk())
+      .andExpect(MockMvcResultMatchers.jsonPath("$[0].provinceCode").value("BC"));
+  }
+
+  @Test
+  public void testGetFacilityTypeCodes_ShouldReturnCodes() throws Exception {
+    final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_INSTITUTE_CODES";
+    final var mockAuthority = oidcLogin().authorities(grantedAuthority);
+    this.mockMvc.perform(get(URL.BASE_URL + URL.FACILITY_TYPE_CODES).with(mockAuthority)).andDo(print()).andExpect(status().isOk())
+      .andExpect(MockMvcResultMatchers.jsonPath("$[0].facilityTypeCode").value("STAND_SCHL"));
+  }
+
+  @Test
+  public void testGetDistrictRegionCodes_ShouldReturnCodes() throws Exception {
+    final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_INSTITUTE_CODES";
+    final var mockAuthority = oidcLogin().authorities(grantedAuthority);
+    this.mockMvc.perform(get(URL.BASE_URL + URL.DISTRICT_REGION_CODES).with(mockAuthority)).andDo(print()).andExpect(status().isOk())
+      .andExpect(MockMvcResultMatchers.jsonPath("$[0].districtRegionCode").value("KOOTENAYS"));
+  }
+
+  @Test
+  public void testGetContactTypeCodes_ShouldReturnCodes() throws Exception {
+    final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_INSTITUTE_CODES";
+    final var mockAuthority = oidcLogin().authorities(grantedAuthority);
+    this.mockMvc.perform(get(URL.BASE_URL + URL.CONTACT_TYPE_CODES).with(mockAuthority)).andDo(print()).andExpect(status().isOk())
+      .andExpect(MockMvcResultMatchers.jsonPath("$[0].contactTypeCode").value("PRINCIPAL"));
+  }
+
+  @Test
+  public void testGetAuthorityTypeCodes_ShouldReturnCodes() throws Exception {
+    final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_INSTITUTE_CODES";
+    final var mockAuthority = oidcLogin().authorities(grantedAuthority);
+    this.mockMvc.perform(get(URL.BASE_URL + URL.AUTHORITY_TYPE_CODES).with(mockAuthority)).andDo(print()).andExpect(status().isOk())
+      .andExpect(MockMvcResultMatchers.jsonPath("$[0].authorityTypeCode").value("INDEPEND"));
+  }
+
+  @Test
+  public void testGetAuthorityGroupCodes_ShouldReturnCodes() throws Exception {
+    final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_INSTITUTE_CODES";
+    final var mockAuthority = oidcLogin().authorities(grantedAuthority);
+    this.mockMvc.perform(get(URL.BASE_URL + URL.AUTHORITY_GROUP_CODES).with(mockAuthority)).andDo(print()).andExpect(status().isOk())
+      .andExpect(MockMvcResultMatchers.jsonPath("$[0].authorityGroupCode").value("ACC_CHRIS"));
+  }
 }
+
+

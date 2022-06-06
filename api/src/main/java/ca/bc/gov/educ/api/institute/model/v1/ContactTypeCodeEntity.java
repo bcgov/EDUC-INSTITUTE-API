@@ -13,7 +13,6 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "CONTACT_TYPE_CODE")
 public class ContactTypeCodeEntity {
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Id
   @Column(name = "contact_type_code", unique = true, updatable = false)
   private String contactTypeCode;
