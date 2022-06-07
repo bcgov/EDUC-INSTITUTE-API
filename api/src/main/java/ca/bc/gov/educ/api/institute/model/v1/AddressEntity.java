@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.institute.model.v1;
 
+import ca.bc.gov.educ.api.institute.util.UpperCase;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -42,18 +43,23 @@ public class AddressEntity {
   private String addressLine2;
   @Basic
   @Column(name = "city")
+  @UpperCase
   private String city;
   @Basic
   @Column(name = "postal")
+  @UpperCase
   private String postal;
   @Basic
   @Column(name = "province_code")
+  @UpperCase
   private String provinceCode;
   @Basic
   @Column(name = "country_code")
+  @UpperCase
   private String countryCode;
   @Basic
   @Column(name = "address_type_code")
+  @UpperCase
   private String addressTypeCode;
   @Column(name = "CREATE_USER", updatable = false)
   private String createUser;

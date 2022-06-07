@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.institute.model.v1;
 
+import ca.bc.gov.educ.api.institute.util.UpperCase;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -38,6 +39,7 @@ public class DistrictEntity {
   private String website;
   @Basic
   @Column(name = "display_name")
+  @UpperCase
   private String displayName;
   @Basic
   @Column(name = "district_region_code")

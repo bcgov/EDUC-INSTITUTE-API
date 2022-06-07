@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.institute.model.v1;
 
+import ca.bc.gov.educ.api.institute.util.UpperCase;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -36,9 +37,11 @@ public class ContactEntity {
 
   @Basic
   @Column(name = "first_name")
+  @UpperCase
   private String firstName;
   @Basic
   @Column(name = "last_name")
+  @UpperCase
   private String lastName;
   @Basic
   @Column(name = "phone_number")
@@ -48,6 +51,7 @@ public class ContactEntity {
   private String email;
   @Basic
   @Column(name = "contact_type_code")
+  @UpperCase
   private String contactTypeCode;
   @Column(name = "CREATE_USER", updatable = false)
   private String createUser;

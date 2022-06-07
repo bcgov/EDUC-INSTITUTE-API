@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.institute.model.v1;
 
+import ca.bc.gov.educ.api.institute.util.UpperCase;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -45,18 +46,22 @@ public class SchoolEntity {
   private String website;
   @Basic
   @Column(name = "display_name")
+  @UpperCase
   private String displayName;
   @Basic
   @Column(name = "asset_number")
   private String assetNumber;
   @Basic
   @Column(name = "school_organization_code")
+  @UpperCase
   private String schoolOrganizationCode;
   @Basic
   @Column(name = "school_category_code")
+  @UpperCase
   private String schoolCategoryCode;
   @Basic
   @Column(name = "facility_type_code")
+  @UpperCase
   private String facilityTypeCode;
   @Basic
   @Column(name = "opened_date")

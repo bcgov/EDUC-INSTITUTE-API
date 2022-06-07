@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.institute.model.v1;
 
+import ca.bc.gov.educ.api.institute.util.UpperCase;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -28,6 +29,7 @@ public class SchoolGradeEntity {
 
   @Basic
   @Column(name = "school_grade_code")
+  @UpperCase
   private String schoolGradeCode;
   @Column(name = "CREATE_USER", updatable = false)
   private String createUser;
