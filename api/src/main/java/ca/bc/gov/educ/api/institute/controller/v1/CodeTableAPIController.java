@@ -13,9 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * The type School api controller.
- */
 @RestController
 @Slf4j
 public class CodeTableAPIController implements CodeTableAPIEndpoint {

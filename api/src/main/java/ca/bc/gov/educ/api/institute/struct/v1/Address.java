@@ -20,7 +20,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Address implements Serializable {
+public class Address extends BaseRequest implements Serializable {
   /**
    * The constant serialVersionUID.
    */
@@ -67,7 +67,4 @@ public class Address implements Serializable {
   @Size(max = 10)
   @NotNull(message = "countryCode cannot be null")
   private String countryCode;
-
-  @Null(message = "Create Date Should be null")
-  private String createDate;
 }

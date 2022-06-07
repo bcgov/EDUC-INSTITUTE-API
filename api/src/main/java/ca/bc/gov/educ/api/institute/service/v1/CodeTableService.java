@@ -7,14 +7,8 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
-/**
- * The type Code table service.
- */
 @Service
 public class CodeTableService {
 
@@ -133,5 +127,53 @@ public class CodeTableService {
   @Cacheable("schoolCategoryCodes")
   public List<SchoolCategoryCodeEntity> getSchoolCategoryCodesList() {
     return schoolCategoryCodeRepository.findAll();
+  }
+
+  public Optional<AddressTypeCodeEntity> getAddressTypeCode(String addressTypeCode) {
+    return addressTypeCodeRepository.findById(addressTypeCode);
+  }
+
+  public Optional<AuthorityGroupCodeEntity> getAuthorityGroupCode(String authorityGroupCode) {
+    return authorityGroupCodeRepository.findById(authorityGroupCode);
+  }
+
+  public Optional<AuthorityTypeCodeEntity> getAuthorityTypeCode(String authorityTypeCode) {
+    return authorityTypeCodeRepository.findById(authorityTypeCode);
+  }
+
+  public Optional<ContactTypeCodeEntity> getContactTypeCode(String contactTypeCode) {
+    return contactTypeCodeRepository.findById(contactTypeCode);
+  }
+
+  public Optional<DistrictRegionCodeEntity> getDistrictRegionCode(String districtRegionCode) {
+    return districtRegionCodeRepository.findById(districtRegionCode);
+  }
+
+  public Optional<FacilityTypeCodeEntity> getFacilityTypeCode(String facilityTypeCode) {
+    return facilityTypeCodeRepository.findById(facilityTypeCode);
+  }
+
+  public Optional<NeighborhoodLearningTypeCodeEntity> getNeighborhoodLearningTypeCode(String neighborhoodLearningTypeCode) {
+    return neighborhoodLearningTypeCodeRepository.findById(neighborhoodLearningTypeCode);
+  }
+
+  public Optional<ProvinceCodeEntity> getProvinceCode(String provinceCode) {
+    return provinceCodeRepository.findById(provinceCode);
+  }
+
+  public Optional<CountryCodeEntity> getCountryCode(String countryCode) {
+    return countryCodeRepository.findById(countryCode);
+  }
+
+  public Optional<SchoolGradeCodeEntity> getSchoolGradeCode(String schoolGradeCode) {
+    return schoolGradeCodeRepository.findById(schoolGradeCode);
+  }
+
+  public Optional<SchoolOrganizationCodeEntity> getSchoolOrganizationCode(String schoolOrganizationCode) {
+    return schoolOrganizationCodeRepository.findById(schoolOrganizationCode);
+  }
+
+  public Optional<SchoolCategoryCodeEntity> getSchoolCategoryCode(String schoolCategoryCode) {
+    return schoolCategoryCodeRepository.findById(schoolCategoryCode);
   }
 }

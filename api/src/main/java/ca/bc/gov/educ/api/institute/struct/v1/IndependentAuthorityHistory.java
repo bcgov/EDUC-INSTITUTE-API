@@ -22,7 +22,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class IndependentAuthorityHistory implements Serializable {
+public class IndependentAuthorityHistory extends BaseRequest implements Serializable {
   /**
    * The constant serialVersionUID.
    */
@@ -64,9 +64,6 @@ public class IndependentAuthorityHistory implements Serializable {
 
   @Size(max = 10)
   private LocalDateTime closedDate;
-
-  @Null(message = "Create Date Should be null")
-  private String createDate;
 
   private List<Contact> contacts;
 

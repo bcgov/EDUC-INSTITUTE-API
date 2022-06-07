@@ -9,4 +9,5 @@ import java.util.UUID;
 @Repository
 public interface DistrictHistoryRepository extends JpaRepository<DistrictHistoryEntity, UUID> {
 
+  Long deleteByDistrictID(UUID districtID);
 }

@@ -14,7 +14,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @Builder
 @SuppressWarnings("squid:S1700")
-public class SchoolGrade implements Serializable {
+public class SchoolGrade extends BaseRequest implements Serializable {
 
   private static final long serialVersionUID = 6118916290604876032L;
 
