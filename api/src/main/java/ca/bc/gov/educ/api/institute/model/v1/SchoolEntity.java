@@ -24,10 +24,10 @@ public class SchoolEntity {
   @Column(name = "school_id", unique = true, updatable = false, columnDefinition = "BINARY(16)")
   private UUID schoolId;
   @Basic
-  @Column(name = "district_id")
+  @Column(name = "district_id", columnDefinition = "BINARY(16)")
   private UUID districtId;
   @Basic
-  @Column(name = "independent_authority_id")
+  @Column(name = "independent_authority_id", columnDefinition = "BINARY(16)")
   private UUID independentAuthorityId;
   @Basic
   @Column(name = "school_number")

@@ -76,4 +76,8 @@ public class School extends BaseRequest implements Serializable {
 
   private List<Address> notes;
 
+  private List<SchoolGrade> grades;
+
+  private List<NeighborhoodLearning> neighborhoodLearning;
+
 }

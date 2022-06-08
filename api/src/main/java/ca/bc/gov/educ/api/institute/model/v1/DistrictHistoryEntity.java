@@ -1,7 +1,10 @@
 package ca.bc.gov.educ.api.institute.model.v1;
 
 import ca.bc.gov.educ.api.institute.util.UpperCase;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -23,7 +26,7 @@ public class DistrictHistoryEntity {
   @Column(name = "district_history_id", unique = true, updatable = false, columnDefinition = "BINARY(16)")
   private UUID districtHistoryId;
   @Basic
-  @Column(name = "district_id")
+  @Column(name = "district_id", columnDefinition = "BINARY(16)")
   private UUID districtId;
   @Basic
   @Column(name = "district_number")

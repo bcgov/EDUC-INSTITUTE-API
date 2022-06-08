@@ -25,16 +25,16 @@ public class AddressHistoryEntity {
   @Column(name = "address_history_id", unique = true, updatable = false, columnDefinition = "BINARY(16)")
   private UUID addressHistoryId;
   @Basic
-  @Column(name = "address_id")
+  @Column(name = "address_id", columnDefinition = "BINARY(16)")
   private UUID addressId;
   @Basic
-  @Column(name = "school_id")
+  @Column(name = "school_id", columnDefinition = "BINARY(16)")
   private UUID schoolId;
   @Basic
-  @Column(name = "district_id")
+  @Column(name = "district_id", columnDefinition = "BINARY(16)")
   private UUID districtId;
   @Basic
-  @Column(name = "independent_authority_id")
+  @Column(name = "independent_authority_id", columnDefinition = "BINARY(16)")
   private UUID independentAuthorityId;
   @Basic
   @Column(name = "address_line_1")

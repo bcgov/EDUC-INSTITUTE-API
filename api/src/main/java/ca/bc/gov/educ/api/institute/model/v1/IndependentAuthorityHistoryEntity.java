@@ -1,6 +1,9 @@
 package ca.bc.gov.educ.api.institute.model.v1;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -22,7 +25,7 @@ public class IndependentAuthorityHistoryEntity {
   @Column(name = "independent_authority_history_id", unique = true, updatable = false, columnDefinition = "BINARY(16)")
   private UUID independentAuthorityHistoryId;
   @Basic
-  @Column(name = "independent_authority_id")
+  @Column(name = "independent_authority_id", columnDefinition = "BINARY(16)")
   private UUID independentAuthorityId;
   @Basic
   @Column(name = "authority_number")

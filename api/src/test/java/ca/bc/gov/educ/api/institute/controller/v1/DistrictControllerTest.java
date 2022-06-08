@@ -4,7 +4,9 @@ import ca.bc.gov.educ.api.institute.InstituteApiResourceApplication;
 import ca.bc.gov.educ.api.institute.constants.v1.URL;
 import ca.bc.gov.educ.api.institute.mapper.v1.CodeTableMapper;
 import ca.bc.gov.educ.api.institute.model.v1.DistrictEntity;
+import ca.bc.gov.educ.api.institute.model.v1.DistrictHistoryEntity;
 import ca.bc.gov.educ.api.institute.model.v1.DistrictRegionCodeEntity;
+import ca.bc.gov.educ.api.institute.repository.v1.DistrictHistoryRepository;
 import ca.bc.gov.educ.api.institute.repository.v1.DistrictRegionCodeRepository;
 import ca.bc.gov.educ.api.institute.repository.v1.DistrictRepository;
 import ca.bc.gov.educ.api.institute.service.v1.CodeTableService;
@@ -28,6 +30,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.oidcLogin;
@@ -52,6 +55,9 @@ public class DistrictControllerTest {
   DistrictRepository districtRepository;
 
   @Autowired
+  DistrictHistoryRepository districtHistoryRepository;
+
+  @Autowired
   CodeTableService codeTableService;
 
   @Autowired
@@ -73,6 +79,7 @@ public class DistrictControllerTest {
   @After
   public void after() {
     this.districtRepository.deleteAll();
+    this.districtHistoryRepository.deleteAll();
     this.districtRegionCodeRepository.deleteAll();
   }
 
@@ -94,6 +101,17 @@ public class DistrictControllerTest {
     this.mockMvc.perform(get(URL.BASE_URL_DISTRICT + "/" + entity.getDistrictId()).with(mockAuthority))
       .andDo(print()).andExpect(status().isOk()).andExpect(MockMvcResultMatchers.jsonPath("$.districtId")
         .value(entity.getDistrictId().toString()));
+  }
+
+  @Test
+  public void testRetrieveDistrictHistory_GivenValidID_ShouldReturnStatusOK() throws Exception {
+    final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_DISTRICT";
+    final var mockAuthority = oidcLogin().authorities(grantedAuthority);
+    final DistrictEntity entity = this.districtRepository.save(this.createDistrictData());
+    final DistrictHistoryEntity historyEntity = this.districtHistoryRepository.save(this.createHistoryDistrictData(entity.getDistrictId()));
+    this.mockMvc.perform(get(URL.BASE_URL_DISTRICT + "/" + entity.getDistrictId() + "/history").with(mockAuthority))
+      .andDo(print()).andExpect(status().isOk()).andExpect(MockMvcResultMatchers.jsonPath("$.[0].districtHistoryId")
+        .value(historyEntity.getDistrictHistoryId().toString()));
   }
 
   @Test
@@ -148,6 +166,11 @@ public class DistrictControllerTest {
 
   private DistrictEntity createDistrictData() {
     return DistrictEntity.builder().districtNumber("003").displayName("District Name").openedDate(LocalDateTime.now().minusDays(1)).districtRegionCode("KOOTENAYS")
+      .website("abc@sd99.edu").createDate(LocalDateTime.now()).updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
+  }
+
+  private DistrictHistoryEntity createHistoryDistrictData(UUID districtId) {
+    return DistrictHistoryEntity.builder().districtId(districtId).districtNumber("003").displayName("District Name").openedDate(LocalDateTime.now().minusDays(1)).districtRegionCode("KOOTENAYS")
       .website("abc@sd99.edu").createDate(LocalDateTime.now()).updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
   }
 

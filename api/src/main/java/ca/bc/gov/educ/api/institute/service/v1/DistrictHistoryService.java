@@ -42,6 +42,6 @@ public class DistrictHistoryService {
   }
 
   public List<DistrictHistoryEntity> getAllDistrictHistoryList(UUID districtId) {
-    return districtHistoryRepository.findAllByDistrictId(districtId);
+    return districtHistoryRepository.findByDistrictId(districtId);
   }
 }
