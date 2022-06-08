@@ -2,6 +2,7 @@ package ca.bc.gov.educ.api.institute.endpoint.v1;
 
 import ca.bc.gov.educ.api.institute.constants.v1.URL;
 import ca.bc.gov.educ.api.institute.struct.v1.District;
+import ca.bc.gov.educ.api.institute.struct.v1.DistrictHistory;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;
@@ -33,6 +34,14 @@ public interface DistrictAPIEndpoint {
   @Tag(name = "Endpoint to get district entity.", description = "Endpoint to get district entity by ID.")
   @Schema(name = "District", implementation = District.class)
   District getDistrict(@PathVariable("districtId")  String districtId);
+
+  @GetMapping("/{districtId}/history")
+  @PreAuthorize("hasAuthority('SCOPE_READ_DISTRICT')")
+  @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "404", description = "NOT FOUND")})
+  @Transactional(readOnly = true)
+  @Tag(name = "Endpoint to get district history entity list by district ID.", description = "Endpoint to get district history entity list by district ID.")
+  @Schema(name = "DistrictHistory", implementation = DistrictHistory.class)
+  List<DistrictHistory> getDistrictHistory(@PathVariable("districtId")  String districtId);
 
   @PostMapping
   @PreAuthorize("hasAuthority('SCOPE_WRITE_DISTRICT')")

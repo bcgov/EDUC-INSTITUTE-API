@@ -1,16 +1,14 @@
 package ca.bc.gov.educ.api.institute.controller.v1;
 
-import ca.bc.gov.educ.api.institute.endpoint.v1.CodeTableAPIEndpoint;
 import ca.bc.gov.educ.api.institute.endpoint.v1.DistrictAPIEndpoint;
 import ca.bc.gov.educ.api.institute.exception.EntityNotFoundException;
 import ca.bc.gov.educ.api.institute.exception.InvalidPayloadException;
 import ca.bc.gov.educ.api.institute.exception.errors.ApiError;
-import ca.bc.gov.educ.api.institute.mapper.v1.CodeTableMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.DistrictMapper;
-import ca.bc.gov.educ.api.institute.model.v1.DistrictEntity;
-import ca.bc.gov.educ.api.institute.service.v1.CodeTableService;
+import ca.bc.gov.educ.api.institute.service.v1.DistrictHistoryService;
 import ca.bc.gov.educ.api.institute.service.v1.DistrictService;
-import ca.bc.gov.educ.api.institute.struct.v1.*;
+import ca.bc.gov.educ.api.institute.struct.v1.District;
+import ca.bc.gov.educ.api.institute.struct.v1.DistrictHistory;
 import ca.bc.gov.educ.api.institute.util.RequestUtil;
 import ca.bc.gov.educ.api.institute.validator.DistrictPayloadValidator;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -38,20 +36,23 @@ public class DistrictAPIController implements DistrictAPIEndpoint {
 
   private static final DistrictMapper mapper = DistrictMapper.mapper;
   @Getter(AccessLevel.PRIVATE)
-  private final DistrictService service;
+  private final DistrictService districtService;
+  @Getter(AccessLevel.PRIVATE)
+  private final DistrictHistoryService districtHistoryService;
 
   @Getter(AccessLevel.PRIVATE)
   private final DistrictPayloadValidator payloadValidator;
 
   @Autowired
-  public DistrictAPIController(final DistrictService service, final DistrictPayloadValidator payloadValidator) {
-    this.service = service;
+  public DistrictAPIController(final DistrictService districtService, final DistrictHistoryService districtHistoryService, final DistrictPayloadValidator payloadValidator) {
+    this.districtService = districtService;
+    this.districtHistoryService = districtHistoryService;
     this.payloadValidator = payloadValidator;
   }
 
   @Override
   public District getDistrict(String districtId) {
-    UUID districtUUID = null;
+    UUID districtUUID;
     try{
       districtUUID = UUID.fromString(districtId);
     }catch(Exception e){
@@ -59,7 +60,7 @@ public class DistrictAPIController implements DistrictAPIEndpoint {
       throw new InvalidPayloadException(error);
     }
 
-    var district = getService().getDistrict(districtUUID);
+    var district = getDistrictService().getDistrict(districtUUID);
 
     if(district.isPresent()){
       return mapper.toStructure(district.get());
@@ -69,23 +70,36 @@ public class DistrictAPIController implements DistrictAPIEndpoint {
   }
 
   @Override
-  public District createDistrict(District district) throws JsonProcessingException {
-    validatePayload(() -> getPayloadValidator().validateCreatePayload(district));
-    RequestUtil.setAuditColumnsForCreate(district);
-    return mapper.toStructure(service.createDistrict(district));
+  public List<DistrictHistory> getDistrictHistory(String districtId) {
+    UUID districtUUID;
+    try{
+      districtUUID = UUID.fromString(districtId);
+    }catch(Exception e){
+      final ApiError error = ApiError.builder().timestamp(LocalDateTime.now()).message("Invalid district history ID").status(BAD_REQUEST).build();
+      throw new InvalidPayloadException(error);
+    }
+
+    return getDistrictHistoryService().getAllDistrictHistoryList(districtUUID).stream().map(mapper::toStructure).collect(Collectors.toList());
   }
 
   @Override
-  public District updateDistrict(UUID id, District district) throws JsonProcessingException {
+  public District createDistrict(District district) {
+    validatePayload(() -> getPayloadValidator().validateCreatePayload(district));
+    RequestUtil.setAuditColumnsForCreate(district);
+    return mapper.toStructure(districtService.createDistrict(district));
+  }
+
+  @Override
+  public District updateDistrict(UUID id, District district) {
     validatePayload(() -> getPayloadValidator().validateUpdatePayload(district));
     RequestUtil.setAuditColumnsForUpdate(district);
-    return mapper.toStructure(service.updateDistrict(district, id));
+    return mapper.toStructure(districtService.updateDistrict(district, id));
   }
 
   @Override
   @Transactional
   public ResponseEntity<Void> deleteDistrict(UUID id) {
-    getService().deleteDistrict(id);
+    getDistrictService().deleteDistrict(id);
     return ResponseEntity.noContent().build();
   }
 
@@ -100,6 +114,6 @@ public class DistrictAPIController implements DistrictAPIEndpoint {
 
   @Override
   public List<District> getAllDistricts() {
-    return getService().getAllDistrictsList().stream().map(mapper::toStructure).collect(Collectors.toList());
+    return getDistrictService().getAllDistrictsList().stream().map(mapper::toStructure).collect(Collectors.toList());
   }
 }
