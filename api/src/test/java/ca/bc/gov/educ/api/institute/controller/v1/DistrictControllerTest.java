@@ -77,6 +77,16 @@ public class DistrictControllerTest {
   }
 
   @Test
+  public void testAllDistricts_GivenValidID_ShouldReturnStatusOK() throws Exception {
+    final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_DISTRICT";
+    final var mockAuthority = oidcLogin().authorities(grantedAuthority);
+    final DistrictEntity entity = this.districtRepository.save(this.createDistrictData());
+    this.mockMvc.perform(get(URL.BASE_URL_DISTRICT).with(mockAuthority))
+      .andDo(print()).andExpect(status().isOk()).andExpect(MockMvcResultMatchers.jsonPath("$.[0].districtId")
+        .value(entity.getDistrictId().toString()));
+  }
+
+  @Test
   public void testRetrieveDistrict_GivenValidID_ShouldReturnStatusOK() throws Exception {
     final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_DISTRICT";
     final var mockAuthority = oidcLogin().authorities(grantedAuthority);
