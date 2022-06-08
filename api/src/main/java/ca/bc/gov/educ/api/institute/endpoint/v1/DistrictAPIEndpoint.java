@@ -27,7 +27,7 @@ import static org.springframework.http.HttpStatus.CREATED;
 public interface DistrictAPIEndpoint {
 
   @GetMapping("/{districtId}")
-  @PreAuthorize("hasAuthority('ROLE_READ_DISTRICT')")
+  @PreAuthorize("hasAuthority('SCOPE_READ_DISTRICT')")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "404", description = "NOT FOUND")})
   @Transactional(readOnly = true)
   @Tag(name = "Endpoint to get district entity.", description = "Endpoint to get district entity by ID.")

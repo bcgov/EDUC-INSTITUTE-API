@@ -10,6 +10,6 @@ public class ApplicationProperties {
   public static final String INSTITUTE_API = "INSTITUTE-API";
 
   private ApplicationProperties() {
-    throw new UnsupportedOperationException();
+    // This is fine
   }
 }

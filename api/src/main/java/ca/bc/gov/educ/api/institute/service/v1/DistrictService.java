@@ -6,7 +6,6 @@ import ca.bc.gov.educ.api.institute.model.v1.DistrictEntity;
 import ca.bc.gov.educ.api.institute.repository.v1.DistrictRepository;
 import ca.bc.gov.educ.api.institute.struct.v1.District;
 import ca.bc.gov.educ.api.institute.util.TransformUtil;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.val;
@@ -45,8 +44,8 @@ public class DistrictService {
     return districtRepository.findById(districtId);
   }
 
-  @Transactional(propagation = Propagation.MANDATORY)
-  public DistrictEntity createDistrict(District district) throws JsonProcessingException {
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
+  public DistrictEntity createDistrict(District district) {
     var districtEntity = DistrictMapper.mapper.toModel(district);
     TransformUtil.uppercaseFields(districtEntity);
     districtRepository.save(districtEntity);
@@ -54,7 +53,7 @@ public class DistrictService {
     return districtEntity;
   }
 
-  @Transactional(propagation = Propagation.MANDATORY)
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void deleteDistrict(UUID districtId) {
     val entityOptional = districtRepository.findById(districtId);
     val entity = entityOptional.orElseThrow(() -> new EntityNotFoundException(DistrictEntity.class, DISTRICT_ID_ATTR, districtId.toString()));
@@ -62,8 +61,8 @@ public class DistrictService {
     districtRepository.delete(entity);
   }
 
-  @Transactional(propagation = Propagation.MANDATORY, noRollbackFor = {EntityNotFoundException.class})
-  public DistrictEntity updateDistrict(District districtUpdate, UUID districtId) throws JsonProcessingException {
+  @Transactional(propagation = Propagation.REQUIRES_NEW, noRollbackFor = {EntityNotFoundException.class})
+  public DistrictEntity updateDistrict(District districtUpdate, UUID districtId) {
     var district = DistrictMapper.mapper.toModel(districtUpdate);
     if (districtId == null || !districtId.equals(district.getDistrictId())) {
       throw new EntityNotFoundException(DistrictEntity.class, DISTRICT_ID_ATTR, String.valueOf(districtId));

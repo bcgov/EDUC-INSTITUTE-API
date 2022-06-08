@@ -3,7 +3,6 @@ package ca.bc.gov.educ.api.institute.service.v1;
 import ca.bc.gov.educ.api.institute.model.v1.DistrictEntity;
 import ca.bc.gov.educ.api.institute.model.v1.DistrictHistoryEntity;
 import ca.bc.gov.educ.api.institute.repository.v1.DistrictHistoryRepository;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,12 +23,12 @@ public class DistrictHistoryService {
   }
 
   @Transactional(propagation = Propagation.MANDATORY)
-  public void deleteByDistrictID(final UUID districtID) {
-    districtHistoryRepository.deleteByDistrictID(districtID);
+  public void deleteByDistrictID(final UUID districtId) {
+    districtHistoryRepository.deleteByDistrictId(districtId);
   }
 
   @Transactional(propagation = Propagation.MANDATORY)
-  public DistrictHistoryEntity createDistrictHistory(DistrictEntity curDistrictEntity, String updateUser, boolean copyAudit) {
+  public void createDistrictHistory(DistrictEntity curDistrictEntity, String updateUser, boolean copyAudit) {
     final DistrictHistoryEntity districtHistoryEntity = new DistrictHistoryEntity();
     BeanUtils.copyProperties(curDistrictEntity, districtHistoryEntity);
     districtHistoryEntity.setCreateUser(updateUser);
@@ -38,6 +37,6 @@ public class DistrictHistoryService {
     }
     districtHistoryEntity.setUpdateUser(updateUser);
     districtHistoryEntity.setUpdateDate(LocalDateTime.now());
-    return districtHistoryRepository.save(districtHistoryEntity);
+    districtHistoryRepository.save(districtHistoryEntity);
   }
 }

@@ -1,14 +1,10 @@
 package ca.bc.gov.educ.api.institute.struct.v1;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Null;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -22,6 +18,8 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
+@ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
 public class IndependentAuthority extends BaseRequest implements Serializable {
   /**
    * The constant serialVersionUID.
@@ -56,11 +54,9 @@ public class IndependentAuthority extends BaseRequest implements Serializable {
   @NotNull(message = "authorityTypeCode cannot be null")
   private String authorityTypeCode;
 
-  @Size(max = 10)
   @NotNull(message = "openedDate cannot be null")
   private LocalDateTime openedDate;
 
-  @Size(max = 10)
   private LocalDateTime closedDate;
 
   private List<Contact> contacts;
