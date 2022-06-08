@@ -53,7 +53,7 @@ public class InstituteApiResourceApplication {
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
-      return (web) -> web.ignoring().antMatchers("/v3/api-docs/**",
+      return web -> web.ignoring().antMatchers("/v3/api-docs/**",
         "/actuator/health", "/actuator/prometheus","/actuator/**",
         "/swagger-ui/**");
     }
