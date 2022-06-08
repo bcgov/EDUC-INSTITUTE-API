@@ -63,16 +63,16 @@ public class DistrictEntity {
   private LocalDateTime updateDate;
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  @OneToMany(mappedBy = "districtEntity", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = ContactEntity.class)
+  @OneToMany(mappedBy = "districtEntity", fetch = FetchType.EAGER, cascade = CascadeType.PERSIST, targetEntity = ContactEntity.class)
   private Set<ContactEntity> contacts;
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  @OneToMany(mappedBy = "districtEntity", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = AddressEntity.class)
+  @OneToMany(mappedBy = "districtEntity", fetch = FetchType.EAGER, cascade = CascadeType.PERSIST, targetEntity = AddressEntity.class)
   private Set<AddressEntity> addresses;
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  @OneToMany(mappedBy = "districtEntity", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = NoteEntity.class)
+  @OneToMany(mappedBy = "districtEntity", fetch = FetchType.EAGER, cascade = CascadeType.PERSIST, targetEntity = NoteEntity.class)
   private Set<NoteEntity> notes;
 }
