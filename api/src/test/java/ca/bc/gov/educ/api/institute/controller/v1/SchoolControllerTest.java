@@ -121,6 +121,22 @@ public class SchoolControllerTest {
   }
 
   @Test
+  public void testRetrieveSchoolHistory_GivenInvalidID_ShouldReturnStatusBadRequest() throws Exception {
+    final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_SCHOOL";
+    final var mockAuthority = oidcLogin().authorities(grantedAuthority);
+    this.mockMvc.perform(get(URL.BASE_URL_SCHOOL + "/abc/history").with(mockAuthority))
+      .andDo(print()).andExpect(status().isBadRequest());
+  }
+
+  @Test
+  public void testRetrieveSchool_GivenInvalidID_ShouldReturnStatusBadRequest() throws Exception {
+    final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_SCHOOL";
+    final var mockAuthority = oidcLogin().authorities(grantedAuthority);
+    this.mockMvc.perform(get(URL.BASE_URL_SCHOOL + "/abc").with(mockAuthority))
+      .andDo(print()).andExpect(status().isBadRequest());
+  }
+
+  @Test
   public void testDeleteSchool_GivenValidID_ShouldReturnStatusOK() throws Exception {
     final var school = this.createSchoolData();
     var entity = this.schoolRepository.save(school);

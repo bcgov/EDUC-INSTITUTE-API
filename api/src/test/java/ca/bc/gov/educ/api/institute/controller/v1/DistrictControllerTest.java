@@ -115,6 +115,22 @@ public class DistrictControllerTest {
   }
 
   @Test
+  public void testRetrieveDistrictHistory_GivenInvalidID_ShouldReturnStatusBadRequest() throws Exception {
+    final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_DISTRICT";
+    final var mockAuthority = oidcLogin().authorities(grantedAuthority);
+    this.mockMvc.perform(get(URL.BASE_URL_DISTRICT + "/abc/history").with(mockAuthority))
+      .andDo(print()).andExpect(status().isBadRequest());
+  }
+
+  @Test
+  public void testRetrieveDistrict_GivenInvalidID_ShouldReturnStatusBadRequest() throws Exception {
+    final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_DISTRICT";
+    final var mockAuthority = oidcLogin().authorities(grantedAuthority);
+    this.mockMvc.perform(get(URL.BASE_URL_DISTRICT + "/abc").with(mockAuthority))
+      .andDo(print()).andExpect(status().isBadRequest());
+  }
+
+  @Test
   public void testDeleteDistrict_GivenValidID_ShouldReturnStatusOK() throws Exception {
     final var district = this.createDistrictData();
     var entity = this.districtRepository.save(district);
