@@ -3,14 +3,8 @@ package ca.bc.gov.educ.api.institute.controller.v1;
 import ca.bc.gov.educ.api.institute.InstituteApiResourceApplication;
 import ca.bc.gov.educ.api.institute.constants.v1.URL;
 import ca.bc.gov.educ.api.institute.mapper.v1.CodeTableMapper;
-import ca.bc.gov.educ.api.institute.model.v1.AuthorityGroupCodeEntity;
-import ca.bc.gov.educ.api.institute.model.v1.AuthorityTypeCodeEntity;
-import ca.bc.gov.educ.api.institute.model.v1.IndependentAuthorityEntity;
-import ca.bc.gov.educ.api.institute.model.v1.IndependentAuthorityHistoryEntity;
-import ca.bc.gov.educ.api.institute.repository.v1.AuthorityGroupCodeRepository;
-import ca.bc.gov.educ.api.institute.repository.v1.AuthorityTypeCodeRepository;
-import ca.bc.gov.educ.api.institute.repository.v1.IndependentAuthorityHistoryRepository;
-import ca.bc.gov.educ.api.institute.repository.v1.IndependentAuthorityRepository;
+import ca.bc.gov.educ.api.institute.model.v1.*;
+import ca.bc.gov.educ.api.institute.repository.v1.*;
 import ca.bc.gov.educ.api.institute.service.v1.CodeTableService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -68,6 +62,28 @@ public class IndependentAuthorityControllerTest {
   @Autowired
   AuthorityGroupCodeRepository authorityGroupCodeRepository;
 
+  @Autowired
+  ContactTypeCodeRepository contactTypeCodeRepository;
+
+  @Autowired
+  ContactRepository contactRepository;
+
+  @Autowired
+  AddressRepository addressRepository;
+
+  @Autowired
+  NoteRepository noteRepository;
+
+  @Autowired
+  AddressTypeCodeRepository addressTypeCodeRepository;
+
+  @Autowired
+  ProvinceCodeRepository provinceCodeRepository;
+
+  @Autowired
+  CountryCodeRepository countryCodeRepository;
+
+
   @Before
   public void setUp() {
     MockitoAnnotations.openMocks(this);
@@ -77,6 +93,10 @@ public class IndependentAuthorityControllerTest {
   public void before(){
     this.authorityTypeCodeRepository.save(this.createAuthorityTypeCodeData());
     this.authorityGroupCodeRepository.save(this.createAuthorityGroupCodeData());
+    this.contactTypeCodeRepository.save(this.createContactTypeCodeData());
+    this.addressTypeCodeRepository.save(this.createAddressTypeCodeData());
+    this.countryCodeRepository.save(this.createCountryCodeData());
+    this.provinceCodeRepository.save(this.createProvinceCodeData());
   }
 
   /**
@@ -84,6 +104,9 @@ public class IndependentAuthorityControllerTest {
    */
   @After
   public void after() {
+    this.addressRepository.deleteAll();
+    this.contactRepository.deleteAll();
+    this.noteRepository.deleteAll();
     this.independentAuthorityRepository.deleteAll();
     this.independentAuthorityHistoryRepository.deleteAll();
     this.authorityTypeCodeRepository.deleteAll();
@@ -187,6 +210,201 @@ public class IndependentAuthorityControllerTest {
       .andExpect(MockMvcResultMatchers.jsonPath("$.displayName").value(independentAuthority.getDisplayName().toUpperCase()));
   }
 
+  @Test
+  public void testCreateIndependentAuthorityContact_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
+    final IndependentAuthorityEntity independentAuthorityEntity = this.independentAuthorityRepository.save(this.createIndependentAuthorityData());
+    ContactEntity contactEntity = createContactData(independentAuthorityEntity);
+
+    this.mockMvc.perform(post(URL.BASE_URL_AUTHORITY + "/" + independentAuthorityEntity.getIndependentAuthorityId() + "/contact")
+        .contentType(MediaType.APPLICATION_JSON)
+        .accept(MediaType.APPLICATION_JSON)
+        .content(asJsonString(contactEntity))
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_INDEPENDENT_AUTHORITY_CONTACT"))))
+      .andDo(print())
+      .andExpect(status().isCreated())
+      .andExpect(MockMvcResultMatchers.jsonPath("$.lastName").value(contactEntity.getLastName().toUpperCase()));
+  }
+
+  @Test
+  public void testDeleteIndependentAuthorityContact_GivenValidID_ShouldReturnStatusOK() throws Exception {
+    final var independentAuthority = this.createIndependentAuthorityData();
+    var independentAuthorityEntity = this.independentAuthorityRepository.save(independentAuthority);
+    ContactEntity contactEntity = createContactData(independentAuthorityEntity);
+    var contact = this.contactRepository.save(contactEntity);
+
+    this.mockMvc.perform(delete(URL.BASE_URL_AUTHORITY + "/" + independentAuthorityEntity.getIndependentAuthorityId() + "/contact/" + contact.getContactId())
+        .contentType(MediaType.APPLICATION_JSON)
+        .accept(MediaType.APPLICATION_JSON)
+        .content(asJsonString(independentAuthorityEntity))
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_INDEPENDENT_AUTHORITY_CONTACT"))))
+      .andDo(print())
+      .andExpect(status().isNoContent());
+
+    var deletedContact = this.contactRepository.findById(contact.getContactId());
+    Assert.assertTrue(deletedContact.isEmpty());
+  }
+
+  @Test
+  public void testRetrieveIndependentAuthorityContact_GivenValidID_ShouldReturnStatusOK() throws Exception {
+    final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_INDEPENDENT_AUTHORITY_CONTACT";
+    final var mockAuthority = oidcLogin().authorities(grantedAuthority);
+    final var independentAuthority = this.createIndependentAuthorityData();
+    var independentAuthorityEntity = this.independentAuthorityRepository.save(independentAuthority);
+    ContactEntity contactEntity = createContactData(independentAuthorityEntity);
+    var contact = this.contactRepository.save(contactEntity);
+    this.mockMvc.perform(get(URL.BASE_URL_AUTHORITY + "/" + independentAuthorityEntity.getIndependentAuthorityId() + "/contact/" + contact.getContactId()).with(mockAuthority))
+      .andDo(print()).andExpect(status().isOk()).andExpect(MockMvcResultMatchers.jsonPath("$.contactId")
+        .value(contact.getContactId().toString()));
+  }
+
+  @Test
+  public void testUpdateIndependentAuthorityContact_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
+    final var independentAuthority = this.createIndependentAuthorityData();
+    var independentAuthorityEntity = this.independentAuthorityRepository.save(independentAuthority);
+    ContactEntity contactEntity = createContactData(independentAuthorityEntity);
+    var contact = this.contactRepository.save(contactEntity);
+    contact.setFirstName("pete");
+
+    this.mockMvc.perform(put(URL.BASE_URL_AUTHORITY + "/" + independentAuthorityEntity.getIndependentAuthorityId() + "/contact/" + contact.getContactId())
+        .contentType(MediaType.APPLICATION_JSON)
+        .accept(MediaType.APPLICATION_JSON)
+        .content(asJsonString(contact))
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_INDEPENDENT_AUTHORITY_CONTACT"))))
+      .andDo(print())
+      .andExpect(status().isOk())
+      .andExpect(MockMvcResultMatchers.jsonPath("$.firstName").value(contact.getFirstName().toUpperCase()));
+  }
+
+  @Test
+  public void testCreateIndependentAuthorityAddress_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
+    final IndependentAuthorityEntity independentAuthorityEntity = this.independentAuthorityRepository.save(this.createIndependentAuthorityData());
+    AddressEntity addressEntity = createAddressData(independentAuthorityEntity);
+
+    this.mockMvc.perform(post(URL.BASE_URL_AUTHORITY + "/" + independentAuthorityEntity.getIndependentAuthorityId() + "/address")
+        .contentType(MediaType.APPLICATION_JSON)
+        .accept(MediaType.APPLICATION_JSON)
+        .content(asJsonString(addressEntity))
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_INDEPENDENT_AUTHORITY_ADDRESS"))))
+      .andDo(print())
+      .andExpect(status().isCreated())
+      .andExpect(MockMvcResultMatchers.jsonPath("$.city").value(addressEntity.getCity().toUpperCase()));
+  }
+
+  @Test
+  public void testDeleteIndependentAuthorityAddress_GivenValidID_ShouldReturnStatusOK() throws Exception {
+    final var independentAuthority = this.createIndependentAuthorityData();
+    var independentAuthorityEntity = this.independentAuthorityRepository.save(independentAuthority);
+    AddressEntity addressEntity = createAddressData(independentAuthorityEntity);
+    var address = this.addressRepository.save(addressEntity);
+
+    this.mockMvc.perform(delete(URL.BASE_URL_AUTHORITY + "/" + independentAuthorityEntity.getIndependentAuthorityId() + "/address/" + address.getAddressId())
+        .contentType(MediaType.APPLICATION_JSON)
+        .accept(MediaType.APPLICATION_JSON)
+        .content(asJsonString(independentAuthorityEntity))
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_INDEPENDENT_AUTHORITY_ADDRESS"))))
+      .andDo(print())
+      .andExpect(status().isNoContent());
+
+    var deletedAddress = this.addressRepository.findById(address.getAddressId());
+    Assert.assertTrue(deletedAddress.isEmpty());
+  }
+
+  @Test
+  public void testRetrieveIndependentAuthorityAddress_GivenValidID_ShouldReturnStatusOK() throws Exception {
+    final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_INDEPENDENT_AUTHORITY_ADDRESS";
+    final var mockAuthority = oidcLogin().authorities(grantedAuthority);
+    final var independentAuthority = this.createIndependentAuthorityData();
+    var independentAuthorityEntity = this.independentAuthorityRepository.save(independentAuthority);
+    AddressEntity addressEntity = createAddressData(independentAuthorityEntity);
+    var address = this.addressRepository.save(addressEntity);
+    this.mockMvc.perform(get(URL.BASE_URL_AUTHORITY + "/" + independentAuthorityEntity.getIndependentAuthorityId() + "/address/" + address.getAddressId()).with(mockAuthority))
+      .andDo(print()).andExpect(status().isOk()).andExpect(MockMvcResultMatchers.jsonPath("$.addressId")
+        .value(address.getAddressId().toString()));
+  }
+
+  @Test
+  public void testUpdateIndependentAuthorityAddress_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
+    final var independentAuthority = this.createIndependentAuthorityData();
+    var independentAuthorityEntity = this.independentAuthorityRepository.save(independentAuthority);
+    AddressEntity addressEntity = createAddressData(independentAuthorityEntity);
+    var address = this.addressRepository.save(addressEntity);
+    address.setCity("southshore");
+
+    this.mockMvc.perform(put(URL.BASE_URL_AUTHORITY + "/" + independentAuthorityEntity.getIndependentAuthorityId() + "/address/" + address.getAddressId())
+        .contentType(MediaType.APPLICATION_JSON)
+        .accept(MediaType.APPLICATION_JSON)
+        .content(asJsonString(address))
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_INDEPENDENT_AUTHORITY_ADDRESS"))))
+      .andDo(print())
+      .andExpect(status().isOk())
+      .andExpect(MockMvcResultMatchers.jsonPath("$.city").value(address.getCity().toUpperCase()));
+  }
+
+  @Test
+  public void testCreateIndependentAuthorityNote_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
+    final IndependentAuthorityEntity independentAuthorityEntity = this.independentAuthorityRepository.save(this.createIndependentAuthorityData());
+    NoteEntity noteEntity = createNoteData(independentAuthorityEntity);
+
+    this.mockMvc.perform(post(URL.BASE_URL_AUTHORITY + "/" + independentAuthorityEntity.getIndependentAuthorityId() + "/note")
+        .contentType(MediaType.APPLICATION_JSON)
+        .accept(MediaType.APPLICATION_JSON)
+        .content(asJsonString(noteEntity))
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_INDEPENDENT_AUTHORITY_NOTE"))))
+      .andDo(print())
+      .andExpect(status().isCreated())
+      .andExpect(MockMvcResultMatchers.jsonPath("$.content").value(noteEntity.getContent()));
+  }
+
+  @Test
+  public void testDeleteIndependentAuthorityNote_GivenValidID_ShouldReturnStatusOK() throws Exception {
+    final var independentAuthority = this.createIndependentAuthorityData();
+    var independentAuthorityEntity = this.independentAuthorityRepository.save(independentAuthority);
+    NoteEntity noteEntity = createNoteData(independentAuthorityEntity);
+    var note = this.noteRepository.save(noteEntity);
+
+    this.mockMvc.perform(delete(URL.BASE_URL_AUTHORITY + "/" + independentAuthorityEntity.getIndependentAuthorityId() + "/note/" + note.getNoteId())
+        .contentType(MediaType.APPLICATION_JSON)
+        .accept(MediaType.APPLICATION_JSON)
+        .content(asJsonString(independentAuthorityEntity))
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_INDEPENDENT_AUTHORITY_NOTE"))))
+      .andDo(print())
+      .andExpect(status().isNoContent());
+
+    var deletedNote = this.noteRepository.findById(note.getNoteId());
+    Assert.assertTrue(deletedNote.isEmpty());
+  }
+
+  @Test
+  public void testRetrieveIndependentAuthorityNote_GivenValidID_ShouldReturnStatusOK() throws Exception {
+    final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_INDEPENDENT_AUTHORITY_NOTE";
+    final var mockAuthority = oidcLogin().authorities(grantedAuthority);
+    final var independentAuthority = this.createIndependentAuthorityData();
+    var independentAuthorityEntity = this.independentAuthorityRepository.save(independentAuthority);
+    NoteEntity noteEntity = createNoteData(independentAuthorityEntity);
+    var note = this.noteRepository.save(noteEntity);
+    this.mockMvc.perform(get(URL.BASE_URL_AUTHORITY + "/" + independentAuthorityEntity.getIndependentAuthorityId() + "/note/" + note.getNoteId()).with(mockAuthority))
+      .andDo(print()).andExpect(status().isOk()).andExpect(MockMvcResultMatchers.jsonPath("$.noteId")
+        .value(note.getNoteId().toString()));
+  }
+
+  @Test
+  public void testUpdateIndependentAuthorityNote_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
+    final var independentAuthority = this.createIndependentAuthorityData();
+    var independentAuthorityEntity = this.independentAuthorityRepository.save(independentAuthority);
+    NoteEntity noteEntity = createNoteData(independentAuthorityEntity);
+    var note = this.noteRepository.save(noteEntity);
+    note.setContent("southshore");
+
+    this.mockMvc.perform(put(URL.BASE_URL_AUTHORITY + "/" + independentAuthorityEntity.getIndependentAuthorityId() + "/note/" + note.getNoteId())
+        .contentType(MediaType.APPLICATION_JSON)
+        .accept(MediaType.APPLICATION_JSON)
+        .content(asJsonString(note))
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_INDEPENDENT_AUTHORITY_NOTE"))))
+      .andDo(print())
+      .andExpect(status().isOk())
+      .andExpect(MockMvcResultMatchers.jsonPath("$.content").value(note.getContent()));
+  }
+
   private IndependentAuthorityEntity createIndependentAuthorityData() {
     return IndependentAuthorityEntity.builder().authorityNumber("003").displayName("IndependentAuthority Name").openedDate(LocalDateTime.now().minusDays(1))
       .authorityTypeCode("INDEPEND").authorityGroupCode("ACC_CHRIS").createDate(LocalDateTime.now()).updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
@@ -218,6 +436,44 @@ public class IndependentAuthorityControllerTest {
     return AuthorityTypeCodeEntity.builder().authorityTypeCode("INDEPEND").description("Independent School")
       .effectiveDate(LocalDateTime.now()).expiryDate(LocalDateTime.MAX).displayOrder(1).label("Independent School").createDate(LocalDateTime.now())
       .updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
+  }
+
+  private ContactTypeCodeEntity createContactTypeCodeData() {
+    return ContactTypeCodeEntity.builder().contactTypeCode("PRINCIPAL").description("School Principal")
+      .effectiveDate(LocalDateTime.now()).expiryDate(LocalDateTime.MAX).displayOrder(1).label("Principal").createDate(LocalDateTime.now())
+      .updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
+  }
+
+  private AddressTypeCodeEntity createAddressTypeCodeData() {
+    return AddressTypeCodeEntity.builder().addressTypeCode("MAILING").description("Mailing Address")
+      .effectiveDate(LocalDateTime.now()).expiryDate(LocalDateTime.MAX).displayOrder(1).label("Mailing Address").createDate(LocalDateTime.now())
+      .updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
+  }
+
+  private ProvinceCodeEntity createProvinceCodeData() {
+    return ProvinceCodeEntity.builder().provinceCode("BC").description("British Columbia")
+      .effectiveDate(LocalDateTime.now()).expiryDate(LocalDateTime.MAX).displayOrder(1).label("British Columbia").createDate(LocalDateTime.now())
+      .updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
+  }
+
+  private CountryCodeEntity createCountryCodeData() {
+    return CountryCodeEntity.builder().countryCode("CAN").description("Canada")
+      .effectiveDate(LocalDateTime.now()).expiryDate(LocalDateTime.MAX).displayOrder(1).label("Canada").createDate(LocalDateTime.now())
+      .updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
+  }
+
+
+  private ContactEntity createContactData(IndependentAuthorityEntity entity) {
+    return ContactEntity.builder().independentAuthorityEntity(entity).contactTypeCode("PRINCIPAL").firstName("John").lastName("Wayne").createUser("TEST").updateUser("TEST").build();
+  }
+
+  private AddressEntity createAddressData(IndependentAuthorityEntity entity) {
+    return AddressEntity.builder().independentAuthorityEntity(entity).addressTypeCode("MAILING").addressLine1("123 This Street").city("Compton")
+      .provinceCode("BC").countryCode("CAN").postal("V1B9H2").createUser("TEST").updateUser("TEST").build();
+  }
+
+  private NoteEntity createNoteData(IndependentAuthorityEntity entity) {
+    return NoteEntity.builder().independentAuthorityEntity(entity).content("This is a note.").createUser("TEST").updateUser("TEST").build();
   }
 }
 
