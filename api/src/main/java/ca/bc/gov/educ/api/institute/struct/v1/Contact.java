@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Null;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 
@@ -33,10 +32,6 @@ public class Contact extends BaseRequest implements Serializable {
   private String districtId;
 
   private String independentAuthorityId;
-
-  @Size(max = 5)
-  @NotNull(message = "schoolNumber can not be null.")
-  private String schoolNumber;
 
   @Size(max = 10)
   private String phoneNumber;

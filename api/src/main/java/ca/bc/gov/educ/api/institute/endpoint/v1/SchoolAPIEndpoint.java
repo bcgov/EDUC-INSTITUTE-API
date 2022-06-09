@@ -3,7 +3,6 @@ package ca.bc.gov.educ.api.institute.endpoint.v1;
 import ca.bc.gov.educ.api.institute.constants.v1.URL;
 import ca.bc.gov.educ.api.institute.struct.v1.School;
 import ca.bc.gov.educ.api.institute.struct.v1.SchoolHistory;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -49,14 +48,14 @@ public interface SchoolAPIEndpoint {
   @Tag(name = "Endpoint to create school entity.", description = "Endpoint to create school entity.")
   @Schema(name = "School", implementation = School.class)
   @ResponseStatus(CREATED)
-  School createSchool(@Validated @RequestBody School school) throws JsonProcessingException;
+  School createSchool(@Validated @RequestBody School school);
 
   @PutMapping("/{id}")
   @PreAuthorize("hasAuthority('SCOPE_WRITE_SCHOOL')")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "400", description = "BAD REQUEST"), @ApiResponse(responseCode = "404", description = "NOT FOUND")})
   @Tag(name = "Endpoint to update school entity.", description = "Endpoint to update school entity.")
   @Schema(name = "School", implementation = School.class)
-  School updateSchool(@PathVariable UUID id, @Validated @RequestBody School school) throws JsonProcessingException;
+  School updateSchool(@PathVariable UUID id, @Validated @RequestBody School school);
 
   @DeleteMapping("/{id}")
   @PreAuthorize("hasAuthority('SCOPE_DELETE_SCHOOL')")

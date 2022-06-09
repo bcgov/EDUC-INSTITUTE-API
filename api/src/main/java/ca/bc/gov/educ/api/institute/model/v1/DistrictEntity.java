@@ -1,12 +1,14 @@
 package ca.bc.gov.educ.api.institute.model.v1;
 
 import ca.bc.gov.educ.api.institute.util.UpperCase;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import javax.validation.constraints.PastOrPresent;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -63,16 +65,38 @@ public class DistrictEntity {
   private LocalDateTime updateDate;
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  @OneToMany(mappedBy = "districtEntity", fetch = FetchType.EAGER, cascade = CascadeType.PERSIST, targetEntity = ContactEntity.class)
+  @OneToMany(mappedBy = "districtEntity", fetch = FetchType.EAGER, cascade = CascadeType.DETACH, targetEntity = ContactEntity.class)
+  @JsonIgnoreProperties("districtEntity")
   private Set<ContactEntity> contacts;
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  @OneToMany(mappedBy = "districtEntity", fetch = FetchType.EAGER, cascade = CascadeType.PERSIST, targetEntity = AddressEntity.class)
+  @OneToMany(mappedBy = "districtEntity", fetch = FetchType.EAGER, cascade = CascadeType.DETACH, targetEntity = AddressEntity.class)
   private Set<AddressEntity> addresses;
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  @OneToMany(mappedBy = "districtEntity", fetch = FetchType.EAGER, cascade = CascadeType.PERSIST, targetEntity = NoteEntity.class)
+  @OneToMany(mappedBy = "districtEntity", fetch = FetchType.EAGER, cascade = CascadeType.DETACH, targetEntity = NoteEntity.class)
   private Set<NoteEntity> notes;
+
+  public Set<AddressEntity> getAddresses() {
+    if (this.addresses == null) {
+      this.addresses = new HashSet<>();
+    }
+    return this.addresses;
+  }
+
+  public Set<ContactEntity> getContacts() {
+    if (this.contacts == null) {
+      this.contacts = new HashSet<>();
+    }
+    return this.contacts;
+  }
+
+  public Set<NoteEntity> getNotes() {
+    if (this.notes == null) {
+      this.notes = new HashSet<>();
+    }
+    return this.notes;
+  }
 }

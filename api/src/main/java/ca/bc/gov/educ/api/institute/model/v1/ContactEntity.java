@@ -1,7 +1,11 @@
 package ca.bc.gov.educ.api.institute.model.v1;
 
 import ca.bc.gov.educ.api.institute.util.UpperCase;
-import lombok.*;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -29,6 +33,7 @@ public class ContactEntity {
 
   @ManyToOne(optional = true, targetEntity = DistrictEntity.class)
   @JoinColumn(name = "district_id", referencedColumnName = "district_id")
+  @JsonIgnoreProperties("contacts")
   DistrictEntity districtEntity;
 
   @ManyToOne(optional = true, targetEntity = IndependentAuthorityEntity.class)
