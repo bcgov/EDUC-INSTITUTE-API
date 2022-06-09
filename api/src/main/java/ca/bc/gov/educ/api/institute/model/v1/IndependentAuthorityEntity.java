@@ -65,16 +65,16 @@ public class IndependentAuthorityEntity {
   private LocalDateTime updateDate;
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  @OneToMany(mappedBy = "independentAuthorityEntity", fetch = FetchType.EAGER, cascade = CascadeType.PERSIST, targetEntity = ContactEntity.class)
+  @OneToMany(mappedBy = "independentAuthorityEntity", fetch = FetchType.EAGER, cascade = CascadeType.DETACH, targetEntity = ContactEntity.class)
   private Set<ContactEntity> contacts;
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  @OneToMany(mappedBy = "independentAuthorityEntity", fetch = FetchType.EAGER, cascade = CascadeType.PERSIST, targetEntity = AddressEntity.class)
+  @OneToMany(mappedBy = "independentAuthorityEntity", fetch = FetchType.EAGER, cascade = CascadeType.DETACH, targetEntity = AddressEntity.class)
   private Set<AddressEntity> addresses;
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  @OneToMany(mappedBy = "independentAuthorityEntity", fetch = FetchType.EAGER, cascade = CascadeType.PERSIST, targetEntity = NoteEntity.class)
+  @OneToMany(mappedBy = "independentAuthorityEntity", fetch = FetchType.EAGER, cascade = CascadeType.DETACH, targetEntity = NoteEntity.class)
   private Set<NoteEntity> notes;
 }
