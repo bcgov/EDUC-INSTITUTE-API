@@ -28,6 +28,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.oidcLogin;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -67,6 +68,9 @@ public class DistrictControllerTest {
 
   @Autowired
   AddressRepository addressRepository;
+
+  @Autowired
+  AddressHistoryRepository addressHistoryRepository;
 
   @Autowired
   NoteRepository noteRepository;
@@ -109,6 +113,7 @@ public class DistrictControllerTest {
     this.addressTypeCodeRepository.deleteAll();
     this.provinceCodeRepository.deleteAll();
     this.countryCodeRepository.deleteAll();
+    this.addressHistoryRepository.deleteAll();
   }
 
   @Test
@@ -286,6 +291,9 @@ public class DistrictControllerTest {
       .andDo(print())
       .andExpect(status().isCreated())
       .andExpect(MockMvcResultMatchers.jsonPath("$.city").value(addressEntity.getCity().toUpperCase()));
+
+    var historyAddress = this.addressHistoryRepository.findAll();
+    assertThat(historyAddress).isNotNull().hasSize(1);
   }
 
   @Test
