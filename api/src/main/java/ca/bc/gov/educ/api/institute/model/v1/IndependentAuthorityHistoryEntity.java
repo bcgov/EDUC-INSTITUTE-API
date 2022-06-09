@@ -43,9 +43,6 @@ public class IndependentAuthorityHistoryEntity {
   @Column(name = "display_name")
   private String displayName;
   @Basic
-  @Column(name = "asset_number")
-  private String assetNumber;
-  @Basic
   @Column(name = "authority_group_code")
   private String authorityGroupCode;
   @Basic
