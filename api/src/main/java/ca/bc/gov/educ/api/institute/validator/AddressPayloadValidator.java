@@ -96,6 +96,6 @@ public class AddressPayloadValidator {
   }
 
   private FieldError createFieldError(String fieldName, Object rejectedValue, String message) {
-    return new FieldError("student", fieldName, rejectedValue, false, null, null, message);
+    return new FieldError("address", fieldName, rejectedValue, false, null, null, message);
   }
 }

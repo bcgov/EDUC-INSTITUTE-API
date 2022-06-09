@@ -7,6 +7,7 @@ import ca.bc.gov.educ.api.institute.exception.errors.ApiError;
 import ca.bc.gov.educ.api.institute.mapper.v1.AddressMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.ContactMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.DistrictMapper;
+import ca.bc.gov.educ.api.institute.mapper.v1.NoteMapper;
 import ca.bc.gov.educ.api.institute.service.v1.DistrictHistoryService;
 import ca.bc.gov.educ.api.institute.service.v1.DistrictService;
 import ca.bc.gov.educ.api.institute.struct.v1.*;
@@ -14,6 +15,7 @@ import ca.bc.gov.educ.api.institute.util.RequestUtil;
 import ca.bc.gov.educ.api.institute.validator.AddressPayloadValidator;
 import ca.bc.gov.educ.api.institute.validator.ContactPayloadValidator;
 import ca.bc.gov.educ.api.institute.validator.DistrictPayloadValidator;
+import ca.bc.gov.educ.api.institute.validator.NotePayloadValidator;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +40,8 @@ public class DistrictAPIController implements DistrictAPIEndpoint {
   private static final ContactMapper contactMapper = ContactMapper.mapper;
 
   private static final AddressMapper addressMapper = AddressMapper.mapper;
+
+  private static final NoteMapper noteMapper = NoteMapper.mapper;
   private final DistrictService districtService;
   private final DistrictHistoryService districtHistoryService;
 
@@ -47,13 +51,16 @@ public class DistrictAPIController implements DistrictAPIEndpoint {
 
   private final AddressPayloadValidator addressPayloadValidator;
 
+  private final NotePayloadValidator notePayloadValidator;
+
   @Autowired
-  public DistrictAPIController(final DistrictService districtService, final DistrictHistoryService districtHistoryService, final DistrictPayloadValidator districtPayloadValidator, final ContactPayloadValidator contactPayloadValidator, AddressPayloadValidator addressPayloadValidator) {
+  public DistrictAPIController(final DistrictService districtService, final DistrictHistoryService districtHistoryService, final DistrictPayloadValidator districtPayloadValidator, final ContactPayloadValidator contactPayloadValidator, AddressPayloadValidator addressPayloadValidator, NotePayloadValidator notePayloadValidator) {
     this.districtService = districtService;
     this.districtHistoryService = districtHistoryService;
     this.districtPayloadValidator = districtPayloadValidator;
     this.contactPayloadValidator = contactPayloadValidator;
     this.addressPayloadValidator = addressPayloadValidator;
+    this.notePayloadValidator = notePayloadValidator;
   }
 
   @Override
@@ -170,22 +177,35 @@ public class DistrictAPIController implements DistrictAPIEndpoint {
   }
 
   @Override
-  public IndependentAuthority getDistrictIndependentAuthority(UUID districtId, UUID authorityId) {
-    return null;
+  public Note getDistrictNote(UUID districtId, UUID noteId) {
+    var noteEntity = this.districtService.getDistrictNote(districtId, noteId);
+
+    if (noteEntity.isPresent()) {
+      return noteMapper.toStructure(noteEntity.get());
+    } else {
+      throw new EntityNotFoundException();
+    }
   }
 
   @Override
-  public IndependentAuthority createDistrictIndependentAuthority(UUID districtId, IndependentAuthority authority) {
-    return null;
+  public Note createDistrictNote(UUID districtId, Note note) {
+    validatePayload(() -> this.notePayloadValidator.validateCreatePayload(note));
+    RequestUtil.setAuditColumnsForCreate(note);
+    return noteMapper.toStructure(districtService.createDistrictNote(note, districtId));
   }
 
   @Override
-  public IndependentAuthority updateDistrictIndependentAuthority(UUID districtId, UUID authorityId, IndependentAuthority authority) {
-    return null;
+  public Note updateDistrictNote(UUID districtId, UUID noteId, Note note) {
+    validatePayload(() -> this.notePayloadValidator.validateUpdatePayload(note));
+    RequestUtil.setAuditColumnsForUpdate(note);
+    return noteMapper.toStructure(districtService.updateDistrictNote(note, districtId, noteId));
   }
 
   @Override
-  public ResponseEntity<Void> deleteDistrictIndependentAuthority(UUID districtId, UUID authorityId) {
-    return null;
+  public ResponseEntity<Void> deleteDistrictNote(UUID districtId, UUID noteId) {
+    this.districtService.deleteDistrictNote(districtId, noteId);
+    return ResponseEntity.noContent().build();
   }
+
+
 }

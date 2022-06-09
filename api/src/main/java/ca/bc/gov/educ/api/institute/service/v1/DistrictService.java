@@ -4,9 +4,11 @@ import ca.bc.gov.educ.api.institute.exception.EntityNotFoundException;
 import ca.bc.gov.educ.api.institute.mapper.v1.AddressMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.ContactMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.DistrictMapper;
+import ca.bc.gov.educ.api.institute.mapper.v1.NoteMapper;
 import ca.bc.gov.educ.api.institute.model.v1.AddressEntity;
 import ca.bc.gov.educ.api.institute.model.v1.ContactEntity;
 import ca.bc.gov.educ.api.institute.model.v1.DistrictEntity;
+import ca.bc.gov.educ.api.institute.model.v1.NoteEntity;
 import ca.bc.gov.educ.api.institute.repository.v1.AddressRepository;
 import ca.bc.gov.educ.api.institute.repository.v1.ContactRepository;
 import ca.bc.gov.educ.api.institute.repository.v1.DistrictRepository;
@@ -14,6 +16,7 @@ import ca.bc.gov.educ.api.institute.repository.v1.NoteRepository;
 import ca.bc.gov.educ.api.institute.struct.v1.Address;
 import ca.bc.gov.educ.api.institute.struct.v1.Contact;
 import ca.bc.gov.educ.api.institute.struct.v1.District;
+import ca.bc.gov.educ.api.institute.struct.v1.Note;
 import ca.bc.gov.educ.api.institute.util.TransformUtil;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -252,6 +255,74 @@ public class DistrictService {
     } else {
       throw new EntityNotFoundException(DistrictEntity.class, DISTRICT_ID_ATTR, String.valueOf(districtId));
     }
+  }
 
+  public Optional<NoteEntity> getDistrictNote(UUID districtId, UUID noteId) {
+    Optional<DistrictEntity> curDistrictEntityOptional = districtRepository.findById(districtId);
+
+    if (curDistrictEntityOptional.isPresent()) {
+      final DistrictEntity currentDistrictEntity = curDistrictEntityOptional.get();
+      return noteRepository.findByNoteIdAndDistrictEntity(noteId, currentDistrictEntity);
+    } else {
+      throw new EntityNotFoundException(DistrictEntity.class, DISTRICT_ID_ATTR, String.valueOf(districtId));
+    }
+  }
+
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
+  public NoteEntity createDistrictNote(Note note, UUID districtId) {
+    var noteEntity = NoteMapper.mapper.toModel(note);
+    Optional<DistrictEntity> curDistrictEntityOptional = districtRepository.findById(districtId);
+
+    if (curDistrictEntityOptional.isPresent()) {
+      noteEntity.setDistrictEntity(curDistrictEntityOptional.get());
+      TransformUtil.uppercaseFields(noteEntity);
+      noteRepository.save(noteEntity);
+      return noteEntity;
+    } else {
+      throw new EntityNotFoundException(DistrictEntity.class, DISTRICT_ID_ATTR, String.valueOf(districtId));
+    }
+  }
+
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
+  public NoteEntity updateDistrictNote(Note note, UUID districtId, UUID noteId) {
+    var noteEntity = NoteMapper.mapper.toModel(note);
+    if (noteId == null || !noteId.equals(noteEntity.getNoteId())) {
+      throw new EntityNotFoundException(NoteEntity.class, NOTE_ID_ATTR, String.valueOf(noteId));
+    }
+
+    Optional<DistrictEntity> curDistrictEntityOptional = districtRepository.findById(districtId);
+
+    if (curDistrictEntityOptional.isEmpty()) {
+      throw new EntityNotFoundException(DistrictEntity.class, DISTRICT_ID_ATTR, String.valueOf(districtId));
+    }
+
+    Optional<NoteEntity> curNoteEntityOptional = noteRepository.findById(noteEntity.getNoteId());
+
+    if (curNoteEntityOptional.isPresent()) {
+      if (!districtId.equals(curNoteEntityOptional.get().getDistrictEntity().getDistrictId())) {
+        throw new EntityNotFoundException(DistrictEntity.class, DISTRICT_ID_ATTR, String.valueOf(districtId));
+      }
+      final NoteEntity currentNoteEntity = curNoteEntityOptional.get();
+      BeanUtils.copyProperties(noteEntity, currentNoteEntity, CREATE_DATE, CREATE_USER); // update current student entity with incoming payload ignoring the fields.
+      TransformUtil.uppercaseFields(currentNoteEntity); // convert the input to upper case.
+      currentNoteEntity.setDistrictEntity(curDistrictEntityOptional.get());
+      noteRepository.save(currentNoteEntity);
+      return currentNoteEntity;
+    } else {
+      throw new EntityNotFoundException(NoteEntity.class, NOTE_ID_ATTR, String.valueOf(noteId));
+    }
+  }
+
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
+  public void deleteDistrictNote(UUID districtId, UUID noteId) {
+    Optional<DistrictEntity> curDistrictEntityOptional = districtRepository.findById(districtId);
+    Optional<NoteEntity> curNoteEntityOptional = noteRepository.findById(noteId);
+
+    if (curDistrictEntityOptional.isPresent() && curNoteEntityOptional.isPresent()) {
+      final DistrictEntity currentDistrictEntity = curDistrictEntityOptional.get();
+      noteRepository.deleteByNoteIdAndDistrictEntity(noteId, currentDistrictEntity);
+    } else {
+      throw new EntityNotFoundException(DistrictEntity.class, DISTRICT_ID_ATTR, String.valueOf(districtId));
+    }
   }
 }

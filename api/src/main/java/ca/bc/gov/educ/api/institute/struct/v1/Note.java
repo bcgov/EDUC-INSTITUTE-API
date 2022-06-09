@@ -7,7 +7,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Null;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 
@@ -19,11 +18,13 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Note implements Serializable {
+public class Note extends BaseRequest implements Serializable {
   /**
    * The constant serialVersionUID.
    */
   private static final long serialVersionUID = 1L;
+
+  private String noteId;
 
   private String addressId;
 
@@ -37,6 +38,4 @@ public class Note implements Serializable {
   @NotNull(message = "content cannot be null")
   private String content;
 
-  @Null(message = "Create Date Should be null")
-  private String createDate;
 }

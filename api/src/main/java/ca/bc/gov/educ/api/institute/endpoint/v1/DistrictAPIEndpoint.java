@@ -126,32 +126,32 @@ public interface DistrictAPIEndpoint {
   @Tag(name = "Endpoint to create district address entity.", description = "Endpoint to create district address entity.")
   ResponseEntity<Void> deleteDistrictAddress(@PathVariable UUID districtId, @PathVariable UUID addressId);
 
-  @GetMapping("/{districtId}/authority/{authorityId}")
-  @PreAuthorize("hasAuthority('SCOPE_READ_DISTRICT_AUTHORITY')")
+  @GetMapping("/{districtId}/note/{noteId}")
+  @PreAuthorize("hasAuthority('SCOPE_READ_DISTRICT_NOTE')")
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
-  @Tag(name = "Endpoint to get district authority entity.", description = "Endpoint to get district authority entity.")
-  @Schema(name = "IndependentAuthority", implementation = IndependentAuthority.class)
-  IndependentAuthority getDistrictIndependentAuthority(@PathVariable UUID districtId, @PathVariable UUID authorityId);
+  @Tag(name = "Endpoint to get district note entity.", description = "Endpoint to get district note entity.")
+  @Schema(name = "Note", implementation = Note.class)
+  Note getDistrictNote(@PathVariable UUID districtId, @PathVariable UUID noteId);
 
-  @PostMapping("/{districtId}/authority")
-  @PreAuthorize("hasAuthority('SCOPE_WRITE_DISTRICT_AUTHORITY')")
+  @PostMapping("/{districtId}/note")
+  @PreAuthorize("hasAuthority('SCOPE_WRITE_DISTRICT_NOTE')")
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
-  @Tag(name = "Endpoint to create district authority entity.", description = "Endpoint to create district authority entity.")
-  @Schema(name = "IndependentAuthority", implementation = IndependentAuthority.class)
+  @Tag(name = "Endpoint to create district note entity.", description = "Endpoint to create district note entity.")
+  @Schema(name = "Note", implementation = Note.class)
   @ResponseStatus(CREATED)
-  IndependentAuthority createDistrictIndependentAuthority(@PathVariable UUID districtId, @Validated @RequestBody IndependentAuthority authority);
+  Note createDistrictNote(@PathVariable UUID districtId, @Validated @RequestBody Note note);
 
-  @PutMapping("/{districtId}/authority/{authorityId}")
-  @PreAuthorize("hasAuthority('SCOPE_WRITE_DISTRICT_AUTHORITY')")
+  @PutMapping("/{districtId}/note/{noteId}")
+  @PreAuthorize("hasAuthority('SCOPE_WRITE_DISTRICT_NOTE')")
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
-  @Tag(name = "Endpoint to update district authority entity.", description = "Endpoint to update district authority entity.")
-  @Schema(name = "IndependentAuthority", implementation = IndependentAuthority.class)
-  IndependentAuthority updateDistrictIndependentAuthority(@PathVariable UUID districtId, @PathVariable UUID authorityId, @Validated @RequestBody IndependentAuthority authority);
+  @Tag(name = "Endpoint to update district note entity.", description = "Endpoint to update district note entity.")
+  @Schema(name = "Note", implementation = Note.class)
+  Note updateDistrictNote(@PathVariable UUID districtId, @PathVariable UUID noteId, @Validated @RequestBody Note note);
 
-  @DeleteMapping("/{districtId}/authority/{authorityId}")
-  @PreAuthorize("hasAuthority('SCOPE_DELETE_DISTRICT_AUTHORITY')")
+  @DeleteMapping("/{districtId}/note/{noteId}")
+  @PreAuthorize("hasAuthority('SCOPE_DELETE_DISTRICT_NOTE')")
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
-  @Tag(name = "Endpoint to create district authority entity.", description = "Endpoint to create district authority entity.")
-  ResponseEntity<Void> deleteDistrictIndependentAuthority(@PathVariable UUID districtId, @PathVariable UUID authorityId);
+  @Tag(name = "Endpoint to create district note entity.", description = "Endpoint to create district note entity.")
+  ResponseEntity<Void> deleteDistrictNote(@PathVariable UUID districtId, @PathVariable UUID noteId);
 
 }
