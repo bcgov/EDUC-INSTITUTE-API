@@ -65,6 +65,18 @@ public class DistrictControllerTest {
   @Autowired
   ContactRepository contactRepository;
 
+  @Autowired
+  AddressRepository addressRepository;
+
+  @Autowired
+  AddressTypeCodeRepository addressTypeCodeRepository;
+
+  @Autowired
+  ProvinceCodeRepository provinceCodeRepository;
+
+  @Autowired
+  CountryCodeRepository countryCodeRepository;
+
   @Before
   public void setUp() {
     MockitoAnnotations.openMocks(this);
@@ -74,6 +86,9 @@ public class DistrictControllerTest {
   public void before(){
     this.districtRegionCodeRepository.save(this.createDistrictRegionCodeData());
     this.contactTypeCodeRepository.save(this.createContactTypeCodeData());
+    this.addressTypeCodeRepository.save(this.createAddressTypeCodeData());
+    this.countryCodeRepository.save(this.createCountryCodeData());
+    this.provinceCodeRepository.save(this.createProvinceCodeData());
   }
 
   /**
@@ -81,11 +96,15 @@ public class DistrictControllerTest {
    */
   @After
   public void after() {
+    this.addressRepository.deleteAll();
     this.contactRepository.deleteAll();
     this.districtRepository.deleteAll();
     this.districtHistoryRepository.deleteAll();
     this.districtRegionCodeRepository.deleteAll();
     this.contactTypeCodeRepository.deleteAll();
+    this.addressTypeCodeRepository.deleteAll();
+    this.provinceCodeRepository.deleteAll();
+    this.countryCodeRepository.deleteAll();
   }
 
   @Test
@@ -250,6 +269,72 @@ public class DistrictControllerTest {
       .andExpect(MockMvcResultMatchers.jsonPath("$.firstName").value(contact.getFirstName().toUpperCase()));
   }
 
+  @Test
+  public void testCreateDistrictAddress_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
+    final DistrictEntity districtEntity = this.districtRepository.save(this.createDistrictData());
+    AddressEntity addressEntity = createAddressData(districtEntity);
+
+    this.mockMvc.perform(post(URL.BASE_URL_DISTRICT + "/" + districtEntity.getDistrictId() + "/address")
+        .contentType(MediaType.APPLICATION_JSON)
+        .accept(MediaType.APPLICATION_JSON)
+        .content(asJsonString(addressEntity))
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_DISTRICT_ADDRESS"))))
+      .andDo(print())
+      .andExpect(status().isCreated())
+      .andExpect(MockMvcResultMatchers.jsonPath("$.city").value(addressEntity.getCity().toUpperCase()));
+  }
+
+  @Test
+  public void testDeleteDistrictAddress_GivenValidID_ShouldReturnStatusOK() throws Exception {
+    final var district = this.createDistrictData();
+    var districtEntity = this.districtRepository.save(district);
+    AddressEntity addressEntity = createAddressData(districtEntity);
+    var address = this.addressRepository.save(addressEntity);
+
+    this.mockMvc.perform(delete(URL.BASE_URL_DISTRICT + "/" + districtEntity.getDistrictId() + "/address/" + address.getAddressId())
+        .contentType(MediaType.APPLICATION_JSON)
+        .accept(MediaType.APPLICATION_JSON)
+        .content(asJsonString(districtEntity))
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_DISTRICT_ADDRESS"))))
+      .andDo(print())
+      .andExpect(status().isNoContent());
+
+    var deletedAddress = this.addressRepository.findById(address.getAddressId());
+    Assert.assertTrue(deletedAddress.isEmpty());
+  }
+
+  @Test
+  public void testRetrieveDistrictAddress_GivenValidID_ShouldReturnStatusOK() throws Exception {
+    final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_DISTRICT_ADDRESS";
+    final var mockAuthority = oidcLogin().authorities(grantedAuthority);
+    final var district = this.createDistrictData();
+    var districtEntity = this.districtRepository.save(district);
+    AddressEntity addressEntity = createAddressData(districtEntity);
+    var address = this.addressRepository.save(addressEntity);
+    this.mockMvc.perform(get(URL.BASE_URL_DISTRICT + "/" + districtEntity.getDistrictId() + "/address/" + address.getAddressId()).with(mockAuthority))
+      .andDo(print()).andExpect(status().isOk()).andExpect(MockMvcResultMatchers.jsonPath("$.addressId")
+        .value(address.getAddressId().toString()));
+  }
+
+  @Test
+  public void testUpdateDistrictAddress_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
+    final var district = this.createDistrictData();
+    var districtEntity = this.districtRepository.save(district);
+    AddressEntity addressEntity = createAddressData(districtEntity);
+    var address = this.addressRepository.save(addressEntity);
+    address.setCity("southshore");
+
+    this.mockMvc.perform(put(URL.BASE_URL_DISTRICT + "/" + districtEntity.getDistrictId() + "/address/" + address.getAddressId())
+        .contentType(MediaType.APPLICATION_JSON)
+        .accept(MediaType.APPLICATION_JSON)
+        .content(asJsonString(address))
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_DISTRICT_ADDRESS"))))
+      .andDo(print())
+      .andExpect(status().isOk())
+      .andExpect(MockMvcResultMatchers.jsonPath("$.city").value(address.getCity().toUpperCase()));
+  }
+
+
   private DistrictEntity createDistrictData() {
     return DistrictEntity.builder().districtNumber("003").displayName("District Name").openedDate(LocalDateTime.now().minusDays(1)).districtRegionCode("KOOTENAYS")
       .website("abc@sd99.edu").createDate(LocalDateTime.now()).updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
@@ -257,6 +342,11 @@ public class DistrictControllerTest {
 
   private ContactEntity createContactData(DistrictEntity entity) {
     return ContactEntity.builder().districtEntity(entity).contactTypeCode("PRINCIPAL").firstName("John").lastName("Wayne").createUser("TEST").updateUser("TEST").build();
+  }
+
+  private AddressEntity createAddressData(DistrictEntity entity) {
+    return AddressEntity.builder().districtEntity(entity).addressTypeCode("MAILING").addressLine1("123 This Street").city("Compton")
+      .provinceCode("BC").countryCode("CAN").postal("V1B9H2").createUser("TEST").updateUser("TEST").build();
   }
 
   private DistrictHistoryEntity createHistoryDistrictData(UUID districtId) {
@@ -283,6 +373,24 @@ public class DistrictControllerTest {
   private ContactTypeCodeEntity createContactTypeCodeData() {
     return ContactTypeCodeEntity.builder().contactTypeCode("PRINCIPAL").description("School Principal")
       .effectiveDate(LocalDateTime.now()).expiryDate(LocalDateTime.MAX).displayOrder(1).label("Principal").createDate(LocalDateTime.now())
+      .updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
+  }
+
+  private AddressTypeCodeEntity createAddressTypeCodeData() {
+    return AddressTypeCodeEntity.builder().addressTypeCode("MAILING").description("Mailing Address")
+      .effectiveDate(LocalDateTime.now()).expiryDate(LocalDateTime.MAX).displayOrder(1).label("Mailing Address").createDate(LocalDateTime.now())
+      .updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
+  }
+
+  private ProvinceCodeEntity createProvinceCodeData() {
+    return ProvinceCodeEntity.builder().provinceCode("BC").description("British Columbia")
+      .effectiveDate(LocalDateTime.now()).expiryDate(LocalDateTime.MAX).displayOrder(1).label("British Columbia").createDate(LocalDateTime.now())
+      .updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
+  }
+
+  private CountryCodeEntity createCountryCodeData() {
+    return CountryCodeEntity.builder().countryCode("CAN").description("Canada")
+      .effectiveDate(LocalDateTime.now()).expiryDate(LocalDateTime.MAX).displayOrder(1).label("Canada").createDate(LocalDateTime.now())
       .updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
   }
 }
