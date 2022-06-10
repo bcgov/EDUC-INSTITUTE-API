@@ -9,11 +9,12 @@ import ca.bc.gov.educ.api.institute.service.v1.CodeTableService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -21,7 +22,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
@@ -34,9 +34,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@RunWith(SpringRunner.class)
+@SpringBootTest(classes = { InstituteApiResourceApplication.class })
 @ActiveProfiles("test")
-@SpringBootTest(classes = InstituteApiResourceApplication.class)
 @AutoConfigureMockMvc
 public class SchoolControllerTest {
 
@@ -93,17 +92,14 @@ public class SchoolControllerTest {
   @Autowired
   NeighborhoodLearningTypeCodeRepository neighborhoodLearningTypeCodeRepository;
 
-  @Before
-  public void setUp() {
-    MockitoAnnotations.openMocks(this);
-  }
-
-  @Before
+  @BeforeEach
   public void before(){
+    MockitoAnnotations.openMocks(this);
     this.schoolCategoryCodeRepository.save(this.createSchoolCategoryCodeData());
     this.schoolOrganizationCodeRepository.save(this.createSchoolOrganizationCodeData());
     this.facilityTypeCodeRepository.save(this.createFacilityTypeCodeData());
     this.contactTypeCodeRepository.save(this.createContactTypeCodeData());
+    System.out.println("Adding");
     this.addressTypeCodeRepository.save(this.createAddressTypeCodeData());
     this.countryCodeRepository.save(this.createCountryCodeData());
     this.provinceCodeRepository.save(this.createProvinceCodeData());
@@ -114,12 +110,13 @@ public class SchoolControllerTest {
   /**
    * need to delete the records to make it working in unit tests assertion, else the records will keep growing and assertions will fail.
    */
-  @After
+  @AfterEach
   public void after() {
     this.addressRepository.deleteAll();
     this.contactRepository.deleteAll();
     this.noteRepository.deleteAll();
     this.schoolRepository.deleteAll();
+    System.out.println("Turfing");
     this.schoolHistoryRepository.deleteAll();
     this.schoolGradeCodeRepository.deleteAll();
     this.neighborhoodLearningTypeCodeRepository.deleteAll();
@@ -129,7 +126,7 @@ public class SchoolControllerTest {
   }
 
   @Test
-  public void testAllSchools_GivenValidID_ShouldReturnStatusOK() throws Exception {
+  void testAllSchools_GivenValidID_ShouldReturnStatusOK() throws Exception {
     final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_SCHOOL";
     final var mockAuthority = oidcLogin().authorities(grantedAuthority);
     final SchoolEntity entity = this.schoolRepository.save(this.createSchoolData());
@@ -139,7 +136,7 @@ public class SchoolControllerTest {
   }
 
   @Test
-  public void testRetrieveSchool_GivenValidID_ShouldReturnStatusOK() throws Exception {
+  void testRetrieveSchool_GivenValidID_ShouldReturnStatusOK() throws Exception {
     final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_SCHOOL";
     final var mockAuthority = oidcLogin().authorities(grantedAuthority);
     final SchoolEntity entity = this.schoolRepository.save(this.createSchoolData());
@@ -149,7 +146,7 @@ public class SchoolControllerTest {
   }
 
   @Test
-  public void testRetrieveSchool_GivenInvalidID_ShouldReturnStatusNotFound() throws Exception {
+  void testRetrieveSchool_GivenInvalidID_ShouldReturnStatusNotFound() throws Exception {
     final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_SCHOOL";
     final var mockAuthority = oidcLogin().authorities(grantedAuthority);
     this.mockMvc.perform(get(URL.BASE_URL_SCHOOL + "/" + UUID.randomUUID()).with(mockAuthority))
@@ -157,7 +154,7 @@ public class SchoolControllerTest {
   }
 
   @Test
-  public void testRetrieveSchoolHistory_GivenValidID_ShouldReturnStatusOK() throws Exception {
+  void testRetrieveSchoolHistory_GivenValidID_ShouldReturnStatusOK() throws Exception {
     final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_SCHOOL";
     final var mockAuthority = oidcLogin().authorities(grantedAuthority);
     final SchoolEntity entity = this.schoolRepository.save(this.createSchoolData());
@@ -168,7 +165,7 @@ public class SchoolControllerTest {
   }
 
   @Test
-  public void testRetrieveSchoolHistory_GivenInvalidID_ShouldReturnStatusBadRequest() throws Exception {
+  void testRetrieveSchoolHistory_GivenInvalidID_ShouldReturnStatusBadRequest() throws Exception {
     final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_SCHOOL";
     final var mockAuthority = oidcLogin().authorities(grantedAuthority);
     this.mockMvc.perform(get(URL.BASE_URL_SCHOOL + "/abc/history").with(mockAuthority))
@@ -176,7 +173,7 @@ public class SchoolControllerTest {
   }
 
   @Test
-  public void testRetrieveSchool_GivenInvalidID_ShouldReturnStatusBadRequest() throws Exception {
+  void testRetrieveSchool_GivenInvalidID_ShouldReturnStatusBadRequest() throws Exception {
     final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_SCHOOL";
     final var mockAuthority = oidcLogin().authorities(grantedAuthority);
     this.mockMvc.perform(get(URL.BASE_URL_SCHOOL + "/abc").with(mockAuthority))
@@ -184,7 +181,7 @@ public class SchoolControllerTest {
   }
 
   @Test
-  public void testDeleteSchool_GivenValidID_ShouldReturnStatusOK() throws Exception {
+  void testDeleteSchool_GivenValidID_ShouldReturnStatusOK() throws Exception {
     final var school = this.createSchoolData();
     var entity = this.schoolRepository.save(school);
 
@@ -197,11 +194,11 @@ public class SchoolControllerTest {
       .andExpect(status().isNoContent());
 
     var deletedEntity = this.schoolRepository.findById(entity.getSchoolId());
-    Assert.assertTrue(deletedEntity.isEmpty());
+    Assertions.assertTrue(deletedEntity.isEmpty());
   }
 
   @Test
-  public void testUpdateSchool_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
+  void testUpdateSchool_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
     final var school = this.createSchoolData();
     var entity = this.schoolRepository.save(school);
     entity.setDisplayName("newdist");
@@ -219,7 +216,7 @@ public class SchoolControllerTest {
   }
 
   @Test
-  public void testAddSchoolGrade_GivenValidPayload_ShouldReturnStatusOk() throws Exception {
+  void testAddSchoolGrade_GivenValidPayload_ShouldReturnStatusOk() throws Exception {
     final var school = this.createSchoolData();
     var entity = this.schoolRepository.save(school);
     entity.setDisplayName("newdist");
@@ -238,7 +235,7 @@ public class SchoolControllerTest {
   }
 
   @Test
-  public void testAddSchoolNeighborhoodLearning_GivenValidPayload_ShouldReturnStatusOk() throws Exception {
+  void testAddSchoolNeighborhoodLearning_GivenValidPayload_ShouldReturnStatusOk() throws Exception {
     final var school = this.createSchoolData();
     var entity = this.schoolRepository.save(school);
     entity.setDisplayName("newdist");
@@ -257,7 +254,7 @@ public class SchoolControllerTest {
   }
 
   @Test
-  public void testCreateSchool_GivenValidPayload_ShouldReturnStatusOK() throws Exception {
+  void testCreateSchool_GivenValidPayload_ShouldReturnStatusOK() throws Exception {
     final var school = this.createSchoolData();
     school.setCreateDate(null);
     school.setUpdateDate(null);
@@ -272,7 +269,7 @@ public class SchoolControllerTest {
   }
 
   @Test
-  public void testCreateSchool_GivenInvalidPayload_ShouldReturnStatusBadRequest() throws Exception {
+  void testCreateSchool_GivenInvalidPayload_ShouldReturnStatusBadRequest() throws Exception {
     final var school = this.createSchoolData();
     school.setSchoolCategoryCode("ABCD");
     school.setCreateDate(null);
@@ -287,7 +284,7 @@ public class SchoolControllerTest {
   }
 
   @Test
-  public void testCreateSchoolContact_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
+  void testCreateSchoolContact_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
     final SchoolEntity schoolEntity = this.schoolRepository.save(this.createSchoolData());
     ContactEntity contactEntity = createContactData(schoolEntity);
 
@@ -302,7 +299,7 @@ public class SchoolControllerTest {
   }
 
   @Test
-  public void testDeleteSchoolContact_GivenValidID_ShouldReturnStatusOK() throws Exception {
+  void testDeleteSchoolContact_GivenValidID_ShouldReturnStatusOK() throws Exception {
     final var school = this.createSchoolData();
     var schoolEntity = this.schoolRepository.save(school);
     ContactEntity contactEntity = createContactData(schoolEntity);
@@ -317,11 +314,11 @@ public class SchoolControllerTest {
       .andExpect(status().isNoContent());
 
     var deletedContact = this.contactRepository.findById(contact.getContactId());
-    Assert.assertTrue(deletedContact.isEmpty());
+    Assertions.assertTrue(deletedContact.isEmpty());
   }
 
   @Test
-  public void testRetrieveSchoolContact_GivenValidID_ShouldReturnStatusOK() throws Exception {
+  void testRetrieveSchoolContact_GivenValidID_ShouldReturnStatusOK() throws Exception {
     final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_SCHOOL_CONTACT";
     final var mockAuthority = oidcLogin().authorities(grantedAuthority);
     final var school = this.createSchoolData();
@@ -334,18 +331,7 @@ public class SchoolControllerTest {
   }
 
   @Test
-  public void testRetrieveSchoolContact_GivenInvalidID_ShouldReturnStatusNotFound() throws Exception {
-    final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_SCHOOL_CONTACT";
-    final var mockAuthority = oidcLogin().authorities(grantedAuthority);
-    final var school = this.createSchoolData();
-    var schoolEntity = this.schoolRepository.save(school);
-
-    this.mockMvc.perform(get(URL.BASE_URL_SCHOOL + "/" + schoolEntity.getSchoolId() + "/contact/" + UUID.randomUUID()).with(mockAuthority))
-      .andDo(print()).andExpect(status().isNotFound());
-  }
-
-  @Test
-  public void testUpdateSchoolContact_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
+  void testUpdateSchoolContact_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
     final var school = this.createSchoolData();
     var schoolEntity = this.schoolRepository.save(school);
     ContactEntity contactEntity = createContactData(schoolEntity);
@@ -363,7 +349,7 @@ public class SchoolControllerTest {
   }
 
   @Test
-  public void testCreateSchoolAddress_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
+  void testCreateSchoolAddress_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
     final SchoolEntity schoolEntity = this.schoolRepository.save(this.createSchoolData());
     AddressEntity addressEntity = createAddressData(schoolEntity);
 
@@ -378,7 +364,7 @@ public class SchoolControllerTest {
   }
 
   @Test
-  public void testDeleteSchoolAddress_GivenValidID_ShouldReturnStatusOK() throws Exception {
+  void testDeleteSchoolAddress_GivenValidID_ShouldReturnStatusOK() throws Exception {
     final var school = this.createSchoolData();
     var schoolEntity = this.schoolRepository.save(school);
     AddressEntity addressEntity = createAddressData(schoolEntity);
@@ -393,11 +379,11 @@ public class SchoolControllerTest {
       .andExpect(status().isNoContent());
 
     var deletedAddress = this.addressRepository.findById(address.getAddressId());
-    Assert.assertTrue(deletedAddress.isEmpty());
+    Assertions.assertTrue(deletedAddress.isEmpty());
   }
 
   @Test
-  public void testRetrieveSchoolAddress_GivenValidID_ShouldReturnStatusOK() throws Exception {
+  void testRetrieveSchoolAddress_GivenValidID_ShouldReturnStatusOK() throws Exception {
     final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_SCHOOL_ADDRESS";
     final var mockAuthority = oidcLogin().authorities(grantedAuthority);
     final var school = this.createSchoolData();
@@ -409,19 +395,20 @@ public class SchoolControllerTest {
         .value(address.getAddressId().toString()));
   }
 
-  @Test
-  public void testRetrieveSchoolAddress_GivenInvalidID_ShouldReturnStatusNotFound() throws Exception {
-    final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_SCHOOL_ADDRESS";
+  @ParameterizedTest
+  @CsvSource(value = {"SCOPE_READ_SCHOOL_CONTACT:contact", "SCOPE_READ_SCHOOL_ADDRESS:address", "SCOPE_READ_SCHOOL_NOTE:note"}, delimiter = ':')
+  void testRetrieveDistrictInstitute_GivenInvalidID_ShouldReturnStatusNotFound(String scope, String path) throws Exception {
+    final GrantedAuthority grantedAuthority = () -> scope;
     final var mockAuthority = oidcLogin().authorities(grantedAuthority);
     final var school = this.createSchoolData();
     var schoolEntity = this.schoolRepository.save(school);
 
-    this.mockMvc.perform(get(URL.BASE_URL_SCHOOL + "/" + schoolEntity.getSchoolId() + "/address/" + UUID.randomUUID()).with(mockAuthority))
+    this.mockMvc.perform(get(URL.BASE_URL_SCHOOL + "/" + schoolEntity.getSchoolId() + "/" + path + "/" + UUID.randomUUID()).with(mockAuthority))
       .andDo(print()).andExpect(status().isNotFound());
   }
 
   @Test
-  public void testUpdateSchoolAddress_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
+  void testUpdateSchoolAddress_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
     final var school = this.createSchoolData();
     var schoolEntity = this.schoolRepository.save(school);
     AddressEntity addressEntity = createAddressData(schoolEntity);
@@ -439,7 +426,7 @@ public class SchoolControllerTest {
   }
 
   @Test
-  public void testCreateSchoolNote_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
+  void testCreateSchoolNote_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
     final SchoolEntity schoolEntity = this.schoolRepository.save(this.createSchoolData());
     NoteEntity noteEntity = createNoteData(schoolEntity);
 
@@ -454,7 +441,7 @@ public class SchoolControllerTest {
   }
 
   @Test
-  public void testDeleteSchoolNote_GivenValidID_ShouldReturnStatusOK() throws Exception {
+  void testDeleteSchoolNote_GivenValidID_ShouldReturnStatusOK() throws Exception {
     final var school = this.createSchoolData();
     var schoolEntity = this.schoolRepository.save(school);
     NoteEntity noteEntity = createNoteData(schoolEntity);
@@ -469,11 +456,11 @@ public class SchoolControllerTest {
       .andExpect(status().isNoContent());
 
     var deletedNote = this.noteRepository.findById(note.getNoteId());
-    Assert.assertTrue(deletedNote.isEmpty());
+    Assertions.assertTrue(deletedNote.isEmpty());
   }
 
   @Test
-  public void testRetrieveSchoolNote_GivenValidID_ShouldReturnStatusOK() throws Exception {
+  void testRetrieveSchoolNote_GivenValidID_ShouldReturnStatusOK() throws Exception {
     final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_SCHOOL_NOTE";
     final var mockAuthority = oidcLogin().authorities(grantedAuthority);
     final var school = this.createSchoolData();
@@ -486,17 +473,7 @@ public class SchoolControllerTest {
   }
 
   @Test
-  public void testRetrieveSchoolNote_GivenInvalidID_ShouldReturnStatusNotFound() throws Exception {
-    final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_SCHOOL_NOTE";
-    final var mockAuthority = oidcLogin().authorities(grantedAuthority);
-    final var school = this.createSchoolData();
-    var schoolEntity = this.schoolRepository.save(school);
-    this.mockMvc.perform(get(URL.BASE_URL_SCHOOL + "/" + schoolEntity.getSchoolId() + "/note/" + UUID.randomUUID()).with(mockAuthority))
-      .andDo(print()).andExpect(status().isNotFound());
-  }
-
-  @Test
-  public void testUpdateSchoolNote_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
+  void testUpdateSchoolNote_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
     final var school = this.createSchoolData();
     var schoolEntity = this.schoolRepository.save(school);
     NoteEntity noteEntity = createNoteData(schoolEntity);

@@ -9,11 +9,12 @@ import ca.bc.gov.educ.api.institute.service.v1.CodeTableService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -21,7 +22,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
@@ -34,9 +34,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@RunWith(SpringRunner.class)
+@SpringBootTest(classes = { InstituteApiResourceApplication.class })
 @ActiveProfiles("test")
-@SpringBootTest(classes = InstituteApiResourceApplication.class)
 @AutoConfigureMockMvc
 public class IndependentAuthorityControllerTest {
 
@@ -83,14 +82,9 @@ public class IndependentAuthorityControllerTest {
   @Autowired
   CountryCodeRepository countryCodeRepository;
 
-
-  @Before
-  public void setUp() {
-    MockitoAnnotations.openMocks(this);
-  }
-
-  @Before
+  @BeforeEach
   public void before(){
+    MockitoAnnotations.openMocks(this);
     this.authorityTypeCodeRepository.save(this.createAuthorityTypeCodeData());
     this.authorityGroupCodeRepository.save(this.createAuthorityGroupCodeData());
     this.contactTypeCodeRepository.save(this.createContactTypeCodeData());
@@ -102,7 +96,7 @@ public class IndependentAuthorityControllerTest {
   /**
    * need to delete the records to make it working in unit tests assertion, else the records will keep growing and assertions will fail.
    */
-  @After
+  @AfterEach
   public void after() {
     this.addressRepository.deleteAll();
     this.contactRepository.deleteAll();
@@ -114,7 +108,7 @@ public class IndependentAuthorityControllerTest {
   }
 
   @Test
-  public void testAllIndependentAuthoritys_GivenValidID_ShouldReturnStatusOK() throws Exception {
+  void testAllIndependentAuthoritys_GivenValidID_ShouldReturnStatusOK() throws Exception {
     final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_INDEPENDENT_AUTHORITY";
     final var mockAuthority = oidcLogin().authorities(grantedAuthority);
     final IndependentAuthorityEntity entity = this.independentAuthorityRepository.save(this.createIndependentAuthorityData());
@@ -124,7 +118,7 @@ public class IndependentAuthorityControllerTest {
   }
 
   @Test
-  public void testRetrieveIndependentAuthority_GivenValidID_ShouldReturnStatusOK() throws Exception {
+  void testRetrieveIndependentAuthority_GivenValidID_ShouldReturnStatusOK() throws Exception {
     final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_INDEPENDENT_AUTHORITY";
     final var mockAuthority = oidcLogin().authorities(grantedAuthority);
     final IndependentAuthorityEntity entity = this.independentAuthorityRepository.save(this.createIndependentAuthorityData());
@@ -134,7 +128,7 @@ public class IndependentAuthorityControllerTest {
   }
 
   @Test
-  public void testRetrieveIndependentAuthority_GivenInvalidID_ShouldReturnStatusNotFound() throws Exception {
+  void testRetrieveIndependentAuthority_GivenInvalidID_ShouldReturnStatusNotFound() throws Exception {
     final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_INDEPENDENT_AUTHORITY";
     final var mockAuthority = oidcLogin().authorities(grantedAuthority);
     this.mockMvc.perform(get(URL.BASE_URL_AUTHORITY + "/" + UUID.randomUUID()).with(mockAuthority))
@@ -143,7 +137,7 @@ public class IndependentAuthorityControllerTest {
 
 
   @Test
-  public void testRetrieveIndependentAuthorityHistory_GivenValidID_ShouldReturnStatusOK() throws Exception {
+  void testRetrieveIndependentAuthorityHistory_GivenValidID_ShouldReturnStatusOK() throws Exception {
     final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_INDEPENDENT_AUTHORITY";
     final var mockAuthority = oidcLogin().authorities(grantedAuthority);
     final IndependentAuthorityEntity entity = this.independentAuthorityRepository.save(this.createIndependentAuthorityData());
@@ -154,7 +148,7 @@ public class IndependentAuthorityControllerTest {
   }
 
   @Test
-  public void testRetrieveIndependentAuthorityHistory_GivenInvalidID_ShouldReturnStatusBadRequest() throws Exception {
+  void testRetrieveIndependentAuthorityHistory_GivenInvalidID_ShouldReturnStatusBadRequest() throws Exception {
     final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_INDEPENDENT_AUTHORITY";
     final var mockAuthority = oidcLogin().authorities(grantedAuthority);
     this.mockMvc.perform(get(URL.BASE_URL_AUTHORITY + "/abc/history").with(mockAuthority))
@@ -162,7 +156,7 @@ public class IndependentAuthorityControllerTest {
   }
 
   @Test
-  public void testRetrieveIndependentAuthority_GivenInvalidID_ShouldReturnStatusBadRequest() throws Exception {
+  void testRetrieveIndependentAuthority_GivenInvalidID_ShouldReturnStatusBadRequest() throws Exception {
     final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_INDEPENDENT_AUTHORITY";
     final var mockAuthority = oidcLogin().authorities(grantedAuthority);
     this.mockMvc.perform(get(URL.BASE_URL_AUTHORITY + "/abc").with(mockAuthority))
@@ -170,7 +164,7 @@ public class IndependentAuthorityControllerTest {
   }
 
   @Test
-  public void testDeleteIndependentAuthority_GivenValidID_ShouldReturnStatusOK() throws Exception {
+  void testDeleteIndependentAuthority_GivenValidID_ShouldReturnStatusOK() throws Exception {
     final var independentAuthority = this.createIndependentAuthorityData();
     var entity = this.independentAuthorityRepository.save(independentAuthority);
 
@@ -183,11 +177,11 @@ public class IndependentAuthorityControllerTest {
       .andExpect(status().isNoContent());
 
     var deletedEntity = this.independentAuthorityRepository.findById(entity.getIndependentAuthorityId());
-    Assert.assertTrue(deletedEntity.isEmpty());
+    Assertions.assertTrue(deletedEntity.isEmpty());
   }
 
   @Test
-  public void testUpdateIndependentAuthority_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
+  void testUpdateIndependentAuthority_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
     final var independentAuthority = this.createIndependentAuthorityData();
     var entity = this.independentAuthorityRepository.save(independentAuthority);
     entity.setDisplayName("newdist");
@@ -205,7 +199,7 @@ public class IndependentAuthorityControllerTest {
   }
 
   @Test
-  public void testCreateIndependentAuthority_GivenValidPayload_ShouldReturnStatusOK() throws Exception {
+  void testCreateIndependentAuthority_GivenValidPayload_ShouldReturnStatusOK() throws Exception {
     final var independentAuthority = this.createIndependentAuthorityData();
     independentAuthority.setCreateDate(null);
     independentAuthority.setUpdateDate(null);
@@ -219,8 +213,9 @@ public class IndependentAuthorityControllerTest {
       .andExpect(MockMvcResultMatchers.jsonPath("$.displayName").value(independentAuthority.getDisplayName().toUpperCase()));
   }
 
+
   @Test
-  public void testCreateIndependentAuthority_GivenInvalidPayload_ShouldReturnStatusBadRequest() throws Exception {
+  void testCreateIndependentAuthority_GivenInvalidPayload_ShouldReturnStatusBadRequest() throws Exception {
     final var school = this.createIndependentAuthorityData();
     school.setAuthorityGroupCode("ABCD");
     school.setCreateDate(null);
@@ -235,7 +230,7 @@ public class IndependentAuthorityControllerTest {
   }
 
   @Test
-  public void testCreateIndependentAuthorityContact_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
+  void testCreateIndependentAuthorityContact_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
     final IndependentAuthorityEntity independentAuthorityEntity = this.independentAuthorityRepository.save(this.createIndependentAuthorityData());
     ContactEntity contactEntity = createContactData(independentAuthorityEntity);
 
@@ -250,7 +245,7 @@ public class IndependentAuthorityControllerTest {
   }
 
   @Test
-  public void testDeleteIndependentAuthorityContact_GivenValidID_ShouldReturnStatusOK() throws Exception {
+  void testDeleteIndependentAuthorityContact_GivenValidID_ShouldReturnStatusOK() throws Exception {
     final var independentAuthority = this.createIndependentAuthorityData();
     var independentAuthorityEntity = this.independentAuthorityRepository.save(independentAuthority);
     ContactEntity contactEntity = createContactData(independentAuthorityEntity);
@@ -265,11 +260,11 @@ public class IndependentAuthorityControllerTest {
       .andExpect(status().isNoContent());
 
     var deletedContact = this.contactRepository.findById(contact.getContactId());
-    Assert.assertTrue(deletedContact.isEmpty());
+    Assertions.assertTrue(deletedContact.isEmpty());
   }
 
   @Test
-  public void testRetrieveIndependentAuthorityContact_GivenValidID_ShouldReturnStatusOK() throws Exception {
+  void testRetrieveIndependentAuthorityContact_GivenValidID_ShouldReturnStatusOK() throws Exception {
     final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_INDEPENDENT_AUTHORITY_CONTACT";
     final var mockAuthority = oidcLogin().authorities(grantedAuthority);
     final var independentAuthority = this.createIndependentAuthorityData();
@@ -281,19 +276,20 @@ public class IndependentAuthorityControllerTest {
         .value(contact.getContactId().toString()));
   }
 
-  @Test
-  public void testRetrieveIndependentAuthorityContact_GivenInvalidID_ShouldReturnStatusNotFound() throws Exception {
-    final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_INDEPENDENT_AUTHORITY_CONTACT";
+  @ParameterizedTest
+  @CsvSource(value = {"SCOPE_READ_INDEPENDENT_AUTHORITY_CONTACT:contact", "SCOPE_READ_INDEPENDENT_AUTHORITY_ADDRESS:address", "SCOPE_READ_INDEPENDENT_AUTHORITY_NOTE:note"}, delimiter = ':')
+  void testRetrieveDistrictInstitute_GivenInvalidID_ShouldReturnStatusNotFound(String scope, String path) throws Exception {
+    final GrantedAuthority grantedAuthority = () -> scope;
     final var mockAuthority = oidcLogin().authorities(grantedAuthority);
     final var independentAuthority = this.createIndependentAuthorityData();
     var independentAuthorityEntity = this.independentAuthorityRepository.save(independentAuthority);
 
-    this.mockMvc.perform(get(URL.BASE_URL_AUTHORITY + "/" + independentAuthorityEntity.getIndependentAuthorityId() + "/contact/" + UUID.randomUUID()).with(mockAuthority))
+    this.mockMvc.perform(get(URL.BASE_URL_AUTHORITY + "/" + independentAuthorityEntity.getIndependentAuthorityId() + "/" + path + "/" + UUID.randomUUID()).with(mockAuthority))
       .andDo(print()).andExpect(status().isNotFound());
   }
 
   @Test
-  public void testUpdateIndependentAuthorityContact_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
+  void testUpdateIndependentAuthorityContact_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
     final var independentAuthority = this.createIndependentAuthorityData();
     var independentAuthorityEntity = this.independentAuthorityRepository.save(independentAuthority);
     ContactEntity contactEntity = createContactData(independentAuthorityEntity);
@@ -311,7 +307,7 @@ public class IndependentAuthorityControllerTest {
   }
 
   @Test
-  public void testCreateIndependentAuthorityAddress_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
+  void testCreateIndependentAuthorityAddress_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
     final IndependentAuthorityEntity independentAuthorityEntity = this.independentAuthorityRepository.save(this.createIndependentAuthorityData());
     AddressEntity addressEntity = createAddressData(independentAuthorityEntity);
 
@@ -326,7 +322,7 @@ public class IndependentAuthorityControllerTest {
   }
 
   @Test
-  public void testDeleteIndependentAuthorityAddress_GivenValidID_ShouldReturnStatusOK() throws Exception {
+  void testDeleteIndependentAuthorityAddress_GivenValidID_ShouldReturnStatusOK() throws Exception {
     final var independentAuthority = this.createIndependentAuthorityData();
     var independentAuthorityEntity = this.independentAuthorityRepository.save(independentAuthority);
     AddressEntity addressEntity = createAddressData(independentAuthorityEntity);
@@ -341,11 +337,11 @@ public class IndependentAuthorityControllerTest {
       .andExpect(status().isNoContent());
 
     var deletedAddress = this.addressRepository.findById(address.getAddressId());
-    Assert.assertTrue(deletedAddress.isEmpty());
+    Assertions.assertTrue(deletedAddress.isEmpty());
   }
 
   @Test
-  public void testRetrieveIndependentAuthorityAddress_GivenValidID_ShouldReturnStatusOK() throws Exception {
+  void testRetrieveIndependentAuthorityAddress_GivenValidID_ShouldReturnStatusOK() throws Exception {
     final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_INDEPENDENT_AUTHORITY_ADDRESS";
     final var mockAuthority = oidcLogin().authorities(grantedAuthority);
     final var independentAuthority = this.createIndependentAuthorityData();
@@ -358,18 +354,7 @@ public class IndependentAuthorityControllerTest {
   }
 
   @Test
-  public void testRetrieveIndependentAuthorityAddress_GivenInvalidID_ShouldReturnStatusNotFound() throws Exception {
-    final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_INDEPENDENT_AUTHORITY_ADDRESS";
-    final var mockAuthority = oidcLogin().authorities(grantedAuthority);
-    final var independentAuthority = this.createIndependentAuthorityData();
-    var independentAuthorityEntity = this.independentAuthorityRepository.save(independentAuthority);
-
-    this.mockMvc.perform(get(URL.BASE_URL_AUTHORITY + "/" + independentAuthorityEntity.getIndependentAuthorityId() + "/address/" + UUID.randomUUID()).with(mockAuthority))
-      .andDo(print()).andExpect(status().isNotFound());
-  }
-
-  @Test
-  public void testUpdateIndependentAuthorityAddress_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
+  void testUpdateIndependentAuthorityAddress_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
     final var independentAuthority = this.createIndependentAuthorityData();
     var independentAuthorityEntity = this.independentAuthorityRepository.save(independentAuthority);
     AddressEntity addressEntity = createAddressData(independentAuthorityEntity);
@@ -387,7 +372,7 @@ public class IndependentAuthorityControllerTest {
   }
 
   @Test
-  public void testCreateIndependentAuthorityNote_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
+  void testCreateIndependentAuthorityNote_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
     final IndependentAuthorityEntity independentAuthorityEntity = this.independentAuthorityRepository.save(this.createIndependentAuthorityData());
     NoteEntity noteEntity = createNoteData(independentAuthorityEntity);
 
@@ -402,7 +387,7 @@ public class IndependentAuthorityControllerTest {
   }
 
   @Test
-  public void testDeleteIndependentAuthorityNote_GivenValidID_ShouldReturnStatusOK() throws Exception {
+  void testDeleteIndependentAuthorityNote_GivenValidID_ShouldReturnStatusOK() throws Exception {
     final var independentAuthority = this.createIndependentAuthorityData();
     var independentAuthorityEntity = this.independentAuthorityRepository.save(independentAuthority);
     NoteEntity noteEntity = createNoteData(independentAuthorityEntity);
@@ -417,11 +402,11 @@ public class IndependentAuthorityControllerTest {
       .andExpect(status().isNoContent());
 
     var deletedNote = this.noteRepository.findById(note.getNoteId());
-    Assert.assertTrue(deletedNote.isEmpty());
+    Assertions.assertTrue(deletedNote.isEmpty());
   }
 
   @Test
-  public void testRetrieveIndependentAuthorityNote_GivenValidID_ShouldReturnStatusOK() throws Exception {
+  void testRetrieveIndependentAuthorityNote_GivenValidID_ShouldReturnStatusOK() throws Exception {
     final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_INDEPENDENT_AUTHORITY_NOTE";
     final var mockAuthority = oidcLogin().authorities(grantedAuthority);
     final var independentAuthority = this.createIndependentAuthorityData();
@@ -434,18 +419,7 @@ public class IndependentAuthorityControllerTest {
   }
 
   @Test
-  public void testRetrieveIndependentAuthorityNote_GivenInvalidID_ShouldReturnStatusNotFound() throws Exception {
-    final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_INDEPENDENT_AUTHORITY_NOTE";
-    final var mockAuthority = oidcLogin().authorities(grantedAuthority);
-    final var independentAuthority = this.createIndependentAuthorityData();
-    var independentAuthorityEntity = this.independentAuthorityRepository.save(independentAuthority);
-
-    this.mockMvc.perform(get(URL.BASE_URL_AUTHORITY + "/" + independentAuthorityEntity.getIndependentAuthorityId() + "/note/" + UUID.randomUUID()).with(mockAuthority))
-      .andDo(print()).andExpect(status().isNotFound());
-  }
-
-  @Test
-  public void testUpdateIndependentAuthorityNote_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
+  void testUpdateIndependentAuthorityNote_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
     final var independentAuthority = this.createIndependentAuthorityData();
     var independentAuthorityEntity = this.independentAuthorityRepository.save(independentAuthority);
     NoteEntity noteEntity = createNoteData(independentAuthorityEntity);
