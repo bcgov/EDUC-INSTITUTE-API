@@ -8,9 +8,12 @@ import ca.bc.gov.educ.api.institute.mapper.v1.AddressMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.ContactMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.NoteMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.SchoolMapper;
+import ca.bc.gov.educ.api.institute.model.v1.SchoolEntity;
 import ca.bc.gov.educ.api.institute.service.v1.SchoolHistoryService;
+import ca.bc.gov.educ.api.institute.service.v1.SchoolSearchService;
 import ca.bc.gov.educ.api.institute.service.v1.SchoolService;
 import ca.bc.gov.educ.api.institute.struct.v1.*;
+import ca.bc.gov.educ.api.institute.util.JsonUtil;
 import ca.bc.gov.educ.api.institute.util.RequestUtil;
 import ca.bc.gov.educ.api.institute.validator.AddressPayloadValidator;
 import ca.bc.gov.educ.api.institute.validator.ContactPayloadValidator;
@@ -21,14 +24,19 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -52,6 +60,9 @@ public class SchoolAPIController implements SchoolAPIEndpoint {
   private final SchoolHistoryService schoolHistoryService;
 
   @Getter(AccessLevel.PRIVATE)
+  private final SchoolSearchService schoolSearchService;
+
+  @Getter(AccessLevel.PRIVATE)
   private final SchoolPayloadValidator payloadValidator;
 
   private final ContactPayloadValidator contactPayloadValidator;
@@ -60,9 +71,10 @@ public class SchoolAPIController implements SchoolAPIEndpoint {
 
   private final NotePayloadValidator notePayloadValidator;
   @Autowired
-  public SchoolAPIController(final SchoolService schoolService, final SchoolHistoryService schoolHistoryService, final SchoolPayloadValidator payloadValidator, ContactPayloadValidator contactPayloadValidator, AddressPayloadValidator addressPayloadValidator, NotePayloadValidator notePayloadValidator) {
+  public SchoolAPIController(final SchoolService schoolService, final SchoolHistoryService schoolHistoryService, SchoolSearchService schoolSearchService, final SchoolPayloadValidator payloadValidator, ContactPayloadValidator contactPayloadValidator, AddressPayloadValidator addressPayloadValidator, NotePayloadValidator notePayloadValidator) {
     this.schoolService = schoolService;
     this.schoolHistoryService = schoolHistoryService;
+    this.schoolSearchService = schoolSearchService;
     this.payloadValidator = payloadValidator;
     this.contactPayloadValidator = contactPayloadValidator;
     this.addressPayloadValidator = addressPayloadValidator;
@@ -211,6 +223,13 @@ public class SchoolAPIController implements SchoolAPIEndpoint {
   public ResponseEntity<Void> deleteSchoolNote(UUID schoolId, UUID noteId) {
     this.schoolService.deleteSchoolNote(schoolId, noteId);
     return ResponseEntity.noContent().build();
+  }
+
+  @Override
+  public CompletableFuture<Page<School>> findAll(Integer pageNumber, Integer pageSize, String sortCriteriaJson, String searchCriteriaListJson) {
+    final List<Sort.Order> sorts = new ArrayList<>();
+    Specification<SchoolEntity> studentSpecs = schoolSearchService.setSpecificationAndSortCriteria(sortCriteriaJson, searchCriteriaListJson, JsonUtil.mapper, sorts);
+    return this.schoolSearchService.findAll(studentSpecs, pageNumber, pageSize, sorts).thenApplyAsync(schoolEntities -> schoolEntities.map(mapper::toStructure));
   }
 
 }

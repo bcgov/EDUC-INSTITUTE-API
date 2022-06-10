@@ -9,7 +9,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 import static org.springframework.http.HttpStatus.CREATED;
 
@@ -153,5 +156,16 @@ public interface SchoolAPIEndpoint {
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
   @Tag(name = "Endpoint to create school note entity.", description = "Endpoint to create school note entity.")
   ResponseEntity<Void> deleteSchoolNote(@PathVariable UUID schoolId, @PathVariable UUID noteId);
+
+  @GetMapping("/paginated")
+  @Async
+  @PreAuthorize("hasAuthority('SCOPE_READ_SCHOOL')")
+  @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR.")})
+  @Transactional(readOnly = true)
+  @Tag(name = "Endpoint to support data table view in frontend, with sort, filter and pagination.", description = "This API endpoint exposes flexible way to query the entity by leveraging JPA specifications.")
+  CompletableFuture<Page<School>> findAll(@RequestParam(name = "pageNumber", defaultValue = "0") Integer pageNumber,
+                                           @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
+                                           @RequestParam(name = "sort", defaultValue = "") String sortCriteriaJson,
+                                           @RequestParam(name = "searchCriteriaList", required = false) String searchCriteriaListJson);
 
 }
