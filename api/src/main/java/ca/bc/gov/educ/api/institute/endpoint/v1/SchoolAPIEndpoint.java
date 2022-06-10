@@ -31,7 +31,7 @@ public interface SchoolAPIEndpoint {
   @Transactional(readOnly = true)
   @Tag(name = "Endpoint to get school entity.", description = "Endpoint to get school entity by ID.")
   @Schema(name = "School", implementation = School.class)
-  School getSchool(@PathVariable("schoolId")  String schoolId);
+  School getSchool(@PathVariable("schoolId")  UUID schoolId);
 
   @GetMapping("/{schoolId}/history")
   @PreAuthorize("hasAuthority('SCOPE_READ_SCHOOL')")
@@ -39,7 +39,7 @@ public interface SchoolAPIEndpoint {
   @Transactional(readOnly = true)
   @Tag(name = "Endpoint to get school history entity list by school ID.", description = "Endpoint to get school history entity list by school ID.")
   @Schema(name = "SchoolHistory", implementation = SchoolHistory.class)
-  List<SchoolHistory> getSchoolHistory(@PathVariable("schoolId")  String schoolId);
+  List<SchoolHistory> getSchoolHistory(@PathVariable("schoolId")  UUID schoolId);
 
   @PostMapping
   @PreAuthorize("hasAuthority('SCOPE_WRITE_SCHOOL')")

@@ -7,6 +7,7 @@ import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.*;
 import javax.validation.constraints.PastOrPresent;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -104,4 +105,18 @@ public class SchoolEntity {
   @EqualsAndHashCode.Exclude
   @OneToMany(mappedBy = "schoolEntity", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = NeighborhoodLearningEntity.class)
   private Set<NeighborhoodLearningEntity> neighborhoodLearning;
+
+  public Set<NeighborhoodLearningEntity> getNeighborhoodLearning() {
+    if (this.neighborhoodLearning == null) {
+      this.neighborhoodLearning = new HashSet<>();
+    }
+    return this.neighborhoodLearning;
+  }
+
+  public Set<SchoolGradeEntity> getGrades() {
+    if (this.grades == null) {
+      this.grades = new HashSet<>();
+    }
+    return this.grades;
+  }
 }

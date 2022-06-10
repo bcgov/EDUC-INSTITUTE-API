@@ -137,6 +137,14 @@ public class DistrictControllerTest {
   }
 
   @Test
+  public void testRetrieveDistrict_GivenInvalidID_ShouldReturnStatusNotFound() throws Exception {
+    final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_DISTRICT";
+    final var mockAuthority = oidcLogin().authorities(grantedAuthority);
+    this.mockMvc.perform(get(URL.BASE_URL_DISTRICT + "/" + UUID.randomUUID()).with(mockAuthority))
+      .andDo(print()).andExpect(status().isNotFound());
+  }
+
+  @Test
   public void testRetrieveDistrictHistory_GivenValidID_ShouldReturnStatusOK() throws Exception {
     final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_DISTRICT";
     final var mockAuthority = oidcLogin().authorities(grantedAuthority);
@@ -214,6 +222,21 @@ public class DistrictControllerTest {
   }
 
   @Test
+  public void testCreateDistrict_GivenInvalidPayload_ShouldReturnStatusBadRequest() throws Exception {
+    final var district = this.createDistrictData();
+    district.setDistrictRegionCode("ABCD");
+    district.setCreateDate(null);
+    district.setUpdateDate(null);
+    this.mockMvc.perform(post(URL.BASE_URL_DISTRICT)
+        .contentType(MediaType.APPLICATION_JSON)
+        .accept(MediaType.APPLICATION_JSON)
+        .content(asJsonString(district))
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_DISTRICT"))))
+      .andDo(print())
+      .andExpect(status().isBadRequest());
+  }
+
+  @Test
   public void testCreateDistrictContact_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
     final DistrictEntity districtEntity = this.districtRepository.save(this.createDistrictData());
     ContactEntity contactEntity = createContactData(districtEntity);
@@ -258,6 +281,16 @@ public class DistrictControllerTest {
     this.mockMvc.perform(get(URL.BASE_URL_DISTRICT + "/" + districtEntity.getDistrictId() + "/contact/" + contact.getContactId()).with(mockAuthority))
       .andDo(print()).andExpect(status().isOk()).andExpect(MockMvcResultMatchers.jsonPath("$.contactId")
         .value(contact.getContactId().toString()));
+  }
+
+  @Test
+  public void testRetrieveDistrictContact_GivenInvalidID_ShouldReturnStatusNotFound() throws Exception {
+    final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_DISTRICT_CONTACT";
+    final var mockAuthority = oidcLogin().authorities(grantedAuthority);
+    final var district = this.createDistrictData();
+    var districtEntity = this.districtRepository.save(district);
+    this.mockMvc.perform(get(URL.BASE_URL_DISTRICT + "/" + districtEntity.getDistrictId() + "/contact/" + UUID.randomUUID()).with(mockAuthority))
+      .andDo(print()).andExpect(status().isNotFound());
   }
 
   @Test
@@ -329,6 +362,16 @@ public class DistrictControllerTest {
   }
 
   @Test
+  public void testRetrieveDistrictAddress_GivenInvalidID_ShouldReturnStatusNotFound() throws Exception {
+    final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_DISTRICT_ADDRESS";
+    final var mockAuthority = oidcLogin().authorities(grantedAuthority);
+    final var district = this.createDistrictData();
+    var districtEntity = this.districtRepository.save(district);
+    this.mockMvc.perform(get(URL.BASE_URL_DISTRICT + "/" + districtEntity.getDistrictId() + "/address/" + UUID.randomUUID()).with(mockAuthority))
+      .andDo(print()).andExpect(status().isNotFound());
+  }
+
+  @Test
   public void testUpdateDistrictAddress_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
     final var district = this.createDistrictData();
     var districtEntity = this.districtRepository.save(district);
@@ -391,6 +434,17 @@ public class DistrictControllerTest {
     this.mockMvc.perform(get(URL.BASE_URL_DISTRICT + "/" + districtEntity.getDistrictId() + "/note/" + note.getNoteId()).with(mockAuthority))
       .andDo(print()).andExpect(status().isOk()).andExpect(MockMvcResultMatchers.jsonPath("$.noteId")
         .value(note.getNoteId().toString()));
+  }
+
+  @Test
+  public void testRetrieveDistrictNote_GivenInvalidID_ShouldReturnStatusNotFound() throws Exception {
+    final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_DISTRICT_NOTE";
+    final var mockAuthority = oidcLogin().authorities(grantedAuthority);
+    final var district = this.createDistrictData();
+    var districtEntity = this.districtRepository.save(district);
+
+    this.mockMvc.perform(get(URL.BASE_URL_DISTRICT + "/" + districtEntity.getDistrictId() + "/note/" + UUID.randomUUID()).with(mockAuthority))
+      .andDo(print()).andExpect(status().isNotFound());
   }
 
   @Test

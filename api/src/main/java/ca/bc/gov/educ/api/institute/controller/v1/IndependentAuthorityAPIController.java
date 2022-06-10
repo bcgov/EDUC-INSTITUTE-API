@@ -70,16 +70,8 @@ public class IndependentAuthorityAPIController implements IndependentAuthorityAP
   }
 
   @Override
-  public IndependentAuthority getIndependentAuthority(String independentAuthorityId) {
-    UUID independentAuthorityUUID;
-    try{
-      independentAuthorityUUID = UUID.fromString(independentAuthorityId);
-    }catch(Exception e){
-      final ApiError error = ApiError.builder().timestamp(LocalDateTime.now()).message("Invalid independentAuthority ID").status(BAD_REQUEST).build();
-      throw new InvalidPayloadException(error);
-    }
-
-    var independentAuthority = getIndependentAuthorityService().getIndependentAuthority(independentAuthorityUUID);
+  public IndependentAuthority getIndependentAuthority(UUID independentAuthorityId) {
+    var independentAuthority = getIndependentAuthorityService().getIndependentAuthority(independentAuthorityId);
 
     if(independentAuthority.isPresent()){
       return mapper.toStructure(independentAuthority.get());
@@ -89,16 +81,8 @@ public class IndependentAuthorityAPIController implements IndependentAuthorityAP
   }
 
   @Override
-  public List<IndependentAuthorityHistory> getIndependentAuthorityHistory(String independentAuthorityId) {
-    UUID independentAuthorityUUID;
-    try{
-      independentAuthorityUUID = UUID.fromString(independentAuthorityId);
-    }catch(Exception e){
-      final ApiError error = ApiError.builder().timestamp(LocalDateTime.now()).message("Invalid independentAuthority history ID").status(BAD_REQUEST).build();
-      throw new InvalidPayloadException(error);
-    }
-
-    return getIndependentAuthorityHistoryService().getAllIndependentAuthorityHistoryList(independentAuthorityUUID).stream().map(mapper::toStructure).collect(Collectors.toList());
+  public List<IndependentAuthorityHistory> getIndependentAuthorityHistory(UUID independentAuthorityId) {
+    return getIndependentAuthorityHistoryService().getAllIndependentAuthorityHistoryList(independentAuthorityId).stream().map(mapper::toStructure).collect(Collectors.toList());
   }
 
   @Override

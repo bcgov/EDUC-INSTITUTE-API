@@ -31,7 +31,7 @@ public interface IndependentAuthorityAPIEndpoint {
   @Transactional(readOnly = true)
   @Tag(name = "Endpoint to get independent authority entity.", description = "Endpoint to get independent authority entity by ID.")
   @Schema(name = "Independent Authority", implementation = IndependentAuthority.class)
-  IndependentAuthority getIndependentAuthority(@PathVariable("independentAuthorityId")  String independentAuthorityId);
+  IndependentAuthority getIndependentAuthority(@PathVariable("independentAuthorityId")  UUID independentAuthorityId);
 
   @GetMapping("/{independentAuthorityId}/history")
   @PreAuthorize("hasAuthority('SCOPE_READ_INDEPENDENT_AUTHORITY')")
@@ -39,7 +39,7 @@ public interface IndependentAuthorityAPIEndpoint {
   @Transactional(readOnly = true)
   @Tag(name = "Endpoint to get independent authority history entity list by independent authority ID.", description = "Endpoint to get independent authority history entity list by independent authority ID.")
   @Schema(name = "IndependentAuthorityHistory", implementation = IndependentAuthorityHistory.class)
-  List<IndependentAuthorityHistory> getIndependentAuthorityHistory(@PathVariable("independentAuthorityId")  String independentAuthorityId);
+  List<IndependentAuthorityHistory> getIndependentAuthorityHistory(@PathVariable("independentAuthorityId")  UUID independentAuthorityId);
 
   @PostMapping
   @PreAuthorize("hasAuthority('SCOPE_WRITE_INDEPENDENT_AUTHORITY')")

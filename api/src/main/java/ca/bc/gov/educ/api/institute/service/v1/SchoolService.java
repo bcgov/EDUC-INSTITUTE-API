@@ -5,7 +5,10 @@ import ca.bc.gov.educ.api.institute.mapper.v1.AddressMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.ContactMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.NoteMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.SchoolMapper;
-import ca.bc.gov.educ.api.institute.model.v1.*;
+import ca.bc.gov.educ.api.institute.model.v1.AddressEntity;
+import ca.bc.gov.educ.api.institute.model.v1.ContactEntity;
+import ca.bc.gov.educ.api.institute.model.v1.NoteEntity;
+import ca.bc.gov.educ.api.institute.model.v1.SchoolEntity;
 import ca.bc.gov.educ.api.institute.repository.v1.AddressRepository;
 import ca.bc.gov.educ.api.institute.repository.v1.ContactRepository;
 import ca.bc.gov.educ.api.institute.repository.v1.NoteRepository;
@@ -102,6 +105,13 @@ public class SchoolService {
     if (curSchoolEntityOptional.isPresent()) {
       final SchoolEntity currentSchoolEntity = curSchoolEntityOptional.get();
       BeanUtils.copyProperties(school, currentSchoolEntity, CREATE_DATE, CREATE_USER, "grades", "neighborhoodLearning"); // update current student entity with incoming payload ignoring the fields.
+
+      currentSchoolEntity.getGrades().clear();
+      currentSchoolEntity.getNeighborhoodLearning().clear();
+
+      currentSchoolEntity.getGrades().addAll(school.getGrades());
+      currentSchoolEntity.getNeighborhoodLearning().addAll(school.getNeighborhoodLearning());
+
       TransformUtil.uppercaseFields(currentSchoolEntity); // convert the input to upper case.
       schoolHistoryService.createSchoolHistory(currentSchoolEntity, currentSchoolEntity.getUpdateUser(), false);
       schoolRepository.save(currentSchoolEntity);

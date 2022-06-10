@@ -8,7 +8,6 @@ import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.*;
 import javax.validation.constraints.PastOrPresent;
 import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -78,25 +77,4 @@ public class DistrictEntity {
   @EqualsAndHashCode.Exclude
   @OneToMany(mappedBy = "districtEntity", fetch = FetchType.EAGER, cascade = CascadeType.DETACH, targetEntity = NoteEntity.class)
   private Set<NoteEntity> notes;
-
-  public Set<AddressEntity> getAddresses() {
-    if (this.addresses == null) {
-      this.addresses = new HashSet<>();
-    }
-    return this.addresses;
-  }
-
-  public Set<ContactEntity> getContacts() {
-    if (this.contacts == null) {
-      this.contacts = new HashSet<>();
-    }
-    return this.contacts;
-  }
-
-  public Set<NoteEntity> getNotes() {
-    if (this.notes == null) {
-      this.notes = new HashSet<>();
-    }
-    return this.notes;
-  }
 }

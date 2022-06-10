@@ -1,7 +1,11 @@
 package ca.bc.gov.educ.api.institute.model.v1;
 
 import ca.bc.gov.educ.api.institute.util.UpperCase;
-import lombok.*;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -25,6 +29,7 @@ public class SchoolGradeEntity {
 
   @ManyToOne(optional = true, targetEntity = SchoolEntity.class)
   @JoinColumn(name = "school_id", referencedColumnName = "school_id")
+  @JsonIgnoreProperties("grades")
   SchoolEntity schoolEntity;
 
   @Basic

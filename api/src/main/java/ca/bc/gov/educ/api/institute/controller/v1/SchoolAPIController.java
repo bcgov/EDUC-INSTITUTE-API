@@ -70,16 +70,8 @@ public class SchoolAPIController implements SchoolAPIEndpoint {
   }
 
   @Override
-  public School getSchool(String schoolId) {
-    UUID schoolUUID;
-    try{
-      schoolUUID = UUID.fromString(schoolId);
-    }catch(Exception e){
-      final ApiError error = ApiError.builder().timestamp(LocalDateTime.now()).message("Invalid school ID").status(BAD_REQUEST).build();
-      throw new InvalidPayloadException(error);
-    }
-
-    var school = getSchoolService().getSchool(schoolUUID);
+  public School getSchool(UUID schoolId) {
+    var school = getSchoolService().getSchool(schoolId);
 
     if(school.isPresent()){
       return mapper.toStructure(school.get());
@@ -89,16 +81,8 @@ public class SchoolAPIController implements SchoolAPIEndpoint {
   }
 
   @Override
-  public List<SchoolHistory> getSchoolHistory(String schoolId) {
-    UUID schoolUUID;
-    try{
-      schoolUUID = UUID.fromString(schoolId);
-    }catch(Exception e){
-      final ApiError error = ApiError.builder().timestamp(LocalDateTime.now()).message("Invalid school history ID").status(BAD_REQUEST).build();
-      throw new InvalidPayloadException(error);
-    }
-
-    return getSchoolHistoryService().getAllSchoolHistoryList(schoolUUID).stream().map(mapper::toStructure).collect(Collectors.toList());
+  public List<SchoolHistory> getSchoolHistory(UUID schoolId) {
+    return getSchoolHistoryService().getAllSchoolHistoryList(schoolId).stream().map(mapper::toStructure).collect(Collectors.toList());
   }
 
   @Override

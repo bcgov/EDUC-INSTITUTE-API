@@ -86,6 +86,13 @@ public class SchoolControllerTest {
   @Autowired
   CountryCodeRepository countryCodeRepository;
 
+  @Autowired
+  SchoolGradeCodeRepository schoolGradeCodeRepository;
+
+
+  @Autowired
+  NeighborhoodLearningTypeCodeRepository neighborhoodLearningTypeCodeRepository;
+
   @Before
   public void setUp() {
     MockitoAnnotations.openMocks(this);
@@ -100,6 +107,8 @@ public class SchoolControllerTest {
     this.addressTypeCodeRepository.save(this.createAddressTypeCodeData());
     this.countryCodeRepository.save(this.createCountryCodeData());
     this.provinceCodeRepository.save(this.createProvinceCodeData());
+    this.schoolGradeCodeRepository.save(this.createSchoolGradeCodeData());
+    this.neighborhoodLearningTypeCodeRepository.save(this.createNeighborhoodLearningTypeCodeData());
   }
 
   /**
@@ -112,6 +121,8 @@ public class SchoolControllerTest {
     this.noteRepository.deleteAll();
     this.schoolRepository.deleteAll();
     this.schoolHistoryRepository.deleteAll();
+    this.schoolGradeCodeRepository.deleteAll();
+    this.neighborhoodLearningTypeCodeRepository.deleteAll();
     this.schoolCategoryCodeRepository.deleteAll();
     this.schoolOrganizationCodeRepository.deleteAll();
     this.facilityTypeCodeRepository.deleteAll();
@@ -135,6 +146,14 @@ public class SchoolControllerTest {
     this.mockMvc.perform(get(URL.BASE_URL_SCHOOL + "/" + entity.getSchoolId()).with(mockAuthority))
       .andDo(print()).andExpect(status().isOk()).andExpect(MockMvcResultMatchers.jsonPath("$.schoolId")
         .value(entity.getSchoolId().toString()));
+  }
+
+  @Test
+  public void testRetrieveSchool_GivenInvalidID_ShouldReturnStatusNotFound() throws Exception {
+    final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_SCHOOL";
+    final var mockAuthority = oidcLogin().authorities(grantedAuthority);
+    this.mockMvc.perform(get(URL.BASE_URL_SCHOOL + "/" + UUID.randomUUID()).with(mockAuthority))
+      .andDo(print()).andExpect(status().isNotFound());
   }
 
   @Test
@@ -200,6 +219,44 @@ public class SchoolControllerTest {
   }
 
   @Test
+  public void testAddSchoolGrade_GivenValidPayload_ShouldReturnStatusOk() throws Exception {
+    final var school = this.createSchoolData();
+    var entity = this.schoolRepository.save(school);
+    entity.setDisplayName("newdist");
+    entity.setCreateDate(null);
+    entity.setUpdateDate(null);
+    entity.getGrades().add(createSchoolGradeData(entity));
+
+    this.mockMvc.perform(put(URL.BASE_URL_SCHOOL + "/" + entity.getSchoolId())
+        .contentType(MediaType.APPLICATION_JSON)
+        .accept(MediaType.APPLICATION_JSON)
+        .content(asJsonString(entity))
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SCHOOL"))))
+      .andDo(print())
+      .andExpect(status().isOk())
+      .andExpect(MockMvcResultMatchers.jsonPath("$.grades[0].schoolGradeCode").value("01"));
+  }
+
+  @Test
+  public void testAddSchoolNeighborhoodLearning_GivenValidPayload_ShouldReturnStatusOk() throws Exception {
+    final var school = this.createSchoolData();
+    var entity = this.schoolRepository.save(school);
+    entity.setDisplayName("newdist");
+    entity.setCreateDate(null);
+    entity.setUpdateDate(null);
+    entity.getNeighborhoodLearning().add(createNeighborhoodLearningData(entity));
+
+    this.mockMvc.perform(put(URL.BASE_URL_SCHOOL + "/" + entity.getSchoolId())
+        .contentType(MediaType.APPLICATION_JSON)
+        .accept(MediaType.APPLICATION_JSON)
+        .content(asJsonString(entity))
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SCHOOL"))))
+      .andDo(print())
+      .andExpect(status().isOk())
+      .andExpect(MockMvcResultMatchers.jsonPath("$.neighborhoodLearning[0].neighborhoodLearningTypeCode").value("COMM_USE"));
+  }
+
+  @Test
   public void testCreateSchool_GivenValidPayload_ShouldReturnStatusOK() throws Exception {
     final var school = this.createSchoolData();
     school.setCreateDate(null);
@@ -212,6 +269,21 @@ public class SchoolControllerTest {
       .andDo(print())
       .andExpect(status().isCreated())
       .andExpect(MockMvcResultMatchers.jsonPath("$.displayName").value(school.getDisplayName().toUpperCase()));
+  }
+
+  @Test
+  public void testCreateSchool_GivenInvalidPayload_ShouldReturnStatusBadRequest() throws Exception {
+    final var school = this.createSchoolData();
+    school.setSchoolCategoryCode("ABCD");
+    school.setCreateDate(null);
+    school.setUpdateDate(null);
+    this.mockMvc.perform(post(URL.BASE_URL_SCHOOL)
+        .contentType(MediaType.APPLICATION_JSON)
+        .accept(MediaType.APPLICATION_JSON)
+        .content(asJsonString(school))
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SCHOOL"))))
+      .andDo(print())
+      .andExpect(status().isBadRequest());
   }
 
   @Test
@@ -259,6 +331,17 @@ public class SchoolControllerTest {
     this.mockMvc.perform(get(URL.BASE_URL_SCHOOL + "/" + schoolEntity.getSchoolId() + "/contact/" + contact.getContactId()).with(mockAuthority))
       .andDo(print()).andExpect(status().isOk()).andExpect(MockMvcResultMatchers.jsonPath("$.contactId")
         .value(contact.getContactId().toString()));
+  }
+
+  @Test
+  public void testRetrieveSchoolContact_GivenInvalidID_ShouldReturnStatusNotFound() throws Exception {
+    final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_SCHOOL_CONTACT";
+    final var mockAuthority = oidcLogin().authorities(grantedAuthority);
+    final var school = this.createSchoolData();
+    var schoolEntity = this.schoolRepository.save(school);
+
+    this.mockMvc.perform(get(URL.BASE_URL_SCHOOL + "/" + schoolEntity.getSchoolId() + "/contact/" + UUID.randomUUID()).with(mockAuthority))
+      .andDo(print()).andExpect(status().isNotFound());
   }
 
   @Test
@@ -327,6 +410,17 @@ public class SchoolControllerTest {
   }
 
   @Test
+  public void testRetrieveSchoolAddress_GivenInvalidID_ShouldReturnStatusNotFound() throws Exception {
+    final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_SCHOOL_ADDRESS";
+    final var mockAuthority = oidcLogin().authorities(grantedAuthority);
+    final var school = this.createSchoolData();
+    var schoolEntity = this.schoolRepository.save(school);
+
+    this.mockMvc.perform(get(URL.BASE_URL_SCHOOL + "/" + schoolEntity.getSchoolId() + "/address/" + UUID.randomUUID()).with(mockAuthority))
+      .andDo(print()).andExpect(status().isNotFound());
+  }
+
+  @Test
   public void testUpdateSchoolAddress_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
     final var school = this.createSchoolData();
     var schoolEntity = this.schoolRepository.save(school);
@@ -392,6 +486,16 @@ public class SchoolControllerTest {
   }
 
   @Test
+  public void testRetrieveSchoolNote_GivenInvalidID_ShouldReturnStatusNotFound() throws Exception {
+    final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_SCHOOL_NOTE";
+    final var mockAuthority = oidcLogin().authorities(grantedAuthority);
+    final var school = this.createSchoolData();
+    var schoolEntity = this.schoolRepository.save(school);
+    this.mockMvc.perform(get(URL.BASE_URL_SCHOOL + "/" + schoolEntity.getSchoolId() + "/note/" + UUID.randomUUID()).with(mockAuthority))
+      .andDo(print()).andExpect(status().isNotFound());
+  }
+
+  @Test
   public void testUpdateSchoolNote_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
     final var school = this.createSchoolData();
     var schoolEntity = this.schoolRepository.save(school);
@@ -453,6 +557,14 @@ public class SchoolControllerTest {
     return ContactEntity.builder().schoolEntity(entity).contactTypeCode("PRINCIPAL").firstName("John").lastName("Wayne").createUser("TEST").updateUser("TEST").build();
   }
 
+  private SchoolGradeEntity createSchoolGradeData(SchoolEntity entity) {
+    return SchoolGradeEntity.builder().schoolEntity(entity).schoolGradeCode("01").createUser("TEST").updateUser("TEST").build();
+  }
+
+  private NeighborhoodLearningEntity createNeighborhoodLearningData(SchoolEntity entity) {
+    return NeighborhoodLearningEntity.builder().schoolEntity(entity).neighborhoodLearningTypeCode("COMM_USE").createUser("TEST").updateUser("TEST").build();
+  }
+
   private AddressEntity createAddressData(SchoolEntity entity) {
     return AddressEntity.builder().schoolEntity(entity).addressTypeCode("MAILING").addressLine1("123 This Street").city("Compton")
       .provinceCode("BC").countryCode("CAN").postal("V1B9H2").createUser("TEST").updateUser("TEST").build();
@@ -483,6 +595,18 @@ public class SchoolControllerTest {
   private CountryCodeEntity createCountryCodeData() {
     return CountryCodeEntity.builder().countryCode("CAN").description("Canada")
       .effectiveDate(LocalDateTime.now()).expiryDate(LocalDateTime.MAX).displayOrder(1).label("Canada").createDate(LocalDateTime.now())
+      .updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
+  }
+
+  private SchoolGradeCodeEntity createSchoolGradeCodeData() {
+    return SchoolGradeCodeEntity.builder().schoolGradeCode("01").description("First Grade")
+      .effectiveDate(LocalDateTime.now()).expiryDate(LocalDateTime.MAX).displayOrder(1).label("First").createDate(LocalDateTime.now())
+      .updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
+  }
+
+  private NeighborhoodLearningTypeCodeEntity createNeighborhoodLearningTypeCodeData() {
+    return NeighborhoodLearningTypeCodeEntity.builder().neighborhoodLearningTypeCode("COMM_USE").description("Community Use")
+      .effectiveDate(LocalDateTime.now()).expiryDate(LocalDateTime.MAX).displayOrder(1).label("Community Use").createDate(LocalDateTime.now())
       .updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
   }
 }
