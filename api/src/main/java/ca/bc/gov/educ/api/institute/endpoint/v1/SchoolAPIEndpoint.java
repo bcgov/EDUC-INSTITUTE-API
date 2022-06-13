@@ -157,7 +157,7 @@ public interface SchoolAPIEndpoint {
   @PreAuthorize("hasAuthority('SCOPE_READ_SCHOOL')")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR.")})
   @Transactional(readOnly = true)
-  @Tag(name = "School Entity", description = "This API endpoint exposes flexible way to query the entity by leveraging JPA specifications.")
+  @Tag(name = "School Entity", description = "Endpoints for school entity.")
   CompletableFuture<Page<School>> findAll(@RequestParam(name = "pageNumber", defaultValue = "0") Integer pageNumber,
                                            @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
                                            @RequestParam(name = "sort", defaultValue = "") String sortCriteriaJson,
