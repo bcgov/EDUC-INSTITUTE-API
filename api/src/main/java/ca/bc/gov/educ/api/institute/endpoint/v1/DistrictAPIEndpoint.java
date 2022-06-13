@@ -2,12 +2,9 @@ package ca.bc.gov.educ.api.institute.endpoint.v1;
 
 import ca.bc.gov.educ.api.institute.constants.v1.URL;
 import ca.bc.gov.educ.api.institute.struct.v1.*;
-import io.swagger.v3.oas.annotations.OpenAPIDefinition;
-import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -21,11 +18,6 @@ import java.util.UUID;
 import static org.springframework.http.HttpStatus.CREATED;
 
 @RequestMapping(URL.BASE_URL_DISTRICT)
-@OpenAPIDefinition(info = @Info(title = "API to District CRUD.", description = "This API is related to district data.", version = "1"),
-  security = {@SecurityRequirement(name = "OAUTH2", scopes = {"READ_DISTRICT", "WRITE_DISTRICT", "DELETE_DISTRICT",
-    "READ_DISTRICT_CONTACT", "WRITE_DISTRICT_CONTACT", "DELETE_DISTRICT_CONTACT",
-    "READ_DISTRICT_ADDRESS", "WRITE_DISTRICT_ADDRESS", "DELETE_DISTRICT_ADDRESS",
-    "READ_DISTRICT_NOTE", "WRITE_DISTRICT_NOTE", "DELETE_DISTRICT_NOTE"})})
 public interface DistrictAPIEndpoint {
 
   @GetMapping("/{districtId}")

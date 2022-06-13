@@ -2,12 +2,9 @@ package ca.bc.gov.educ.api.institute.endpoint.v1;
 
 import ca.bc.gov.educ.api.institute.constants.v1.URL;
 import ca.bc.gov.educ.api.institute.struct.v1.*;
-import io.swagger.v3.oas.annotations.OpenAPIDefinition;
-import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -21,11 +18,6 @@ import java.util.UUID;
 import static org.springframework.http.HttpStatus.CREATED;
 
 @RequestMapping(URL.BASE_URL_AUTHORITY)
-@OpenAPIDefinition(info = @Info(title = "API to Independent Authority CRUD.", description = "This API is related to independent authority data.", version = "1"),
-  security = {@SecurityRequirement(name = "OAUTH2", scopes = {"READ_INDEPENDENT_AUTHORITY", "WRITE_INDEPENDENT_AUTHORITY", "DELETE_INDEPENDENT_AUTHORITY",
-    "READ_INDEPENDENT_AUTHORITY_CONTACT", "WRITE_INDEPENDENT_AUTHORITY_CONTACT", "DELETE_INDEPENDENT_AUTHORITY_CONTACT",
-    "READ_INDEPENDENT_AUTHORITY_ADDRESS", "WRITE_INDEPENDENT_AUTHORITY_ADDRESS", "DELETE_INDEPENDENT_AUTHORITY_ADDRESS",
-    "READ_INDEPENDENT_AUTHORITY_NOTE", "WRITE_INDEPENDENT_AUTHORITY_NOTE", "DELETE_INDEPENDENT_AUTHORITY_NOTE"})})
 public interface IndependentAuthorityAPIEndpoint {
 
   @GetMapping("/{independentAuthorityId}")

@@ -2,12 +2,9 @@ package ca.bc.gov.educ.api.institute.endpoint.v1;
 
 import ca.bc.gov.educ.api.institute.constants.v1.URL;
 import ca.bc.gov.educ.api.institute.struct.v1.*;
-import io.swagger.v3.oas.annotations.OpenAPIDefinition;
-import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -24,11 +21,6 @@ import java.util.concurrent.CompletableFuture;
 import static org.springframework.http.HttpStatus.CREATED;
 
 @RequestMapping(URL.BASE_URL_SCHOOL)
-@OpenAPIDefinition(info = @Info(title = "API to School CRUD.", description = "This API is related to school data.", version = "1"),
-  security = {@SecurityRequirement(name = "OAUTH2", scopes = {"READ_SCHOOL", "WRITE_SCHOOL", "DELETE_SCHOOL",
-    "READ_SCHOOL_CONTACT", "WRITE_SCHOOL_CONTACT", "DELETE_SCHOOL_CONTACT",
-    "READ_SCHOOL_ADDRESS", "WRITE_SCHOOL_ADDRESS", "DELETE_SCHOOL_ADDRESS",
-    "READ_SCHOOL_NOTE", "WRITE_SCHOOL_NOTE", "DELETE_SCHOOL_NOTE"})})
 public interface SchoolAPIEndpoint {
 
   @GetMapping("/{schoolId}")
