@@ -90,7 +90,7 @@ public interface IndependentAuthorityAPIEndpoint {
   @DeleteMapping("/{independentAuthorityId}/contact/{contactId}")
   @PreAuthorize("hasAuthority('SCOPE_DELETE_INDEPENDENT_AUTHORITY_CONTACT')")
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
-  @Tag(name = "Endpoint to create independent authority contact entity.", description = "Endpoint to create independent authority contact entity.")
+  @Tag(name = "Endpoint to delete independent authority contact entity.", description = "Endpoint to delete independent authority contact entity.")
   ResponseEntity<Void> deleteIndependentAuthorityContact(@PathVariable UUID independentAuthorityId, @PathVariable UUID contactId);
 
   @GetMapping("/{independentAuthorityId}/address/{addressId}")
@@ -118,7 +118,7 @@ public interface IndependentAuthorityAPIEndpoint {
   @DeleteMapping("/{independentAuthorityId}/address/{addressId}")
   @PreAuthorize("hasAuthority('SCOPE_DELETE_INDEPENDENT_AUTHORITY_ADDRESS')")
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
-  @Tag(name = "Endpoint to create independent authority address entity.", description = "Endpoint to create independent authority address entity.")
+  @Tag(name = "Endpoint to delete independent authority address entity.", description = "Endpoint to delete independent authority address entity.")
   ResponseEntity<Void> deleteIndependentAuthorityAddress(@PathVariable UUID independentAuthorityId, @PathVariable UUID addressId);
 
   @GetMapping("/{independentAuthorityId}/note/{noteId}")
@@ -146,7 +146,7 @@ public interface IndependentAuthorityAPIEndpoint {
   @DeleteMapping("/{independentAuthorityId}/note/{noteId}")
   @PreAuthorize("hasAuthority('SCOPE_DELETE_INDEPENDENT_AUTHORITY_NOTE')")
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
-  @Tag(name = "Endpoint to create independent authority note entity.", description = "Endpoint to create independent authority note entity.")
+  @Tag(name = "Endpoint to delete independent authority note entity.", description = "Endpoint to delete independent authority note entity.")
   ResponseEntity<Void> deleteIndependentAuthorityNote(@PathVariable UUID independentAuthorityId, @PathVariable UUID noteId);
 
 

@@ -93,7 +93,7 @@ public interface SchoolAPIEndpoint {
   @DeleteMapping("/{schoolId}/contact/{contactId}")
   @PreAuthorize("hasAuthority('SCOPE_DELETE_SCHOOL_CONTACT')")
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
-  @Tag(name = "Endpoint to create school contact entity.", description = "Endpoint to create school contact entity.")
+  @Tag(name = "Endpoint to delete school contact entity.", description = "Endpoint to delete school contact entity.")
   ResponseEntity<Void> deleteSchoolContact(@PathVariable UUID schoolId, @PathVariable UUID contactId);
 
   @GetMapping("/{schoolId}/address/{addressId}")

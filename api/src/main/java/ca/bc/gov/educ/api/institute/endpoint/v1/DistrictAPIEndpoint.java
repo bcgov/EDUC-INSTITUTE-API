@@ -90,7 +90,7 @@ public interface DistrictAPIEndpoint {
   @DeleteMapping("/{districtId}/contact/{contactId}")
   @PreAuthorize("hasAuthority('SCOPE_DELETE_DISTRICT_CONTACT')")
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
-  @Tag(name = "Endpoint to create district contact entity.", description = "Endpoint to create district contact entity.")
+  @Tag(name = "Endpoint to delete district contact entity.", description = "Endpoint to delete district contact entity.")
   ResponseEntity<Void> deleteDistrictContact(@PathVariable UUID districtId, @PathVariable UUID contactId);
 
   @GetMapping("/{districtId}/address/{addressId}")
@@ -118,7 +118,7 @@ public interface DistrictAPIEndpoint {
   @DeleteMapping("/{districtId}/address/{addressId}")
   @PreAuthorize("hasAuthority('SCOPE_DELETE_DISTRICT_ADDRESS')")
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
-  @Tag(name = "Endpoint to create district address entity.", description = "Endpoint to create district address entity.")
+  @Tag(name = "Endpoint to delete district address entity.", description = "Endpoint to delete district address entity.")
   ResponseEntity<Void> deleteDistrictAddress(@PathVariable UUID districtId, @PathVariable UUID addressId);
 
   @GetMapping("/{districtId}/note/{noteId}")
@@ -146,7 +146,7 @@ public interface DistrictAPIEndpoint {
   @DeleteMapping("/{districtId}/note/{noteId}")
   @PreAuthorize("hasAuthority('SCOPE_DELETE_DISTRICT_NOTE')")
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
-  @Tag(name = "Endpoint to create district note entity.", description = "Endpoint to create district note entity.")
+  @Tag(name = "Endpoint to delete district note entity.", description = "Endpoint to delete district note entity.")
   ResponseEntity<Void> deleteDistrictNote(@PathVariable UUID districtId, @PathVariable UUID noteId);
 
 }
