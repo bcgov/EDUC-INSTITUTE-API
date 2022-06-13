@@ -52,9 +52,6 @@ public class SchoolHistoryEntity {
   @Column(name = "display_name")
   private String displayName;
   @Basic
-  @Column(name = "asset_number")
-  private String assetNumber;
-  @Basic
   @Column(name = "school_organization_code")
   private String schoolOrganizationCode;
   @Basic

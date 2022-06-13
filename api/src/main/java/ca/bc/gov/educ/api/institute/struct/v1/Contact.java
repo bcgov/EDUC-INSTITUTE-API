@@ -10,6 +10,7 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * The type Student.
@@ -51,4 +52,6 @@ public class Contact extends BaseRequest implements Serializable {
   @Size(max = 10)
   @NotNull(message = "contactTypeCode cannot be null")
   private String contactTypeCode;
+
+  private LocalDateTime effectiveDate;
 }

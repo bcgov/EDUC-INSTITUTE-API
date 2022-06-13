@@ -24,7 +24,7 @@ public interface DistrictAPIEndpoint {
   @PreAuthorize("hasAuthority('SCOPE_READ_DISTRICT')")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "404", description = "NOT FOUND")})
   @Transactional(readOnly = true)
-  @Tag(name = "District Entity", description = "Endpoint to get district entity by ID.")
+  @Tag(name = "District Entity", description = "Endpoints for district entity.")
   @Schema(name = "District", implementation = District.class)
   District getDistrict(@PathVariable("districtId") UUID districtId);
 
@@ -32,14 +32,14 @@ public interface DistrictAPIEndpoint {
   @PreAuthorize("hasAuthority('SCOPE_READ_DISTRICT')")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "404", description = "NOT FOUND")})
   @Transactional(readOnly = true)
-  @Tag(name = "District history Entity", description = "Endpoint to get district history entity list by district ID.")
+  @Tag(name = "District History Entity", description = "Endpoints for district history entity.")
   @Schema(name = "DistrictHistory", implementation = DistrictHistory.class)
   List<DistrictHistory> getDistrictHistory(@PathVariable("districtId") UUID districtId);
 
   @PostMapping
   @PreAuthorize("hasAuthority('SCOPE_WRITE_DISTRICT')")
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
-  @Tag(name = "District Entity", description = "Endpoint to create district entity.")
+  @Tag(name = "District Entity", description = "Endpoints for district entity.")
   @Schema(name = "District", implementation = District.class)
   @ResponseStatus(CREATED)
   District createDistrict(@Validated @RequestBody District district);
@@ -47,35 +47,35 @@ public interface DistrictAPIEndpoint {
   @PutMapping("/{id}")
   @PreAuthorize("hasAuthority('SCOPE_WRITE_DISTRICT')")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "400", description = "BAD REQUEST"), @ApiResponse(responseCode = "404", description = "NOT FOUND")})
-  @Tag(name = "District Entity", description = "Endpoint to update district entity.")
+  @Tag(name = "District Entity", description = "Endpoints for district entity.")
   @Schema(name = "District", implementation = District.class)
   District updateDistrict(@PathVariable UUID id, @Validated @RequestBody District district);
 
   @DeleteMapping("/{id}")
   @PreAuthorize("hasAuthority('SCOPE_DELETE_DISTRICT')")
   @ApiResponses(value = {@ApiResponse(responseCode = "204", description = "NO CONTENT"), @ApiResponse(responseCode = "404", description = "NOT FOUND."), @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR.")})
-  @Tag(name = "District Entity", description = "Endpoint to delete district entity.")
+  @Tag(name = "District Entity", description = "Endpoints for district entity.")
   ResponseEntity<Void> deleteDistrict(@PathVariable UUID id);
 
   @GetMapping
   @PreAuthorize("hasAuthority('SCOPE_READ_DISTRICT')")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
   @Transactional(readOnly = true)
-  @Tag(name = "District Entity", description = "Endpoint to get all district entities.")
+  @Tag(name = "District Entity", description = "Endpoints for district entity.")
   @Schema(name = "District", implementation = District.class)
   List<District> getAllDistricts();
 
   @GetMapping("/{districtId}/contact/{contactId}")
   @PreAuthorize("hasAuthority('SCOPE_READ_DISTRICT_CONTACT')")
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
-  @Tag(name = "District Contact Entity", description = "Endpoint to get district contact entity.")
+  @Tag(name = "District Contact Entity", description = "Endpoints for district contact entity.")
   @Schema(name = "Contact", implementation = Contact.class)
   Contact getDistrictContact(@PathVariable UUID districtId, @PathVariable UUID contactId);
 
   @PostMapping("/{districtId}/contact")
   @PreAuthorize("hasAuthority('SCOPE_WRITE_DISTRICT_CONTACT')")
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
-  @Tag(name = "District Contact Entity", description = "Endpoint to create district contact entity.")
+  @Tag(name = "District Contact Entity", description = "Endpoints for district contact entity.")
   @Schema(name = "Contact", implementation = Contact.class)
   @ResponseStatus(CREATED)
   Contact createDistrictContact(@PathVariable UUID districtId, @Validated @RequestBody Contact contact);
@@ -83,27 +83,27 @@ public interface DistrictAPIEndpoint {
   @PutMapping("/{districtId}/contact/{contactId}")
   @PreAuthorize("hasAuthority('SCOPE_WRITE_DISTRICT_CONTACT')")
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
-  @Tag(name = "District Contact Entity", description = "Endpoint to update district contact entity.")
+  @Tag(name = "District Contact Entity", description = "Endpoints for district contact entity.")
   @Schema(name = "Contact", implementation = Contact.class)
   Contact updateDistrictContact(@PathVariable UUID districtId, @PathVariable UUID contactId, @Validated @RequestBody Contact contact);
 
   @DeleteMapping("/{districtId}/contact/{contactId}")
   @PreAuthorize("hasAuthority('SCOPE_DELETE_DISTRICT_CONTACT')")
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
-  @Tag(name = "District Contact Entity", description = "Endpoint to delete district contact entity.")
+  @Tag(name = "District Contact Entity", description = "Endpoints for district contact entity.")
   ResponseEntity<Void> deleteDistrictContact(@PathVariable UUID districtId, @PathVariable UUID contactId);
 
   @GetMapping("/{districtId}/address/{addressId}")
   @PreAuthorize("hasAuthority('SCOPE_READ_DISTRICT_ADDRESS')")
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
-  @Tag(name = "District Address Entity", description = "Endpoint to get district address entity.")
+  @Tag(name = "District Address Entity", description = "Endpoints for district address entity.")
   @Schema(name = "Address", implementation = Address.class)
   Address getDistrictAddress(@PathVariable UUID districtId, @PathVariable UUID addressId);
 
   @PostMapping("/{districtId}/address")
   @PreAuthorize("hasAuthority('SCOPE_WRITE_DISTRICT_ADDRESS')")
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
-  @Tag(name = "District Address Entity", description = "Endpoint to create district address entity.")
+  @Tag(name = "District Address Entity", description = "Endpoints for district address entity.")
   @Schema(name = "Address", implementation = Address.class)
   @ResponseStatus(CREATED)
   Address createDistrictAddress(@PathVariable UUID districtId, @Validated @RequestBody Address address);
@@ -111,27 +111,27 @@ public interface DistrictAPIEndpoint {
   @PutMapping("/{districtId}/address/{addressId}")
   @PreAuthorize("hasAuthority('SCOPE_WRITE_DISTRICT_ADDRESS')")
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
-  @Tag(name = "District Address Entity", description = "Endpoint to update district address entity.")
+  @Tag(name = "District Address Entity", description = "Endpoints for district address entity.")
   @Schema(name = "Address", implementation = Address.class)
   Address updateDistrictAddress(@PathVariable UUID districtId, @PathVariable UUID addressId, @Validated @RequestBody Address address);
 
   @DeleteMapping("/{districtId}/address/{addressId}")
   @PreAuthorize("hasAuthority('SCOPE_DELETE_DISTRICT_ADDRESS')")
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
-  @Tag(name = "District Address Entity", description = "Endpoint to delete district address entity.")
+  @Tag(name = "District Address Entity", description = "Endpoints for district address entity.")
   ResponseEntity<Void> deleteDistrictAddress(@PathVariable UUID districtId, @PathVariable UUID addressId);
 
   @GetMapping("/{districtId}/note/{noteId}")
   @PreAuthorize("hasAuthority('SCOPE_READ_DISTRICT_NOTE')")
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
-  @Tag(name = "District Note Entity", description = "Endpoint to get district note entity.")
+  @Tag(name = "District Note Entity", description = "Endpoints for district note entity.")
   @Schema(name = "Note", implementation = Note.class)
   Note getDistrictNote(@PathVariable UUID districtId, @PathVariable UUID noteId);
 
   @PostMapping("/{districtId}/note")
   @PreAuthorize("hasAuthority('SCOPE_WRITE_DISTRICT_NOTE')")
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
-  @Tag(name = "District Note Entity", description = "Endpoint to create district note entity.")
+  @Tag(name = "District Note Entity", description = "Endpoints for district note entity.")
   @Schema(name = "Note", implementation = Note.class)
   @ResponseStatus(CREATED)
   Note createDistrictNote(@PathVariable UUID districtId, @Validated @RequestBody Note note);
@@ -139,14 +139,14 @@ public interface DistrictAPIEndpoint {
   @PutMapping("/{districtId}/note/{noteId}")
   @PreAuthorize("hasAuthority('SCOPE_WRITE_DISTRICT_NOTE')")
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
-  @Tag(name = "District Note Entity", description = "Endpoint to update district note entity.")
+  @Tag(name = "District Note Entity", description = "Endpoints for district note entity.")
   @Schema(name = "Note", implementation = Note.class)
   Note updateDistrictNote(@PathVariable UUID districtId, @PathVariable UUID noteId, @Validated @RequestBody Note note);
 
   @DeleteMapping("/{districtId}/note/{noteId}")
   @PreAuthorize("hasAuthority('SCOPE_DELETE_DISTRICT_NOTE')")
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
-  @Tag(name = "District Note Entity", description = "Endpoint to delete district note entity.")
+  @Tag(name = "District Note Entity", description = "Endpoints for district note entity.")
   ResponseEntity<Void> deleteDistrictNote(@PathVariable UUID districtId, @PathVariable UUID noteId);
 
 }

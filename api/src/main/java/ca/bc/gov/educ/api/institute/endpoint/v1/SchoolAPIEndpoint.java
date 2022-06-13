@@ -27,7 +27,7 @@ public interface SchoolAPIEndpoint {
   @PreAuthorize("hasAuthority('SCOPE_READ_SCHOOL')")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "404", description = "NOT FOUND")})
   @Transactional(readOnly = true)
-  @Tag(name = "School Entity", description = "Endpoint to get school entity by ID.")
+  @Tag(name = "School Entity", description = "Endpoints for school entity.")
   @Schema(name = "School", implementation = School.class)
   School getSchool(@PathVariable("schoolId")  UUID schoolId);
 
@@ -35,14 +35,14 @@ public interface SchoolAPIEndpoint {
   @PreAuthorize("hasAuthority('SCOPE_READ_SCHOOL')")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "404", description = "NOT FOUND")})
   @Transactional(readOnly = true)
-  @Tag(name = "School Entity", description = "Endpoint to get school history entity list by school ID.")
+  @Tag(name = "School History Entity", description = "Endpoints for school history entity.")
   @Schema(name = "SchoolHistory", implementation = SchoolHistory.class)
   List<SchoolHistory> getSchoolHistory(@PathVariable("schoolId")  UUID schoolId);
 
   @PostMapping
   @PreAuthorize("hasAuthority('SCOPE_WRITE_SCHOOL')")
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
-  @Tag(name = "School Entity", description = "Endpoint to create school entity.")
+  @Tag(name = "School Entity", description = "Endpoints for school entity.")
   @Schema(name = "School", implementation = School.class)
   @ResponseStatus(CREATED)
   School createSchool(@Validated @RequestBody School school);
@@ -50,35 +50,35 @@ public interface SchoolAPIEndpoint {
   @PutMapping("/{id}")
   @PreAuthorize("hasAuthority('SCOPE_WRITE_SCHOOL')")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "400", description = "BAD REQUEST"), @ApiResponse(responseCode = "404", description = "NOT FOUND")})
-  @Tag(name = "School Entity", description = "Endpoint to update school entity.")
+  @Tag(name = "School Entity", description = "Endpoints for school entity.")
   @Schema(name = "School", implementation = School.class)
   School updateSchool(@PathVariable UUID id, @Validated @RequestBody School school);
 
   @DeleteMapping("/{id}")
   @PreAuthorize("hasAuthority('SCOPE_DELETE_SCHOOL')")
   @ApiResponses(value = {@ApiResponse(responseCode = "204", description = "NO CONTENT"), @ApiResponse(responseCode = "404", description = "NOT FOUND."), @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR.")})
-  @Tag(name = "School Entity", description = "Endpoint to delete school entity.")
+  @Tag(name = "School Entity", description = "Endpoints for school entity.")
   ResponseEntity<Void> deleteSchool(@PathVariable UUID id);
 
   @GetMapping
   @PreAuthorize("hasAuthority('SCOPE_READ_SCHOOL')")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
   @Transactional(readOnly = true)
-  @Tag(name = "School Entity", description = "Endpoint to get all school entities.")
+  @Tag(name = "School Entity", description = "Endpoints for school entity.")
   @Schema(name = "School", implementation = School.class)
   List<School> getAllSchools();
 
   @GetMapping("/{schoolId}/contact/{contactId}")
   @PreAuthorize("hasAuthority('SCOPE_READ_SCHOOL_CONTACT')")
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
-  @Tag(name = "School Contact Entity", description = "Endpoint to get school contact entity.")
+  @Tag(name = "School Contact Entity", description = "Endpoints for school contact entity.")
   @Schema(name = "Contact", implementation = Contact.class)
   Contact getSchoolContact(@PathVariable UUID schoolId, @PathVariable UUID contactId);
 
   @PostMapping("/{schoolId}/contact")
   @PreAuthorize("hasAuthority('SCOPE_WRITE_SCHOOL_CONTACT')")
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
-  @Tag(name = "School Contact Entity", description = "Endpoint to create school contact entity.")
+  @Tag(name = "School Contact Entity", description = "Endpoints for school contact entity.")
   @Schema(name = "Contact", implementation = Contact.class)
   @ResponseStatus(CREATED)
   Contact createSchoolContact(@PathVariable UUID schoolId, @Validated @RequestBody Contact contact);
@@ -86,27 +86,27 @@ public interface SchoolAPIEndpoint {
   @PutMapping("/{schoolId}/contact/{contactId}")
   @PreAuthorize("hasAuthority('SCOPE_WRITE_SCHOOL_CONTACT')")
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
-  @Tag(name = "School Contact Entity", description = "Endpoint to update school contact entity.")
+  @Tag(name = "School Contact Entity", description = "Endpoints for school contact entity.")
   @Schema(name = "Contact", implementation = Contact.class)
   Contact updateSchoolContact(@PathVariable UUID schoolId, @PathVariable UUID contactId, @Validated @RequestBody Contact contact);
 
   @DeleteMapping("/{schoolId}/contact/{contactId}")
   @PreAuthorize("hasAuthority('SCOPE_DELETE_SCHOOL_CONTACT')")
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
-  @Tag(name = "School Address Entity", description = "Endpoint to delete school contact entity.")
+  @Tag(name = "School Contact Entity", description = "Endpoints for school contact entity.")
   ResponseEntity<Void> deleteSchoolContact(@PathVariable UUID schoolId, @PathVariable UUID contactId);
 
   @GetMapping("/{schoolId}/address/{addressId}")
   @PreAuthorize("hasAuthority('SCOPE_READ_SCHOOL_ADDRESS')")
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
-  @Tag(name = "School Address Entity", description = "Endpoint to get school address entity.")
+  @Tag(name = "School Address Entity", description = "Endpoints for school address entity.")
   @Schema(name = "Address", implementation = Address.class)
   Address getSchoolAddress(@PathVariable UUID schoolId, @PathVariable UUID addressId);
 
   @PostMapping("/{schoolId}/address")
   @PreAuthorize("hasAuthority('SCOPE_WRITE_SCHOOL_ADDRESS')")
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
-  @Tag(name = "School Address Entity", description = "Endpoint to create school address entity.")
+  @Tag(name = "School Address Entity", description = "Endpoints for school address entity.")
   @Schema(name = "Address", implementation = Address.class)
   @ResponseStatus(CREATED)
   Address createSchoolAddress(@PathVariable UUID schoolId, @Validated @RequestBody Address address);
@@ -114,27 +114,27 @@ public interface SchoolAPIEndpoint {
   @PutMapping("/{schoolId}/address/{addressId}")
   @PreAuthorize("hasAuthority('SCOPE_WRITE_SCHOOL_ADDRESS')")
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
-  @Tag(name = "School Address Entity", description = "Endpoint to update school address entity.")
+  @Tag(name = "School Address Entity", description = "Endpoints for school address entity.")
   @Schema(name = "Address", implementation = Address.class)
   Address updateSchoolAddress(@PathVariable UUID schoolId, @PathVariable UUID addressId, @Validated @RequestBody Address address);
 
   @DeleteMapping("/{schoolId}/address/{addressId}")
   @PreAuthorize("hasAuthority('SCOPE_DELETE_SCHOOL_ADDRESS')")
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
-  @Tag(name = "School Address Entity", description = "Endpoint to create school address entity.")
+  @Tag(name = "School Address Entity", description = "Endpoints for school address entity.")
   ResponseEntity<Void> deleteSchoolAddress(@PathVariable UUID schoolId, @PathVariable UUID addressId);
 
   @GetMapping("/{schoolId}/note/{noteId}")
   @PreAuthorize("hasAuthority('SCOPE_READ_SCHOOL_NOTE')")
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
-  @Tag(name = "School Note Entity", description = "Endpoint to get school note entity.")
+  @Tag(name = "School Note Entity", description = "Endpoints for school note entity.")
   @Schema(name = "Note", implementation = Note.class)
   Note getSchoolNote(@PathVariable UUID schoolId, @PathVariable UUID noteId);
 
   @PostMapping("/{schoolId}/note")
   @PreAuthorize("hasAuthority('SCOPE_WRITE_SCHOOL_NOTE')")
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
-  @Tag(name = "School Note Entity", description = "Endpoint to create school note entity.")
+  @Tag(name = "School Note Entity", description = "Endpoints for school note entity.")
   @Schema(name = "Note", implementation = Note.class)
   @ResponseStatus(CREATED)
   Note createSchoolNote(@PathVariable UUID schoolId, @Validated @RequestBody Note note);
@@ -142,14 +142,14 @@ public interface SchoolAPIEndpoint {
   @PutMapping("/{schoolId}/note/{noteId}")
   @PreAuthorize("hasAuthority('SCOPE_WRITE_SCHOOL_NOTE')")
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
-  @Tag(name = "School Note Entity", description = "Endpoint to update school note entity.")
+  @Tag(name = "School Note Entity", description = "Endpoints for school note entity.")
   @Schema(name = "Note", implementation = Note.class)
   Note updateSchoolNote(@PathVariable UUID schoolId, @PathVariable UUID noteId, @Validated @RequestBody Note note);
 
   @DeleteMapping("/{schoolId}/note/{noteId}")
   @PreAuthorize("hasAuthority('SCOPE_DELETE_SCHOOL_NOTE')")
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
-  @Tag(name = "School Note Entity", description = "Endpoint to create school note entity.")
+  @Tag(name = "School Note Entity", description = "Endpoints for school note entity.")
   ResponseEntity<Void> deleteSchoolNote(@PathVariable UUID schoolId, @PathVariable UUID noteId);
 
   @GetMapping("/paginated")

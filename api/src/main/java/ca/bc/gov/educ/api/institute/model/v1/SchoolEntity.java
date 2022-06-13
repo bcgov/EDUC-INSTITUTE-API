@@ -50,9 +50,6 @@ public class SchoolEntity {
   @UpperCase
   private String displayName;
   @Basic
-  @Column(name = "asset_number")
-  private String assetNumber;
-  @Basic
   @Column(name = "school_organization_code")
   @UpperCase
   private String schoolOrganizationCode;
