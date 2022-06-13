@@ -22,7 +22,10 @@ import static org.springframework.http.HttpStatus.CREATED;
 
 @RequestMapping(URL.BASE_URL_AUTHORITY)
 @OpenAPIDefinition(info = @Info(title = "API to Independent Authority CRUD.", description = "This API is related to independent authority data.", version = "1"),
-  security = {@SecurityRequirement(name = "OAUTH2", scopes = {"READ_INDEPENDENT_AUTHORITY", "WRITE_INDEPENDENT_AUTHORITY", "DELETE_INDEPENDENT_AUTHORITY"})})
+  security = {@SecurityRequirement(name = "OAUTH2", scopes = {"READ_INDEPENDENT_AUTHORITY", "WRITE_INDEPENDENT_AUTHORITY", "DELETE_INDEPENDENT_AUTHORITY",
+    "READ_INDEPENDENT_AUTHORITY_CONTACT", "WRITE_INDEPENDENT_AUTHORITY_CONTACT", "DELETE_INDEPENDENT_AUTHORITY_CONTACT",
+    "READ_INDEPENDENT_AUTHORITY_ADDRESS", "WRITE_INDEPENDENT_AUTHORITY_ADDRESS", "DELETE_INDEPENDENT_AUTHORITY_ADDRESS",
+    "READ_INDEPENDENT_AUTHORITY_NOTE", "WRITE_INDEPENDENT_AUTHORITY_NOTE", "DELETE_INDEPENDENT_AUTHORITY_NOTE"})})
 public interface IndependentAuthorityAPIEndpoint {
 
   @GetMapping("/{independentAuthorityId}")

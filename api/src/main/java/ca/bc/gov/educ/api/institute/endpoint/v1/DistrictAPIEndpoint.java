@@ -22,7 +22,10 @@ import static org.springframework.http.HttpStatus.CREATED;
 
 @RequestMapping(URL.BASE_URL_DISTRICT)
 @OpenAPIDefinition(info = @Info(title = "API to District CRUD.", description = "This API is related to district data.", version = "1"),
-  security = {@SecurityRequirement(name = "OAUTH2", scopes = {"READ_DISTRICT", "WRITE_DISTRICT", "DELETE_DISTRICT"})})
+  security = {@SecurityRequirement(name = "OAUTH2", scopes = {"READ_DISTRICT", "WRITE_DISTRICT", "DELETE_DISTRICT",
+    "READ_DISTRICT_CONTACT", "WRITE_DISTRICT_CONTACT", "DELETE_DISTRICT_CONTACT",
+    "READ_DISTRICT_ADDRESS", "WRITE_DISTRICT_ADDRESS", "DELETE_DISTRICT_ADDRESS",
+    "READ_DISTRICT_NOTE", "WRITE_DISTRICT_NOTE", "DELETE_DISTRICT_NOTE"})})
 public interface DistrictAPIEndpoint {
 
   @GetMapping("/{districtId}")

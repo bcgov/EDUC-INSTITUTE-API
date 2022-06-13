@@ -25,7 +25,10 @@ import static org.springframework.http.HttpStatus.CREATED;
 
 @RequestMapping(URL.BASE_URL_SCHOOL)
 @OpenAPIDefinition(info = @Info(title = "API to School CRUD.", description = "This API is related to school data.", version = "1"),
-  security = {@SecurityRequirement(name = "OAUTH2", scopes = {"READ_SCHOOL", "WRITE_SCHOOL", "DELETE_SCHOOL"})})
+  security = {@SecurityRequirement(name = "OAUTH2", scopes = {"READ_SCHOOL", "WRITE_SCHOOL", "DELETE_SCHOOL",
+    "READ_SCHOOL_CONTACT", "WRITE_SCHOOL_CONTACT", "DELETE_SCHOOL_CONTACT",
+    "READ_SCHOOL_ADDRESS", "WRITE_SCHOOL_ADDRESS", "DELETE_SCHOOL_ADDRESS",
+    "READ_SCHOOL_NOTE", "WRITE_SCHOOL_NOTE", "DELETE_SCHOOL_NOTE"})})
 public interface SchoolAPIEndpoint {
 
   @GetMapping("/{schoolId}")
