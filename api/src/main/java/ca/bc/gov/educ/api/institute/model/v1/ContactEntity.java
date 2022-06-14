@@ -58,6 +58,12 @@ public class ContactEntity {
   @Column(name = "contact_type_code")
   @UpperCase
   private String contactTypeCode;
+  @Basic
+  @Column(name = "effective_date")
+  private LocalDateTime effectiveDate;
+  @Basic
+  @Column(name = "expiry_date")
+  private LocalDateTime expiryDate;
   @Column(name = "CREATE_USER", updatable = false)
   private String createUser;
   @PastOrPresent

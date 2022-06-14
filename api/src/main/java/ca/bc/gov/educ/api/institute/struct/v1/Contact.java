@@ -54,4 +54,6 @@ public class Contact extends BaseRequest implements Serializable {
   private String contactTypeCode;
 
   private LocalDateTime effectiveDate;
+
+  private LocalDateTime expiryDate;
 }
