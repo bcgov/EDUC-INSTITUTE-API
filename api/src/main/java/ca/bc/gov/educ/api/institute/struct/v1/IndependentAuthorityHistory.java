@@ -48,10 +48,6 @@ public class IndependentAuthorityHistory extends BaseRequest implements Serializ
   private String displayName;
 
   @Size(max = 10)
-  @NotNull(message = "authorityGroupCode cannot be null")
-  private String authorityGroupCode;
-
-  @Size(max = 10)
   @NotNull(message = "authorityTypeCode cannot be null")
   private String authorityTypeCode;
 

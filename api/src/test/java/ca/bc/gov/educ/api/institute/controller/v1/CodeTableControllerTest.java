@@ -44,9 +44,6 @@ public class CodeTableControllerTest {
   AddressTypeCodeRepository addressTypeCodeRepository;
 
   @Autowired
-  AuthorityGroupCodeRepository authorityGroupCodeRepository;
-
-  @Autowired
   AuthorityTypeCodeRepository authorityTypeCodeRepository;
 
   @Autowired
@@ -56,6 +53,9 @@ public class CodeTableControllerTest {
   DistrictRegionCodeRepository districtRegionCodeRepository;
 
   @Autowired
+  DistrictStatusCodeRepository districtStatusCodeRepository;
+
+  @Autowired
   FacilityTypeCodeRepository facilityTypeCodeRepository;
 
   @Autowired
@@ -63,9 +63,6 @@ public class CodeTableControllerTest {
 
   @Autowired
   ProvinceCodeRepository provinceCodeRepository;
-
-  @Autowired
-  CountryCodeRepository countryCodeRepository;
 
   @Autowired
   SchoolGradeCodeRepository schoolGradeCodeRepository;
@@ -83,14 +80,13 @@ public class CodeTableControllerTest {
   public void setUp() {
     MockitoAnnotations.openMocks(this);
     this.addressTypeCodeRepository.save(this.createAddressTypeCodeData());
-    this.authorityGroupCodeRepository.save(this.createAuthorityGroupCodeData());
     this.authorityTypeCodeRepository.save(this.createAuthorityTypeCodeData());
     this.contactTypeCodeRepository.save(this.createContactTypeCodeData());
     this.districtRegionCodeRepository.save(this.createDistrictRegionCodeData());
+    this.districtStatusCodeRepository.save(this.createDistrictStatusCodeData());
     this.facilityTypeCodeRepository.save(this.createFacilityTypeCodeData());
     this.neighborhoodLearningTypeCodeRepository.save(this.createNeighborhoodLearningTypeCodeData());
     this.provinceCodeRepository.save(this.createProvinceCodeData());
-    this.countryCodeRepository.save(this.createCountryCodeData());
     this.schoolGradeCodeRepository.save(this.createSchoolGradeCodeData());
     this.schoolOrganizationCodeRepository.save(this.createSchoolOrganizationCodeData());
     this.schoolCategoryCodeRepository.save(this.createSchoolCategoryCodeData());
@@ -102,14 +98,13 @@ public class CodeTableControllerTest {
   @After
   public void after() {
     this.addressTypeCodeRepository.deleteAll();
-    this.authorityGroupCodeRepository.deleteAll();
     this.authorityTypeCodeRepository.deleteAll();
     this.contactTypeCodeRepository.deleteAll();
     this.districtRegionCodeRepository.deleteAll();
+    this.districtStatusCodeRepository.deleteAll();
     this.facilityTypeCodeRepository.deleteAll();
     this.neighborhoodLearningTypeCodeRepository.deleteAll();
     this.provinceCodeRepository.deleteAll();
-    this.countryCodeRepository.deleteAll();
     this.schoolGradeCodeRepository.deleteAll();
     this.schoolOrganizationCodeRepository.deleteAll();
     this.schoolCategoryCodeRepository.deleteAll();
@@ -118,12 +113,6 @@ public class CodeTableControllerTest {
   private AddressTypeCodeEntity createAddressTypeCodeData() {
     return AddressTypeCodeEntity.builder().addressTypeCode("MAILING").description("Mailing Address")
         .effectiveDate(LocalDateTime.now()).expiryDate(LocalDateTime.MAX).displayOrder(1).label("Mailing Address").createDate(LocalDateTime.now())
-        .updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
-  }
-
-  private AuthorityGroupCodeEntity createAuthorityGroupCodeData() {
-    return AuthorityGroupCodeEntity.builder().authorityGroupCode("ACC_CHRIS").description("Accelerated Christian Educ Association")
-        .effectiveDate(LocalDateTime.now()).expiryDate(LocalDateTime.MAX).displayOrder(1).label("Accelerated Christian Ed.").createDate(LocalDateTime.now())
         .updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
   }
 
@@ -145,6 +134,12 @@ public class CodeTableControllerTest {
       .updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
   }
 
+  private DistrictStatusCodeEntity createDistrictStatusCodeData() {
+    return DistrictStatusCodeEntity.builder().districtStatusCode("OPEN").description("Open District")
+      .effectiveDate(LocalDateTime.now()).expiryDate(LocalDateTime.MAX).displayOrder(1).label("Open").createDate(LocalDateTime.now())
+      .updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
+  }
+
   private FacilityTypeCodeEntity createFacilityTypeCodeData() {
     return FacilityTypeCodeEntity.builder().facilityTypeCode("STAND_SCHL").description("Standard School")
       .effectiveDate(LocalDateTime.now()).expiryDate(LocalDateTime.MAX).displayOrder(1).label("Standard School").createDate(LocalDateTime.now())
@@ -154,12 +149,6 @@ public class CodeTableControllerTest {
   private ProvinceCodeEntity createProvinceCodeData() {
     return ProvinceCodeEntity.builder().provinceCode("BC").description("British Columbia")
       .effectiveDate(LocalDateTime.now()).expiryDate(LocalDateTime.MAX).displayOrder(1).label("British Columbia").createDate(LocalDateTime.now())
-      .updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
-  }
-
-  private CountryCodeEntity createCountryCodeData() {
-    return CountryCodeEntity.builder().countryCode("CAN").description("Canada")
-      .effectiveDate(LocalDateTime.now()).expiryDate(LocalDateTime.MAX).displayOrder(1).label("Canada").createDate(LocalDateTime.now())
       .updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
   }
 
@@ -228,14 +217,6 @@ public class CodeTableControllerTest {
   }
 
   @Test
-  public void testGetCountryCodes_ShouldReturnCodes() throws Exception {
-    final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_INSTITUTE_CODES";
-    final var mockAuthority = oidcLogin().authorities(grantedAuthority);
-    this.mockMvc.perform(get(URL.BASE_URL + URL.COUNTRY_CODES).with(mockAuthority)).andDo(print()).andExpect(status().isOk())
-      .andExpect(MockMvcResultMatchers.jsonPath("$[0].countryCode").value("CAN"));
-  }
-
-  @Test
   public void testGetProvinceCodes_ShouldReturnCodes() throws Exception {
     final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_INSTITUTE_CODES";
     final var mockAuthority = oidcLogin().authorities(grantedAuthority);
@@ -260,6 +241,14 @@ public class CodeTableControllerTest {
   }
 
   @Test
+  public void testGetDistrictStatusCodes_ShouldReturnCodes() throws Exception {
+    final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_INSTITUTE_CODES";
+    final var mockAuthority = oidcLogin().authorities(grantedAuthority);
+    this.mockMvc.perform(get(URL.BASE_URL + URL.DISTRICT_STATUS_CODES).with(mockAuthority)).andDo(print()).andExpect(status().isOk())
+      .andExpect(MockMvcResultMatchers.jsonPath("$[0].districtStatusCode").value("OPEN"));
+  }
+
+  @Test
   public void testGetContactTypeCodes_ShouldReturnCodes() throws Exception {
     final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_INSTITUTE_CODES";
     final var mockAuthority = oidcLogin().authorities(grantedAuthority);
@@ -273,14 +262,6 @@ public class CodeTableControllerTest {
     final var mockAuthority = oidcLogin().authorities(grantedAuthority);
     this.mockMvc.perform(get(URL.BASE_URL + URL.AUTHORITY_TYPE_CODES).with(mockAuthority)).andDo(print()).andExpect(status().isOk())
       .andExpect(MockMvcResultMatchers.jsonPath("$[0].authorityTypeCode").value("INDEPEND"));
-  }
-
-  @Test
-  public void testGetAuthorityGroupCodes_ShouldReturnCodes() throws Exception {
-    final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_INSTITUTE_CODES";
-    final var mockAuthority = oidcLogin().authorities(grantedAuthority);
-    this.mockMvc.perform(get(URL.BASE_URL + URL.AUTHORITY_GROUP_CODES).with(mockAuthority)).andDo(print()).andExpect(status().isOk())
-      .andExpect(MockMvcResultMatchers.jsonPath("$[0].authorityGroupCode").value("ACC_CHRIS"));
   }
 }
 

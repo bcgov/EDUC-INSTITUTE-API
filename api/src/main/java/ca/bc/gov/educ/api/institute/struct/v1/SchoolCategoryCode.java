@@ -22,6 +22,8 @@ public class SchoolCategoryCode implements Serializable {
 
   private String description;
 
+  private String legacyCode;
+
   private Integer displayOrder;
 
   private String effectiveDate;

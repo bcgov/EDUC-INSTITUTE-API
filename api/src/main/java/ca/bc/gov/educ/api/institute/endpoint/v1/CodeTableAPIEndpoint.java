@@ -31,14 +31,6 @@ import java.util.List;
 public interface CodeTableAPIEndpoint {
 
   @PreAuthorize("hasAuthority('SCOPE_READ_INSTITUTE_CODES')")
-  @GetMapping(URL.COUNTRY_CODES)
-  @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
-  @Transactional(readOnly = true)
-  @Tag(name = "Institute Codes", description = "Endpoints to get institute codes.")
-  @Schema(name = "CountryCode", implementation = CountryCode.class)
-  List<CountryCode> getCountryCodes();
-
-  @PreAuthorize("hasAuthority('SCOPE_READ_INSTITUTE_CODES')")
   @GetMapping(URL.PROVINCE_CODES)
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
   @Transactional(readOnly = true)
@@ -55,6 +47,14 @@ public interface CodeTableAPIEndpoint {
   List<DistrictRegionCode> getDistrictRegionCodes();
 
   @PreAuthorize("hasAuthority('SCOPE_READ_INSTITUTE_CODES')")
+  @GetMapping(URL.DISTRICT_STATUS_CODES)
+  @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
+  @Transactional(readOnly = true)
+  @Tag(name = "Institute Codes", description = "Endpoints to get institute codes.")
+  @Schema(name = "DistrictStatusCode", implementation = DistrictStatusCode.class)
+  List<DistrictStatusCode> getDistrictStatusCodes();
+
+  @PreAuthorize("hasAuthority('SCOPE_READ_INSTITUTE_CODES')")
   @GetMapping(URL.CONTACT_TYPE_CODES)
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
   @Transactional(readOnly = true)
@@ -69,14 +69,6 @@ public interface CodeTableAPIEndpoint {
   @Tag(name = "Institute Codes", description = "Endpoints to get institute codes.")
   @Schema(name = "AuthorityTypeCode", implementation = AuthorityTypeCode.class)
   List<AuthorityTypeCode> getAuthorityTypeCodes();
-
-  @PreAuthorize("hasAuthority('SCOPE_READ_INSTITUTE_CODES')")
-  @GetMapping(URL.AUTHORITY_GROUP_CODES)
-  @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
-  @Transactional(readOnly = true)
-  @Tag(name = "Institute Codes", description = "Endpoints to get institute codes.")
-  @Schema(name = "AuthorityGroupCode", implementation = AuthorityGroupCode.class)
-  List<AuthorityGroupCode> getAuthorityGroupCodes();
 
   @PreAuthorize("hasAuthority('SCOPE_READ_INSTITUTE_CODES')")
   @GetMapping(URL.ADDRESS_TYPE_CODES)

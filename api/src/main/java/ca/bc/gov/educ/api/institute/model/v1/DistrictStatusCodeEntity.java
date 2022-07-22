@@ -1,6 +1,10 @@
 package ca.bc.gov.educ.api.institute.model.v1;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import javax.persistence.*;
 import javax.validation.constraints.PastOrPresent;
 import java.time.LocalDateTime;
@@ -10,11 +14,11 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "AUTHORITY_GROUP_CODE")
-public class AuthorityGroupCodeEntity {
+@Table(name = "DISTRICT_STATUS_CODE")
+public class DistrictStatusCodeEntity {
   @Id
-  @Column(name = "authority_group_code", unique = true, updatable = false)
-  private String authorityGroupCode;
+  @Column(name = "district_status_code", unique = true, updatable = false)
+  private String districtStatusCode;
   @Basic
   @Column(name = "label")
   private String label;

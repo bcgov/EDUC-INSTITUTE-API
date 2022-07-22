@@ -1,6 +1,5 @@
 package ca.bc.gov.educ.api.institute.validator;
 
-import ca.bc.gov.educ.api.institute.model.v1.AuthorityGroupCodeEntity;
 import ca.bc.gov.educ.api.institute.model.v1.AuthorityTypeCodeEntity;
 import ca.bc.gov.educ.api.institute.service.v1.CodeTableService;
 import ca.bc.gov.educ.api.institute.service.v1.IndependentAuthorityService;
@@ -41,7 +40,6 @@ public class IndependentAuthorityPayloadValidator {
       apiValidationErrors.add(createFieldError("independentAuthorityId", independentAuthority.getIndependentAuthorityId(), "independentAuthorityId should be null for post operation."));
     }
     validateIndependentAuthorityTypeCode(independentAuthority, apiValidationErrors);
-    validateIndependentAuthorityGroupCode(independentAuthority, apiValidationErrors);
     return apiValidationErrors;
   }
 
@@ -62,19 +60,6 @@ public class IndependentAuthorityPayloadValidator {
         apiValidationErrors.add(createFieldError(AUTHORITY_TYPE_CODE, independentAuthority.getAuthorityTypeCode(), "Authority type code provided is not yet effective."));
       } else if (authorityTypeCode.get().getExpiryDate() != null && authorityTypeCode.get().getExpiryDate().isBefore(LocalDateTime.now())) {
         apiValidationErrors.add(createFieldError(AUTHORITY_TYPE_CODE, independentAuthority.getAuthorityTypeCode(), "Authority type code provided has expired."));
-      }
-    }
-  }
-
-  protected void validateIndependentAuthorityGroupCode(IndependentAuthority independentAuthority, List<FieldError> apiValidationErrors) {
-    if (independentAuthority.getAuthorityGroupCode() != null) {
-      Optional<AuthorityGroupCodeEntity> authorityTypeCode = codeTableService.getAuthorityGroupCode(independentAuthority.getAuthorityGroupCode());
-      if (authorityTypeCode.isEmpty()) {
-        apiValidationErrors.add(createFieldError(AUTHORITY_GROUP_CODE, independentAuthority.getAuthorityGroupCode(), "Invalid authority group code."));
-      } else if (authorityTypeCode.get().getEffectiveDate() != null && authorityTypeCode.get().getEffectiveDate().isAfter(LocalDateTime.now())) {
-        apiValidationErrors.add(createFieldError(AUTHORITY_GROUP_CODE, independentAuthority.getAuthorityGroupCode(), "Authority group code provided is not yet effective."));
-      } else if (authorityTypeCode.get().getExpiryDate() != null && authorityTypeCode.get().getExpiryDate().isBefore(LocalDateTime.now())) {
-        apiValidationErrors.add(createFieldError(AUTHORITY_GROUP_CODE, independentAuthority.getAuthorityGroupCode(), "Authority group code provided has expired."));
       }
     }
   }

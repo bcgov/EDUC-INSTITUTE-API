@@ -52,9 +52,6 @@ public class AddressHistoryEntity {
   @Column(name = "province_code")
   private String provinceCode;
   @Basic
-  @Column(name = "country_code")
-  private String countryCode;
-  @Basic
   @Column(name = "address_type_code")
   private String addressTypeCode;
   @Column(name = "CREATE_USER", updatable = false)

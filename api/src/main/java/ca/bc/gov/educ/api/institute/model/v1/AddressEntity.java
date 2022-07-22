@@ -1,7 +1,10 @@
 package ca.bc.gov.educ.api.institute.model.v1;
 
 import ca.bc.gov.educ.api.institute.util.UpperCase;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -53,10 +56,6 @@ public class AddressEntity {
   @Column(name = "province_code")
   @UpperCase
   private String provinceCode;
-  @Basic
-  @Column(name = "country_code")
-  @UpperCase
-  private String countryCode;
   @Basic
   @Column(name = "address_type_code")
   @UpperCase

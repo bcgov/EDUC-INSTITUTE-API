@@ -49,8 +49,9 @@ CREATE TABLE SCHOOL_HISTORY
 CREATE TABLE SCHOOL_CATEGORY_CODE
 (
     SCHOOL_CATEGORY_CODE              VARCHAR(10)           NOT NULL,
-    LABEL                             VARCHAR(30),
-    DESCRIPTION                       VARCHAR(255),
+    LABEL                             VARCHAR(30) NOT NULL,
+    DESCRIPTION                       VARCHAR(255) NOT NULL,
+    LEGACY_CODE                       VARCHAR(10),
     DISPLAY_ORDER                     NUMERIC DEFAULT 1       NOT NULL,
     EFFECTIVE_DATE                    TIMESTAMP                   NOT NULL,
     EXPIRY_DATE                       TIMESTAMP                   NOT NULL,
@@ -64,8 +65,9 @@ CREATE TABLE SCHOOL_CATEGORY_CODE
 CREATE TABLE SCHOOL_ORGANIZATION_CODE
 (
     SCHOOL_ORGANIZATION_CODE          VARCHAR(10)           NOT NULL,
-    LABEL                             VARCHAR(30),
-    DESCRIPTION                       VARCHAR(255),
+    LABEL                             VARCHAR(30) NOT NULL,
+    DESCRIPTION                       VARCHAR(255) NOT NULL,
+    LEGACY_CODE                       VARCHAR(10),
     DISPLAY_ORDER                     NUMERIC DEFAULT 1       NOT NULL,
     EFFECTIVE_DATE                    TIMESTAMP                   NOT NULL,
     EXPIRY_DATE                       TIMESTAMP                   NOT NULL,
@@ -79,8 +81,9 @@ CREATE TABLE SCHOOL_ORGANIZATION_CODE
 CREATE TABLE FACILITY_TYPE_CODE
 (
     FACILITY_TYPE_CODE                VARCHAR(10)           NOT NULL,
-    LABEL                             VARCHAR(30),
-    DESCRIPTION                       VARCHAR(255),
+    LABEL                             VARCHAR(30) NOT NULL,
+    DESCRIPTION                       VARCHAR(255) NOT NULL,
+    LEGACY_CODE                       VARCHAR(10),
     DISPLAY_ORDER                     NUMERIC DEFAULT 1       NOT NULL,
     EFFECTIVE_DATE                    TIMESTAMP                   NOT NULL,
     EXPIRY_DATE                       TIMESTAMP                   NOT NULL,
@@ -106,8 +109,9 @@ CREATE TABLE SCHOOL_GRADE
 CREATE TABLE SCHOOL_GRADE_CODE
 (
     SCHOOL_GRADE_CODE                 VARCHAR(10)           NOT NULL,
-    LABEL                             VARCHAR(30),
-    DESCRIPTION                       VARCHAR(255),
+    LABEL                             VARCHAR(30) NOT NULL,
+    DESCRIPTION                       VARCHAR(255) NOT NULL,
+    LEGACY_CODE                       VARCHAR(10),
     DISPLAY_ORDER                     NUMERIC DEFAULT 1       NOT NULL,
     EFFECTIVE_DATE                    TIMESTAMP                   NOT NULL,
     EXPIRY_DATE                       TIMESTAMP                   NOT NULL,
@@ -133,8 +137,8 @@ CREATE TABLE NEIGHBORHOOD_LEARNING
 CREATE TABLE NEIGHBORHOOD_LEARNING_TYPE_CODE
 (
     NEIGHBORHOOD_LEARNING_TYPE_CODE   VARCHAR(10)           NOT NULL,
-    LABEL                             VARCHAR(30),
-    DESCRIPTION                       VARCHAR(255),
+    LABEL                             VARCHAR(30) NOT NULL,
+    DESCRIPTION                       VARCHAR(255) NOT NULL,
     DISPLAY_ORDER                     NUMERIC DEFAULT 1       NOT NULL,
     EFFECTIVE_DATE                    TIMESTAMP                   NOT NULL,
     EXPIRY_DATE                       TIMESTAMP                   NOT NULL,
@@ -169,6 +173,7 @@ CREATE TABLE DISTRICT
     WEBSITE                             VARCHAR(255),
     DISPLAY_NAME                        VARCHAR(255) NOT NULL,
     DISTRICT_REGION_CODE                VARCHAR(10) NOT NULL,
+    DISTRICT_STATUS_CODE                VARCHAR(10) NOT NULL,
     OPENED_DATE                         TIMESTAMP NOT NULL,
     CLOSED_DATE                         TIMESTAMP,
     CREATE_USER                         VARCHAR(32)         NOT NULL,
@@ -181,8 +186,9 @@ CREATE TABLE DISTRICT
 CREATE TABLE DISTRICT_REGION_CODE
 (
     DISTRICT_REGION_CODE              VARCHAR(10)           NOT NULL,
-    LABEL                             VARCHAR(30),
-    DESCRIPTION                       VARCHAR(255),
+    LABEL                             VARCHAR(30) NOT NULL,
+    DESCRIPTION                       VARCHAR(255) NOT NULL,
+    LEGACY_CODE                       VARCHAR(10),
     DISPLAY_ORDER                     NUMERIC DEFAULT 1       NOT NULL,
     EFFECTIVE_DATE                    TIMESTAMP                   NOT NULL,
     EXPIRY_DATE                       TIMESTAMP                   NOT NULL,
@@ -191,6 +197,21 @@ CREATE TABLE DISTRICT_REGION_CODE
     UPDATE_USER                       VARCHAR(32)           NOT NULL,
     UPDATE_DATE                       TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     CONSTRAINT DISTRICT_REGION_CODE_PK PRIMARY KEY (DISTRICT_REGION_CODE)
+);
+
+CREATE TABLE DISTRICT_STATUS_CODE
+(
+    DISTRICT_STATUS_CODE              VARCHAR(10)           NOT NULL,
+    LABEL                             VARCHAR(30) NOT NULL,
+    DESCRIPTION                       VARCHAR(255) NOT NULL,
+    DISPLAY_ORDER                     NUMERIC DEFAULT 1       NOT NULL,
+    EFFECTIVE_DATE                    TIMESTAMP                   NOT NULL,
+    EXPIRY_DATE                       TIMESTAMP                   NOT NULL,
+    CREATE_USER                       VARCHAR(32)           NOT NULL,
+    CREATE_DATE                       TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    UPDATE_USER                       VARCHAR(32)           NOT NULL,
+    UPDATE_DATE                       TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    CONSTRAINT DISTRICT_STATUS_CODE_PK PRIMARY KEY (DISTRICT_STATUS_CODE)
 );
 
 CREATE TABLE DISTRICT_HISTORY
@@ -221,7 +242,6 @@ CREATE TABLE INDEPENDENT_AUTHORITY
     PHONE_NUMBER                        VARCHAR(10),
     EMAIL                               VARCHAR(255),
     DISPLAY_NAME                        VARCHAR(255) NOT NULL,
-    AUTHORITY_GROUP_CODE                VARCHAR(10) NOT NULL,
     AUTHORITY_TYPE_CODE                 VARCHAR(10) NOT NULL,
     OPENED_DATE                         TIMESTAMP NOT NULL,
     CLOSED_DATE                         TIMESTAMP,
@@ -241,7 +261,6 @@ CREATE TABLE INDEPENDENT_AUTHORITY_HISTORY
     PHONE_NUMBER                        VARCHAR(10),
     EMAIL                               VARCHAR(255),
     DISPLAY_NAME                        VARCHAR(255) NOT NULL,
-    AUTHORITY_GROUP_CODE                VARCHAR(10) NOT NULL,
     AUTHORITY_TYPE_CODE                 VARCHAR(10) NOT NULL,
     OPENED_DATE                         TIMESTAMP NOT NULL,
     CLOSED_DATE                         TIMESTAMP,
@@ -252,26 +271,11 @@ CREATE TABLE INDEPENDENT_AUTHORITY_HISTORY
     CONSTRAINT INDEPENDENT_AUTHORITY_HISTORY_ID_PK PRIMARY KEY (INDEPENDENT_AUTHORITY_HISTORY_ID)
 );
 
-CREATE TABLE AUTHORITY_GROUP_CODE
-(
-    AUTHORITY_GROUP_CODE              VARCHAR(10)           NOT NULL,
-    LABEL                             VARCHAR(30),
-    DESCRIPTION                       VARCHAR(255),
-    DISPLAY_ORDER                     NUMERIC DEFAULT 1       NOT NULL,
-    EFFECTIVE_DATE                    TIMESTAMP                   NOT NULL,
-    EXPIRY_DATE                       TIMESTAMP                   NOT NULL,
-    CREATE_USER                       VARCHAR(32)           NOT NULL,
-    CREATE_DATE                       TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    UPDATE_USER                       VARCHAR(32)           NOT NULL,
-    UPDATE_DATE                       TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    CONSTRAINT AUTHORITY_GROUP_CODE_PK PRIMARY KEY (AUTHORITY_GROUP_CODE)
-);
-
 CREATE TABLE AUTHORITY_TYPE_CODE
 (
     AUTHORITY_TYPE_CODE               VARCHAR(10)           NOT NULL,
-    LABEL                             VARCHAR(30),
-    DESCRIPTION                       VARCHAR(255),
+    LABEL                             VARCHAR(30) NOT NULL,
+    DESCRIPTION                       VARCHAR(255) NOT NULL,
     DISPLAY_ORDER                     NUMERIC DEFAULT 1       NOT NULL,
     EFFECTIVE_DATE                    TIMESTAMP                   NOT NULL,
     EXPIRY_DATE                       TIMESTAMP                   NOT NULL,
@@ -290,8 +294,13 @@ CREATE TABLE CONTACT
     INDEPENDENT_AUTHORITY_ID            UUID,
     FIRST_NAME                          VARCHAR(255) NOT NULL,
     LAST_NAME                           VARCHAR(255) NOT NULL,
+    JOB_TITLE                           VARCHAR(255),
     PHONE_NUMBER                        VARCHAR(10),
+    PHONE_EXTENSION                     VARCHAR(10),
+    ALT_PHONE_NUMBER                    VARCHAR(10),
+    ALT_PHONE_EXTENSION                 VARCHAR(10),
     EMAIL                               VARCHAR(255),
+    PUBLICLY_AVAIL                      BOOLEAN NOT NULL,
     CONTACT_TYPE_CODE                   VARCHAR(10) NOT NULL,
     EFFECTIVE_DATE                      TIMESTAMP,
     EXPIRY_DATE                         TIMESTAMP,
@@ -305,8 +314,9 @@ CREATE TABLE CONTACT
 CREATE TABLE CONTACT_TYPE_CODE
 (
     CONTACT_TYPE_CODE                 VARCHAR(10)           NOT NULL,
-    LABEL                             VARCHAR(30),
-    DESCRIPTION                       VARCHAR(255),
+    LABEL                             VARCHAR(30) NOT NULL,
+    DESCRIPTION                       VARCHAR(255) NOT NULL,
+    LEGACY_CODE                       VARCHAR(10),
     DISPLAY_ORDER                     NUMERIC DEFAULT 1       NOT NULL,
     EFFECTIVE_DATE                    TIMESTAMP                   NOT NULL,
     EXPIRY_DATE                       TIMESTAMP                   NOT NULL,
@@ -328,7 +338,6 @@ CREATE TABLE ADDRESS
     CITY                                VARCHAR(255) NOT NULL,
     POSTAL                              VARCHAR(10) NOT NULL,
     PROVINCE_CODE                       VARCHAR(10) NOT NULL,
-    COUNTRY_CODE                        VARCHAR(10) NOT NULL,
     ADDRESS_TYPE_CODE                   VARCHAR(10) NOT NULL,
     CREATE_USER                         VARCHAR(32)         NOT NULL,
     CREATE_DATE                         TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
@@ -361,8 +370,8 @@ CREATE TABLE ADDRESS_HISTORY
 CREATE TABLE ADDRESS_TYPE_CODE
 (
     ADDRESS_TYPE_CODE                 VARCHAR(10)           NOT NULL,
-    LABEL                             VARCHAR(30),
-    DESCRIPTION                       VARCHAR(255),
+    LABEL                             VARCHAR(30) NOT NULL,
+    DESCRIPTION                       VARCHAR(255) NOT NULL,
     DISPLAY_ORDER                     NUMERIC DEFAULT 1       NOT NULL,
     EFFECTIVE_DATE                    TIMESTAMP                   NOT NULL,
     EXPIRY_DATE                       TIMESTAMP                   NOT NULL,
@@ -376,8 +385,8 @@ CREATE TABLE ADDRESS_TYPE_CODE
 CREATE TABLE COUNTRY_CODE
 (
     COUNTRY_CODE                     VARCHAR(10)           NOT NULL,
-    LABEL                             VARCHAR(30),
-    DESCRIPTION                       VARCHAR(255),
+    LABEL                             VARCHAR(30) NOT NULL,
+    DESCRIPTION                       VARCHAR(255) NOT NULL,
     DISPLAY_ORDER                     NUMERIC DEFAULT 1       NOT NULL,
     EFFECTIVE_DATE                    TIMESTAMP                   NOT NULL,
     EXPIRY_DATE                       TIMESTAMP                   NOT NULL,
@@ -391,8 +400,8 @@ CREATE TABLE COUNTRY_CODE
 CREATE TABLE PROVINCE_CODE
 (
     PROVINCE_CODE                     VARCHAR(10)             NOT NULL,
-    LABEL                             VARCHAR(30),
-    DESCRIPTION                       VARCHAR(255),
+    LABEL                             VARCHAR(30) NOT NULL,
+    DESCRIPTION                       VARCHAR(255) NOT NULL,
     DISPLAY_ORDER                     NUMERIC DEFAULT 1       NOT NULL,
     EFFECTIVE_DATE                    TIMESTAMP               NOT NULL,
     EXPIRY_DATE                       TIMESTAMP               NOT NULL,
@@ -430,20 +439,20 @@ ALTER TABLE SCHOOL_HISTORY
 --District Foreign Keys
 ALTER TABLE DISTRICT
     ADD CONSTRAINT FK_DISTRICT_DISTRICT_REGION_CODE FOREIGN KEY (DISTRICT_REGION_CODE) REFERENCES DISTRICT_REGION_CODE (DISTRICT_REGION_CODE);
+ALTER TABLE DISTRICT
+    ADD CONSTRAINT FK_DISTRICT_DISTRICT_STATUS_CODE FOREIGN KEY (DISTRICT_STATUS_CODE) REFERENCES DISTRICT_STATUS_CODE (DISTRICT_STATUS_CODE);
 ALTER TABLE DISTRICT_HISTORY
     ADD CONSTRAINT FK_DISTRICT_HISTORY_DISTRICT_ID FOREIGN KEY (DISTRICT_ID) REFERENCES DISTRICT (DISTRICT_ID);
 ALTER TABLE DISTRICT_HISTORY
     ADD CONSTRAINT FK_DISTRICT_HISTORY_DISTRICT_REGION_CODE FOREIGN KEY (DISTRICT_REGION_CODE) REFERENCES DISTRICT_REGION_CODE (DISTRICT_REGION_CODE);
+ALTER TABLE DISTRICT_HISTORY
+    ADD CONSTRAINT FK_DISTRICT_HISTORY_DISTRICT_STATUS_CODE FOREIGN KEY (DISTRICT_STATUS_CODE) REFERENCES DISTRICT_STATUS_CODE (DISTRICT_STATUS_CODE);
 
 --Independent Authority & History Foreign Keys
-ALTER TABLE INDEPENDENT_AUTHORITY
-    ADD CONSTRAINT FK_INDEPENDENT_AUTHORITY_AUTHORITY_GROUP_CODE FOREIGN KEY (AUTHORITY_GROUP_CODE) REFERENCES AUTHORITY_GROUP_CODE (AUTHORITY_GROUP_CODE);
 ALTER TABLE INDEPENDENT_AUTHORITY
     ADD CONSTRAINT FK_INDEPENDENT_AUTHORITY_AUTHORITY_TYPE_CODE FOREIGN KEY (AUTHORITY_TYPE_CODE) REFERENCES AUTHORITY_TYPE_CODE (AUTHORITY_TYPE_CODE);
 ALTER TABLE INDEPENDENT_AUTHORITY_HISTORY
     ADD CONSTRAINT FK_INDEPENDENT_AUTHORITY_HISTORY_INDEPENDENT_AUTHORITY_ID FOREIGN KEY (INDEPENDENT_AUTHORITY_ID) REFERENCES INDEPENDENT_AUTHORITY (INDEPENDENT_AUTHORITY_ID);
-ALTER TABLE INDEPENDENT_AUTHORITY_HISTORY
-    ADD CONSTRAINT FK_INDEPENDENT_AUTHORITY_HISTORY_AUTHORITY_GROUP_CODE FOREIGN KEY (AUTHORITY_GROUP_CODE) REFERENCES AUTHORITY_GROUP_CODE (AUTHORITY_GROUP_CODE);
 ALTER TABLE INDEPENDENT_AUTHORITY_HISTORY
     ADD CONSTRAINT FK_INDEPENDENT_AUTHORITY_HISTORY_AUTHORITY_TYPE_CODE FOREIGN KEY (AUTHORITY_TYPE_CODE) REFERENCES AUTHORITY_TYPE_CODE (AUTHORITY_TYPE_CODE);
 

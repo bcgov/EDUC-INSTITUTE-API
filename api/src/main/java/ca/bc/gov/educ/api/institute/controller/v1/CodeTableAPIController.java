@@ -31,11 +31,6 @@ public class CodeTableAPIController implements CodeTableAPIEndpoint {
   }
 
   @Override
-  public List<CountryCode> getCountryCodes() {
-    return getService().getCountryCodesList().stream().map(mapper::toStructure).collect(Collectors.toList());
-  }
-
-  @Override
   public List<ProvinceCode> getProvinceCodes() {
     return getService().getProvinceCodesList().stream().map(mapper::toStructure).collect(Collectors.toList());
   }
@@ -46,6 +41,11 @@ public class CodeTableAPIController implements CodeTableAPIEndpoint {
   }
 
   @Override
+  public List<DistrictStatusCode> getDistrictStatusCodes() {
+    return getService().getDistrictStatusCodesList().stream().map(mapper::toStructure).collect(Collectors.toList());
+  }
+
+  @Override
   public List<ContactTypeCode> getContactTypeCodes() {
     return getService().getContactTypeCodesList().stream().map(mapper::toStructure).collect(Collectors.toList());
   }
@@ -53,11 +53,6 @@ public class CodeTableAPIController implements CodeTableAPIEndpoint {
   @Override
   public List<AuthorityTypeCode> getAuthorityTypeCodes() {
     return getService().getAuthorityTypeCodesList().stream().map(mapper::toStructure).collect(Collectors.toList());
-  }
-
-  @Override
-  public List<AuthorityGroupCode> getAuthorityGroupCodes() {
-    return getService().getAuthorityGroupCodesList().stream().map(mapper::toStructure).collect(Collectors.toList());
   }
 
   @Override

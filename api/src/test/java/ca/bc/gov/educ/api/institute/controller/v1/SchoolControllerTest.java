@@ -8,12 +8,9 @@ import ca.bc.gov.educ.api.institute.mapper.v1.SchoolMapper;
 import ca.bc.gov.educ.api.institute.model.v1.*;
 import ca.bc.gov.educ.api.institute.repository.v1.*;
 import ca.bc.gov.educ.api.institute.service.v1.CodeTableService;
-import ca.bc.gov.educ.api.institute.struct.v1.School;
 import ca.bc.gov.educ.api.institute.struct.v1.Search;
 import ca.bc.gov.educ.api.institute.struct.v1.SearchCriteria;
 import ca.bc.gov.educ.api.institute.struct.v1.ValueType;
-import ca.bc.gov.educ.api.institute.util.TransformUtil;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -35,10 +32,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import java.io.File;
 import java.time.LocalDateTime;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.UUID;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -100,9 +98,6 @@ public class SchoolControllerTest {
   ProvinceCodeRepository provinceCodeRepository;
 
   @Autowired
-  CountryCodeRepository countryCodeRepository;
-
-  @Autowired
   SchoolGradeCodeRepository schoolGradeCodeRepository;
 
 
@@ -117,7 +112,6 @@ public class SchoolControllerTest {
     this.facilityTypeCodeRepository.save(this.createFacilityTypeCodeData());
     this.contactTypeCodeRepository.save(this.createContactTypeCodeData());
     this.addressTypeCodeRepository.save(this.createAddressTypeCodeData());
-    this.countryCodeRepository.save(this.createCountryCodeData());
     this.provinceCodeRepository.save(this.createProvinceCodeData());
     this.schoolGradeCodeRepository.save(this.createSchoolGradeCodeData());
     this.neighborhoodLearningTypeCodeRepository.save(this.createNeighborhoodLearningTypeCodeData());
@@ -599,7 +593,7 @@ public class SchoolControllerTest {
 
   private AddressEntity createAddressData(SchoolEntity entity) {
     return AddressEntity.builder().schoolEntity(entity).addressTypeCode("MAILING").addressLine1("123 This Street").city("Compton")
-      .provinceCode("BC").countryCode("CAN").postal("V1B9H2").createUser("TEST").updateUser("TEST").build();
+      .provinceCode("BC").postal("V1B9H2").createUser("TEST").updateUser("TEST").build();
   }
 
   private NoteEntity createNoteData(SchoolEntity entity) {
@@ -621,12 +615,6 @@ public class SchoolControllerTest {
   private ProvinceCodeEntity createProvinceCodeData() {
     return ProvinceCodeEntity.builder().provinceCode("BC").description("British Columbia")
       .effectiveDate(LocalDateTime.now()).expiryDate(LocalDateTime.MAX).displayOrder(1).label("British Columbia").createDate(LocalDateTime.now())
-      .updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
-  }
-
-  private CountryCodeEntity createCountryCodeData() {
-    return CountryCodeEntity.builder().countryCode("CAN").description("Canada")
-      .effectiveDate(LocalDateTime.now()).expiryDate(LocalDateTime.MAX).displayOrder(1).label("Canada").createDate(LocalDateTime.now())
       .updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
   }
 

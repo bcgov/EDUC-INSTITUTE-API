@@ -1,7 +1,6 @@
 package ca.bc.gov.educ.api.institute.validator;
 
 import ca.bc.gov.educ.api.institute.model.v1.AddressTypeCodeEntity;
-import ca.bc.gov.educ.api.institute.model.v1.CountryCodeEntity;
 import ca.bc.gov.educ.api.institute.model.v1.ProvinceCodeEntity;
 import ca.bc.gov.educ.api.institute.service.v1.CodeTableService;
 import ca.bc.gov.educ.api.institute.service.v1.DistrictService;
@@ -22,7 +21,6 @@ import java.util.Optional;
 public class AddressPayloadValidator {
 
   public static final String ADDRESS_TYPE_CODE = "addressTypeCode";
-  public static final String COUNTRY_CODE = "countryCode";
   public static final String PROVINCE_CODE = "provinceCode";
 
   @Getter(AccessLevel.PRIVATE)
@@ -43,7 +41,6 @@ public class AddressPayloadValidator {
       apiValidationErrors.add(createFieldError("addressId", address.getAddressId(), "addressId should be null for post operation."));
     }
     validateAddressTypeCode(address, apiValidationErrors);
-    validateCountryCode(address, apiValidationErrors);
     validateProvinceCode(address, apiValidationErrors);
     return apiValidationErrors;
   }
@@ -65,19 +62,6 @@ public class AddressPayloadValidator {
         apiValidationErrors.add(createFieldError(ADDRESS_TYPE_CODE, address.getAddressTypeCode(), "Address type code provided is not yet effective."));
       } else if (addressTypeCodeEntity.get().getExpiryDate() != null && addressTypeCodeEntity.get().getExpiryDate().isBefore(LocalDateTime.now())) {
         apiValidationErrors.add(createFieldError(ADDRESS_TYPE_CODE, address.getAddressTypeCode(), "Address type code provided has expired."));
-      }
-    }
-  }
-
-  protected void validateCountryCode(Address address, List<FieldError> apiValidationErrors) {
-    if (address.getCountryCode() != null) {
-      Optional<CountryCodeEntity> countryCodeEntity = codeTableService.getCountryCode(address.getCountryCode());
-      if (countryCodeEntity.isEmpty()) {
-        apiValidationErrors.add(createFieldError(COUNTRY_CODE, address.getCountryCode(), "Invalid country code."));
-      } else if (countryCodeEntity.get().getEffectiveDate() != null && countryCodeEntity.get().getEffectiveDate().isAfter(LocalDateTime.now())) {
-        apiValidationErrors.add(createFieldError(COUNTRY_CODE, address.getCountryCode(), "Country code provided is not yet effective."));
-      } else if (countryCodeEntity.get().getExpiryDate() != null && countryCodeEntity.get().getExpiryDate().isBefore(LocalDateTime.now())) {
-        apiValidationErrors.add(createFieldError(COUNTRY_CODE, address.getCountryCode(), "Country code provided has expired."));
       }
     }
   }

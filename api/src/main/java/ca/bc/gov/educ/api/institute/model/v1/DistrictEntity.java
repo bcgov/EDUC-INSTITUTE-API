@@ -47,11 +47,8 @@ public class DistrictEntity {
   @Column(name = "district_region_code")
   private String districtRegionCode;
   @Basic
-  @Column(name = "opened_date")
-  private LocalDateTime openedDate;
-  @Basic
-  @Column(name = "closed_date")
-  private LocalDateTime closedDate;
+  @Column(name = "district_status_code")
+  private String districtStatusCode;
   @Column(name = "CREATE_USER", updatable = false)
   private String createUser;
   @PastOrPresent

@@ -60,6 +60,9 @@ public class DistrictControllerTest {
   DistrictRegionCodeRepository districtRegionCodeRepository;
 
   @Autowired
+  DistrictStatusCodeRepository districtStatusCodeRepository;
+
+  @Autowired
   ContactTypeCodeRepository contactTypeCodeRepository;
 
   @Autowired
@@ -80,9 +83,6 @@ public class DistrictControllerTest {
   @Autowired
   ProvinceCodeRepository provinceCodeRepository;
 
-  @Autowired
-  CountryCodeRepository countryCodeRepository;
-
   @BeforeEach
   public void setUp() {
     MockitoAnnotations.openMocks(this);
@@ -91,9 +91,9 @@ public class DistrictControllerTest {
   @BeforeEach
   public void before() {
     this.districtRegionCodeRepository.save(this.createDistrictRegionCodeData());
+    this.districtStatusCodeRepository.save(this.createDistrictStatusCodeData());
     this.contactTypeCodeRepository.save(this.createContactTypeCodeData());
     this.addressTypeCodeRepository.save(this.createAddressTypeCodeData());
-    this.countryCodeRepository.save(this.createCountryCodeData());
     this.provinceCodeRepository.save(this.createProvinceCodeData());
   }
 
@@ -108,10 +108,10 @@ public class DistrictControllerTest {
     this.districtRepository.deleteAll();
     this.districtHistoryRepository.deleteAll();
     this.districtRegionCodeRepository.deleteAll();
+    this.districtStatusCodeRepository.deleteAll();
     this.contactTypeCodeRepository.deleteAll();
     this.addressTypeCodeRepository.deleteAll();
     this.provinceCodeRepository.deleteAll();
-    this.countryCodeRepository.deleteAll();
     this.addressHistoryRepository.deleteAll();
   }
 
@@ -445,7 +445,7 @@ public class DistrictControllerTest {
   }
 
   private DistrictEntity createDistrictData() {
-    return DistrictEntity.builder().districtNumber("003").displayName("District Name").openedDate(LocalDateTime.now().minusDays(1)).districtRegionCode("KOOTENAYS")
+    return DistrictEntity.builder().districtNumber("003").displayName("District Name").districtStatusCode("OPEN").districtRegionCode("KOOTENAYS")
       .website("abc@sd99.edu").createDate(LocalDateTime.now()).updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
   }
 
@@ -455,7 +455,7 @@ public class DistrictControllerTest {
 
   private AddressEntity createAddressData(DistrictEntity entity) {
     return AddressEntity.builder().districtEntity(entity).addressTypeCode("MAILING").addressLine1("123 This Street").city("Compton")
-      .provinceCode("BC").countryCode("CAN").postal("V1B9H2").createUser("TEST").updateUser("TEST").build();
+      .provinceCode("BC").postal("V1B9H2").createUser("TEST").updateUser("TEST").build();
   }
 
   private NoteEntity createNoteData(DistrictEntity entity) {
@@ -483,6 +483,12 @@ public class DistrictControllerTest {
       .updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
   }
 
+  private DistrictStatusCodeEntity createDistrictStatusCodeData() {
+    return DistrictStatusCodeEntity.builder().districtStatusCode("OPEN").description("Open Region.")
+      .effectiveDate(LocalDateTime.now()).expiryDate(LocalDateTime.MAX).displayOrder(1).label("Open").createDate(LocalDateTime.now())
+      .updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
+  }
+
   private ContactTypeCodeEntity createContactTypeCodeData() {
     return ContactTypeCodeEntity.builder().contactTypeCode("PRINCIPAL").description("School Principal")
       .effectiveDate(LocalDateTime.now()).expiryDate(LocalDateTime.MAX).displayOrder(1).label("Principal").createDate(LocalDateTime.now())
@@ -501,11 +507,6 @@ public class DistrictControllerTest {
       .updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
   }
 
-  private CountryCodeEntity createCountryCodeData() {
-    return CountryCodeEntity.builder().countryCode("CAN").description("Canada")
-      .effectiveDate(LocalDateTime.now()).expiryDate(LocalDateTime.MAX).displayOrder(1).label("Canada").createDate(LocalDateTime.now())
-      .updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
-  }
 }
 
 

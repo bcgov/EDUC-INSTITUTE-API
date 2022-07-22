@@ -40,10 +40,6 @@ public class IndependentAuthorityEntity {
   @UpperCase
   private String displayName;
   @Basic
-  @Column(name = "authority_group_code")
-  @UpperCase
-  private String authorityGroupCode;
-  @Basic
   @Column(name = "authority_type_code")
   @UpperCase
   private String authorityTypeCode;

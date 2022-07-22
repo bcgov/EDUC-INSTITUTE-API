@@ -1,6 +1,7 @@
 package ca.bc.gov.educ.api.institute.validator;
 
 import ca.bc.gov.educ.api.institute.model.v1.DistrictRegionCodeEntity;
+import ca.bc.gov.educ.api.institute.model.v1.DistrictStatusCodeEntity;
 import ca.bc.gov.educ.api.institute.service.v1.CodeTableService;
 import ca.bc.gov.educ.api.institute.service.v1.DistrictService;
 import ca.bc.gov.educ.api.institute.struct.v1.District;
@@ -21,6 +22,8 @@ public class DistrictPayloadValidator {
 
   public static final String DISTICT_REGION_CODE = "districtRegionCode";
 
+  public static final String DISTICT_STATUS_CODE = "districtStatusCode";
+
   @Getter(AccessLevel.PRIVATE)
   private final DistrictService districtService;
 
@@ -39,6 +42,7 @@ public class DistrictPayloadValidator {
       apiValidationErrors.add(createFieldError("districtId", district.getDistrictId(), "districtId should be null for post operation."));
     }
     validateDistrictRegionCode(district, apiValidationErrors);
+    validateDistrictStatusCode(district, apiValidationErrors);
     return apiValidationErrors;
   }
 
@@ -59,6 +63,19 @@ public class DistrictPayloadValidator {
         apiValidationErrors.add(createFieldError(DISTICT_REGION_CODE, district.getDistrictRegionCode(), "Region Code provided is not yet effective."));
       } else if (districtRegionCodeEntity.get().getExpiryDate() != null && districtRegionCodeEntity.get().getExpiryDate().isBefore(LocalDateTime.now())) {
         apiValidationErrors.add(createFieldError(DISTICT_REGION_CODE, district.getDistrictRegionCode(), "Region Code provided has expired."));
+      }
+    }
+  }
+
+  protected void validateDistrictStatusCode(District district, List<FieldError> apiValidationErrors) {
+    if (district.getDistrictStatusCode() != null) {
+      Optional<DistrictStatusCodeEntity> districtStatusCodeEntity = codeTableService.getDistrictStatusCode(district.getDistrictStatusCode());
+      if (districtStatusCodeEntity.isEmpty()) {
+        apiValidationErrors.add(createFieldError(DISTICT_STATUS_CODE, district.getDistrictStatusCode(), "Invalid Status code."));
+      } else if (districtStatusCodeEntity.get().getEffectiveDate() != null && districtStatusCodeEntity.get().getEffectiveDate().isAfter(LocalDateTime.now())) {
+        apiValidationErrors.add(createFieldError(DISTICT_STATUS_CODE, district.getDistrictStatusCode(), "Status Code provided is not yet effective."));
+      } else if (districtStatusCodeEntity.get().getExpiryDate() != null && districtStatusCodeEntity.get().getExpiryDate().isBefore(LocalDateTime.now())) {
+        apiValidationErrors.add(createFieldError(DISTICT_STATUS_CODE, district.getDistrictStatusCode(), "Status Code provided has expired."));
       }
     }
   }

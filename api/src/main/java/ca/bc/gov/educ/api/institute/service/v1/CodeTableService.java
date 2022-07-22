@@ -14,21 +14,19 @@ public class CodeTableService {
 
   private final AddressTypeCodeRepository addressTypeCodeRepository;
 
-  private final AuthorityGroupCodeRepository authorityGroupCodeRepository;
-
   private final AuthorityTypeCodeRepository authorityTypeCodeRepository;
 
   private final ContactTypeCodeRepository contactTypeCodeRepository;
 
   private final DistrictRegionCodeRepository districtRegionCodeRepository;
 
+  private final DistrictStatusCodeRepository districtStatusCodeRepository;
+
   private final FacilityTypeCodeRepository facilityTypeCodeRepository;
 
   private final NeighborhoodLearningTypeCodeRepository neighborhoodLearningTypeCodeRepository;
 
   private final ProvinceCodeRepository provinceCodeRepository;
-
-  private final CountryCodeRepository countryCodeRepository;
 
   private final SchoolGradeCodeRepository schoolGradeCodeRepository;
 
@@ -40,9 +38,9 @@ public class CodeTableService {
    * Instantiates a new Code table service.
    *
    * @param addressTypeCodeRepository
-   * @param authorityGroupCodeRepository
    * @param authorityTypeCodeRepository
    * @param contactTypeCodeRepository
+   * @param districtStatusCodeRepository
    * @param facilityTypeCodeRepository
    * @param provinceCodeRepository
    * @param countryCodeRepository
@@ -51,19 +49,18 @@ public class CodeTableService {
    * @param schoolCategoryCodeRepository
    */
   @Autowired
-  public CodeTableService(AddressTypeCodeRepository addressTypeCodeRepository, AuthorityGroupCodeRepository authorityGroupCodeRepository, AuthorityTypeCodeRepository authorityTypeCodeRepository,
-                          ContactTypeCodeRepository contactTypeCodeRepository, DistrictRegionCodeRepository districtRegionCodeRepository, FacilityTypeCodeRepository facilityTypeCodeRepository,
-                          NeighborhoodLearningTypeCodeRepository neighborhoodLearningTypeCodeRepository, ProvinceCodeRepository provinceCodeRepository, CountryCodeRepository countryCodeRepository,
+  public CodeTableService(AddressTypeCodeRepository addressTypeCodeRepository, AuthorityTypeCodeRepository authorityTypeCodeRepository,
+                          ContactTypeCodeRepository contactTypeCodeRepository, DistrictRegionCodeRepository districtRegionCodeRepository, DistrictStatusCodeRepository districtStatusCodeRepository, FacilityTypeCodeRepository facilityTypeCodeRepository,
+                          NeighborhoodLearningTypeCodeRepository neighborhoodLearningTypeCodeRepository, ProvinceCodeRepository provinceCodeRepository,
                           SchoolGradeCodeRepository schoolGradeCodeRepository, SchoolOrganizationCodeRepository schoolOrganizationCodeRepository, SchoolCategoryCodeRepository schoolCategoryCodeRepository) {
     this.addressTypeCodeRepository = addressTypeCodeRepository;
-    this.authorityGroupCodeRepository = authorityGroupCodeRepository;
     this.authorityTypeCodeRepository = authorityTypeCodeRepository;
     this.contactTypeCodeRepository = contactTypeCodeRepository;
     this.districtRegionCodeRepository = districtRegionCodeRepository;
+    this.districtStatusCodeRepository = districtStatusCodeRepository;
     this.facilityTypeCodeRepository = facilityTypeCodeRepository;
     this.neighborhoodLearningTypeCodeRepository = neighborhoodLearningTypeCodeRepository;
     this.provinceCodeRepository = provinceCodeRepository;
-    this.countryCodeRepository = countryCodeRepository;
     this.schoolGradeCodeRepository = schoolGradeCodeRepository;
     this.schoolOrganizationCodeRepository = schoolOrganizationCodeRepository;
     this.schoolCategoryCodeRepository = schoolCategoryCodeRepository;
@@ -72,11 +69,6 @@ public class CodeTableService {
   @Cacheable("addressTypeCodes")
   public List<AddressTypeCodeEntity> getAddressTypeCodesList() {
     return addressTypeCodeRepository.findAll();
-  }
-
-  @Cacheable("authorityGroupCodes")
-  public List<AuthorityGroupCodeEntity> getAuthorityGroupCodesList() {
-    return authorityGroupCodeRepository.findAll();
   }
 
   @Cacheable("authorityTypeCodes")
@@ -94,6 +86,11 @@ public class CodeTableService {
     return districtRegionCodeRepository.findAll();
   }
 
+  @Cacheable("districtStatusCodes")
+  public List<DistrictStatusCodeEntity> getDistrictStatusCodesList() {
+    return districtStatusCodeRepository.findAll();
+  }
+
   @Cacheable("facilityTypeCodes")
   public List<FacilityTypeCodeEntity> getFacilityTypeCodesList() {
     return facilityTypeCodeRepository.findAll();
@@ -107,11 +104,6 @@ public class CodeTableService {
   @Cacheable("provinceCodes")
   public List<ProvinceCodeEntity> getProvinceCodesList() {
     return provinceCodeRepository.findAll();
-  }
-
-  @Cacheable("countryCodes")
-  public List<CountryCodeEntity> getCountryCodesList() {
-    return countryCodeRepository.findAll();
   }
 
   @Cacheable("schoolGradeCodes")
@@ -133,10 +125,6 @@ public class CodeTableService {
     return addressTypeCodeRepository.findById(addressTypeCode);
   }
 
-  public Optional<AuthorityGroupCodeEntity> getAuthorityGroupCode(String authorityGroupCode) {
-    return authorityGroupCodeRepository.findById(authorityGroupCode);
-  }
-
   public Optional<AuthorityTypeCodeEntity> getAuthorityTypeCode(String authorityTypeCode) {
     return authorityTypeCodeRepository.findById(authorityTypeCode);
   }
@@ -149,6 +137,10 @@ public class CodeTableService {
     return districtRegionCodeRepository.findById(districtRegionCode);
   }
 
+  public Optional<DistrictStatusCodeEntity> getDistrictStatusCode(String districtStatusCode) {
+    return districtStatusCodeRepository.findById(districtStatusCode);
+  }
+
   public Optional<FacilityTypeCodeEntity> getFacilityTypeCode(String facilityTypeCode) {
     return facilityTypeCodeRepository.findById(facilityTypeCode);
   }
@@ -159,10 +151,6 @@ public class CodeTableService {
 
   public Optional<ProvinceCodeEntity> getProvinceCode(String provinceCode) {
     return provinceCodeRepository.findById(provinceCode);
-  }
-
-  public Optional<CountryCodeEntity> getCountryCode(String countryCode) {
-    return countryCodeRepository.findById(countryCode);
   }
 
   public Optional<SchoolGradeCodeEntity> getSchoolGradeCode(String schoolGradeCode) {

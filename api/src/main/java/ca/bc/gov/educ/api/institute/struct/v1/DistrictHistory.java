@@ -7,7 +7,6 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
-import java.time.LocalDateTime;
 
 /**
  * The type Student.
@@ -54,9 +53,9 @@ public class DistrictHistory extends BaseRequest implements Serializable {
   @NotNull(message = "districtRegionCode cannot be null")
   private String districtRegionCode;
 
-  @NotNull(message = "openedDate cannot be null")
-  private LocalDateTime openedDate;
+  @Size(max = 10)
+  @NotNull(message = "districtStatusCode cannot be null")
+  private String districtStatusCode;
 
-  private LocalDateTime closedDate;
 
 }

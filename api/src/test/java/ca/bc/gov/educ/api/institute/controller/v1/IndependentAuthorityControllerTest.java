@@ -59,9 +59,6 @@ public class IndependentAuthorityControllerTest {
   AuthorityTypeCodeRepository authorityTypeCodeRepository;
 
   @Autowired
-  AuthorityGroupCodeRepository authorityGroupCodeRepository;
-
-  @Autowired
   ContactTypeCodeRepository contactTypeCodeRepository;
 
   @Autowired
@@ -79,17 +76,12 @@ public class IndependentAuthorityControllerTest {
   @Autowired
   ProvinceCodeRepository provinceCodeRepository;
 
-  @Autowired
-  CountryCodeRepository countryCodeRepository;
-
   @BeforeEach
   public void before(){
     MockitoAnnotations.openMocks(this);
     this.authorityTypeCodeRepository.save(this.createAuthorityTypeCodeData());
-    this.authorityGroupCodeRepository.save(this.createAuthorityGroupCodeData());
     this.contactTypeCodeRepository.save(this.createContactTypeCodeData());
     this.addressTypeCodeRepository.save(this.createAddressTypeCodeData());
-    this.countryCodeRepository.save(this.createCountryCodeData());
     this.provinceCodeRepository.save(this.createProvinceCodeData());
   }
 
@@ -104,7 +96,6 @@ public class IndependentAuthorityControllerTest {
     this.independentAuthorityRepository.deleteAll();
     this.independentAuthorityHistoryRepository.deleteAll();
     this.authorityTypeCodeRepository.deleteAll();
-    this.authorityGroupCodeRepository.deleteAll();
   }
 
   @Test
@@ -216,14 +207,14 @@ public class IndependentAuthorityControllerTest {
 
   @Test
   void testCreateIndependentAuthority_GivenInvalidPayload_ShouldReturnStatusBadRequest() throws Exception {
-    final var school = this.createIndependentAuthorityData();
-    school.setAuthorityGroupCode("ABCD");
-    school.setCreateDate(null);
-    school.setUpdateDate(null);
+    final var independentAuthorityData = this.createIndependentAuthorityData();
+    independentAuthorityData.setDisplayName(null);
+    independentAuthorityData.setCreateDate(null);
+    independentAuthorityData.setUpdateDate(null);
     this.mockMvc.perform(post(URL.BASE_URL_AUTHORITY)
         .contentType(MediaType.APPLICATION_JSON)
         .accept(MediaType.APPLICATION_JSON)
-        .content(asJsonString(school))
+        .content(asJsonString(independentAuthorityData))
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_INDEPENDENT_AUTHORITY"))))
       .andDo(print())
       .andExpect(status().isBadRequest());
@@ -438,7 +429,7 @@ public class IndependentAuthorityControllerTest {
 
   private IndependentAuthorityEntity createIndependentAuthorityData() {
     return IndependentAuthorityEntity.builder().authorityNumber("003").displayName("IndependentAuthority Name").openedDate(LocalDateTime.now().minusDays(1))
-      .authorityTypeCode("INDEPEND").authorityGroupCode("ACC_CHRIS").createDate(LocalDateTime.now()).updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
+      .authorityTypeCode("INDEPEND").createDate(LocalDateTime.now()).updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
   }
 
   private IndependentAuthorityHistoryEntity createHistoryIndependentAuthorityData(UUID independentAuthorityId) {
@@ -455,12 +446,6 @@ public class IndependentAuthorityControllerTest {
     } catch (final Exception e) {
       throw new RuntimeException(e);
     }
-  }
-
-  private AuthorityGroupCodeEntity createAuthorityGroupCodeData() {
-    return AuthorityGroupCodeEntity.builder().authorityGroupCode("ACC_CHRIS").description("Accelerated Christian Educ Association")
-      .effectiveDate(LocalDateTime.now()).expiryDate(LocalDateTime.MAX).displayOrder(1).label("Accelerated Christian Ed.").createDate(LocalDateTime.now())
-      .updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
   }
 
   private AuthorityTypeCodeEntity createAuthorityTypeCodeData() {
@@ -487,20 +472,13 @@ public class IndependentAuthorityControllerTest {
       .updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
   }
 
-  private CountryCodeEntity createCountryCodeData() {
-    return CountryCodeEntity.builder().countryCode("CAN").description("Canada")
-      .effectiveDate(LocalDateTime.now()).expiryDate(LocalDateTime.MAX).displayOrder(1).label("Canada").createDate(LocalDateTime.now())
-      .updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
-  }
-
-
   private ContactEntity createContactData(IndependentAuthorityEntity entity) {
     return ContactEntity.builder().independentAuthorityEntity(entity).contactTypeCode("PRINCIPAL").firstName("John").lastName("Wayne").createUser("TEST").updateUser("TEST").build();
   }
 
   private AddressEntity createAddressData(IndependentAuthorityEntity entity) {
     return AddressEntity.builder().independentAuthorityEntity(entity).addressTypeCode("MAILING").addressLine1("123 This Street").city("Compton")
-      .provinceCode("BC").countryCode("CAN").postal("V1B9H2").createUser("TEST").updateUser("TEST").build();
+      .provinceCode("BC").postal("V1B9H2").createUser("TEST").updateUser("TEST").build();
   }
 
   private NoteEntity createNoteData(IndependentAuthorityEntity entity) {
