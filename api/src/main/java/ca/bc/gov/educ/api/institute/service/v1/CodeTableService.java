@@ -43,7 +43,6 @@ public class CodeTableService {
    * @param districtStatusCodeRepository
    * @param facilityTypeCodeRepository
    * @param provinceCodeRepository
-   * @param countryCodeRepository
    * @param schoolGradeCodeRepository
    * @param schoolOrganizationCodeRepository
    * @param schoolCategoryCodeRepository
