@@ -225,6 +225,7 @@ CREATE TABLE DISTRICT_HISTORY
     WEBSITE                             VARCHAR(255),
     DISPLAY_NAME                        VARCHAR(255) NOT NULL,
     DISTRICT_REGION_CODE                VARCHAR(10) NOT NULL,
+    DISTRICT_STATUS_CODE                VARCHAR(10) NOT NULL,
     OPENED_DATE                         TIMESTAMP NOT NULL,
     CLOSED_DATE                         TIMESTAMP,
     CREATE_USER                         VARCHAR(32)         NOT NULL,
