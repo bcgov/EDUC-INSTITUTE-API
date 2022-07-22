@@ -1,0 +1,92 @@
+CREATE TABLE DISTRICT
+as
+SELECT
+    LOWER(REGEXP_REPLACE(dbms_crypto.randombytes(16), '(.{8})(.{4})(.{4})(.{4})(.{12})', '\1-\2-\3-\4-\5')) as DISTRICT_ID,
+    TRIM(dist_mast.DISTNO) as DISTRICT_NUMBER,
+    CONCAT(TRIM(dist_mast.FAX_AREA),TRIM(dist_mast.FAX_NUMBER)) as FAX_NUMBER,
+    CONCAT(TRIM(dist_mast.PHONE_AREA),TRIM(dist_mast.PHONE_NUMBER)) as PHONE_NUMBER,
+    TRIM(dist_mast.E_MAIL_ID) as EMAIL,
+    TRIM(dist_mast.WEB_ADDRESS) as WEBSITE,
+    TRIM(dist_mast.DISTRICT_NAME) as DISTRICT_NAME,
+    (SELECT dist_reg.DISTRICT_REGION_CODE from DISTRICT_REGION_CODE dist_reg where TRIM(dist_mast.DIST_AREA_CODE) = dist_reg.LEGACY_CODE) as DISTRICT_REGION_CODE,
+    'ACTIVE' as STATUS,
+    sysdate as CREATE_DATE,
+    'SPM_MIGRATION' as CREATE_USER,
+    sysdate as UPDATE_DATE,
+    'SPM_MIGRATION' as UPDATE_USER
+FROM DISTRICT_MASTER dist_mast;
+
+CREATE TABLE DISTRICT_HISTORY
+as
+SELECT
+    LOWER(REGEXP_REPLACE(dbms_crypto.randombytes(16), '(.{8})(.{4})(.{4})(.{4})(.{12})', '\1-\2-\3-\4-\5')) as DISTRICT_HISTORY_ID,
+    (SELECT dist.DISTRICT_ID from DISTRICT dist WHERE dist_mast.DISTNO = dist.DISTRICT_NUMBER) as DISTRICT_ID,
+    TRIM(dist_mast.DISTNO) as DISTRICT_NUMBER,
+    CONCAT(TRIM(dist_mast.FAX_AREA),TRIM(dist_mast.FAX_NUMBER)) as FAX_NUMBER,
+    CONCAT(TRIM(dist_mast.PHONE_AREA),TRIM(dist_mast.PHONE_NUMBER)) as PHONE_NUMBER,
+    TRIM(dist_mast.E_MAIL_ID) as EMAIL,
+    TRIM(dist_mast.WEB_ADDRESS) as WEBSITE,
+    TRIM(dist_mast.DISTRICT_NAME) as DISTRICT_NAME,
+    (SELECT dist_reg.DISTRICT_REGION_CODE from DISTRICT_REGION_CODE dist_reg where TRIM(dist_mast.DIST_AREA_CODE) = dist_reg.LEGACY_CODE) as DISTRICT_REGION_CODE,
+    'ACTIVE' as STATUS,
+    sysdate as CREATE_DATE,
+    'SPM_MIGRATION' as CREATE_USER,
+    sysdate as UPDATE_DATE,
+    'SPM_MIGRATION' as UPDATE_USER
+FROM DISTRICT_MASTER dist_mast;
+
+CREATE TABLE INDEPENDENT_AUTHORITY
+as
+SELECT
+    LOWER(REGEXP_REPLACE(dbms_crypto.randombytes(16), '(.{8})(.{4})(.{4})(.{4})(.{12})', '\1-\2-\3-\4-\5')) as INDEPENDENT_AUTHORITY_ID,
+    TRIM(auth_mast.AUTH_NUMBER) as authority_number,
+    TRIM(auth_mast.FAX_NUMBER) as FAX_NUMBER,
+    TRIM(auth_mast.PHONE_NUMBER) as PHONE_NUMBER,
+    TRIM(auth_mast.E_MAIL_ID) as EMAIL,
+    TRIM(auth_mast.SCHOOL_AUTHORITY_NAME) as DISPLAY_NAME,
+    (SELECT auth_type.AUTHORITY_TYPE_CODE from AUTHORITY_TYPE_CODE auth_type where TRIM(auth_mast.AUTHORITY_TYPE) = SUBSTR(auth_type.AUTHORITY_TYPE_CODE, 0, 1)) as AUTHORITY_TYPE_CODE,
+    auth_mast.DATE_OPENED as OPENED_DATE,
+    auth_mast.DATE_CLOSED as CLOSED_DATE,
+    sysdate as CREATE_DATE,
+    'SPM_MIGRATION' as CREATE_USER,
+    sysdate as UPDATE_DATE,
+    'SPM_MIGRATION' as UPDATE_USER
+FROM AUTHORITY_MASTER auth_mast;
+
+CREATE TABLE INDEPENDENT_AUTHORITY_HISTORY
+as
+SELECT
+    LOWER(REGEXP_REPLACE(dbms_crypto.randombytes(16), '(.{8})(.{4})(.{4})(.{4})(.{12})', '\1-\2-\3-\4-\5')) as INDEPENDENT_AUTHORITY_HISTORY_ID,
+    (SELECT auth.INDEPENDENT_AUTHORITY_ID from INDEPENDENT_AUTHORITY auth WHERE auth_mast.AUTH_NUMBER = auth.AUTHORITY_NUMBER) as INDEPENDENT_AUTHORITY_ID,
+    TRIM(auth_mast.AUTH_NUMBER) as authority_number,
+    TRIM(auth_mast.FAX_NUMBER) as FAX_NUMBER,
+    TRIM(auth_mast.PHONE_NUMBER) as PHONE_NUMBER,
+    TRIM(auth_mast.E_MAIL_ID) as EMAIL,
+    TRIM(auth_mast.SCHOOL_AUTHORITY_NAME) as DISPLAY_NAME,
+    (SELECT auth_type.AUTHORITY_TYPE_CODE from AUTHORITY_TYPE_CODE auth_type where TRIM(auth_mast.AUTHORITY_TYPE) = SUBSTR(auth_type.AUTHORITY_TYPE_CODE, 0, 1)) as AUTHORITY_TYPE_CODE,
+    auth_mast.DATE_OPENED as OPENED_DATE,
+    auth_mast.DATE_CLOSED as CLOSED_DATE,
+    sysdate as CREATE_DATE,
+    'SPM_MIGRATION' as CREATE_USER,
+    sysdate as UPDATE_DATE,
+    'SPM_MIGRATION' as UPDATE_USER
+FROM AUTHORITY_MASTER auth_mast;
+
+CREATE TABLE SCHOOL
+as
+SELECT
+    LOWER(REGEXP_REPLACE(dbms_crypto.randombytes(16), '(.{8})(.{4})(.{4})(.{4})(.{12})', '\1-\2-\3-\4-\5')) as SCHOOL_ID,
+    (SELECT dist.DISTRICT_ID from DISTRICT dist WHERE schl_mast.DISTNO = dist.DISTRICT_NUMBER) as DISTRICT_ID,
+    TRIM(dist_mast.DISTNO) as DISTRICT_NUMBER,
+    CONCAT(dist_mast.FAX_AREA,dist_mast.FAX_NUMBER) as FAX_NUMBER,
+    CONCAT(dist_mast.PHONE_AREA,dist_mast.PHONE_NUMBER) as PHONE_NUMBER,
+    TRIM(dist_mast.E_MAIL_ID) as EMAIL,
+    TRIM(dist_mast.WEB_ADDRESS) as WEBSITE,
+    TRIM(dist_mast.DISTRICT_NAME) as DISTRICT_NAME,
+    (SELECT dist_reg.DISTRICT_REGION_CODE from DISTRICT_REGION_CODE dist_reg where TRIM(dist_mast.DIST_AREA_CODE) = dist_reg.LEGACY_CODE) as DISTRICT_REGION_CODE,
+    'ACTIVE' as STATUS,
+    sysdate as CREATE_DATE,
+    'SPM_MIGRATION' as CREATE_USER,
+    sysdate as UPDATE_DATE,
+    'SPM_MIGRATION' as UPDATE_USER
+FROM SCHOOL_MASTER schl_mast;
