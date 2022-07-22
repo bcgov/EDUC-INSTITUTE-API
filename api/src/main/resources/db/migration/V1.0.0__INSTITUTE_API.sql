@@ -387,6 +387,7 @@ CREATE TABLE PROVINCE_CODE
     PROVINCE_CODE                     VARCHAR(10)             NOT NULL,
     LABEL                             VARCHAR(30) NOT NULL,
     DESCRIPTION                       VARCHAR(255) NOT NULL,
+    LEGACY_CODE                       VARCHAR(10),
     DISPLAY_ORDER                     NUMERIC DEFAULT 1       NOT NULL,
     EFFECTIVE_DATE                    TIMESTAMP               NOT NULL,
     EXPIRY_DATE                       TIMESTAMP               NOT NULL,
