@@ -53,6 +53,14 @@ public interface CodeTableMapper {
   @Mapping(target = "updateDate", ignore = true)
   @Mapping(target = "createUser", ignore = true)
   @Mapping(target = "createDate", ignore = true)
+  CountryCodeEntity toModel(CountryCode structure);
+
+  CountryCode toStructure(CountryCodeEntity entity);
+
+  @Mapping(target = "updateUser", ignore = true)
+  @Mapping(target = "updateDate", ignore = true)
+  @Mapping(target = "createUser", ignore = true)
+  @Mapping(target = "createDate", ignore = true)
   DistrictRegionCodeEntity toModel(DistrictRegionCode structure);
 
   DistrictRegionCode toStructure(DistrictRegionCodeEntity entity);

@@ -12,6 +12,8 @@ public final class URL {
   public static final String AUTHORITY_TYPE_CODES = "/authority-type-codes";
   public static final String CONTACT_TYPE_CODES = "/contact-type-codes";
   public static final String PROVINCE_CODES = "/province-codes";
+
+  public static final String COUNTRY_CODES = "/country-codes";
   public static final String DISTRICT_REGION_CODES = "/district-region-codes";
   public static final String DISTRICT_STATUS_CODES = "/district-status-codes";
 

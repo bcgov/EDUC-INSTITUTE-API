@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.institute.model.v1;
 
+import ca.bc.gov.educ.api.institute.util.UpperCase;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -51,6 +52,10 @@ public class AddressHistoryEntity {
   @Basic
   @Column(name = "province_code")
   private String provinceCode;
+  @Basic
+  @Column(name = "country_code")
+  @UpperCase
+  private String countryCode;
   @Basic
   @Column(name = "address_type_code")
   private String addressTypeCode;

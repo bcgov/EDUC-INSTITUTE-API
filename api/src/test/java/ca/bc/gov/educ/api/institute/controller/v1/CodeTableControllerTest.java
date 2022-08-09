@@ -65,6 +65,9 @@ public class CodeTableControllerTest {
   ProvinceCodeRepository provinceCodeRepository;
 
   @Autowired
+  CountryCodeRepository countryCodeRepository;
+
+  @Autowired
   SchoolGradeCodeRepository schoolGradeCodeRepository;
 
   @Autowired
@@ -87,6 +90,7 @@ public class CodeTableControllerTest {
     this.facilityTypeCodeRepository.save(this.createFacilityTypeCodeData());
     this.neighborhoodLearningTypeCodeRepository.save(this.createNeighborhoodLearningTypeCodeData());
     this.provinceCodeRepository.save(this.createProvinceCodeData());
+    this.countryCodeRepository.save(this.createCountryCodeData());
     this.schoolGradeCodeRepository.save(this.createSchoolGradeCodeData());
     this.schoolOrganizationCodeRepository.save(this.createSchoolOrganizationCodeData());
     this.schoolCategoryCodeRepository.save(this.createSchoolCategoryCodeData());
@@ -105,6 +109,7 @@ public class CodeTableControllerTest {
     this.facilityTypeCodeRepository.deleteAll();
     this.neighborhoodLearningTypeCodeRepository.deleteAll();
     this.provinceCodeRepository.deleteAll();
+    this.countryCodeRepository.deleteAll();
     this.schoolGradeCodeRepository.deleteAll();
     this.schoolOrganizationCodeRepository.deleteAll();
     this.schoolCategoryCodeRepository.deleteAll();
@@ -149,6 +154,12 @@ public class CodeTableControllerTest {
   private ProvinceCodeEntity createProvinceCodeData() {
     return ProvinceCodeEntity.builder().provinceCode("BC").description("British Columbia")
       .effectiveDate(LocalDateTime.now()).expiryDate(LocalDateTime.MAX).displayOrder(1).label("British Columbia").createDate(LocalDateTime.now())
+      .updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
+  }
+
+  private CountryCodeEntity createCountryCodeData() {
+    return CountryCodeEntity.builder().countryCode("CA").description("Canada")
+      .effectiveDate(LocalDateTime.now()).expiryDate(LocalDateTime.MAX).displayOrder(1).label("Canada").createDate(LocalDateTime.now())
       .updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
   }
 
@@ -222,6 +233,14 @@ public class CodeTableControllerTest {
     final var mockAuthority = oidcLogin().authorities(grantedAuthority);
     this.mockMvc.perform(get(URL.BASE_URL + URL.PROVINCE_CODES).with(mockAuthority)).andDo(print()).andExpect(status().isOk())
       .andExpect(MockMvcResultMatchers.jsonPath("$[0].provinceCode").value("BC"));
+  }
+
+  @Test
+  public void testGetCountryCodes_ShouldReturnCodes() throws Exception {
+    final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_INSTITUTE_CODES";
+    final var mockAuthority = oidcLogin().authorities(grantedAuthority);
+    this.mockMvc.perform(get(URL.BASE_URL + URL.COUNTRY_CODES).with(mockAuthority)).andDo(print()).andExpect(status().isOk())
+      .andExpect(MockMvcResultMatchers.jsonPath("$[0].countryCode").value("CA"));
   }
 
   @Test

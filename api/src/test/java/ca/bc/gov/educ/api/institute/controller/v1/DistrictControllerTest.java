@@ -83,6 +83,9 @@ public class DistrictControllerTest {
   @Autowired
   ProvinceCodeRepository provinceCodeRepository;
 
+  @Autowired
+  CountryCodeRepository countryCodeRepository;
+
   @BeforeEach
   public void setUp() {
     MockitoAnnotations.openMocks(this);
@@ -95,6 +98,7 @@ public class DistrictControllerTest {
     this.contactTypeCodeRepository.save(this.createContactTypeCodeData());
     this.addressTypeCodeRepository.save(this.createAddressTypeCodeData());
     this.provinceCodeRepository.save(this.createProvinceCodeData());
+    this.countryCodeRepository.save(this.createCountryCodeData());
   }
 
   /**
@@ -112,6 +116,7 @@ public class DistrictControllerTest {
     this.contactTypeCodeRepository.deleteAll();
     this.addressTypeCodeRepository.deleteAll();
     this.provinceCodeRepository.deleteAll();
+    this.countryCodeRepository.deleteAll();
     this.addressHistoryRepository.deleteAll();
   }
 
@@ -455,7 +460,7 @@ public class DistrictControllerTest {
 
   private AddressEntity createAddressData(DistrictEntity entity) {
     return AddressEntity.builder().districtEntity(entity).addressTypeCode("MAILING").addressLine1("123 This Street").city("Compton")
-      .provinceCode("BC").postal("V1B9H2").createUser("TEST").updateUser("TEST").build();
+      .provinceCode("BC").countryCode("CA").postal("V1B9H2").createUser("TEST").updateUser("TEST").build();
   }
 
   private NoteEntity createNoteData(DistrictEntity entity) {
@@ -504,6 +509,12 @@ public class DistrictControllerTest {
   private ProvinceCodeEntity createProvinceCodeData() {
     return ProvinceCodeEntity.builder().provinceCode("BC").description("British Columbia")
       .effectiveDate(LocalDateTime.now()).expiryDate(LocalDateTime.MAX).displayOrder(1).label("British Columbia").createDate(LocalDateTime.now())
+      .updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
+  }
+
+  private CountryCodeEntity createCountryCodeData() {
+    return CountryCodeEntity.builder().countryCode("CA").description("Canada")
+      .effectiveDate(LocalDateTime.now()).expiryDate(LocalDateTime.MAX).displayOrder(1).label("Canada").createDate(LocalDateTime.now())
       .updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
   }
 

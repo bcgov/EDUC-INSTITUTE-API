@@ -28,6 +28,8 @@ public class CodeTableService {
 
   private final ProvinceCodeRepository provinceCodeRepository;
 
+  private final CountryCodeRepository countryCodeRepository;
+
   private final SchoolGradeCodeRepository schoolGradeCodeRepository;
 
   private final SchoolOrganizationCodeRepository schoolOrganizationCodeRepository;
@@ -43,6 +45,7 @@ public class CodeTableService {
    * @param districtStatusCodeRepository
    * @param facilityTypeCodeRepository
    * @param provinceCodeRepository
+   * @param countryCodeRepository
    * @param schoolGradeCodeRepository
    * @param schoolOrganizationCodeRepository
    * @param schoolCategoryCodeRepository
@@ -51,7 +54,7 @@ public class CodeTableService {
   public CodeTableService(AddressTypeCodeRepository addressTypeCodeRepository, AuthorityTypeCodeRepository authorityTypeCodeRepository,
                           ContactTypeCodeRepository contactTypeCodeRepository, DistrictRegionCodeRepository districtRegionCodeRepository, DistrictStatusCodeRepository districtStatusCodeRepository, FacilityTypeCodeRepository facilityTypeCodeRepository,
                           NeighborhoodLearningTypeCodeRepository neighborhoodLearningTypeCodeRepository, ProvinceCodeRepository provinceCodeRepository,
-                          SchoolGradeCodeRepository schoolGradeCodeRepository, SchoolOrganizationCodeRepository schoolOrganizationCodeRepository, SchoolCategoryCodeRepository schoolCategoryCodeRepository) {
+                          CountryCodeRepository countryCodeRepository, SchoolGradeCodeRepository schoolGradeCodeRepository, SchoolOrganizationCodeRepository schoolOrganizationCodeRepository, SchoolCategoryCodeRepository schoolCategoryCodeRepository) {
     this.addressTypeCodeRepository = addressTypeCodeRepository;
     this.authorityTypeCodeRepository = authorityTypeCodeRepository;
     this.contactTypeCodeRepository = contactTypeCodeRepository;
@@ -60,6 +63,7 @@ public class CodeTableService {
     this.facilityTypeCodeRepository = facilityTypeCodeRepository;
     this.neighborhoodLearningTypeCodeRepository = neighborhoodLearningTypeCodeRepository;
     this.provinceCodeRepository = provinceCodeRepository;
+    this.countryCodeRepository = countryCodeRepository;
     this.schoolGradeCodeRepository = schoolGradeCodeRepository;
     this.schoolOrganizationCodeRepository = schoolOrganizationCodeRepository;
     this.schoolCategoryCodeRepository = schoolCategoryCodeRepository;
@@ -103,6 +107,11 @@ public class CodeTableService {
   @Cacheable("provinceCodes")
   public List<ProvinceCodeEntity> getProvinceCodesList() {
     return provinceCodeRepository.findAll();
+  }
+
+  @Cacheable("countryCodes")
+  public List<CountryCodeEntity> getCountryCodesList() {
+    return countryCodeRepository.findAll();
   }
 
   @Cacheable("schoolGradeCodes")
@@ -150,6 +159,10 @@ public class CodeTableService {
 
   public Optional<ProvinceCodeEntity> getProvinceCode(String provinceCode) {
     return provinceCodeRepository.findById(provinceCode);
+  }
+
+  public Optional<CountryCodeEntity> getCountryCode(String countryCode) {
+    return countryCodeRepository.findById(countryCode);
   }
 
   public Optional<SchoolGradeCodeEntity> getSchoolGradeCode(String schoolGradeCode) {

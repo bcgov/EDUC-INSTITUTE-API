@@ -39,6 +39,14 @@ public interface CodeTableAPIEndpoint {
   List<ProvinceCode> getProvinceCodes();
 
   @PreAuthorize("hasAuthority('SCOPE_READ_INSTITUTE_CODES')")
+  @GetMapping(URL.COUNTRY_CODES)
+  @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
+  @Transactional(readOnly = true)
+  @Tag(name = "Institute Codes", description = "Endpoints to get institute codes.")
+  @Schema(name = "CountryCode", implementation = ProvinceCode.class)
+  List<CountryCode> getCountryCodes();
+
+  @PreAuthorize("hasAuthority('SCOPE_READ_INSTITUTE_CODES')")
   @GetMapping(URL.DISTRICT_REGION_CODES)
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
   @Transactional(readOnly = true)

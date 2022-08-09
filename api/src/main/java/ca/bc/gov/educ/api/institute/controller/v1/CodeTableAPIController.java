@@ -36,6 +36,10 @@ public class CodeTableAPIController implements CodeTableAPIEndpoint {
   }
 
   @Override
+  public List<CountryCode> getCountryCodes() { return getService().getCountryCodesList().stream().map(mapper::toStructure).collect(Collectors.toList());
+  }
+
+  @Override
   public List<DistrictRegionCode> getDistrictRegionCodes() {
     return getService().getDistrictRegionCodesList().stream().map(mapper::toStructure).collect(Collectors.toList());
   }

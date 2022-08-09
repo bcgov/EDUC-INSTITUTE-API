@@ -57,6 +57,10 @@ public class AddressEntity {
   @UpperCase
   private String provinceCode;
   @Basic
+  @Column(name = "country_code")
+  @UpperCase
+  private String countryCode;
+  @Basic
   @Column(name = "address_type_code")
   @UpperCase
   private String addressTypeCode;

@@ -98,6 +98,9 @@ public class SchoolControllerTest {
   ProvinceCodeRepository provinceCodeRepository;
 
   @Autowired
+  CountryCodeRepository countryCodeRepository;
+
+  @Autowired
   SchoolGradeCodeRepository schoolGradeCodeRepository;
 
 
@@ -113,6 +116,7 @@ public class SchoolControllerTest {
     this.contactTypeCodeRepository.save(this.createContactTypeCodeData());
     this.addressTypeCodeRepository.save(this.createAddressTypeCodeData());
     this.provinceCodeRepository.save(this.createProvinceCodeData());
+    this.countryCodeRepository.save(this.createCountryCodeData());
     this.schoolGradeCodeRepository.save(this.createSchoolGradeCodeData());
     this.neighborhoodLearningTypeCodeRepository.save(this.createNeighborhoodLearningTypeCodeData());
   }
@@ -593,7 +597,7 @@ public class SchoolControllerTest {
 
   private AddressEntity createAddressData(SchoolEntity entity) {
     return AddressEntity.builder().schoolEntity(entity).addressTypeCode("MAILING").addressLine1("123 This Street").city("Compton")
-      .provinceCode("BC").postal("V1B9H2").createUser("TEST").updateUser("TEST").build();
+      .provinceCode("BC").countryCode("CA").postal("V1B9H2").createUser("TEST").updateUser("TEST").build();
   }
 
   private NoteEntity createNoteData(SchoolEntity entity) {
@@ -615,6 +619,12 @@ public class SchoolControllerTest {
   private ProvinceCodeEntity createProvinceCodeData() {
     return ProvinceCodeEntity.builder().provinceCode("BC").description("British Columbia")
       .effectiveDate(LocalDateTime.now()).expiryDate(LocalDateTime.MAX).displayOrder(1).label("British Columbia").createDate(LocalDateTime.now())
+      .updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
+  }
+
+  private CountryCodeEntity createCountryCodeData() {
+    return CountryCodeEntity.builder().countryCode("CA").description("Canada")
+      .effectiveDate(LocalDateTime.now()).expiryDate(LocalDateTime.MAX).displayOrder(1).label("Canada").createDate(LocalDateTime.now())
       .updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
   }
 

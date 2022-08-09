@@ -65,4 +65,8 @@ public class AddressHistory extends BaseRequest implements Serializable {
   @NotNull(message = "provinceCode cannot be null")
   private String provinceCode;
 
+  @Size(max = 10)
+  @NotNull(message = "countryCode cannot be null")
+  private String countryCode;
+
 }

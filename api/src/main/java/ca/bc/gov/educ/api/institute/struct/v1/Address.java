@@ -62,4 +62,8 @@ public class Address extends BaseRequest implements Serializable {
   @Size(max = 10)
   @NotNull(message = "provinceCode cannot be null")
   private String provinceCode;
+
+  @Size(max = 10)
+  @NotNull(message = "countryCode cannot be null")
+  private String countryCode;
 }
