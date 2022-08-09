@@ -3,8 +3,8 @@ as
 SELECT
     LOWER(REGEXP_REPLACE(dbms_crypto.randombytes(16), '(.{8})(.{4})(.{4})(.{4})(.{12})', '\1-\2-\3-\4-\5')) as DISTRICT_ID,
     TRIM(dist_mast.DISTNO) as DISTRICT_NUMBER,
-    CASE WHEN regexp_like (CONCAT(TRIM(dist_mast.FAX_AREA),TRIM(dist_mast.FAX_NUMBER)),'^(\d{3}\d{3}?\d{4}|\d{10})$') then CONCAT(TRIM(dist_mast.FAX_AREA),TRIM(dist_mast.FAX_NUMBER)) ELSE (CAST(NULL as VARCHAR2(100))) END as FAX_NUMBER,
-    CASE WHEN regexp_like (CONCAT(TRIM(dist_mast.PHONE_AREA),TRIM(dist_mast.PHONE_NUMBER)),'^(\d{3}\d{3}?\d{4}|\d{10})$') then CONCAT(TRIM(dist_mast.PHONE_AREA),TRIM(dist_mast.PHONE_NUMBER)) ELSE (CAST(NULL as VARCHAR2(100))) END as PHONE_NUMBER,
+    CASE WHEN regexp_like (CONCAT(TRIM(dist_mast.FAX_AREA),TRIM(dist_mast.FAX_NUMBER)),'^(\d{3}\d{3}?\d{4}|\d{10})$') AND TRIM(dist_mast.FAX_NUMBER) != '0000000000' then CONCAT(TRIM(dist_mast.FAX_AREA),TRIM(dist_mast.FAX_NUMBER)) ELSE (CAST(NULL as VARCHAR2(100))) END as FAX_NUMBER,
+    CASE WHEN regexp_like (CONCAT(TRIM(dist_mast.PHONE_AREA),TRIM(dist_mast.PHONE_NUMBER)),'^(\d{3}\d{3}?\d{4}|\d{10})$') AND TRIM(dist_mast.PHONE_NUMBER) != '0000000000' then CONCAT(TRIM(dist_mast.PHONE_AREA),TRIM(dist_mast.PHONE_NUMBER)) ELSE (CAST(NULL as VARCHAR2(100))) END as PHONE_NUMBER,
     TRIM(LOWER(dist_mast.E_MAIL_ID)) as EMAIL,
     TRIM(LOWER(dist_mast.WEB_ADDRESS)) as WEBSITE,
     TRIM(INITCAP(dist_mast.DISTRICT_NAME)) as DISTRICT_NAME,
@@ -28,8 +28,8 @@ as
 SELECT
     LOWER(REGEXP_REPLACE(dbms_crypto.randombytes(16), '(.{8})(.{4})(.{4})(.{4})(.{12})', '\1-\2-\3-\4-\5')) as INDEPENDENT_AUTHORITY_ID,
     TRIM(auth_mast.AUTH_NUMBER) as authority_number,
-    CASE WHEN regexp_like (TRIM(auth_mast.FAX_NUMBER),'^(\d{3}\d{3}?\d{4}|\d{10})$') then TRIM(auth_mast.FAX_NUMBER) ELSE (CAST(NULL as VARCHAR2(100))) END as FAX_NUMBER,
-    CASE WHEN regexp_like (TRIM(auth_mast.PHONE_NUMBER),'^(\d{3}\d{3}?\d{4}|\d{10})$') then TRIM(auth_mast.PHONE_NUMBER) ELSE (CAST(NULL as VARCHAR2(100))) END as PHONE_NUMBER,
+    CASE WHEN regexp_like (TRIM(auth_mast.FAX_NUMBER),'^(\d{3}\d{3}?\d{4}|\d{10})$') AND TRIM(auth_mast.FAX_NUMBER) != '0000000000' then TRIM(auth_mast.FAX_NUMBER) ELSE (CAST(NULL as VARCHAR2(100))) END as FAX_NUMBER,
+    CASE WHEN regexp_like (TRIM(auth_mast.PHONE_NUMBER),'^(\d{3}\d{3}?\d{4}|\d{10})$') AND TRIM(auth_mast.PHONE_NUMBER) != '0000000000' then TRIM(auth_mast.PHONE_NUMBER) ELSE (CAST(NULL as VARCHAR2(100))) END as PHONE_NUMBER,
     TRIM(LOWER(auth_mast.E_MAIL_ID)) as EMAIL,
     TRIM(INITCAP(auth_mast.SCHOOL_AUTHORITY_NAME)) as DISPLAY_NAME,
     (SELECT auth_type.AUTHORITY_TYPE_CODE from AUTHORITY_TYPE_CODE auth_type where TRIM(auth_mast.AUTHORITY_TYPE) = SUBSTR(auth_type.AUTHORITY_TYPE_CODE, 0, 1)) as AUTHORITY_TYPE_CODE,
@@ -55,8 +55,8 @@ SELECT
     (SELECT dist.DISTRICT_ID from DISTRICT dist WHERE schl_mast.DISTNO = dist.DISTRICT_NUMBER) as DISTRICT_ID,
     (SELECT auth.INDEPENDENT_AUTHORITY_ID from INDEPENDENT_AUTHORITY auth WHERE schl_mast.AUTH_NUMBER = auth.AUTHORITY_NUMBER) as INDEPENDENT_AUTHORITY_ID,
     TRIM(schl_mast.SCHLNO) as SCHOOL_NUMBER,
-    CASE WHEN regexp_like (TRIM(schl_mast.SC_FAX_NUMBER),'^(\d{3}\d{3}?\d{4}|\d{10})$') then TRIM(schl_mast.SC_FAX_NUMBER) ELSE (CAST(NULL as VARCHAR2(100))) END as FAX_NUMBER,
-    CASE WHEN regexp_like (TRIM(schl_mast.SC_PHONE_NUMBER),'^(\d{3}\d{3}?\d{4}|\d{10})$') then TRIM(schl_mast.SC_PHONE_NUMBER) ELSE (CAST(NULL as VARCHAR2(100))) END as PHONE_NUMBER,
+    CASE WHEN regexp_like (TRIM(schl_mast.SC_FAX_NUMBER),'^(\d{3}\d{3}?\d{4}|\d{10})$') AND TRIM(schl_mast.SC_FAX_NUMBER) != '0000000000' then TRIM(schl_mast.SC_FAX_NUMBER) ELSE (CAST(NULL as VARCHAR2(100))) END as FAX_NUMBER,
+    CASE WHEN regexp_like (TRIM(schl_mast.SC_PHONE_NUMBER),'^(\d{3}\d{3}?\d{4}|\d{10})$') AND TRIM(schl_mast.SC_PHONE_NUMBER) != '0000000000' then TRIM(schl_mast.SC_PHONE_NUMBER) ELSE (CAST(NULL as VARCHAR2(100))) END as PHONE_NUMBER,
     TRIM(LOWER(schl_mast.SC_E_MAIL_ID)) as EMAIL,
     (CAST(NULL as VARCHAR2(100))) as WEBSITE,
     TRIM(INITCAP(schl_mast.SCHOOL_NAME)) as DISPLAY_NAME,
@@ -423,7 +423,7 @@ SELECT
     sysdate as UPDATE_DATE,
     'SPM_MIGRATION' as UPDATE_USER
 FROM SCHOOL_MASTER schl_mast
-WHERE TRIM(schl_mast.PHYS_ADDRESS_LINE_1) != ' '
+WHERE TRIM(schl_mast.PHYS_ADDRESS_LINE_1) != ' ' AND schl_mast.SCHOOL_CATEGORY_CODE != '09'
 UNION
 SELECT
     LOWER(REGEXP_REPLACE(dbms_crypto.randombytes(16), '(.{8})(.{4})(.{4})(.{4})(.{12})', '\1-\2-\3-\4-\5')) as ADDRESS_ID,
@@ -520,9 +520,9 @@ SELECT
     TRIM(INITCAP(dist_mast.GIVEN_NAME)) as FIRST_NAME,
     TRIM(INITCAP(dist_mast.SURNAME)) as LAST_NAME,
     TRIM(INITCAP(dist_mast.JOB_TITLE)) as JOB_TITLE,
-    CASE WHEN regexp_like (CONCAT(TRIM(dist_mast.PHONE_AREA_1),TRIM(dist_mast.PHONE_NUMBER_1)),'^(\d{3}\d{3}?\d{4}|\d{10})$') then CONCAT(TRIM(dist_mast.PHONE_AREA_1),TRIM(dist_mast.PHONE_NUMBER_1)) ELSE (CAST(NULL as VARCHAR2(100))) END as PHONE_NUMBER,
+    CASE WHEN regexp_like (CONCAT(TRIM(dist_mast.PHONE_AREA_1),TRIM(dist_mast.PHONE_NUMBER_1)),'^(\d{3}\d{3}?\d{4}|\d{10})$') AND TRIM(CONCAT(TRIM(dist_mast.PHONE_AREA_1),TRIM(dist_mast.PHONE_NUMBER_1))) != '0000000000' then CONCAT(TRIM(dist_mast.PHONE_AREA_1),TRIM(dist_mast.PHONE_NUMBER_1)) ELSE (CAST(NULL as VARCHAR2(100))) END as PHONE_NUMBER,
     TRIM(dist_mast.PHONE_EXT_1) as PHONE_EXTENSION,
-    CASE WHEN regexp_like (CONCAT(TRIM(dist_mast.PHONE_AREA_2),TRIM(dist_mast.PHONE_NUMBER_2)),'^(\d{3}\d{3}?\d{4}|\d{10})$') then CONCAT(TRIM(dist_mast.PHONE_AREA_2),TRIM(dist_mast.PHONE_NUMBER_2)) ELSE (CAST(NULL as VARCHAR2(100))) END as ALT_PHONE_NUMBER,
+    CASE WHEN regexp_like (CONCAT(TRIM(dist_mast.PHONE_AREA_2),TRIM(dist_mast.PHONE_NUMBER_2)),'^(\d{3}\d{3}?\d{4}|\d{10})$') AND TRIM(CONCAT(TRIM(dist_mast.PHONE_AREA_2),TRIM(dist_mast.PHONE_NUMBER_2))) != '0000000000' then CONCAT(TRIM(dist_mast.PHONE_AREA_2),TRIM(dist_mast.PHONE_NUMBER_2)) ELSE (CAST(NULL as VARCHAR2(100))) END as ALT_PHONE_NUMBER,
     TRIM(dist_mast.PHONE_EXT_2) as ALT_PHONE_EXTENSION,
     TRIM(LOWER(dist_mast.EMAIL_ID)) as EMAIL,
     CASE WHEN TRIM(dist_mast.CONTACT_TYPE_CODE) = '17' then 'false' ELSE 'true' END as PUBLICLY_AVAIL,
@@ -538,7 +538,6 @@ WHERE TRIM(dist_mast.SURNAME) != ' '
 UNION
 SELECT
     LOWER(REGEXP_REPLACE(dbms_crypto.randombytes(16), '(.{8})(.{4})(.{4})(.{4})(.{12})', '\1-\2-\3-\4-\5')) as CONTACT_ID,
-    (CAST(NULL as VARCHAR2(100))) as SCHOOL_ID,
     (CAST(NULL as VARCHAR2(100))) as DISTRICT_ID,
     (SELECT auth.INDEPENDENT_AUTHORITY_ID from INDEPENDENT_AUTHORITY auth WHERE auth_mast.AUTH_NUMBER = auth.AUTHORITY_NUMBER) as INDEPENDENT_AUTHORITY_ID,
     TRIM(INITCAP(auth_mast.GIVEN_NAME)) as FIRST_NAME,

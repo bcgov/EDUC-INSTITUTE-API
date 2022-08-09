@@ -147,7 +147,7 @@ INSERT INTO SCHOOL_CATEGORY_CODE (SCHOOL_CATEGORY_CODE, LABEL, DESCRIPTION, LEGA
                                   CREATE_DATE, UPDATE_USER, UPDATE_DATE)
 VALUES ('IMM_DATA', 'Immigration Data', 'Immigration data', '06', 10,
         to_date('2020-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS'),
-        to_date('2022-06-30 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
+        CURRENT_DATE, 'IDIR/MVILLENE',
         to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
         to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'));
 
@@ -156,7 +156,7 @@ INSERT INTO SCHOOL_CATEGORY_CODE (SCHOOL_CATEGORY_CODE, LABEL, DESCRIPTION, LEGA
                                   CREATE_DATE, UPDATE_USER, UPDATE_DATE)
 VALUES ('CHILD_CARE', 'Children in Care', 'Children in care', '07', 10,
         to_date('2020-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS'),
-        to_date('2022-06-30 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
+        CURRENT_DATE, 'IDIR/MVILLENE',
         to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
         to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'));
 
@@ -165,7 +165,7 @@ INSERT INTO SCHOOL_CATEGORY_CODE (SCHOOL_CATEGORY_CODE, LABEL, DESCRIPTION, LEGA
                                   CREATE_DATE, UPDATE_USER, UPDATE_DATE)
 VALUES ('MISC', 'Miscellaneous Data Matching', 'Miscellaneous data matching', '08', 10,
         to_date('2020-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS'),
-        to_date('2022-06-30 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
+        CURRENT_DATE, 'IDIR/MVILLENE',
         to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
         to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'));
 
@@ -228,7 +228,7 @@ INSERT INTO FACILITY_TYPE_CODE (FACILITY_TYPE_CODE, LABEL, DESCRIPTION, LEGACY_C
                                 CREATE_DATE, UPDATE_USER, UPDATE_DATE)
 VALUES ('PROVINCIAL', 'Provincial', 'Provincial school', '04', 10,
         to_date('2020-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS'),
-        to_date('2099-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
+        CURRENT_DATE, 'IDIR/MVILLENE',
         to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
         to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'));
 
