@@ -7,13 +7,13 @@ SELECT
     CASE WHEN regexp_like (CONCAT(TRIM(dist_mast.PHONE_AREA),TRIM(dist_mast.PHONE_NUMBER)),'^(\d{3}\d{3}?\d{4}|\d{10})$') AND TRIM(dist_mast.PHONE_NUMBER) != '0000000000' then CONCAT(TRIM(dist_mast.PHONE_AREA),TRIM(dist_mast.PHONE_NUMBER)) ELSE (CAST(NULL as VARCHAR2(100))) END as PHONE_NUMBER,
     TRIM(LOWER(dist_mast.E_MAIL_ID)) as EMAIL,
     TRIM(LOWER(dist_mast.WEB_ADDRESS)) as WEBSITE,
-    TRIM(INITCAP(dist_mast.DISTRICT_NAME)) as DISTRICT_NAME,
+    TRIM(INITCAP(dist_mast.DISTRICT_NAME)) as DISPLAY_NAME,
     (SELECT dist_reg.DISTRICT_REGION_CODE from DISTRICT_REGION_CODE dist_reg where TRIM(dist_mast.DIST_AREA_CODE) = dist_reg.LEGACY_CODE) as DISTRICT_REGION_CODE,
-    CASE WHEN dist_mast.DISTRICT_STATUS_CODE = 'O' then 'ACTIVE' ELSE 'INACTIVE' END as STATUS,
-    sysdate as CREATE_DATE,
+    CASE WHEN dist_mast.DISTRICT_STATUS_CODE = 'O' then 'ACTIVE' ELSE 'INACTIVE' END as DISTRICT_STATUS_CODE,
     'SPM_MIGRATION' as CREATE_USER,
-    sysdate as UPDATE_DATE,
-    'SPM_MIGRATION' as UPDATE_USER
+    sysdate as CREATE_DATE,
+    'SPM_MIGRATION' as UPDATE_USER,
+    sysdate as UPDATE_DATE
 FROM DISTRICT_MASTER dist_mast;
 
 CREATE TABLE DISTRICT_HISTORY
@@ -35,10 +35,10 @@ SELECT
     (SELECT auth_type.AUTHORITY_TYPE_CODE from AUTHORITY_TYPE_CODE auth_type where TRIM(auth_mast.AUTHORITY_TYPE) = SUBSTR(auth_type.AUTHORITY_TYPE_CODE, 0, 1)) as AUTHORITY_TYPE_CODE,
     auth_mast.DATE_OPENED as OPENED_DATE,
     CASE WHEN TRUNC(auth_mast.DATE_CLOSED) = '9999-12-31' then (CAST(NULL as DATE)) ELSE auth_mast.DATE_CLOSED END as CLOSED_DATE,
-    sysdate as CREATE_DATE,
     'SPM_MIGRATION' as CREATE_USER,
-    sysdate as UPDATE_DATE,
-    'SPM_MIGRATION' as UPDATE_USER
+    sysdate as CREATE_DATE,
+    'SPM_MIGRATION' as UPDATE_USER,
+    sysdate as UPDATE_DATE
 FROM AUTHORITY_MASTER auth_mast;
 
 CREATE TABLE INDEPENDENT_AUTHORITY_HISTORY
@@ -65,10 +65,10 @@ SELECT
     (SELECT fac_type.FACILITY_TYPE_CODE from FACILITY_TYPE_CODE fac_type where TRIM(schl_mast.FACILITY_TYPE_CODE) = fac_type.LEGACY_CODE) as FACILITY_TYPE_CODE,
     schl_mast.DATE_OPENED as OPENED_DATE,
     CASE WHEN TRUNC(schl_mast.DATE_CLOSED) = '9999-12-31' then (CAST(NULL as DATE)) ELSE schl_mast.DATE_CLOSED END as CLOSED_DATE,
-    sysdate as CREATE_DATE,
     'SPM_MIGRATION' as CREATE_USER,
-    sysdate as UPDATE_DATE,
-    'SPM_MIGRATION' as UPDATE_USER
+    sysdate as CREATE_DATE,
+    'SPM_MIGRATION' as UPDATE_USER,
+    sysdate as UPDATE_DATE
 FROM SCHOOL_MASTER schl_mast;
 
 CREATE TABLE SCHOOL_HISTORY
@@ -86,10 +86,10 @@ SELECT
     (CAST(NULL as VARCHAR2(100))) as DISTRICT_ID,
     (CAST(NULL as VARCHAR2(100))) as INDEPENDENT_AUTHORITY_ID,
     TRIM(schl_mast."COMMENT") as CONTENT,
-    sysdate as CREATE_DATE,
     'SPM_MIGRATION' as CREATE_USER,
-    sysdate as UPDATE_DATE,
-    'SPM_MIGRATION' as UPDATE_USER
+    sysdate as CREATE_DATE,
+    'SPM_MIGRATION' as UPDATE_USER,
+    sysdate as UPDATE_DATE
 FROM SCHOOL_MASTER schl_mast
 WHERE TRIM(schl_mast."COMMENT") != ' '
 UNION
@@ -99,10 +99,10 @@ SELECT
     (SELECT dist.DISTRICT_ID from DISTRICT dist WHERE dist_mast.DISTNO = dist.DISTRICT_NUMBER) as DISTRICT_ID,
     (CAST(NULL as VARCHAR2(100))) as INDEPENDENT_AUTHORITY_ID,
     TRIM(dist_mast.NOTES) as CONTENT,
-    sysdate as CREATE_DATE,
     'SPM_MIGRATION' as CREATE_USER,
-    sysdate as UPDATE_DATE,
-    'SPM_MIGRATION' as UPDATE_USER
+    sysdate as CREATE_DATE,
+    'SPM_MIGRATION' as UPDATE_USER,
+    sysdate as UPDATE_DATE
 FROM DISTRICT_MASTER dist_mast
 WHERE TRIM(dist_mast.NOTES) != ' ';
 
@@ -112,10 +112,10 @@ SELECT
     LOWER(REGEXP_REPLACE(dbms_crypto.randombytes(16), '(.{8})(.{4})(.{4})(.{4})(.{12})', '\1-\2-\3-\4-\5')) as SCHOOL_GRADE_ID,
     (SELECT schl.SCHOOL_ID from SCHOOL schl WHERE schl_mast.SCHLNO = schl.SCHOOL_NUMBER AND schl_mast.DISTNO = (SELECT dist.DISTRICT_NUMBER from DISTRICT dist WHERE schl.DISTRICT_ID = dist.DISTRICT_ID)) as SCHOOL_ID,
     'KINDHALF' as SCHOOL_GRADE_CODE,
-    sysdate as CREATE_DATE,
     'SPM_MIGRATION' as CREATE_USER,
-    sysdate as UPDATE_DATE,
-    'SPM_MIGRATION' as UPDATE_USER
+    sysdate as CREATE_DATE,
+    'SPM_MIGRATION' as UPDATE_USER,
+    sysdate as UPDATE_DATE
 FROM SCHOOL_MASTER schl_mast
 WHERE TRIM(schl_mast.GRADE_KH_IND) = 'Y'
 UNION
@@ -123,10 +123,10 @@ SELECT
     LOWER(REGEXP_REPLACE(dbms_crypto.randombytes(16), '(.{8})(.{4})(.{4})(.{4})(.{12})', '\1-\2-\3-\4-\5')) as SCHOOL_GRADE_ID,
     (SELECT schl.SCHOOL_ID from SCHOOL schl WHERE schl_mast.SCHLNO = schl.SCHOOL_NUMBER AND schl_mast.DISTNO = (SELECT dist.DISTRICT_NUMBER from DISTRICT dist WHERE schl.DISTRICT_ID = dist.DISTRICT_ID)) as SCHOOL_ID,
     'KINDFULL' as SCHOOL_GRADE_CODE,
-    sysdate as CREATE_DATE,
     'SPM_MIGRATION' as CREATE_USER,
-    sysdate as UPDATE_DATE,
-    'SPM_MIGRATION' as UPDATE_USER
+    sysdate as CREATE_DATE,
+    'SPM_MIGRATION' as UPDATE_USER,
+    sysdate as UPDATE_DATE
 FROM SCHOOL_MASTER schl_mast
 WHERE TRIM(schl_mast.GRADE_KF_IND) = 'Y'
 UNION
@@ -134,10 +134,10 @@ SELECT
     LOWER(REGEXP_REPLACE(dbms_crypto.randombytes(16), '(.{8})(.{4})(.{4})(.{4})(.{12})', '\1-\2-\3-\4-\5')) as SCHOOL_GRADE_ID,
     (SELECT schl.SCHOOL_ID from SCHOOL schl WHERE schl_mast.SCHLNO = schl.SCHOOL_NUMBER AND schl_mast.DISTNO = (SELECT dist.DISTRICT_NUMBER from DISTRICT dist WHERE schl.DISTRICT_ID = dist.DISTRICT_ID)) as SCHOOL_ID,
     'GRADE01' as SCHOOL_GRADE_CODE,
-    sysdate as CREATE_DATE,
     'SPM_MIGRATION' as CREATE_USER,
-    sysdate as UPDATE_DATE,
-    'SPM_MIGRATION' as UPDATE_USER
+    sysdate as CREATE_DATE,
+    'SPM_MIGRATION' as UPDATE_USER,
+    sysdate as UPDATE_DATE
 FROM SCHOOL_MASTER schl_mast
 WHERE TRIM(schl_mast.GRADE_01_IND ) = 'Y'
 UNION
@@ -145,10 +145,10 @@ SELECT
     LOWER(REGEXP_REPLACE(dbms_crypto.randombytes(16), '(.{8})(.{4})(.{4})(.{4})(.{12})', '\1-\2-\3-\4-\5')) as SCHOOL_GRADE_ID,
     (SELECT schl.SCHOOL_ID from SCHOOL schl WHERE schl_mast.SCHLNO = schl.SCHOOL_NUMBER AND schl_mast.DISTNO = (SELECT dist.DISTRICT_NUMBER from DISTRICT dist WHERE schl.DISTRICT_ID = dist.DISTRICT_ID)) as SCHOOL_ID,
     'GRADE02' as SCHOOL_GRADE_CODE,
-    sysdate as CREATE_DATE,
     'SPM_MIGRATION' as CREATE_USER,
-    sysdate as UPDATE_DATE,
-    'SPM_MIGRATION' as UPDATE_USER
+    sysdate as CREATE_DATE,
+    'SPM_MIGRATION' as UPDATE_USER,
+    sysdate as UPDATE_DATE
 FROM SCHOOL_MASTER schl_mast
 WHERE TRIM(schl_mast.GRADE_02_IND ) = 'Y'
 UNION
@@ -156,10 +156,10 @@ SELECT
     LOWER(REGEXP_REPLACE(dbms_crypto.randombytes(16), '(.{8})(.{4})(.{4})(.{4})(.{12})', '\1-\2-\3-\4-\5')) as SCHOOL_GRADE_ID,
     (SELECT schl.SCHOOL_ID from SCHOOL schl WHERE schl_mast.SCHLNO = schl.SCHOOL_NUMBER AND schl_mast.DISTNO = (SELECT dist.DISTRICT_NUMBER from DISTRICT dist WHERE schl.DISTRICT_ID = dist.DISTRICT_ID)) as SCHOOL_ID,
     'GRADE03' as SCHOOL_GRADE_CODE,
-    sysdate as CREATE_DATE,
     'SPM_MIGRATION' as CREATE_USER,
-    sysdate as UPDATE_DATE,
-    'SPM_MIGRATION' as UPDATE_USER
+    sysdate as CREATE_DATE,
+    'SPM_MIGRATION' as UPDATE_USER,
+    sysdate as UPDATE_DATE
 FROM SCHOOL_MASTER schl_mast
 WHERE TRIM(schl_mast.GRADE_03_IND ) = 'Y'
 UNION
@@ -167,10 +167,10 @@ SELECT
     LOWER(REGEXP_REPLACE(dbms_crypto.randombytes(16), '(.{8})(.{4})(.{4})(.{4})(.{12})', '\1-\2-\3-\4-\5')) as SCHOOL_GRADE_ID,
     (SELECT schl.SCHOOL_ID from SCHOOL schl WHERE schl_mast.SCHLNO = schl.SCHOOL_NUMBER AND schl_mast.DISTNO = (SELECT dist.DISTRICT_NUMBER from DISTRICT dist WHERE schl.DISTRICT_ID = dist.DISTRICT_ID)) as SCHOOL_ID,
     'GRADE04' as SCHOOL_GRADE_CODE,
-    sysdate as CREATE_DATE,
     'SPM_MIGRATION' as CREATE_USER,
-    sysdate as UPDATE_DATE,
-    'SPM_MIGRATION' as UPDATE_USER
+    sysdate as CREATE_DATE,
+    'SPM_MIGRATION' as UPDATE_USER,
+    sysdate as UPDATE_DATE
 FROM SCHOOL_MASTER schl_mast
 WHERE TRIM(schl_mast.GRADE_04_IND ) = 'Y'
 UNION
@@ -178,10 +178,10 @@ SELECT
     LOWER(REGEXP_REPLACE(dbms_crypto.randombytes(16), '(.{8})(.{4})(.{4})(.{4})(.{12})', '\1-\2-\3-\4-\5')) as SCHOOL_GRADE_ID,
     (SELECT schl.SCHOOL_ID from SCHOOL schl WHERE schl_mast.SCHLNO = schl.SCHOOL_NUMBER AND schl_mast.DISTNO = (SELECT dist.DISTRICT_NUMBER from DISTRICT dist WHERE schl.DISTRICT_ID = dist.DISTRICT_ID)) as SCHOOL_ID,
     'GRADE05' as SCHOOL_GRADE_CODE,
-    sysdate as CREATE_DATE,
     'SPM_MIGRATION' as CREATE_USER,
-    sysdate as UPDATE_DATE,
-    'SPM_MIGRATION' as UPDATE_USER
+    sysdate as CREATE_DATE,
+    'SPM_MIGRATION' as UPDATE_USER,
+    sysdate as UPDATE_DATE
 FROM SCHOOL_MASTER schl_mast
 WHERE TRIM(schl_mast.GRADE_05_IND ) = 'Y'
 UNION
@@ -189,10 +189,10 @@ SELECT
     LOWER(REGEXP_REPLACE(dbms_crypto.randombytes(16), '(.{8})(.{4})(.{4})(.{4})(.{12})', '\1-\2-\3-\4-\5')) as SCHOOL_GRADE_ID,
     (SELECT schl.SCHOOL_ID from SCHOOL schl WHERE schl_mast.SCHLNO = schl.SCHOOL_NUMBER AND schl_mast.DISTNO = (SELECT dist.DISTRICT_NUMBER from DISTRICT dist WHERE schl.DISTRICT_ID = dist.DISTRICT_ID)) as SCHOOL_ID,
     'GRADE06' as SCHOOL_GRADE_CODE,
-    sysdate as CREATE_DATE,
     'SPM_MIGRATION' as CREATE_USER,
-    sysdate as UPDATE_DATE,
-    'SPM_MIGRATION' as UPDATE_USER
+    sysdate as CREATE_DATE,
+    'SPM_MIGRATION' as UPDATE_USER,
+    sysdate as UPDATE_DATE
 FROM SCHOOL_MASTER schl_mast
 WHERE TRIM(schl_mast.GRADE_06_IND ) = 'Y'
 UNION
@@ -200,10 +200,10 @@ SELECT
     LOWER(REGEXP_REPLACE(dbms_crypto.randombytes(16), '(.{8})(.{4})(.{4})(.{4})(.{12})', '\1-\2-\3-\4-\5')) as SCHOOL_GRADE_ID,
     (SELECT schl.SCHOOL_ID from SCHOOL schl WHERE schl_mast.SCHLNO = schl.SCHOOL_NUMBER AND schl_mast.DISTNO = (SELECT dist.DISTRICT_NUMBER from DISTRICT dist WHERE schl.DISTRICT_ID = dist.DISTRICT_ID)) as SCHOOL_ID,
     'GRADE07' as SCHOOL_GRADE_CODE,
-    sysdate as CREATE_DATE,
     'SPM_MIGRATION' as CREATE_USER,
-    sysdate as UPDATE_DATE,
-    'SPM_MIGRATION' as UPDATE_USER
+    sysdate as CREATE_DATE,
+    'SPM_MIGRATION' as UPDATE_USER,
+    sysdate as UPDATE_DATE
 FROM SCHOOL_MASTER schl_mast
 WHERE TRIM(schl_mast.GRADE_07_IND ) = 'Y'
 UNION
@@ -211,10 +211,10 @@ SELECT
     LOWER(REGEXP_REPLACE(dbms_crypto.randombytes(16), '(.{8})(.{4})(.{4})(.{4})(.{12})', '\1-\2-\3-\4-\5')) as SCHOOL_GRADE_ID,
     (SELECT schl.SCHOOL_ID from SCHOOL schl WHERE schl_mast.SCHLNO = schl.SCHOOL_NUMBER AND schl_mast.DISTNO = (SELECT dist.DISTRICT_NUMBER from DISTRICT dist WHERE schl.DISTRICT_ID = dist.DISTRICT_ID)) as SCHOOL_ID,
     'GRADE08' as SCHOOL_GRADE_CODE,
-    sysdate as CREATE_DATE,
     'SPM_MIGRATION' as CREATE_USER,
-    sysdate as UPDATE_DATE,
-    'SPM_MIGRATION' as UPDATE_USER
+    sysdate as CREATE_DATE,
+    'SPM_MIGRATION' as UPDATE_USER,
+    sysdate as UPDATE_DATE
 FROM SCHOOL_MASTER schl_mast
 WHERE TRIM(schl_mast.GRADE_08_IND ) = 'Y'
 UNION
@@ -222,10 +222,10 @@ SELECT
     LOWER(REGEXP_REPLACE(dbms_crypto.randombytes(16), '(.{8})(.{4})(.{4})(.{4})(.{12})', '\1-\2-\3-\4-\5')) as SCHOOL_GRADE_ID,
     (SELECT schl.SCHOOL_ID from SCHOOL schl WHERE schl_mast.SCHLNO = schl.SCHOOL_NUMBER AND schl_mast.DISTNO = (SELECT dist.DISTRICT_NUMBER from DISTRICT dist WHERE schl.DISTRICT_ID = dist.DISTRICT_ID)) as SCHOOL_ID,
     'GRADE09' as SCHOOL_GRADE_CODE,
-    sysdate as CREATE_DATE,
     'SPM_MIGRATION' as CREATE_USER,
-    sysdate as UPDATE_DATE,
-    'SPM_MIGRATION' as UPDATE_USER
+    sysdate as CREATE_DATE,
+    'SPM_MIGRATION' as UPDATE_USER,
+    sysdate as UPDATE_DATE
 FROM SCHOOL_MASTER schl_mast
 WHERE TRIM(schl_mast.GRADE_09_IND ) = 'Y'
 UNION
@@ -233,10 +233,10 @@ SELECT
     LOWER(REGEXP_REPLACE(dbms_crypto.randombytes(16), '(.{8})(.{4})(.{4})(.{4})(.{12})', '\1-\2-\3-\4-\5')) as SCHOOL_GRADE_ID,
     (SELECT schl.SCHOOL_ID from SCHOOL schl WHERE schl_mast.SCHLNO = schl.SCHOOL_NUMBER AND schl_mast.DISTNO = (SELECT dist.DISTRICT_NUMBER from DISTRICT dist WHERE schl.DISTRICT_ID = dist.DISTRICT_ID)) as SCHOOL_ID,
     'GRADE10' as SCHOOL_GRADE_CODE,
-    sysdate as CREATE_DATE,
     'SPM_MIGRATION' as CREATE_USER,
-    sysdate as UPDATE_DATE,
-    'SPM_MIGRATION' as UPDATE_USER
+    sysdate as CREATE_DATE,
+    'SPM_MIGRATION' as UPDATE_USER,
+    sysdate as UPDATE_DATE
 FROM SCHOOL_MASTER schl_mast
 WHERE TRIM(schl_mast.GRADE_10_IND ) = 'Y'
 UNION
@@ -244,10 +244,10 @@ SELECT
     LOWER(REGEXP_REPLACE(dbms_crypto.randombytes(16), '(.{8})(.{4})(.{4})(.{4})(.{12})', '\1-\2-\3-\4-\5')) as SCHOOL_GRADE_ID,
     (SELECT schl.SCHOOL_ID from SCHOOL schl WHERE schl_mast.SCHLNO = schl.SCHOOL_NUMBER AND schl_mast.DISTNO = (SELECT dist.DISTRICT_NUMBER from DISTRICT dist WHERE schl.DISTRICT_ID = dist.DISTRICT_ID)) as SCHOOL_ID,
     'GRADE11' as SCHOOL_GRADE_CODE,
-    sysdate as CREATE_DATE,
     'SPM_MIGRATION' as CREATE_USER,
-    sysdate as UPDATE_DATE,
-    'SPM_MIGRATION' as UPDATE_USER
+    sysdate as CREATE_DATE,
+    'SPM_MIGRATION' as UPDATE_USER,
+    sysdate as UPDATE_DATE
 FROM SCHOOL_MASTER schl_mast
 WHERE TRIM(schl_mast.GRADE_11_IND ) = 'Y'
 UNION
@@ -255,10 +255,10 @@ SELECT
     LOWER(REGEXP_REPLACE(dbms_crypto.randombytes(16), '(.{8})(.{4})(.{4})(.{4})(.{12})', '\1-\2-\3-\4-\5')) as SCHOOL_GRADE_ID,
     (SELECT schl.SCHOOL_ID from SCHOOL schl WHERE schl_mast.SCHLNO = schl.SCHOOL_NUMBER AND schl_mast.DISTNO = (SELECT dist.DISTRICT_NUMBER from DISTRICT dist WHERE schl.DISTRICT_ID = dist.DISTRICT_ID)) as SCHOOL_ID,
     'GRADE12' as SCHOOL_GRADE_CODE,
-    sysdate as CREATE_DATE,
     'SPM_MIGRATION' as CREATE_USER,
-    sysdate as UPDATE_DATE,
-    'SPM_MIGRATION' as UPDATE_USER
+    sysdate as CREATE_DATE,
+    'SPM_MIGRATION' as UPDATE_USER,
+    sysdate as UPDATE_DATE
 FROM SCHOOL_MASTER schl_mast
 WHERE TRIM(schl_mast.GRADE_12_IND ) = 'Y'
 UNION
@@ -266,10 +266,10 @@ SELECT
     LOWER(REGEXP_REPLACE(dbms_crypto.randombytes(16), '(.{8})(.{4})(.{4})(.{4})(.{12})', '\1-\2-\3-\4-\5')) as SCHOOL_GRADE_ID,
     (SELECT schl.SCHOOL_ID from SCHOOL schl WHERE schl_mast.SCHLNO = schl.SCHOOL_NUMBER AND schl_mast.DISTNO = (SELECT dist.DISTRICT_NUMBER from DISTRICT dist WHERE schl.DISTRICT_ID = dist.DISTRICT_ID)) as SCHOOL_ID,
     'ELEMUNGR' as SCHOOL_GRADE_CODE,
-    sysdate as CREATE_DATE,
     'SPM_MIGRATION' as CREATE_USER,
-    sysdate as UPDATE_DATE,
-    'SPM_MIGRATION' as UPDATE_USER
+    sysdate as CREATE_DATE,
+    'SPM_MIGRATION' as UPDATE_USER,
+    sysdate as UPDATE_DATE
 FROM SCHOOL_MASTER schl_mast
 WHERE TRIM(schl_mast.GRADE_EU_IND ) = 'Y'
 UNION
@@ -277,10 +277,10 @@ SELECT
     LOWER(REGEXP_REPLACE(dbms_crypto.randombytes(16), '(.{8})(.{4})(.{4})(.{4})(.{12})', '\1-\2-\3-\4-\5')) as SCHOOL_GRADE_ID,
     (SELECT schl.SCHOOL_ID from SCHOOL schl WHERE schl_mast.SCHLNO = schl.SCHOOL_NUMBER AND schl_mast.DISTNO = (SELECT dist.DISTRICT_NUMBER from DISTRICT dist WHERE schl.DISTRICT_ID = dist.DISTRICT_ID)) as SCHOOL_ID,
     'SECUNGR' as SCHOOL_GRADE_CODE,
-    sysdate as CREATE_DATE,
     'SPM_MIGRATION' as CREATE_USER,
-    sysdate as UPDATE_DATE,
-    'SPM_MIGRATION' as UPDATE_USER
+    sysdate as CREATE_DATE,
+    'SPM_MIGRATION' as UPDATE_USER,
+    sysdate as UPDATE_DATE
 FROM SCHOOL_MASTER schl_mast
 WHERE TRIM(schl_mast.GRADE_SU_IND ) = 'Y'
 UNION
@@ -288,10 +288,10 @@ SELECT
     LOWER(REGEXP_REPLACE(dbms_crypto.randombytes(16), '(.{8})(.{4})(.{4})(.{4})(.{12})', '\1-\2-\3-\4-\5')) as SCHOOL_GRADE_ID,
     (SELECT schl.SCHOOL_ID from SCHOOL schl WHERE schl_mast.SCHLNO = schl.SCHOOL_NUMBER AND schl_mast.DISTNO = (SELECT dist.DISTRICT_NUMBER from DISTRICT dist WHERE schl.DISTRICT_ID = dist.DISTRICT_ID)) as SCHOOL_ID,
     'HOMESCHL' as SCHOOL_GRADE_CODE,
-    sysdate as CREATE_DATE,
     'SPM_MIGRATION' as CREATE_USER,
-    sysdate as UPDATE_DATE,
-    'SPM_MIGRATION' as UPDATE_USER
+    sysdate as CREATE_DATE,
+    'SPM_MIGRATION' as UPDATE_USER,
+    sysdate as UPDATE_DATE
 FROM SCHOOL_MASTER schl_mast
 WHERE TRIM(schl_mast.GRADE_HS_IND ) = 'Y'
 UNION
@@ -299,10 +299,10 @@ SELECT
     LOWER(REGEXP_REPLACE(dbms_crypto.randombytes(16), '(.{8})(.{4})(.{4})(.{4})(.{12})', '\1-\2-\3-\4-\5')) as SCHOOL_GRADE_ID,
     (SELECT schl.SCHOOL_ID from SCHOOL schl WHERE schl_mast.SCHLNO = schl.SCHOOL_NUMBER AND schl_mast.DISTNO = (SELECT dist.DISTRICT_NUMBER from DISTRICT dist WHERE schl.DISTRICT_ID = dist.DISTRICT_ID)) as SCHOOL_ID,
     'GRADADULT' as SCHOOL_GRADE_CODE,
-    sysdate as CREATE_DATE,
     'SPM_MIGRATION' as CREATE_USER,
-    sysdate as UPDATE_DATE,
-    'SPM_MIGRATION' as UPDATE_USER
+    sysdate as CREATE_DATE,
+    'SPM_MIGRATION' as UPDATE_USER,
+    sysdate as UPDATE_DATE
 FROM SCHOOL_MASTER schl_mast
 WHERE TRIM(schl_mast.GRADE_GA_IND ) = 'Y';
 
@@ -312,10 +312,10 @@ SELECT
     LOWER(REGEXP_REPLACE(dbms_crypto.randombytes(16), '(.{8})(.{4})(.{4})(.{4})(.{12})', '\1-\2-\3-\4-\5')) as NEIGHBOURHOOD_LEARNING_ID,
     (SELECT schl.SCHOOL_ID from SCHOOL schl WHERE schl_mast.SCHLNO = schl.SCHOOL_NUMBER AND schl_mast.DISTNO = (SELECT dist.DISTRICT_NUMBER from DISTRICT dist WHERE schl.DISTRICT_ID = dist.DISTRICT_ID)) as SCHOOL_ID,
     'EARLYLEARN' as NEIGHBOURHOOD_LEARNING_CODE,
-    sysdate as CREATE_DATE,
     'SPM_MIGRATION' as CREATE_USER,
-    sysdate as UPDATE_DATE,
-    'SPM_MIGRATION' as UPDATE_USER
+    sysdate as CREATE_DATE,
+    'SPM_MIGRATION' as UPDATE_USER,
+    sysdate as UPDATE_DATE
 FROM SCHOOL_MASTER schl_mast
 WHERE TRIM(schl_mast.NLC_EARLY_LEARNING_FLAG) = 'Y'
 UNION
@@ -323,10 +323,10 @@ SELECT
     LOWER(REGEXP_REPLACE(dbms_crypto.randombytes(16), '(.{8})(.{4})(.{4})(.{4})(.{12})', '\1-\2-\3-\4-\5')) as NEIGHBOURHOOD_LEARNING_ID,
     (SELECT schl.SCHOOL_ID from SCHOOL schl WHERE schl_mast.SCHLNO = schl.SCHOOL_NUMBER AND schl_mast.DISTNO = (SELECT dist.DISTRICT_NUMBER from DISTRICT dist WHERE schl.DISTRICT_ID = dist.DISTRICT_ID)) as SCHOOL_ID,
     'AFTERSCHL' as NEIGHBOURHOOD_LEARNING_CODE,
-    sysdate as CREATE_DATE,
     'SPM_MIGRATION' as CREATE_USER,
-    sysdate as UPDATE_DATE,
-    'SPM_MIGRATION' as UPDATE_USER
+    sysdate as CREATE_DATE,
+    'SPM_MIGRATION' as UPDATE_USER,
+    sysdate as UPDATE_DATE
 FROM SCHOOL_MASTER schl_mast
 WHERE TRIM(schl_mast.NLC_AFTER_SCHOOL_PROGRAM_FLAG ) = 'Y'
 UNION
@@ -334,10 +334,10 @@ SELECT
     LOWER(REGEXP_REPLACE(dbms_crypto.randombytes(16), '(.{8})(.{4})(.{4})(.{4})(.{12})', '\1-\2-\3-\4-\5')) as NEIGHBOURHOOD_LEARNING_ID,
     (SELECT schl.SCHOOL_ID from SCHOOL schl WHERE schl_mast.SCHLNO = schl.SCHOOL_NUMBER AND schl_mast.DISTNO = (SELECT dist.DISTRICT_NUMBER from DISTRICT dist WHERE schl.DISTRICT_ID = dist.DISTRICT_ID)) as SCHOOL_ID,
     'CONTINEDUC' as NEIGHBOURHOOD_LEARNING_CODE,
-    sysdate as CREATE_DATE,
     'SPM_MIGRATION' as CREATE_USER,
-    sysdate as UPDATE_DATE,
-    'SPM_MIGRATION' as UPDATE_USER
+    sysdate as CREATE_DATE,
+    'SPM_MIGRATION' as UPDATE_USER,
+    sysdate as UPDATE_DATE
 FROM SCHOOL_MASTER schl_mast
 WHERE TRIM(schl_mast.NLC_CONTINUING_ED_FLAG ) = 'Y'
 UNION
@@ -345,10 +345,10 @@ SELECT
     LOWER(REGEXP_REPLACE(dbms_crypto.randombytes(16), '(.{8})(.{4})(.{4})(.{4})(.{12})', '\1-\2-\3-\4-\5')) as NEIGHBOURHOOD_LEARNING_ID,
     (SELECT schl.SCHOOL_ID from SCHOOL schl WHERE schl_mast.SCHLNO = schl.SCHOOL_NUMBER AND schl_mast.DISTNO = (SELECT dist.DISTRICT_NUMBER from DISTRICT dist WHERE schl.DISTRICT_ID = dist.DISTRICT_ID)) as SCHOOL_ID,
     'SENIORS' as NEIGHBOURHOOD_LEARNING_CODE,
-    sysdate as CREATE_DATE,
     'SPM_MIGRATION' as CREATE_USER,
-    sysdate as UPDATE_DATE,
-    'SPM_MIGRATION' as UPDATE_USER
+    sysdate as CREATE_DATE,
+    'SPM_MIGRATION' as UPDATE_USER,
+    sysdate as UPDATE_DATE
 FROM SCHOOL_MASTER schl_mast
 WHERE TRIM(schl_mast.NLC_SENIORS_FLAG ) = 'Y'
 UNION
@@ -356,10 +356,10 @@ SELECT
     LOWER(REGEXP_REPLACE(dbms_crypto.randombytes(16), '(.{8})(.{4})(.{4})(.{4})(.{12})', '\1-\2-\3-\4-\5')) as NEIGHBOURHOOD_LEARNING_ID,
     (SELECT schl.SCHOOL_ID from SCHOOL schl WHERE schl_mast.SCHLNO = schl.SCHOOL_NUMBER AND schl_mast.DISTNO = (SELECT dist.DISTRICT_NUMBER from DISTRICT dist WHERE schl.DISTRICT_ID = dist.DISTRICT_ID)) as SCHOOL_ID,
     'SPORTRECR' as NEIGHBOURHOOD_LEARNING_CODE,
-    sysdate as CREATE_DATE,
     'SPM_MIGRATION' as CREATE_USER,
-    sysdate as UPDATE_DATE,
-    'SPM_MIGRATION' as UPDATE_USER
+    sysdate as CREATE_DATE,
+    'SPM_MIGRATION' as UPDATE_USER,
+    sysdate as UPDATE_DATE
 FROM SCHOOL_MASTER schl_mast
 WHERE TRIM(schl_mast.NLC_SPORT_AND_REC_FLAG ) = 'Y'
 UNION
@@ -367,10 +367,10 @@ SELECT
     LOWER(REGEXP_REPLACE(dbms_crypto.randombytes(16), '(.{8})(.{4})(.{4})(.{4})(.{12})', '\1-\2-\3-\4-\5')) as NEIGHBOURHOOD_LEARNING_ID,
     (SELECT schl.SCHOOL_ID from SCHOOL schl WHERE schl_mast.SCHLNO = schl.SCHOOL_NUMBER AND schl_mast.DISTNO = (SELECT dist.DISTRICT_NUMBER from DISTRICT dist WHERE schl.DISTRICT_ID = dist.DISTRICT_ID)) as SCHOOL_ID,
     'COMMUNITY' as NEIGHBOURHOOD_LEARNING_CODE,
-    sysdate as CREATE_DATE,
     'SPM_MIGRATION' as CREATE_USER,
-    sysdate as UPDATE_DATE,
-    'SPM_MIGRATION' as UPDATE_USER
+    sysdate as CREATE_DATE,
+    'SPM_MIGRATION' as UPDATE_USER,
+    sysdate as UPDATE_DATE
 FROM SCHOOL_MASTER schl_mast
 WHERE TRIM(schl_mast.NLC_COMMUNITY_USE_FLAG ) = 'Y'
 UNION
@@ -378,10 +378,10 @@ SELECT
     LOWER(REGEXP_REPLACE(dbms_crypto.randombytes(16), '(.{8})(.{4})(.{4})(.{4})(.{12})', '\1-\2-\3-\4-\5')) as NEIGHBOURHOOD_LEARNING_ID,
     (SELECT schl.SCHOOL_ID from SCHOOL schl WHERE schl_mast.SCHLNO = schl.SCHOOL_NUMBER AND schl_mast.DISTNO = (SELECT dist.DISTRICT_NUMBER from DISTRICT dist WHERE schl.DISTRICT_ID = dist.DISTRICT_ID)) as SCHOOL_ID,
     'INTEGRSERV' as NEIGHBOURHOOD_LEARNING_CODE,
-    sysdate as CREATE_DATE,
     'SPM_MIGRATION' as CREATE_USER,
-    sysdate as UPDATE_DATE,
-    'SPM_MIGRATION' as UPDATE_USER
+    sysdate as CREATE_DATE,
+    'SPM_MIGRATION' as UPDATE_USER,
+    sysdate as UPDATE_DATE
 FROM SCHOOL_MASTER schl_mast
 WHERE TRIM(schl_mast.NLC_INTEGRATED_SERVICES_FLAG ) = 'Y';
 
@@ -401,10 +401,10 @@ SELECT
     (SELECT cnty.COUNTRY_CODE FROM COUNTRY_CODE cnty where TRIM(schl_mast.SC_COUNTRY_CODE) = cnty.LEGACY_CODE) as COUNTRY_CODE,
     TRIM(schl_mast.SC_POSTAL_CODE) as POSTAL_CODE,
     'MAILING' as ADDRESS_TYPE_CODE,
-    sysdate as CREATE_DATE,
     'SPM_MIGRATION' as CREATE_USER,
-    sysdate as UPDATE_DATE,
-    'SPM_MIGRATION' as UPDATE_USER
+    sysdate as CREATE_DATE,
+    'SPM_MIGRATION' as UPDATE_USER,
+    sysdate as UPDATE_DATE
 FROM SCHOOL_MASTER schl_mast
 WHERE TRIM(schl_mast.SC_ADDRESS_LINE_1) != ' '
 UNION
@@ -420,10 +420,10 @@ SELECT
     (SELECT cnty.COUNTRY_CODE FROM COUNTRY_CODE cnty where TRIM(schl_mast.PHYS_COUNTRY_CODE) = cnty.LEGACY_CODE) as COUNTRY_CODE,
     TRIM(UPPER(schl_mast.PHYS_POSTAL_CODE)) as POSTAL_CODE,
     'PHYSICAL' as ADDRESS_TYPE_CODE,
-    sysdate as CREATE_DATE,
     'SPM_MIGRATION' as CREATE_USER,
-    sysdate as UPDATE_DATE,
-    'SPM_MIGRATION' as UPDATE_USER
+    sysdate as CREATE_DATE,
+    'SPM_MIGRATION' as UPDATE_USER,
+    sysdate as UPDATE_DATE
 FROM SCHOOL_MASTER schl_mast
 WHERE TRIM(schl_mast.PHYS_ADDRESS_LINE_1) != ' ' AND schl_mast.SCHOOL_CATEGORY_CODE != '09'
 UNION
@@ -439,10 +439,10 @@ SELECT
     TRIM(UPPER(dist_mast.MAIL_COUNTRY_CODE)) as COUNTRY_CODE,
     TRIM(UPPER(dist_mast.MAIL_POSTAL_CODE)) as POSTAL_CODE,
     'MAILING' as ADDRESS_TYPE_CODE,
-    sysdate as CREATE_DATE,
     'SPM_MIGRATION' as CREATE_USER,
-    sysdate as UPDATE_DATE,
-    'SPM_MIGRATION' as UPDATE_USER
+    sysdate as CREATE_DATE,
+    'SPM_MIGRATION' as UPDATE_USER,
+    sysdate as UPDATE_DATE
 FROM DISTRICT_MASTER dist_mast
 WHERE TRIM(dist_mast.MAIL_ADDRESS_LINE_1) != ' '
 UNION
@@ -458,10 +458,10 @@ SELECT
     TRIM(UPPER(dist_mast.PHYS_COUNTRY_CODE)) as COUNTRY_CODE,
     TRIM(UPPER(dist_mast.PHYS_POSTAL_CODE)) as POSTAL_CODE,
     'PHYSICAL' as ADDRESS_TYPE_CODE,
-    sysdate as CREATE_DATE,
     'SPM_MIGRATION' as CREATE_USER,
-    sysdate as UPDATE_DATE,
-    'SPM_MIGRATION' as UPDATE_USER
+    sysdate as CREATE_DATE,
+    'SPM_MIGRATION' as UPDATE_USER,
+    sysdate as UPDATE_DATE
 FROM DISTRICT_MASTER dist_mast
 WHERE TRIM(dist_mast.PHYS_ADDRESS_LINE_1) != ' '
 UNION
@@ -477,10 +477,10 @@ SELECT
     (SELECT cnty.COUNTRY_CODE FROM COUNTRY_CODE cnty where TRIM(auth_mast.COUNTRY_CODE) = cnty.LEGACY_CODE) as COUNTRY_CODE,
     TRIM(UPPER(auth_mast.POSTAL_CODE)) as POSTAL_CODE,
     'MAILING' as ADDRESS_TYPE_CODE,
-    sysdate as CREATE_DATE,
     'SPM_MIGRATION' as CREATE_USER,
-    sysdate as UPDATE_DATE,
-    'SPM_MIGRATION' as UPDATE_USER
+    sysdate as CREATE_DATE,
+    'SPM_MIGRATION' as UPDATE_USER,
+    sysdate as UPDATE_DATE
 FROM AUTHORITY_MASTER auth_mast
 WHERE TRIM(auth_mast.ADDRESS_LINE_1) != ' ';
 
@@ -510,10 +510,10 @@ SELECT
     'PRINCIPAL' as CONTACT_TYPE_CODE,
     sysdate as EFFECTIVE_DATE,
     (CAST(NULL as DATE)) as EXPIRY_DATE,
-    sysdate as CREATE_DATE,
     'SPM_MIGRATION' as CREATE_USER,
-    sysdate as UPDATE_DATE,
-    'SPM_MIGRATION' as UPDATE_USER
+    sysdate as CREATE_DATE,
+    'SPM_MIGRATION' as UPDATE_USER,
+    sysdate as UPDATE_DATE
 FROM SCHOOL_MASTER schl_mast
 WHERE TRIM(schl_mast.PR_SURNAME) != ' '
 UNION
@@ -534,10 +534,10 @@ SELECT
     (SELECT cont.CONTACT_TYPE_CODE from CONTACT_TYPE_CODE cont where TRIM(dist_mast.CONTACT_TYPE_CODE) = cont.LEGACY_CODE) as CONTACT_TYPE_CODE,
     dist_mast.EFFECTIVE_FROM_DATE as EFFECTIVE_DATE,
     CASE WHEN TRUNC(dist_mast.EFFECTIVE_TO_DATE) = '9999-12-31' then (CAST(NULL as DATE)) ELSE dist_mast.EFFECTIVE_TO_DATE END as EXPIRY_DATE,
-    sysdate as CREATE_DATE,
     'SPM_MIGRATION' as CREATE_USER,
-    sysdate as UPDATE_DATE,
-    'SPM_MIGRATION' as UPDATE_USER
+    sysdate as CREATE_DATE,
+    'SPM_MIGRATION' as UPDATE_USER,
+    sysdate as UPDATE_DATE
 FROM DISTRICT_CONTACT dist_mast
 WHERE TRIM(dist_mast.SURNAME) != ' '
 UNION
@@ -557,9 +557,9 @@ SELECT
     'INDAUTHREP' as CONTACT_TYPE_CODE,
     sysdate as EFFECTIVE_DATE,
     (CAST(NULL as DATE)) as EXPIRY_DATE,
-    sysdate as CREATE_DATE,
     'SPM_MIGRATION' as CREATE_USER,
-    sysdate as UPDATE_DATE,
-    'SPM_MIGRATION' as UPDATE_USER
+    sysdate as CREATE_DATE,
+    'SPM_MIGRATION' as UPDATE_USER,
+    sysdate as UPDATE_DATE
 FROM AUTHORITY_MASTER auth_mast
 WHERE TRIM(auth_mast.SURNAME) != ' '
