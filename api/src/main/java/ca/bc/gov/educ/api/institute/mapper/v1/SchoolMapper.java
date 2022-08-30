@@ -23,6 +23,8 @@ public interface SchoolMapper {
   @Mapping(target = "createDate", ignore = true)
   SchoolEntity toModel(School structure);
 
+  @Mapping(target = "districtId", source = "districtEntity.districtId")
+  @Mapping(target = "mincode", expression = "java(entity.getDistrictEntity() != null && entity.getSchoolNumber() != null ? entity.getDistrictEntity().getDistrictNumber() + entity.getSchoolNumber() : null)")
   School toStructure(SchoolEntity entity);
 
   @Mapping(target = "updateUser", ignore = true)
