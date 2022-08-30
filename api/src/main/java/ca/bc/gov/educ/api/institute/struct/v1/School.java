@@ -27,6 +27,8 @@ public class School extends BaseRequest implements Serializable {
 
   private String districtId;
 
+  private String mincode;
+
   private String independentAuthorityId;
 
   @Size(max = 5)

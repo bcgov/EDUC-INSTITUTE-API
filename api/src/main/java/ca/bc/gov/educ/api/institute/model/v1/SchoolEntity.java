@@ -24,9 +24,9 @@ public class SchoolEntity {
     @org.hibernate.annotations.Parameter(name = "uuid_gen_strategy_class", value = "org.hibernate.id.uuid.CustomVersionOneStrategy")})
   @Column(name = "school_id", unique = true, updatable = false, columnDefinition = "BINARY(16)")
   private UUID schoolId;
-  @Basic
-  @Column(name = "district_id", columnDefinition = "BINARY(16)")
-  private UUID districtId;
+  @ManyToOne(optional = true,  targetEntity = DistrictEntity.class)
+  @JoinColumn(name = "district_id", referencedColumnName = "district_id")
+  DistrictEntity districtEntity;
   @Basic
   @Column(name = "independent_authority_id", columnDefinition = "BINARY(16)")
   private UUID independentAuthorityId;

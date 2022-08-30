@@ -8,6 +8,7 @@ import ca.bc.gov.educ.api.institute.mapper.v1.SchoolMapper;
 import ca.bc.gov.educ.api.institute.model.v1.*;
 import ca.bc.gov.educ.api.institute.repository.v1.*;
 import ca.bc.gov.educ.api.institute.service.v1.CodeTableService;
+import ca.bc.gov.educ.api.institute.struct.v1.School;
 import ca.bc.gov.educ.api.institute.struct.v1.Search;
 import ca.bc.gov.educ.api.institute.struct.v1.SearchCriteria;
 import ca.bc.gov.educ.api.institute.struct.v1.ValueType;
@@ -60,6 +61,9 @@ public class SchoolControllerTest {
 
   @Autowired
   CodeTableAPIController controller;
+
+  @Autowired
+  DistrictRepository districtRepository;
 
   @Autowired
   SchoolRepository schoolRepository;
@@ -142,17 +146,37 @@ public class SchoolControllerTest {
   void testAllSchools_GivenValidID_ShouldReturnStatusOK() throws Exception {
     final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_SCHOOL";
     final var mockAuthority = oidcLogin().authorities(grantedAuthority);
-    final SchoolEntity entity = this.schoolRepository.save(this.createSchoolData());
+    final DistrictEntity dist = this.districtRepository.save(this.createDistrictData());
+    var schoolEntity = this.createSchoolData();
+    schoolEntity.setDistrictEntity(dist);
+    final SchoolEntity entity = this.schoolRepository.save(schoolEntity);
     this.mockMvc.perform(get(URL.BASE_URL_SCHOOL).with(mockAuthority))
       .andDo(print()).andExpect(status().isOk()).andExpect(MockMvcResultMatchers.jsonPath("$.[0].schoolId")
         .value(entity.getSchoolId().toString()));
   }
 
   @Test
+  void testAllSchoolsCheckDistrict_GivenValidID_ShouldReturnStatusOK() throws Exception {
+    final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_SCHOOL";
+    final var mockAuthority = oidcLogin().authorities(grantedAuthority);
+    final DistrictEntity dist = this.districtRepository.save(this.createDistrictData());
+    var schoolEntity = this.createSchoolData();
+    schoolEntity.setDistrictEntity(dist);
+    final SchoolEntity entity = this.schoolRepository.save(schoolEntity);
+    this.mockMvc.perform(get(URL.BASE_URL_SCHOOL).with(mockAuthority))
+      .andDo(print()).andExpect(status().isOk()).andExpect(MockMvcResultMatchers.jsonPath("$.[0].schoolId")
+        .value(entity.getSchoolId().toString())).andExpect(MockMvcResultMatchers.jsonPath("$.[0].mincode")
+        .value(entity.getDistrictEntity().getDistrictNumber() + entity.getSchoolNumber()));
+  }
+
+  @Test
   void testRetrieveSchool_GivenValidID_ShouldReturnStatusOK() throws Exception {
     final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_SCHOOL";
     final var mockAuthority = oidcLogin().authorities(grantedAuthority);
-    final SchoolEntity entity = this.schoolRepository.save(this.createSchoolData());
+    final DistrictEntity dist = this.districtRepository.save(this.createDistrictData());
+    var schoolEntity = this.createSchoolData();
+    schoolEntity.setDistrictEntity(dist);
+    final SchoolEntity entity = this.schoolRepository.save(schoolEntity);
     this.mockMvc.perform(get(URL.BASE_URL_SCHOOL + "/" + entity.getSchoolId()).with(mockAuthority))
       .andDo(print()).andExpect(status().isOk()).andExpect(MockMvcResultMatchers.jsonPath("$.schoolId")
         .value(entity.getSchoolId().toString()));
@@ -213,7 +237,10 @@ public class SchoolControllerTest {
   @Test
   void testUpdateSchool_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
     final var school = this.createSchoolData();
-    var entity = this.schoolRepository.save(school);
+    final DistrictEntity dist = this.districtRepository.save(this.createDistrictData());
+    var schoolEntity = this.createSchoolData();
+    schoolEntity.setDistrictEntity(dist);
+    final SchoolEntity entity = this.schoolRepository.save(schoolEntity);
     entity.setDisplayName("newdist");
     entity.setCreateDate(null);
     entity.setUpdateDate(null);
@@ -230,17 +257,26 @@ public class SchoolControllerTest {
 
   @Test
   void testAddSchoolGrade_GivenValidPayload_ShouldReturnStatusOk() throws Exception {
-    final var school = this.createSchoolData();
-    var entity = this.schoolRepository.save(school);
+    final DistrictEntity dist = this.districtRepository.save(this.createDistrictData());
+    var schoolEntity = this.createSchoolData();
+    schoolEntity.setDistrictEntity(dist);
+    final SchoolEntity entity = this.schoolRepository.save(schoolEntity);
     entity.setDisplayName("newdist");
     entity.setCreateDate(null);
     entity.setUpdateDate(null);
     entity.getGrades().add(createSchoolGradeData(entity));
 
+    SchoolMapper map = SchoolMapper.mapper;
+
+    School mappedSchool = map.toStructure(entity);
+
+    mappedSchool.setCreateDate(null);
+    mappedSchool.setUpdateDate(null);
+
     this.mockMvc.perform(put(URL.BASE_URL_SCHOOL + "/" + entity.getSchoolId())
         .contentType(MediaType.APPLICATION_JSON)
         .accept(MediaType.APPLICATION_JSON)
-        .content(asJsonString(entity))
+        .content(asJsonString(mappedSchool))
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SCHOOL"))))
       .andDo(print())
       .andExpect(status().isOk())
@@ -249,8 +285,10 @@ public class SchoolControllerTest {
 
   @Test
   void testAddSchoolNeighborhoodLearning_GivenValidPayload_ShouldReturnStatusOk() throws Exception {
-    final var school = this.createSchoolData();
-    var entity = this.schoolRepository.save(school);
+    final DistrictEntity dist = this.districtRepository.save(this.createDistrictData());
+    var schoolEntity = this.createSchoolData();
+    schoolEntity.setDistrictEntity(dist);
+    final SchoolEntity entity = this.schoolRepository.save(schoolEntity);
     entity.setDisplayName("newdist");
     entity.setCreateDate(null);
     entity.setUpdateDate(null);
@@ -268,17 +306,24 @@ public class SchoolControllerTest {
 
   @Test
   void testCreateSchool_GivenValidPayload_ShouldReturnStatusOK() throws Exception {
-    final var school = this.createSchoolData();
-    school.setCreateDate(null);
-    school.setUpdateDate(null);
+    final DistrictEntity dist = this.districtRepository.save(this.createDistrictData());
+    var schoolEntity = this.createSchoolData();
+    SchoolMapper map = SchoolMapper.mapper;
+
+    School mappedSchool = map.toStructure(schoolEntity);
+
+    mappedSchool.setDistrictId(dist.getDistrictId().toString());
+    mappedSchool.setCreateDate(null);
+    mappedSchool.setUpdateDate(null);
+
     this.mockMvc.perform(post(URL.BASE_URL_SCHOOL)
         .contentType(MediaType.APPLICATION_JSON)
         .accept(MediaType.APPLICATION_JSON)
-        .content(asJsonString(school))
+        .content(asJsonString(mappedSchool))
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SCHOOL"))))
       .andDo(print())
       .andExpect(status().isCreated())
-      .andExpect(MockMvcResultMatchers.jsonPath("$.displayName").value(school.getDisplayName().toUpperCase()));
+      .andExpect(MockMvcResultMatchers.jsonPath("$.displayName").value(mappedSchool.getDisplayName().toUpperCase()));
   }
 
   @Test
@@ -532,10 +577,13 @@ public class SchoolControllerTest {
     final List<Search> searches = new LinkedList<>();
     searches.add(Search.builder().searchCriteriaList(criteriaList).build());
     final ObjectMapper objectMapper = new ObjectMapper();
+    final DistrictEntity dist = this.districtRepository.save(this.createDistrictData());
     final String criteriaJSON = objectMapper.writeValueAsString(searches);
     var schoolData = createSchoolData();
     schoolData.setDisplayName(schoolData.getDisplayName().toUpperCase());
+    schoolData.setDistrictEntity(dist);
     this.schoolRepository.save(schoolData);
+
     final MvcResult result = this.mockMvc
       .perform(get(URL.BASE_URL_SCHOOL + "/paginated").with(mockAuthority).param("searchCriteriaList", criteriaJSON)
         .contentType(APPLICATION_JSON))
@@ -544,7 +592,7 @@ public class SchoolControllerTest {
   }
 
   private SchoolEntity createSchoolData() {
-    return SchoolEntity.builder().schoolNumber("003").displayName("School Name").openedDate(LocalDateTime.now().minusDays(1)).schoolCategoryCode("PUB_SCHL")
+    return SchoolEntity.builder().schoolNumber("12345").displayName("School Name").openedDate(LocalDateTime.now().minusDays(1)).schoolCategoryCode("PUB_SCHL")
       .schoolOrganizationCode("TWO_SEM").facilityTypeCode("STAND_SCHL").website("abc@sd99.edu").createDate(LocalDateTime.now())
       .updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
   }
@@ -553,6 +601,11 @@ public class SchoolControllerTest {
     return SchoolHistoryEntity.builder().schoolId(schoolId).schoolNumber("003").displayName("School Name").openedDate(LocalDateTime.now().minusDays(1)).schoolCategoryCode("PUB_SCHL")
       .schoolOrganizationCode("TWO_SEM").facilityTypeCode("STAND_SCHL").website("abc@sd99.edu").createDate(LocalDateTime.now())
       .updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
+  }
+
+  private DistrictEntity createDistrictData() {
+    return DistrictEntity.builder().districtNumber("003").displayName("District Name").districtStatusCode("OPEN").districtRegionCode("KOOTENAYS")
+      .website("abc@sd99.edu").createDate(LocalDateTime.now()).updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
   }
 
   public static String asJsonString(final Object obj) {
