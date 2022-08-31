@@ -39,11 +39,26 @@ public class AuthorityContactEntity {
   @UpperCase
   private String lastName;
   @Basic
+  @Column(name = "job_title")
+  @UpperCase
+  private String jobTitle;
+  @Basic
   @Column(name = "phone_number")
   private String phoneNumber;
   @Basic
+  @Column(name = "phone_extension")
+  private String phoneExtension;
+  @Basic
+  @Column(name = "alt_phone_number")
+  private String alternatePhoneNumber;
+  @Basic
+  @Column(name = "alt_phone_extension")
+  private String alternatePhoneExtension;
+  @Basic
   @Column(name = "email")
   private String email;
+  @Column(name = "publicly_avail")
+  private boolean publiclyAvailable;
   @Basic
   @Column(name = "authority_contact_type_code")
   @UpperCase

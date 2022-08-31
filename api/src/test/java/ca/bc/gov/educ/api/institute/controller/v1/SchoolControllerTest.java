@@ -357,6 +357,36 @@ public class SchoolControllerTest {
   }
 
   @Test
+  void testCreateSchoolContact_GivenInvalidPayload_ShouldReturnStatusCreated() throws Exception {
+    final SchoolEntity schoolEntity = this.schoolRepository.save(this.createSchoolData());
+    SchoolContactEntity contactEntity = createContactData(schoolEntity);
+    contactEntity.setSchoolContactId(UUID.randomUUID());
+
+    this.mockMvc.perform(post(URL.BASE_URL_SCHOOL + "/" + schoolEntity.getSchoolId() + "/contact")
+        .contentType(MediaType.APPLICATION_JSON)
+        .accept(MediaType.APPLICATION_JSON)
+        .content(asJsonString(contactEntity))
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SCHOOL_CONTACT"))))
+      .andDo(print())
+      .andExpect(status().isBadRequest());
+  }
+
+  @Test
+  void testCreateSchoolContact_GivenInvalidTypeCodePayload_ShouldReturnStatusCreated() throws Exception {
+    final SchoolEntity schoolEntity = this.schoolRepository.save(this.createSchoolData());
+    SchoolContactEntity contactEntity = createContactData(schoolEntity);
+    contactEntity.setSchoolContactTypeCode("TESTER");
+
+    this.mockMvc.perform(post(URL.BASE_URL_SCHOOL + "/" + schoolEntity.getSchoolId() + "/contact")
+        .contentType(MediaType.APPLICATION_JSON)
+        .accept(MediaType.APPLICATION_JSON)
+        .content(asJsonString(contactEntity))
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SCHOOL_CONTACT"))))
+      .andDo(print())
+      .andExpect(status().isBadRequest());
+  }
+
+  @Test
   void testDeleteSchoolContact_GivenValidID_ShouldReturnStatusOK() throws Exception {
     final var school = this.createSchoolData();
     var schoolEntity = this.schoolRepository.save(school);

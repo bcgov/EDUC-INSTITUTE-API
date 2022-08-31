@@ -256,6 +256,36 @@ public class DistrictControllerTest {
   }
 
   @Test
+  void testCreateDistrictContact_GivenInValidPayload_ShouldReturnStatusBadRequest() throws Exception {
+    final DistrictEntity districtEntity = this.districtRepository.save(this.createDistrictData());
+    DistrictContactEntity contactEntity = createContactData(districtEntity);
+    contactEntity.setDistrictContactId(UUID.randomUUID());
+
+    this.mockMvc.perform(post(URL.BASE_URL_DISTRICT + "/" + districtEntity.getDistrictId() + "/contact")
+        .contentType(MediaType.APPLICATION_JSON)
+        .accept(MediaType.APPLICATION_JSON)
+        .content(asJsonString(contactEntity))
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_DISTRICT_CONTACT"))))
+      .andDo(print())
+      .andExpect(status().isBadRequest());
+  }
+
+  @Test
+  void testCreateDistrictContact_GivenInValidTypeCodePayload_ShouldReturnStatusBadRequest() throws Exception {
+    final DistrictEntity districtEntity = this.districtRepository.save(this.createDistrictData());
+    DistrictContactEntity contactEntity = createContactData(districtEntity);
+    contactEntity.setDistrictContactTypeCode("TESTER");
+
+    this.mockMvc.perform(post(URL.BASE_URL_DISTRICT + "/" + districtEntity.getDistrictId() + "/contact")
+        .contentType(MediaType.APPLICATION_JSON)
+        .accept(MediaType.APPLICATION_JSON)
+        .content(asJsonString(contactEntity))
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_DISTRICT_CONTACT"))))
+      .andDo(print())
+      .andExpect(status().isBadRequest());
+  }
+
+  @Test
   void testDeleteDistrictContact_GivenValidID_ShouldReturnStatusOK() throws Exception {
     final var district = this.createDistrictData();
     var districtEntity = this.districtRepository.save(district);

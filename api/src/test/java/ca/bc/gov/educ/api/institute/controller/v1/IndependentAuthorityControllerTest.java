@@ -240,6 +240,36 @@ public class IndependentAuthorityControllerTest {
   }
 
   @Test
+  void testCreateIndependentAuthorityContact_GivenInvalidPayload_ShouldReturnStatusCreated() throws Exception {
+    final IndependentAuthorityEntity independentAuthorityEntity = this.independentAuthorityRepository.save(this.createIndependentAuthorityData());
+    AuthorityContactEntity contactEntity = createContactData(independentAuthorityEntity);
+    contactEntity.setAuthorityContactId(UUID.randomUUID());
+
+    this.mockMvc.perform(post(URL.BASE_URL_AUTHORITY + "/" + independentAuthorityEntity.getIndependentAuthorityId() + "/contact")
+        .contentType(MediaType.APPLICATION_JSON)
+        .accept(MediaType.APPLICATION_JSON)
+        .content(asJsonString(contactEntity))
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_INDEPENDENT_AUTHORITY_CONTACT"))))
+      .andDo(print())
+      .andExpect(status().isBadRequest());
+  }
+
+  @Test
+  void testCreateIndependentAuthorityContact_GivenInvalidContactTypeCodePayload_ShouldReturnStatusCreated() throws Exception {
+    final IndependentAuthorityEntity independentAuthorityEntity = this.independentAuthorityRepository.save(this.createIndependentAuthorityData());
+    AuthorityContactEntity contactEntity = createContactData(independentAuthorityEntity);
+    contactEntity.setAuthorityContactTypeCode("TESTER");
+
+    this.mockMvc.perform(post(URL.BASE_URL_AUTHORITY + "/" + independentAuthorityEntity.getIndependentAuthorityId() + "/contact")
+        .contentType(MediaType.APPLICATION_JSON)
+        .accept(MediaType.APPLICATION_JSON)
+        .content(asJsonString(contactEntity))
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_INDEPENDENT_AUTHORITY_CONTACT"))))
+      .andDo(print())
+      .andExpect(status().isBadRequest());
+  }
+
+  @Test
   void testDeleteIndependentAuthorityContact_GivenValidID_ShouldReturnStatusOK() throws Exception {
     final var independentAuthority = this.createIndependentAuthorityData();
     var independentAuthorityEntity = this.independentAuthorityRepository.save(independentAuthority);
