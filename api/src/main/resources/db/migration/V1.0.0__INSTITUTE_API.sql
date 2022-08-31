@@ -373,7 +373,7 @@ CREATE TABLE AUTHORITY_CONTACT
     ALT_PHONE_EXTENSION                 VARCHAR(10),
     EMAIL                               VARCHAR(255),
     PUBLICLY_AVAIL                      BOOLEAN NOT NULL,
-    AUTHORITY_CONTACT_CODE              VARCHAR(10) NOT NULL,
+    AUTHORITY_CONTACT_TYPE_CODE         VARCHAR(10) NOT NULL,
     EFFECTIVE_DATE                      TIMESTAMP,
     EXPIRY_DATE                         TIMESTAMP,
     CREATE_USER                         VARCHAR(32)         NOT NULL,
