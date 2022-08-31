@@ -65,8 +65,8 @@ public interface SchoolAPIEndpoint {
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
   @Transactional(readOnly = true)
   @Tag(name = "School Entity", description = "Endpoints for school entity.")
-  @Schema(name = "School", implementation = School.class)
-  List<School> getAllSchools();
+  @Schema(name = "SchoolTombstone", implementation = SchoolTombstone.class)
+  List<SchoolTombstone> getAllSchools();
 
   @GetMapping("/{schoolId}/contact/{contactId}")
   @PreAuthorize("hasAuthority('SCOPE_READ_SCHOOL_CONTACT')")
