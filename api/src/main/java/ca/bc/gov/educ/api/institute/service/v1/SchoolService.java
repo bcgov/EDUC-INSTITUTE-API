@@ -5,14 +5,8 @@ import ca.bc.gov.educ.api.institute.mapper.v1.AddressMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.NoteMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.SchoolContactMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.SchoolMapper;
-import ca.bc.gov.educ.api.institute.model.v1.AddressEntity;
-import ca.bc.gov.educ.api.institute.model.v1.NoteEntity;
-import ca.bc.gov.educ.api.institute.model.v1.SchoolContactEntity;
-import ca.bc.gov.educ.api.institute.model.v1.SchoolEntity;
-import ca.bc.gov.educ.api.institute.repository.v1.AddressRepository;
-import ca.bc.gov.educ.api.institute.repository.v1.NoteRepository;
-import ca.bc.gov.educ.api.institute.repository.v1.SchoolContactRepository;
-import ca.bc.gov.educ.api.institute.repository.v1.SchoolRepository;
+import ca.bc.gov.educ.api.institute.model.v1.*;
+import ca.bc.gov.educ.api.institute.repository.v1.*;
 import ca.bc.gov.educ.api.institute.struct.v1.Address;
 import ca.bc.gov.educ.api.institute.struct.v1.Note;
 import ca.bc.gov.educ.api.institute.struct.v1.School;
@@ -48,6 +42,8 @@ public class SchoolService {
   @Getter(AccessLevel.PRIVATE)
   private final SchoolRepository schoolRepository;
 
+  private final SchoolTombstoneRepository schoolTombstoneRepository;
+
   private final SchoolHistoryService schoolHistoryService;
 
   private final AddressHistoryService addressHistoryService;
@@ -59,8 +55,9 @@ public class SchoolService {
   private final NoteRepository noteRepository;
 
   @Autowired
-  public SchoolService(SchoolRepository schoolRepository, SchoolHistoryService schoolHistoryService, AddressHistoryService addressHistoryService, SchoolContactRepository schoolContactRepository, AddressRepository addressRepository, NoteRepository noteRepository) {
+  public SchoolService(SchoolRepository schoolRepository, SchoolTombstoneRepository schoolTombstoneRepository, SchoolHistoryService schoolHistoryService, AddressHistoryService addressHistoryService, SchoolContactRepository schoolContactRepository, AddressRepository addressRepository, NoteRepository noteRepository) {
     this.schoolRepository = schoolRepository;
+    this.schoolTombstoneRepository = schoolTombstoneRepository;
     this.schoolHistoryService = schoolHistoryService;
     this.addressHistoryService = addressHistoryService;
     this.schoolContactRepository = schoolContactRepository;
@@ -68,8 +65,8 @@ public class SchoolService {
     this.noteRepository = noteRepository;
   }
 
-  public List<SchoolEntity> getAllSchoolsList() {
-    return schoolRepository.findAll();
+  public List<SchoolTombstoneEntity> getAllSchoolsList() {
+    return schoolTombstoneRepository.findAll();
   }
 
   public Optional<SchoolEntity> getSchool(UUID schoolId) {

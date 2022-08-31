@@ -4,10 +4,7 @@ import ca.bc.gov.educ.api.institute.endpoint.v1.SchoolAPIEndpoint;
 import ca.bc.gov.educ.api.institute.exception.EntityNotFoundException;
 import ca.bc.gov.educ.api.institute.exception.InvalidPayloadException;
 import ca.bc.gov.educ.api.institute.exception.errors.ApiError;
-import ca.bc.gov.educ.api.institute.mapper.v1.AddressMapper;
-import ca.bc.gov.educ.api.institute.mapper.v1.NoteMapper;
-import ca.bc.gov.educ.api.institute.mapper.v1.SchoolContactMapper;
-import ca.bc.gov.educ.api.institute.mapper.v1.SchoolMapper;
+import ca.bc.gov.educ.api.institute.mapper.v1.*;
 import ca.bc.gov.educ.api.institute.model.v1.SchoolEntity;
 import ca.bc.gov.educ.api.institute.service.v1.SchoolHistoryService;
 import ca.bc.gov.educ.api.institute.service.v1.SchoolSearchService;
@@ -47,6 +44,8 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 public class SchoolAPIController implements SchoolAPIEndpoint {
 
   private static final SchoolMapper mapper = SchoolMapper.mapper;
+
+  private static final SchoolTombstoneMapper tombstoneMapper = SchoolTombstoneMapper.mapper;
 
   private static final SchoolContactMapper schoolContactMapper = SchoolContactMapper.mapper;
 
@@ -128,8 +127,8 @@ public class SchoolAPIController implements SchoolAPIEndpoint {
   }
 
   @Override
-  public List<School> getAllSchools() {
-    return getSchoolService().getAllSchoolsList().stream().map(mapper::toStructure).collect(Collectors.toList());
+  public List<SchoolTombstone> getAllSchools() {
+    return getSchoolService().getAllSchoolsList().stream().map(tombstoneMapper::toStructure).collect(Collectors.toList());
   }
 
   @Override
