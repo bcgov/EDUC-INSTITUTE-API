@@ -2,20 +2,20 @@ package ca.bc.gov.educ.api.institute.service.v1;
 
 import ca.bc.gov.educ.api.institute.exception.EntityNotFoundException;
 import ca.bc.gov.educ.api.institute.mapper.v1.AddressMapper;
-import ca.bc.gov.educ.api.institute.mapper.v1.ContactMapper;
+import ca.bc.gov.educ.api.institute.mapper.v1.DistrictContactMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.DistrictMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.NoteMapper;
 import ca.bc.gov.educ.api.institute.model.v1.AddressEntity;
-import ca.bc.gov.educ.api.institute.model.v1.ContactEntity;
+import ca.bc.gov.educ.api.institute.model.v1.DistrictContactEntity;
 import ca.bc.gov.educ.api.institute.model.v1.DistrictEntity;
 import ca.bc.gov.educ.api.institute.model.v1.NoteEntity;
 import ca.bc.gov.educ.api.institute.repository.v1.AddressRepository;
-import ca.bc.gov.educ.api.institute.repository.v1.ContactRepository;
+import ca.bc.gov.educ.api.institute.repository.v1.DistrictContactRepository;
 import ca.bc.gov.educ.api.institute.repository.v1.DistrictRepository;
 import ca.bc.gov.educ.api.institute.repository.v1.NoteRepository;
 import ca.bc.gov.educ.api.institute.struct.v1.Address;
-import ca.bc.gov.educ.api.institute.struct.v1.Contact;
 import ca.bc.gov.educ.api.institute.struct.v1.District;
+import ca.bc.gov.educ.api.institute.struct.v1.DistrictContact;
 import ca.bc.gov.educ.api.institute.struct.v1.Note;
 import ca.bc.gov.educ.api.institute.util.TransformUtil;
 import lombok.AccessLevel;
@@ -53,7 +53,7 @@ public class DistrictService {
 
   private final AddressHistoryService addressHistoryService;
 
-  private final ContactRepository contactRepository;
+  private final DistrictContactRepository districtContactRepository;
 
   private final AddressRepository addressRepository;
 
@@ -61,13 +61,13 @@ public class DistrictService {
 
 
   @Autowired
-  public DistrictService(DistrictRepository districtRepository, DistrictHistoryService districtHistoryService, ContactRepository contactRepository, AddressRepository addressRepository, NoteRepository noteRepository, AddressHistoryService addressHistoryService) {
+  public DistrictService(DistrictRepository districtRepository, DistrictHistoryService districtHistoryService, AddressRepository addressRepository, NoteRepository noteRepository, AddressHistoryService addressHistoryService, DistrictContactRepository districtContactRepository) {
     this.districtRepository = districtRepository;
     this.districtHistoryService = districtHistoryService;
-    this.contactRepository = contactRepository;
     this.addressRepository = addressRepository;
     this.noteRepository = noteRepository;
     this.addressHistoryService = addressHistoryService;
+    this.districtContactRepository = districtContactRepository;
   }
 
   public List<DistrictEntity> getAllDistrictsList() {
@@ -116,26 +116,26 @@ public class DistrictService {
     }
   }
 
-  public Optional<ContactEntity> getDistrictContact(UUID districtId, UUID contactId) {
+  public Optional<DistrictContactEntity> getDistrictContact(UUID districtId, UUID contactId) {
     Optional<DistrictEntity> curDistrictEntityOptional = districtRepository.findById(districtId);
 
     if (curDistrictEntityOptional.isPresent()) {
       final DistrictEntity currentDistrictEntity = curDistrictEntityOptional.get();
-      return contactRepository.findByContactIdAndDistrictEntity(contactId, currentDistrictEntity);
+      return districtContactRepository.findByDistrictContactIdAndDistrictEntity(contactId, currentDistrictEntity);
     } else {
       throw new EntityNotFoundException(DistrictEntity.class, DISTRICT_ID_ATTR, String.valueOf(districtId));
     }
   }
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)
-  public ContactEntity createDistrictContact(Contact contact, UUID districtId) {
-    var contactEntity = ContactMapper.mapper.toModel(contact);
+  public DistrictContactEntity createDistrictContact(DistrictContact contact, UUID districtId) {
+    var contactEntity = DistrictContactMapper.mapper.toModel(contact);
     Optional<DistrictEntity> curDistrictEntityOptional = districtRepository.findById(districtId);
 
     if (curDistrictEntityOptional.isPresent()) {
       contactEntity.setDistrictEntity(curDistrictEntityOptional.get());
       TransformUtil.uppercaseFields(contactEntity);
-      contactRepository.save(contactEntity);
+      districtContactRepository.save(contactEntity);
       return contactEntity;
     } else {
       throw new EntityNotFoundException(DistrictEntity.class, DISTRICT_ID_ATTR, String.valueOf(districtId));
@@ -143,10 +143,10 @@ public class DistrictService {
   }
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)
-  public ContactEntity updateDistrictContact(Contact contact, UUID districtId, UUID contactId) {
-    var contactEntity = ContactMapper.mapper.toModel(contact);
-    if (contactId == null || !contactId.equals(contactEntity.getContactId())) {
-      throw new EntityNotFoundException(ContactEntity.class, CONTACT_ID_ATTR, String.valueOf(contactId));
+  public DistrictContactEntity updateDistrictContact(DistrictContact contact, UUID districtId, UUID contactId) {
+    var contactEntity = DistrictContactMapper.mapper.toModel(contact);
+    if (contactId == null || !contactId.equals(contactEntity.getDistrictContactId())) {
+      throw new EntityNotFoundException(DistrictContactEntity.class, CONTACT_ID_ATTR, String.valueOf(contactId));
     }
 
     Optional<DistrictEntity> curDistrictEntityOptional = districtRepository.findById(districtId);
@@ -155,20 +155,20 @@ public class DistrictService {
       throw new EntityNotFoundException(DistrictEntity.class, DISTRICT_ID_ATTR, String.valueOf(districtId));
     }
 
-    Optional<ContactEntity> curContactEntityOptional = contactRepository.findById(contactEntity.getContactId());
+    Optional<DistrictContactEntity> curContactEntityOptional = districtContactRepository.findById(contactEntity.getDistrictContactId());
 
     if (curContactEntityOptional.isPresent()) {
       if (!districtId.equals(curContactEntityOptional.get().getDistrictEntity().getDistrictId())) {
         throw new EntityNotFoundException(DistrictEntity.class, DISTRICT_ID_ATTR, String.valueOf(districtId));
       }
-      final ContactEntity currentContactEntity = curContactEntityOptional.get();
+      final DistrictContactEntity currentContactEntity = curContactEntityOptional.get();
       BeanUtils.copyProperties(contactEntity, currentContactEntity, CREATE_DATE, CREATE_USER); // update current student entity with incoming payload ignoring the fields.
       TransformUtil.uppercaseFields(currentContactEntity); // convert the input to upper case.
       currentContactEntity.setDistrictEntity(curDistrictEntityOptional.get());
-      contactRepository.save(currentContactEntity);
+      districtContactRepository.save(currentContactEntity);
       return currentContactEntity;
     } else {
-      throw new EntityNotFoundException(ContactEntity.class, CONTACT_ID_ATTR, String.valueOf(contactId));
+      throw new EntityNotFoundException(DistrictContactEntity.class, CONTACT_ID_ATTR, String.valueOf(contactId));
     }
   }
 
@@ -178,7 +178,7 @@ public class DistrictService {
 
     if (curDistrictEntityOptional.isPresent()) {
       final DistrictEntity currentDistrictEntity = curDistrictEntityOptional.get();
-      contactRepository.deleteByContactIdAndDistrictEntity(contactId, currentDistrictEntity);
+      districtContactRepository.deleteByDistrictContactIdAndDistrictEntity(contactId, currentDistrictEntity);
     } else {
       throw new EntityNotFoundException(DistrictEntity.class, DISTRICT_ID_ATTR, String.valueOf(districtId));
     }

@@ -20,19 +20,19 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Contact extends BaseRequest implements Serializable {
+public class AuthorityContact extends BaseRequest implements Serializable {
   /**
    * The constant serialVersionUID.
    */
   private static final long serialVersionUID = 1L;
 
-  private String contactId;
-
-  private String schoolId;
-
-  private String districtId;
+  private String authorityContactId;
 
   private String independentAuthorityId;
+
+  @Size(max = 10)
+  @NotNull(message = "authorityContactTypeCode cannot be null")
+  private String authorityContactTypeCode;
 
   @Size(max = 10)
   private String phoneNumber;
@@ -49,11 +49,8 @@ public class Contact extends BaseRequest implements Serializable {
   @NotNull(message = "lastName cannot be null")
   private String lastName;
 
-  @Size(max = 10)
-  @NotNull(message = "contactTypeCode cannot be null")
-  private String contactTypeCode;
-
   private LocalDateTime effectiveDate;
 
   private LocalDateTime expiryDate;
+
 }

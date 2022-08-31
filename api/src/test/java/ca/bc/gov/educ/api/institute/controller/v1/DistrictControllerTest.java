@@ -63,10 +63,10 @@ public class DistrictControllerTest {
   DistrictStatusCodeRepository districtStatusCodeRepository;
 
   @Autowired
-  ContactTypeCodeRepository contactTypeCodeRepository;
+  DistrictContactTypeCodeRepository districtContactTypeCodeRepository;
 
   @Autowired
-  ContactRepository contactRepository;
+  DistrictContactRepository districtContactRepository;
 
   @Autowired
   AddressRepository addressRepository;
@@ -95,7 +95,7 @@ public class DistrictControllerTest {
   public void before() {
     this.districtRegionCodeRepository.save(this.createDistrictRegionCodeData());
     this.districtStatusCodeRepository.save(this.createDistrictStatusCodeData());
-    this.contactTypeCodeRepository.save(this.createContactTypeCodeData());
+    this.districtContactTypeCodeRepository.save(this.createContactTypeCodeData());
     this.addressTypeCodeRepository.save(this.createAddressTypeCodeData());
     this.provinceCodeRepository.save(this.createProvinceCodeData());
     this.countryCodeRepository.save(this.createCountryCodeData());
@@ -107,13 +107,13 @@ public class DistrictControllerTest {
   @AfterEach
   public void after() {
     this.addressRepository.deleteAll();
-    this.contactRepository.deleteAll();
+    this.districtContactRepository.deleteAll();
     this.noteRepository.deleteAll();
     this.districtRepository.deleteAll();
     this.districtHistoryRepository.deleteAll();
     this.districtRegionCodeRepository.deleteAll();
     this.districtStatusCodeRepository.deleteAll();
-    this.contactTypeCodeRepository.deleteAll();
+    this.districtContactTypeCodeRepository.deleteAll();
     this.addressTypeCodeRepository.deleteAll();
     this.provinceCodeRepository.deleteAll();
     this.countryCodeRepository.deleteAll();
@@ -243,7 +243,7 @@ public class DistrictControllerTest {
   @Test
   void testCreateDistrictContact_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
     final DistrictEntity districtEntity = this.districtRepository.save(this.createDistrictData());
-    ContactEntity contactEntity = createContactData(districtEntity);
+    DistrictContactEntity contactEntity = createContactData(districtEntity);
 
     this.mockMvc.perform(post(URL.BASE_URL_DISTRICT + "/" + districtEntity.getDistrictId() + "/contact")
         .contentType(MediaType.APPLICATION_JSON)
@@ -259,10 +259,10 @@ public class DistrictControllerTest {
   void testDeleteDistrictContact_GivenValidID_ShouldReturnStatusOK() throws Exception {
     final var district = this.createDistrictData();
     var districtEntity = this.districtRepository.save(district);
-    ContactEntity contactEntity = createContactData(districtEntity);
-    var contact = this.contactRepository.save(contactEntity);
+    DistrictContactEntity contactEntity = createContactData(districtEntity);
+    var contact = this.districtContactRepository.save(contactEntity);
 
-    this.mockMvc.perform(delete(URL.BASE_URL_DISTRICT + "/" + districtEntity.getDistrictId() + "/contact/" + contact.getContactId())
+    this.mockMvc.perform(delete(URL.BASE_URL_DISTRICT + "/" + districtEntity.getDistrictId() + "/contact/" + contact.getDistrictContactId())
         .contentType(MediaType.APPLICATION_JSON)
         .accept(MediaType.APPLICATION_JSON)
         .content(asJsonString(districtEntity))
@@ -270,7 +270,7 @@ public class DistrictControllerTest {
       .andDo(print())
       .andExpect(status().isNoContent());
 
-    var deletedContact = this.contactRepository.findById(contact.getContactId());
+    var deletedContact = this.districtContactRepository.findById(contact.getDistrictContactId());
     Assertions.assertTrue(deletedContact.isEmpty());
   }
 
@@ -280,11 +280,11 @@ public class DistrictControllerTest {
     final var mockAuthority = oidcLogin().authorities(grantedAuthority);
     final var district = this.createDistrictData();
     var districtEntity = this.districtRepository.save(district);
-    ContactEntity contactEntity = createContactData(districtEntity);
-    var contact = this.contactRepository.save(contactEntity);
-    this.mockMvc.perform(get(URL.BASE_URL_DISTRICT + "/" + districtEntity.getDistrictId() + "/contact/" + contact.getContactId()).with(mockAuthority))
-      .andDo(print()).andExpect(status().isOk()).andExpect(MockMvcResultMatchers.jsonPath("$.contactId")
-        .value(contact.getContactId().toString()));
+    DistrictContactEntity contactEntity = createContactData(districtEntity);
+    var contact = this.districtContactRepository.save(contactEntity);
+    this.mockMvc.perform(get(URL.BASE_URL_DISTRICT + "/" + districtEntity.getDistrictId() + "/contact/" + contact.getDistrictContactId()).with(mockAuthority))
+      .andDo(print()).andExpect(status().isOk()).andExpect(MockMvcResultMatchers.jsonPath("$.districtContactId")
+        .value(contact.getDistrictContactId().toString()));
   }
 
   @ParameterizedTest
@@ -302,11 +302,11 @@ public class DistrictControllerTest {
   void testUpdateDistrictContact_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
     final var district = this.createDistrictData();
     var districtEntity = this.districtRepository.save(district);
-    ContactEntity contactEntity = createContactData(districtEntity);
-    var contact = this.contactRepository.save(contactEntity);
+    DistrictContactEntity contactEntity = createContactData(districtEntity);
+    var contact = this.districtContactRepository.save(contactEntity);
     contact.setFirstName("pete");
 
-    this.mockMvc.perform(put(URL.BASE_URL_DISTRICT + "/" + districtEntity.getDistrictId() + "/contact/" + contact.getContactId())
+    this.mockMvc.perform(put(URL.BASE_URL_DISTRICT + "/" + districtEntity.getDistrictId() + "/contact/" + contact.getDistrictContactId())
         .contentType(MediaType.APPLICATION_JSON)
         .accept(MediaType.APPLICATION_JSON)
         .content(asJsonString(contact))
@@ -454,8 +454,8 @@ public class DistrictControllerTest {
       .website("abc@sd99.edu").createDate(LocalDateTime.now()).updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
   }
 
-  private ContactEntity createContactData(DistrictEntity entity) {
-    return ContactEntity.builder().districtEntity(entity).contactTypeCode("PRINCIPAL").firstName("John").lastName("Wayne").createUser("TEST").updateUser("TEST").build();
+  private DistrictContactEntity createContactData(DistrictEntity entity) {
+    return DistrictContactEntity.builder().districtEntity(entity).districtContactTypeCode("PRINCIPAL").firstName("John").lastName("Wayne").createUser("TEST").updateUser("TEST").build();
   }
 
   private AddressEntity createAddressData(DistrictEntity entity) {
@@ -494,8 +494,8 @@ public class DistrictControllerTest {
       .updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
   }
 
-  private ContactTypeCodeEntity createContactTypeCodeData() {
-    return ContactTypeCodeEntity.builder().contactTypeCode("PRINCIPAL").description("School Principal")
+  private DistrictContactTypeCodeEntity createContactTypeCodeData() {
+    return DistrictContactTypeCodeEntity.builder().districtContactTypeCode("PRINCIPAL").description("School Principal")
       .effectiveDate(LocalDateTime.now()).expiryDate(LocalDateTime.MAX).displayOrder(1).label("Principal").createDate(LocalDateTime.now())
       .updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
   }

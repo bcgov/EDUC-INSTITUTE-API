@@ -5,7 +5,7 @@ import ca.bc.gov.educ.api.institute.exception.EntityNotFoundException;
 import ca.bc.gov.educ.api.institute.exception.InvalidPayloadException;
 import ca.bc.gov.educ.api.institute.exception.errors.ApiError;
 import ca.bc.gov.educ.api.institute.mapper.v1.AddressMapper;
-import ca.bc.gov.educ.api.institute.mapper.v1.ContactMapper;
+import ca.bc.gov.educ.api.institute.mapper.v1.AuthorityContactMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.IndependentAuthorityMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.NoteMapper;
 import ca.bc.gov.educ.api.institute.service.v1.IndependentAuthorityHistoryService;
@@ -13,7 +13,7 @@ import ca.bc.gov.educ.api.institute.service.v1.IndependentAuthorityService;
 import ca.bc.gov.educ.api.institute.struct.v1.*;
 import ca.bc.gov.educ.api.institute.util.RequestUtil;
 import ca.bc.gov.educ.api.institute.validator.AddressPayloadValidator;
-import ca.bc.gov.educ.api.institute.validator.ContactPayloadValidator;
+import ca.bc.gov.educ.api.institute.validator.AuthorityContactPayloadValidator;
 import ca.bc.gov.educ.api.institute.validator.IndependentAuthorityPayloadValidator;
 import ca.bc.gov.educ.api.institute.validator.NotePayloadValidator;
 import lombok.AccessLevel;
@@ -44,7 +44,7 @@ public class IndependentAuthorityAPIController implements IndependentAuthorityAP
   @Getter(AccessLevel.PRIVATE)
   private final IndependentAuthorityHistoryService independentAuthorityHistoryService;
 
-  private static final ContactMapper contactMapper = ContactMapper.mapper;
+  private static final AuthorityContactMapper authorityContactMapper = AuthorityContactMapper.mapper;
 
   private static final AddressMapper addressMapper = AddressMapper.mapper;
 
@@ -53,18 +53,18 @@ public class IndependentAuthorityAPIController implements IndependentAuthorityAP
   @Getter(AccessLevel.PRIVATE)
   private final IndependentAuthorityPayloadValidator payloadValidator;
 
-  private final ContactPayloadValidator contactPayloadValidator;
+  private final AuthorityContactPayloadValidator authorityContactPayloadValidator;
 
   private final AddressPayloadValidator addressPayloadValidator;
 
   private final NotePayloadValidator notePayloadValidator;
 
   @Autowired
-  public IndependentAuthorityAPIController(final IndependentAuthorityService independentAuthorityService, final IndependentAuthorityHistoryService independentAuthorityHistoryService, final IndependentAuthorityPayloadValidator payloadValidator, ContactPayloadValidator contactPayloadValidator, AddressPayloadValidator addressPayloadValidator, NotePayloadValidator notePayloadValidator) {
+  public IndependentAuthorityAPIController(final IndependentAuthorityService independentAuthorityService, final IndependentAuthorityHistoryService independentAuthorityHistoryService, final IndependentAuthorityPayloadValidator payloadValidator, AuthorityContactPayloadValidator authorityContactPayloadValidator, AddressPayloadValidator addressPayloadValidator, NotePayloadValidator notePayloadValidator) {
     this.independentAuthorityService = independentAuthorityService;
     this.independentAuthorityHistoryService = independentAuthorityHistoryService;
     this.payloadValidator = payloadValidator;
-    this.contactPayloadValidator = contactPayloadValidator;
+    this.authorityContactPayloadValidator = authorityContactPayloadValidator;
     this.addressPayloadValidator = addressPayloadValidator;
     this.notePayloadValidator = notePayloadValidator;
   }
@@ -121,28 +121,28 @@ public class IndependentAuthorityAPIController implements IndependentAuthorityAP
   }
 
   @Override
-  public Contact getIndependentAuthorityContact(UUID independentAuthorityId, UUID contactId) {
+  public AuthorityContact getIndependentAuthorityContact(UUID independentAuthorityId, UUID contactId) {
     var contactEntity = this.independentAuthorityService.getIndependentAuthorityContact(independentAuthorityId, contactId);
 
     if (contactEntity.isPresent()) {
-      return contactMapper.toStructure(contactEntity.get());
+      return authorityContactMapper.toStructure(contactEntity.get());
     } else {
       throw new EntityNotFoundException();
     }
   }
 
   @Override
-  public Contact createIndependentAuthorityContact(UUID independentAuthorityId, Contact contact) {
-    validatePayload(() -> this.contactPayloadValidator.validateCreatePayload(contact));
+  public AuthorityContact createIndependentAuthorityContact(UUID independentAuthorityId, AuthorityContact contact) {
+    validatePayload(() -> this.authorityContactPayloadValidator.validateCreatePayload(contact));
     RequestUtil.setAuditColumnsForCreate(contact);
-    return contactMapper.toStructure(independentAuthorityService.createIndependentAuthorityContact(contact, independentAuthorityId));
+    return authorityContactMapper.toStructure(independentAuthorityService.createIndependentAuthorityContact(contact, independentAuthorityId));
   }
 
   @Override
-  public Contact updateIndependentAuthorityContact(UUID independentAuthorityId, UUID contactId, Contact contact) {
-    validatePayload(() -> this.contactPayloadValidator.validateUpdatePayload(contact));
+  public AuthorityContact updateIndependentAuthorityContact(UUID independentAuthorityId, UUID contactId, AuthorityContact contact) {
+    validatePayload(() -> this.authorityContactPayloadValidator.validateUpdatePayload(contact));
     RequestUtil.setAuditColumnsForUpdate(contact);
-    return contactMapper.toStructure(independentAuthorityService.updateIndependentAuthorityContact(contact, independentAuthorityId, contactId));
+    return authorityContactMapper.toStructure(independentAuthorityService.updateIndependentAuthorityContact(contact, independentAuthorityId, contactId));
   }
 
   @Override

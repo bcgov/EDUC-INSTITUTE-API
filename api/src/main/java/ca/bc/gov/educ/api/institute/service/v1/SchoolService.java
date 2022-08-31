@@ -2,21 +2,21 @@ package ca.bc.gov.educ.api.institute.service.v1;
 
 import ca.bc.gov.educ.api.institute.exception.EntityNotFoundException;
 import ca.bc.gov.educ.api.institute.mapper.v1.AddressMapper;
-import ca.bc.gov.educ.api.institute.mapper.v1.ContactMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.NoteMapper;
+import ca.bc.gov.educ.api.institute.mapper.v1.SchoolContactMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.SchoolMapper;
 import ca.bc.gov.educ.api.institute.model.v1.AddressEntity;
-import ca.bc.gov.educ.api.institute.model.v1.ContactEntity;
 import ca.bc.gov.educ.api.institute.model.v1.NoteEntity;
+import ca.bc.gov.educ.api.institute.model.v1.SchoolContactEntity;
 import ca.bc.gov.educ.api.institute.model.v1.SchoolEntity;
 import ca.bc.gov.educ.api.institute.repository.v1.AddressRepository;
-import ca.bc.gov.educ.api.institute.repository.v1.ContactRepository;
 import ca.bc.gov.educ.api.institute.repository.v1.NoteRepository;
+import ca.bc.gov.educ.api.institute.repository.v1.SchoolContactRepository;
 import ca.bc.gov.educ.api.institute.repository.v1.SchoolRepository;
 import ca.bc.gov.educ.api.institute.struct.v1.Address;
-import ca.bc.gov.educ.api.institute.struct.v1.Contact;
 import ca.bc.gov.educ.api.institute.struct.v1.Note;
 import ca.bc.gov.educ.api.institute.struct.v1.School;
+import ca.bc.gov.educ.api.institute.struct.v1.SchoolContact;
 import ca.bc.gov.educ.api.institute.util.TransformUtil;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -52,18 +52,18 @@ public class SchoolService {
 
   private final AddressHistoryService addressHistoryService;
 
-  private final ContactRepository contactRepository;
+  private final SchoolContactRepository schoolContactRepository;
 
   private final AddressRepository addressRepository;
 
   private final NoteRepository noteRepository;
 
   @Autowired
-  public SchoolService(SchoolRepository schoolRepository, SchoolHistoryService schoolHistoryService, AddressHistoryService addressHistoryService, ContactRepository contactRepository, AddressRepository addressRepository, NoteRepository noteRepository) {
+  public SchoolService(SchoolRepository schoolRepository, SchoolHistoryService schoolHistoryService, AddressHistoryService addressHistoryService, SchoolContactRepository schoolContactRepository, AddressRepository addressRepository, NoteRepository noteRepository) {
     this.schoolRepository = schoolRepository;
     this.schoolHistoryService = schoolHistoryService;
     this.addressHistoryService = addressHistoryService;
-    this.contactRepository = contactRepository;
+    this.schoolContactRepository = schoolContactRepository;
     this.addressRepository = addressRepository;
     this.noteRepository = noteRepository;
   }
@@ -121,26 +121,26 @@ public class SchoolService {
     }
   }
 
-  public Optional<ContactEntity> getSchoolContact(UUID schoolId, UUID contactId) {
+  public Optional<SchoolContactEntity> getSchoolContact(UUID schoolId, UUID contactId) {
     Optional<SchoolEntity> curSchoolEntityOptional = schoolRepository.findById(schoolId);
 
     if (curSchoolEntityOptional.isPresent()) {
       final SchoolEntity currentSchoolEntity = curSchoolEntityOptional.get();
-      return contactRepository.findByContactIdAndSchoolEntity(contactId, currentSchoolEntity);
+      return schoolContactRepository.findBySchoolContactIdAndSchoolEntity(contactId, currentSchoolEntity);
     } else {
       throw new EntityNotFoundException(SchoolEntity.class, SCHOOL_ID_ATTR, String.valueOf(schoolId));
     }
   }
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)
-  public ContactEntity createSchoolContact(Contact contact, UUID schoolId) {
-    var contactEntity = ContactMapper.mapper.toModel(contact);
+  public SchoolContactEntity createSchoolContact(SchoolContact contact, UUID schoolId) {
+    var contactEntity = SchoolContactMapper.mapper.toModel(contact);
     Optional<SchoolEntity> curSchoolEntityOptional = schoolRepository.findById(schoolId);
 
     if (curSchoolEntityOptional.isPresent()) {
       contactEntity.setSchoolEntity(curSchoolEntityOptional.get());
       TransformUtil.uppercaseFields(contactEntity);
-      contactRepository.save(contactEntity);
+      schoolContactRepository.save(contactEntity);
       return contactEntity;
     } else {
       throw new EntityNotFoundException(SchoolEntity.class, SCHOOL_ID_ATTR, String.valueOf(schoolId));
@@ -148,10 +148,10 @@ public class SchoolService {
   }
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)
-  public ContactEntity updateSchoolContact(Contact contact, UUID schoolId, UUID contactId) {
-    var contactEntity = ContactMapper.mapper.toModel(contact);
-    if (contactId == null || !contactId.equals(contactEntity.getContactId())) {
-      throw new EntityNotFoundException(ContactEntity.class, CONTACT_ID_ATTR, String.valueOf(contactId));
+  public SchoolContactEntity updateSchoolContact(SchoolContact contact, UUID schoolId, UUID contactId) {
+    var contactEntity = SchoolContactMapper.mapper.toModel(contact);
+    if (contactId == null || !contactId.equals(contactEntity.getSchoolContactId())) {
+      throw new EntityNotFoundException(SchoolContactEntity.class, CONTACT_ID_ATTR, String.valueOf(contactId));
     }
 
     Optional<SchoolEntity> curSchoolEntityOptional = schoolRepository.findById(schoolId);
@@ -160,20 +160,20 @@ public class SchoolService {
       throw new EntityNotFoundException(SchoolEntity.class, SCHOOL_ID_ATTR, String.valueOf(schoolId));
     }
 
-    Optional<ContactEntity> curContactEntityOptional = contactRepository.findById(contactEntity.getContactId());
+    Optional<SchoolContactEntity> curContactEntityOptional = schoolContactRepository.findById(contactEntity.getSchoolContactId());
 
     if (curContactEntityOptional.isPresent()) {
       if (!schoolId.equals(curContactEntityOptional.get().getSchoolEntity().getSchoolId())) {
         throw new EntityNotFoundException(SchoolEntity.class, SCHOOL_ID_ATTR, String.valueOf(schoolId));
       }
-      final ContactEntity currentContactEntity = curContactEntityOptional.get();
+      final SchoolContactEntity currentContactEntity = curContactEntityOptional.get();
       BeanUtils.copyProperties(contactEntity, currentContactEntity, CREATE_DATE, CREATE_USER); // update current student entity with incoming payload ignoring the fields.
       TransformUtil.uppercaseFields(currentContactEntity); // convert the input to upper case.
       currentContactEntity.setSchoolEntity(curSchoolEntityOptional.get());
-      contactRepository.save(currentContactEntity);
+      schoolContactRepository.save(currentContactEntity);
       return currentContactEntity;
     } else {
-      throw new EntityNotFoundException(ContactEntity.class, CONTACT_ID_ATTR, String.valueOf(contactId));
+      throw new EntityNotFoundException(SchoolContactEntity.class, CONTACT_ID_ATTR, String.valueOf(contactId));
     }
   }
 
@@ -183,11 +183,10 @@ public class SchoolService {
 
     if (curSchoolEntityOptional.isPresent()) {
       final SchoolEntity currentSchoolEntity = curSchoolEntityOptional.get();
-      contactRepository.deleteByContactIdAndSchoolEntity(contactId, currentSchoolEntity);
+      schoolContactRepository.deleteBySchoolContactIdAndSchoolEntity(contactId, currentSchoolEntity);
     } else {
       throw new EntityNotFoundException(SchoolEntity.class, SCHOOL_ID_ATTR, String.valueOf(schoolId));
     }
-
   }
 
   public Optional<AddressEntity> getSchoolAddress(UUID schoolId, UUID addressId) {

@@ -10,7 +10,11 @@ public final class URL {
   public static final String ADDRESS_TYPE_CODES = "/address-type-codes";
   public static final String AUTHORITY_GROUP_CODES = "/authority-group-codes";
   public static final String AUTHORITY_TYPE_CODES = "/authority-type-codes";
-  public static final String CONTACT_TYPE_CODES = "/contact-type-codes";
+  public static final String DISTRICT_CONTACT_TYPE_CODES = "/district-contact-type-codes";
+
+  public static final String SCHOOL_CONTACT_TYPE_CODES = "/school-contact-type-codes";
+
+  public static final String AUTHORITY_CONTACT_TYPE_CODES = "/authority-contact-type-codes";
   public static final String PROVINCE_CODES = "/province-codes";
 
   public static final String COUNTRY_CODES = "/country-codes";

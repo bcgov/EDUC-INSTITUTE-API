@@ -2,16 +2,19 @@ package ca.bc.gov.educ.api.institute.service.v1;
 
 import ca.bc.gov.educ.api.institute.exception.EntityNotFoundException;
 import ca.bc.gov.educ.api.institute.mapper.v1.AddressMapper;
-import ca.bc.gov.educ.api.institute.mapper.v1.ContactMapper;
+import ca.bc.gov.educ.api.institute.mapper.v1.AuthorityContactMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.IndependentAuthorityMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.NoteMapper;
-import ca.bc.gov.educ.api.institute.model.v1.*;
+import ca.bc.gov.educ.api.institute.model.v1.AddressEntity;
+import ca.bc.gov.educ.api.institute.model.v1.AuthorityContactEntity;
+import ca.bc.gov.educ.api.institute.model.v1.IndependentAuthorityEntity;
+import ca.bc.gov.educ.api.institute.model.v1.NoteEntity;
 import ca.bc.gov.educ.api.institute.repository.v1.AddressRepository;
-import ca.bc.gov.educ.api.institute.repository.v1.ContactRepository;
+import ca.bc.gov.educ.api.institute.repository.v1.AuthorityContactRepository;
 import ca.bc.gov.educ.api.institute.repository.v1.IndependentAuthorityRepository;
 import ca.bc.gov.educ.api.institute.repository.v1.NoteRepository;
 import ca.bc.gov.educ.api.institute.struct.v1.Address;
-import ca.bc.gov.educ.api.institute.struct.v1.Contact;
+import ca.bc.gov.educ.api.institute.struct.v1.AuthorityContact;
 import ca.bc.gov.educ.api.institute.struct.v1.IndependentAuthority;
 import ca.bc.gov.educ.api.institute.struct.v1.Note;
 import ca.bc.gov.educ.api.institute.util.TransformUtil;
@@ -50,7 +53,7 @@ public class IndependentAuthorityService {
 
   private final IndependentAuthorityHistoryService independentAuthorityHistoryService;
 
-  private final ContactRepository contactRepository;
+  private final AuthorityContactRepository authorityContactRepository;
 
   private final AddressRepository addressRepository;
 
@@ -58,11 +61,11 @@ public class IndependentAuthorityService {
 
 
   @Autowired
-  public IndependentAuthorityService(AddressHistoryService addressHistoryService, IndependentAuthorityRepository independentAuthorityRepository, IndependentAuthorityHistoryService independentAuthorityHistoryService, ContactRepository contactRepository, AddressRepository addressRepository, NoteRepository noteRepository) {
+  public IndependentAuthorityService(AddressHistoryService addressHistoryService, IndependentAuthorityRepository independentAuthorityRepository, IndependentAuthorityHistoryService independentAuthorityHistoryService, AuthorityContactRepository authorityContactRepository, AddressRepository addressRepository, NoteRepository noteRepository) {
     this.addressHistoryService = addressHistoryService;
     this.independentAuthorityRepository = independentAuthorityRepository;
     this.independentAuthorityHistoryService = independentAuthorityHistoryService;
-    this.contactRepository = contactRepository;
+    this.authorityContactRepository = authorityContactRepository;
     this.addressRepository = addressRepository;
     this.noteRepository = noteRepository;
   }
@@ -113,26 +116,26 @@ public class IndependentAuthorityService {
     }
   }
 
-  public Optional<ContactEntity> getIndependentAuthorityContact(UUID independentAuthorityId, UUID contactId) {
+  public Optional<AuthorityContactEntity> getIndependentAuthorityContact(UUID independentAuthorityId, UUID contactId) {
     Optional<IndependentAuthorityEntity> curIndependentAuthorityEntityOptional = independentAuthorityRepository.findById(independentAuthorityId);
 
     if (curIndependentAuthorityEntityOptional.isPresent()) {
       final IndependentAuthorityEntity currentIndependentAuthorityEntity = curIndependentAuthorityEntityOptional.get();
-      return contactRepository.findByContactIdAndIndependentAuthorityEntity(contactId, currentIndependentAuthorityEntity);
+      return authorityContactRepository.findByAuthorityContactIdAndIndependentAuthorityEntity(contactId, currentIndependentAuthorityEntity);
     } else {
       throw new EntityNotFoundException(IndependentAuthorityEntity.class, INDEPENDENT_AUTHORITY_ID_ATTR, String.valueOf(independentAuthorityId));
     }
   }
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)
-  public ContactEntity createIndependentAuthorityContact(Contact contact, UUID independentAuthorityId) {
-    var contactEntity = ContactMapper.mapper.toModel(contact);
+  public AuthorityContactEntity createIndependentAuthorityContact(AuthorityContact contact, UUID independentAuthorityId) {
+    var contactEntity = AuthorityContactMapper.mapper.toModel(contact);
     Optional<IndependentAuthorityEntity> curIndependentAuthorityEntityOptional = independentAuthorityRepository.findById(independentAuthorityId);
 
     if (curIndependentAuthorityEntityOptional.isPresent()) {
       contactEntity.setIndependentAuthorityEntity(curIndependentAuthorityEntityOptional.get());
       TransformUtil.uppercaseFields(contactEntity);
-      contactRepository.save(contactEntity);
+      authorityContactRepository.save(contactEntity);
       return contactEntity;
     } else {
       throw new EntityNotFoundException(IndependentAuthorityEntity.class, INDEPENDENT_AUTHORITY_ID_ATTR, String.valueOf(independentAuthorityId));
@@ -140,10 +143,10 @@ public class IndependentAuthorityService {
   }
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)
-  public ContactEntity updateIndependentAuthorityContact(Contact contact, UUID independentAuthorityId, UUID contactId) {
-    var contactEntity = ContactMapper.mapper.toModel(contact);
-    if (contactId == null || !contactId.equals(contactEntity.getContactId())) {
-      throw new EntityNotFoundException(ContactEntity.class, CONTACT_ID_ATTR, String.valueOf(contactId));
+  public AuthorityContactEntity updateIndependentAuthorityContact(AuthorityContact contact, UUID independentAuthorityId, UUID contactId) {
+    var contactEntity = AuthorityContactMapper.mapper.toModel(contact);
+    if (contactId == null || !contactId.equals(contactEntity.getAuthorityContactId())) {
+      throw new EntityNotFoundException(AuthorityContactEntity.class, CONTACT_ID_ATTR, String.valueOf(contactId));
     }
 
     Optional<IndependentAuthorityEntity> curIndependentAuthorityEntityOptional = independentAuthorityRepository.findById(independentAuthorityId);
@@ -152,20 +155,20 @@ public class IndependentAuthorityService {
       throw new EntityNotFoundException(IndependentAuthorityEntity.class, INDEPENDENT_AUTHORITY_ID_ATTR, String.valueOf(independentAuthorityId));
     }
 
-    Optional<ContactEntity> curContactEntityOptional = contactRepository.findById(contactEntity.getContactId());
+    Optional<AuthorityContactEntity> curContactEntityOptional = authorityContactRepository.findById(contactEntity.getAuthorityContactId());
 
     if (curContactEntityOptional.isPresent()) {
       if (!independentAuthorityId.equals(curContactEntityOptional.get().getIndependentAuthorityEntity().getIndependentAuthorityId())) {
         throw new EntityNotFoundException(IndependentAuthorityEntity.class, INDEPENDENT_AUTHORITY_ID_ATTR, String.valueOf(independentAuthorityId));
       }
-      final ContactEntity currentContactEntity = curContactEntityOptional.get();
+      final AuthorityContactEntity currentContactEntity = curContactEntityOptional.get();
       BeanUtils.copyProperties(contactEntity, currentContactEntity, CREATE_DATE, CREATE_USER); // update current student entity with incoming payload ignoring the fields.
       TransformUtil.uppercaseFields(currentContactEntity); // convert the input to upper case.
       currentContactEntity.setIndependentAuthorityEntity(curIndependentAuthorityEntityOptional.get());
-      contactRepository.save(currentContactEntity);
+      authorityContactRepository.save(currentContactEntity);
       return currentContactEntity;
     } else {
-      throw new EntityNotFoundException(ContactEntity.class, CONTACT_ID_ATTR, String.valueOf(contactId));
+      throw new EntityNotFoundException(AuthorityContactEntity.class, CONTACT_ID_ATTR, String.valueOf(contactId));
     }
   }
 
@@ -175,7 +178,7 @@ public class IndependentAuthorityService {
 
     if (curIndependentAuthorityEntityOptional.isPresent()) {
       final IndependentAuthorityEntity currentIndependentAuthorityEntity = curIndependentAuthorityEntityOptional.get();
-      contactRepository.deleteByContactIdAndIndependentAuthorityEntity(contactId, currentIndependentAuthorityEntity);
+      authorityContactRepository.deleteByAuthorityContactIdAndIndependentAuthorityEntity(contactId, currentIndependentAuthorityEntity);
     } else {
       throw new EntityNotFoundException(IndependentAuthorityEntity.class, INDEPENDENT_AUTHORITY_ID_ATTR, String.valueOf(independentAuthorityId));
     }

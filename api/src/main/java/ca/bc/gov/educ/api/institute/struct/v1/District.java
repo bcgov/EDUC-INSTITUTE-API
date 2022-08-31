@@ -56,7 +56,7 @@ public class District extends BaseRequest implements Serializable {
   @NotNull(message = "districtStatusCode cannot be null")
   private String districtStatusCode;
 
-  private List<Contact> contacts;
+  private List<DistrictContact> contacts;
 
   private List<Address> addresses;
 

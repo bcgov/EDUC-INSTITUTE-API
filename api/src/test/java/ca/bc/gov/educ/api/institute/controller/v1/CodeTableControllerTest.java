@@ -47,7 +47,13 @@ public class CodeTableControllerTest {
   AuthorityTypeCodeRepository authorityTypeCodeRepository;
 
   @Autowired
-  ContactTypeCodeRepository contactTypeCodeRepository;
+  DistrictContactTypeCodeRepository districtContactTypeCodeRepository;
+
+  @Autowired
+  SchoolContactTypeCodeRepository schoolContactTypeCodeRepository;
+
+  @Autowired
+  AuthorityContactTypeCodeRepository authorityContactTypeCodeRepository;
 
   @Autowired
   DistrictRegionCodeRepository districtRegionCodeRepository;
@@ -84,7 +90,9 @@ public class CodeTableControllerTest {
     MockitoAnnotations.openMocks(this);
     this.addressTypeCodeRepository.save(this.createAddressTypeCodeData());
     this.authorityTypeCodeRepository.save(this.createAuthorityTypeCodeData());
-    this.contactTypeCodeRepository.save(this.createContactTypeCodeData());
+    this.districtContactTypeCodeRepository.save(this.createDistrictContactTypeCodeData());
+    this.schoolContactTypeCodeRepository.save(this.createSchoolContactTypeCodeData());
+    this.authorityContactTypeCodeRepository.save(this.createAuthorityContactTypeCodeData());
     this.districtRegionCodeRepository.save(this.createDistrictRegionCodeData());
     this.districtStatusCodeRepository.save(this.createDistrictStatusCodeData());
     this.facilityTypeCodeRepository.save(this.createFacilityTypeCodeData());
@@ -103,7 +111,9 @@ public class CodeTableControllerTest {
   public void after() {
     this.addressTypeCodeRepository.deleteAll();
     this.authorityTypeCodeRepository.deleteAll();
-    this.contactTypeCodeRepository.deleteAll();
+    this.districtContactTypeCodeRepository.deleteAll();
+    this.schoolContactTypeCodeRepository.deleteAll();
+    this.authorityContactTypeCodeRepository.deleteAll();
     this.districtRegionCodeRepository.deleteAll();
     this.districtStatusCodeRepository.deleteAll();
     this.facilityTypeCodeRepository.deleteAll();
@@ -127,8 +137,20 @@ public class CodeTableControllerTest {
       .updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
   }
 
-  private ContactTypeCodeEntity createContactTypeCodeData() {
-    return ContactTypeCodeEntity.builder().contactTypeCode("PRINCIPAL").description("School Principal")
+  private DistrictContactTypeCodeEntity createDistrictContactTypeCodeData() {
+    return DistrictContactTypeCodeEntity.builder().districtContactTypeCode("PRINCIPAL").description("School Principal")
+      .effectiveDate(LocalDateTime.now()).expiryDate(LocalDateTime.MAX).displayOrder(1).label("Principal").createDate(LocalDateTime.now())
+      .updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
+  }
+
+  private SchoolContactTypeCodeEntity createSchoolContactTypeCodeData() {
+    return SchoolContactTypeCodeEntity.builder().schoolContactTypeCode("PRINCIPAL").description("School Principal")
+      .effectiveDate(LocalDateTime.now()).expiryDate(LocalDateTime.MAX).displayOrder(1).label("Principal").createDate(LocalDateTime.now())
+      .updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
+  }
+
+  private AuthorityContactTypeCodeEntity createAuthorityContactTypeCodeData() {
+    return AuthorityContactTypeCodeEntity.builder().authorityContactTypeCode("PRINCIPAL").description("School Principal")
       .effectiveDate(LocalDateTime.now()).expiryDate(LocalDateTime.MAX).displayOrder(1).label("Principal").createDate(LocalDateTime.now())
       .updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
   }
@@ -268,11 +290,27 @@ public class CodeTableControllerTest {
   }
 
   @Test
-  public void testGetContactTypeCodes_ShouldReturnCodes() throws Exception {
+  public void testGetDistrictContactTypeCodes_ShouldReturnCodes() throws Exception {
     final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_INSTITUTE_CODES";
     final var mockAuthority = oidcLogin().authorities(grantedAuthority);
-    this.mockMvc.perform(get(URL.BASE_URL + URL.CONTACT_TYPE_CODES).with(mockAuthority)).andDo(print()).andExpect(status().isOk())
-      .andExpect(MockMvcResultMatchers.jsonPath("$[0].contactTypeCode").value("PRINCIPAL"));
+    this.mockMvc.perform(get(URL.BASE_URL + URL.DISTRICT_CONTACT_TYPE_CODES).with(mockAuthority)).andDo(print()).andExpect(status().isOk())
+      .andExpect(MockMvcResultMatchers.jsonPath("$[0].districtContactTypeCode").value("PRINCIPAL"));
+  }
+
+  @Test
+  public void testGetSchoolContactTypeCodes_ShouldReturnCodes() throws Exception {
+    final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_INSTITUTE_CODES";
+    final var mockAuthority = oidcLogin().authorities(grantedAuthority);
+    this.mockMvc.perform(get(URL.BASE_URL + URL.SCHOOL_CONTACT_TYPE_CODES).with(mockAuthority)).andDo(print()).andExpect(status().isOk())
+      .andExpect(MockMvcResultMatchers.jsonPath("$[0].schoolContactTypeCode").value("PRINCIPAL"));
+  }
+
+  @Test
+  public void testGetAuthorityContactTypeCodes_ShouldReturnCodes() throws Exception {
+    final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_INSTITUTE_CODES";
+    final var mockAuthority = oidcLogin().authorities(grantedAuthority);
+    this.mockMvc.perform(get(URL.BASE_URL + URL.AUTHORITY_CONTACT_TYPE_CODES).with(mockAuthority)).andDo(print()).andExpect(status().isOk())
+      .andExpect(MockMvcResultMatchers.jsonPath("$[0].authorityContactTypeCode").value("PRINCIPAL"));
   }
 
   @Test

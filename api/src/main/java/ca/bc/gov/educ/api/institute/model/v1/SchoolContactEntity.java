@@ -1,7 +1,6 @@
 package ca.bc.gov.educ.api.institute.model.v1;
 
 import ca.bc.gov.educ.api.institute.util.UpperCase;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,27 +17,18 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "CONTACT")
-public class ContactEntity {
+@Table(name = "SCHOOL_CONTACT")
+public class SchoolContactEntity {
   @Id
   @GeneratedValue(generator = "UUID")
   @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator", parameters = {
     @org.hibernate.annotations.Parameter(name = "uuid_gen_strategy_class", value = "org.hibernate.id.uuid.CustomVersionOneStrategy")})
-  @Column(name = "contact_id", unique = true, updatable = false, columnDefinition = "BINARY(16)")
-  private UUID contactId;
+  @Column(name = "school_contact_id", unique = true, updatable = false, columnDefinition = "BINARY(16)")
+  private UUID schoolContactId;
 
   @ManyToOne(optional = true, targetEntity = SchoolEntity.class)
   @JoinColumn(name = "school_id", referencedColumnName = "school_id")
   SchoolEntity schoolEntity;
-
-  @ManyToOne(optional = true, targetEntity = DistrictEntity.class)
-  @JoinColumn(name = "district_id", referencedColumnName = "district_id")
-  @JsonIgnoreProperties("contacts")
-  DistrictEntity districtEntity;
-
-  @ManyToOne(optional = true, targetEntity = IndependentAuthorityEntity.class)
-  @JoinColumn(name = "independent_authority_id", referencedColumnName = "independent_authority_id")
-  IndependentAuthorityEntity independentAuthorityEntity;
 
   @Basic
   @Column(name = "first_name")
@@ -55,9 +45,9 @@ public class ContactEntity {
   @Column(name = "email")
   private String email;
   @Basic
-  @Column(name = "contact_type_code")
+  @Column(name = "school_contact_type_code")
   @UpperCase
-  private String contactTypeCode;
+  private String schoolContactTypeCode;
   @Basic
   @Column(name = "effective_date")
   private LocalDateTime effectiveDate;

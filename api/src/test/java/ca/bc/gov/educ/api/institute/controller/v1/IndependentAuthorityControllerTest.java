@@ -59,10 +59,10 @@ public class IndependentAuthorityControllerTest {
   AuthorityTypeCodeRepository authorityTypeCodeRepository;
 
   @Autowired
-  ContactTypeCodeRepository contactTypeCodeRepository;
+  AuthorityContactTypeCodeRepository authorityContactTypeCodeRepository;
 
   @Autowired
-  ContactRepository contactRepository;
+  AuthorityContactRepository authorityContactRepository;
 
   @Autowired
   AddressRepository addressRepository;
@@ -83,7 +83,7 @@ public class IndependentAuthorityControllerTest {
   public void before(){
     MockitoAnnotations.openMocks(this);
     this.authorityTypeCodeRepository.save(this.createAuthorityTypeCodeData());
-    this.contactTypeCodeRepository.save(this.createContactTypeCodeData());
+    this.authorityContactTypeCodeRepository.save(this.createContactTypeCodeData());
     this.addressTypeCodeRepository.save(this.createAddressTypeCodeData());
     this.provinceCodeRepository.save(this.createProvinceCodeData());
     this.countryCodeRepository.save(this.createCountryCodeData());
@@ -95,7 +95,7 @@ public class IndependentAuthorityControllerTest {
   @AfterEach
   public void after() {
     this.addressRepository.deleteAll();
-    this.contactRepository.deleteAll();
+    this.authorityContactRepository.deleteAll();
     this.noteRepository.deleteAll();
     this.independentAuthorityRepository.deleteAll();
     this.independentAuthorityHistoryRepository.deleteAll();
@@ -227,7 +227,7 @@ public class IndependentAuthorityControllerTest {
   @Test
   void testCreateIndependentAuthorityContact_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
     final IndependentAuthorityEntity independentAuthorityEntity = this.independentAuthorityRepository.save(this.createIndependentAuthorityData());
-    ContactEntity contactEntity = createContactData(independentAuthorityEntity);
+    AuthorityContactEntity contactEntity = createContactData(independentAuthorityEntity);
 
     this.mockMvc.perform(post(URL.BASE_URL_AUTHORITY + "/" + independentAuthorityEntity.getIndependentAuthorityId() + "/contact")
         .contentType(MediaType.APPLICATION_JSON)
@@ -243,10 +243,10 @@ public class IndependentAuthorityControllerTest {
   void testDeleteIndependentAuthorityContact_GivenValidID_ShouldReturnStatusOK() throws Exception {
     final var independentAuthority = this.createIndependentAuthorityData();
     var independentAuthorityEntity = this.independentAuthorityRepository.save(independentAuthority);
-    ContactEntity contactEntity = createContactData(independentAuthorityEntity);
-    var contact = this.contactRepository.save(contactEntity);
+    AuthorityContactEntity contactEntity = createContactData(independentAuthorityEntity);
+    var contact = this.authorityContactRepository.save(contactEntity);
 
-    this.mockMvc.perform(delete(URL.BASE_URL_AUTHORITY + "/" + independentAuthorityEntity.getIndependentAuthorityId() + "/contact/" + contact.getContactId())
+    this.mockMvc.perform(delete(URL.BASE_URL_AUTHORITY + "/" + independentAuthorityEntity.getIndependentAuthorityId() + "/contact/" + contact.getAuthorityContactId())
         .contentType(MediaType.APPLICATION_JSON)
         .accept(MediaType.APPLICATION_JSON)
         .content(asJsonString(independentAuthorityEntity))
@@ -254,7 +254,7 @@ public class IndependentAuthorityControllerTest {
       .andDo(print())
       .andExpect(status().isNoContent());
 
-    var deletedContact = this.contactRepository.findById(contact.getContactId());
+    var deletedContact = this.authorityContactRepository.findById(contact.getAuthorityContactId());
     Assertions.assertTrue(deletedContact.isEmpty());
   }
 
@@ -264,11 +264,11 @@ public class IndependentAuthorityControllerTest {
     final var mockAuthority = oidcLogin().authorities(grantedAuthority);
     final var independentAuthority = this.createIndependentAuthorityData();
     var independentAuthorityEntity = this.independentAuthorityRepository.save(independentAuthority);
-    ContactEntity contactEntity = createContactData(independentAuthorityEntity);
-    var contact = this.contactRepository.save(contactEntity);
-    this.mockMvc.perform(get(URL.BASE_URL_AUTHORITY + "/" + independentAuthorityEntity.getIndependentAuthorityId() + "/contact/" + contact.getContactId()).with(mockAuthority))
-      .andDo(print()).andExpect(status().isOk()).andExpect(MockMvcResultMatchers.jsonPath("$.contactId")
-        .value(contact.getContactId().toString()));
+    AuthorityContactEntity contactEntity = createContactData(independentAuthorityEntity);
+    var contact = this.authorityContactRepository.save(contactEntity);
+    this.mockMvc.perform(get(URL.BASE_URL_AUTHORITY + "/" + independentAuthorityEntity.getIndependentAuthorityId() + "/contact/" + contact.getAuthorityContactId()).with(mockAuthority))
+      .andDo(print()).andExpect(status().isOk()).andExpect(MockMvcResultMatchers.jsonPath("$.authorityContactId")
+        .value(contact.getAuthorityContactId().toString()));
   }
 
   @ParameterizedTest
@@ -287,11 +287,11 @@ public class IndependentAuthorityControllerTest {
   void testUpdateIndependentAuthorityContact_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
     final var independentAuthority = this.createIndependentAuthorityData();
     var independentAuthorityEntity = this.independentAuthorityRepository.save(independentAuthority);
-    ContactEntity contactEntity = createContactData(independentAuthorityEntity);
-    var contact = this.contactRepository.save(contactEntity);
+    AuthorityContactEntity contactEntity = createContactData(independentAuthorityEntity);
+    var contact = this.authorityContactRepository.save(contactEntity);
     contact.setFirstName("pete");
 
-    this.mockMvc.perform(put(URL.BASE_URL_AUTHORITY + "/" + independentAuthorityEntity.getIndependentAuthorityId() + "/contact/" + contact.getContactId())
+    this.mockMvc.perform(put(URL.BASE_URL_AUTHORITY + "/" + independentAuthorityEntity.getIndependentAuthorityId() + "/contact/" + contact.getAuthorityContactId())
         .contentType(MediaType.APPLICATION_JSON)
         .accept(MediaType.APPLICATION_JSON)
         .content(asJsonString(contact))
@@ -458,8 +458,8 @@ public class IndependentAuthorityControllerTest {
       .updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
   }
 
-  private ContactTypeCodeEntity createContactTypeCodeData() {
-    return ContactTypeCodeEntity.builder().contactTypeCode("PRINCIPAL").description("School Principal")
+  private AuthorityContactTypeCodeEntity createContactTypeCodeData() {
+    return AuthorityContactTypeCodeEntity.builder().authorityContactTypeCode("PRINCIPAL").description("School Principal")
       .effectiveDate(LocalDateTime.now()).expiryDate(LocalDateTime.MAX).displayOrder(1).label("Principal").createDate(LocalDateTime.now())
       .updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
   }
@@ -482,8 +482,8 @@ public class IndependentAuthorityControllerTest {
       .updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
   }
 
-  private ContactEntity createContactData(IndependentAuthorityEntity entity) {
-    return ContactEntity.builder().independentAuthorityEntity(entity).contactTypeCode("PRINCIPAL").firstName("John").lastName("Wayne").createUser("TEST").updateUser("TEST").build();
+  private AuthorityContactEntity createContactData(IndependentAuthorityEntity entity) {
+    return AuthorityContactEntity.builder().independentAuthorityEntity(entity).authorityContactTypeCode("PRINCIPAL").firstName("John").lastName("Wayne").createUser("TEST").updateUser("TEST").build();
   }
 
   private AddressEntity createAddressData(IndependentAuthorityEntity entity) {

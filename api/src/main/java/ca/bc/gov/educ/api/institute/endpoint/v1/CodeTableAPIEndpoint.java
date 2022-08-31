@@ -63,12 +63,28 @@ public interface CodeTableAPIEndpoint {
   List<DistrictStatusCode> getDistrictStatusCodes();
 
   @PreAuthorize("hasAuthority('SCOPE_READ_INSTITUTE_CODES')")
-  @GetMapping(URL.CONTACT_TYPE_CODES)
+  @GetMapping(URL.DISTRICT_CONTACT_TYPE_CODES)
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
   @Transactional(readOnly = true)
   @Tag(name = "Institute Codes", description = "Endpoints to get institute codes.")
-  @Schema(name = "ContactTypeCode", implementation = ContactTypeCode.class)
-  List<ContactTypeCode> getContactTypeCodes();
+  @Schema(name = "DistrictContactTypeCode", implementation = DistrictContactTypeCode.class)
+  List<DistrictContactTypeCode> getDistrictContactTypeCodes();
+
+  @PreAuthorize("hasAuthority('SCOPE_READ_INSTITUTE_CODES')")
+  @GetMapping(URL.SCHOOL_CONTACT_TYPE_CODES)
+  @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
+  @Transactional(readOnly = true)
+  @Tag(name = "Institute Codes", description = "Endpoints to get institute codes.")
+  @Schema(name = "SchoolContactTypeCode", implementation = SchoolContactTypeCode.class)
+  List<SchoolContactTypeCode> getSchoolContactTypeCodes();
+
+  @PreAuthorize("hasAuthority('SCOPE_READ_INSTITUTE_CODES')")
+  @GetMapping(URL.AUTHORITY_CONTACT_TYPE_CODES)
+  @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
+  @Transactional(readOnly = true)
+  @Tag(name = "Institute Codes", description = "Endpoints to get institute codes.")
+  @Schema(name = "AuthorityContactTypeCode", implementation = AuthorityContactTypeCode.class)
+  List<AuthorityContactTypeCode> getAuthorityContactTypeCodes();
 
   @PreAuthorize("hasAuthority('SCOPE_READ_INSTITUTE_CODES')")
   @GetMapping(URL.AUTHORITY_TYPE_CODES)
