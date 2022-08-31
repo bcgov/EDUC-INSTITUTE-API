@@ -16,7 +16,11 @@ public class CodeTableService {
 
   private final AuthorityTypeCodeRepository authorityTypeCodeRepository;
 
-  private final ContactTypeCodeRepository contactTypeCodeRepository;
+  private final DistrictContactTypeCodeRepository districtContactTypeCodeRepository;
+
+  private final SchoolContactTypeCodeRepository schoolContactTypeCodeRepository;
+
+  private final AuthorityContactTypeCodeRepository authorityContactTypeCodeRepository;
 
   private final DistrictRegionCodeRepository districtRegionCodeRepository;
 
@@ -41,7 +45,9 @@ public class CodeTableService {
    *
    * @param addressTypeCodeRepository
    * @param authorityTypeCodeRepository
-   * @param contactTypeCodeRepository
+   * @param districtContactTypeCodeRepository
+   * @param schoolContactTypeCodeRepository
+   * @param authorityContactTypeCodeRepository
    * @param districtStatusCodeRepository
    * @param facilityTypeCodeRepository
    * @param provinceCodeRepository
@@ -52,12 +58,14 @@ public class CodeTableService {
    */
   @Autowired
   public CodeTableService(AddressTypeCodeRepository addressTypeCodeRepository, AuthorityTypeCodeRepository authorityTypeCodeRepository,
-                          ContactTypeCodeRepository contactTypeCodeRepository, DistrictRegionCodeRepository districtRegionCodeRepository, DistrictStatusCodeRepository districtStatusCodeRepository, FacilityTypeCodeRepository facilityTypeCodeRepository,
+                          DistrictContactTypeCodeRepository districtContactTypeCodeRepository, SchoolContactTypeCodeRepository schoolContactTypeCodeRepository, AuthorityContactTypeCodeRepository authorityContactTypeCodeRepository, DistrictRegionCodeRepository districtRegionCodeRepository, DistrictStatusCodeRepository districtStatusCodeRepository, FacilityTypeCodeRepository facilityTypeCodeRepository,
                           NeighborhoodLearningTypeCodeRepository neighborhoodLearningTypeCodeRepository, ProvinceCodeRepository provinceCodeRepository,
                           CountryCodeRepository countryCodeRepository, SchoolGradeCodeRepository schoolGradeCodeRepository, SchoolOrganizationCodeRepository schoolOrganizationCodeRepository, SchoolCategoryCodeRepository schoolCategoryCodeRepository) {
     this.addressTypeCodeRepository = addressTypeCodeRepository;
     this.authorityTypeCodeRepository = authorityTypeCodeRepository;
-    this.contactTypeCodeRepository = contactTypeCodeRepository;
+    this.districtContactTypeCodeRepository = districtContactTypeCodeRepository;
+    this.schoolContactTypeCodeRepository = schoolContactTypeCodeRepository;
+    this.authorityContactTypeCodeRepository = authorityContactTypeCodeRepository;
     this.districtRegionCodeRepository = districtRegionCodeRepository;
     this.districtStatusCodeRepository = districtStatusCodeRepository;
     this.facilityTypeCodeRepository = facilityTypeCodeRepository;
@@ -79,9 +87,19 @@ public class CodeTableService {
     return authorityTypeCodeRepository.findAll();
   }
 
-  @Cacheable("contactTypeCodes")
-  public List<ContactTypeCodeEntity> getContactTypeCodesList() {
-    return contactTypeCodeRepository.findAll();
+  @Cacheable("districtContactTypeCodes")
+  public List<DistrictContactTypeCodeEntity> getDistrictContactTypeCodesList() {
+    return districtContactTypeCodeRepository.findAll();
+  }
+
+  @Cacheable("schoolContactTypeCodes")
+  public List<SchoolContactTypeCodeEntity> getSchoolContactTypeCodesList() {
+    return schoolContactTypeCodeRepository.findAll();
+  }
+
+  @Cacheable("authorityContactTypeCodes")
+  public List<AuthorityContactTypeCodeEntity> getAuthorityContactTypeCodesList() {
+    return authorityContactTypeCodeRepository.findAll();
   }
 
   @Cacheable("districtRegionCodes")
@@ -137,8 +155,16 @@ public class CodeTableService {
     return authorityTypeCodeRepository.findById(authorityTypeCode);
   }
 
-  public Optional<ContactTypeCodeEntity> getContactTypeCode(String contactTypeCode) {
-    return contactTypeCodeRepository.findById(contactTypeCode);
+  public Optional<DistrictContactTypeCodeEntity> getDistrictContactTypeCode(String districtContactTypeCode) {
+    return districtContactTypeCodeRepository.findById(districtContactTypeCode);
+  }
+
+  public Optional<SchoolContactTypeCodeEntity> getSchoolContactTypeCode(String schoolContactTypeCode) {
+    return schoolContactTypeCodeRepository.findById(schoolContactTypeCode);
+  }
+
+  public Optional<AuthorityContactTypeCodeEntity> getAuthorityContactTypeCode(String authorityContactTypeCode) {
+    return authorityContactTypeCodeRepository.findById(authorityContactTypeCode);
   }
 
   public Optional<DistrictRegionCodeEntity> getDistrictRegionCode(String districtRegionCode) {

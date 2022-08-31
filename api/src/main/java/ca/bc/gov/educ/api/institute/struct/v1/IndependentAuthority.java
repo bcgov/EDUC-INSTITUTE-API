@@ -55,7 +55,7 @@ public class IndependentAuthority extends BaseRequest implements Serializable {
 
   private LocalDateTime closedDate;
 
-  private List<Contact> contacts;
+  private List<AuthorityContact> contacts;
 
   private List<Address> addresses;
 

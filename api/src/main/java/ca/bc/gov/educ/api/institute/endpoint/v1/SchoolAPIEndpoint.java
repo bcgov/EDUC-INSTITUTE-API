@@ -72,23 +72,23 @@ public interface SchoolAPIEndpoint {
   @PreAuthorize("hasAuthority('SCOPE_READ_SCHOOL_CONTACT')")
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
   @Tag(name = "School Contact Entity", description = "Endpoints for school contact entity.")
-  @Schema(name = "Contact", implementation = Contact.class)
-  Contact getSchoolContact(@PathVariable UUID schoolId, @PathVariable UUID contactId);
+  @Schema(name = "SchoolContact", implementation = SchoolContact.class)
+  SchoolContact getSchoolContact(@PathVariable UUID schoolId, @PathVariable UUID contactId);
 
   @PostMapping("/{schoolId}/contact")
   @PreAuthorize("hasAuthority('SCOPE_WRITE_SCHOOL_CONTACT')")
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
   @Tag(name = "School Contact Entity", description = "Endpoints for school contact entity.")
-  @Schema(name = "Contact", implementation = Contact.class)
+  @Schema(name = "SchoolContact", implementation = SchoolContact.class)
   @ResponseStatus(CREATED)
-  Contact createSchoolContact(@PathVariable UUID schoolId, @Validated @RequestBody Contact contact);
+  SchoolContact createSchoolContact(@PathVariable UUID schoolId, @Validated @RequestBody SchoolContact contact);
 
   @PutMapping("/{schoolId}/contact/{contactId}")
   @PreAuthorize("hasAuthority('SCOPE_WRITE_SCHOOL_CONTACT')")
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
   @Tag(name = "School Contact Entity", description = "Endpoints for school contact entity.")
-  @Schema(name = "Contact", implementation = Contact.class)
-  Contact updateSchoolContact(@PathVariable UUID schoolId, @PathVariable UUID contactId, @Validated @RequestBody Contact contact);
+  @Schema(name = "SchoolContact", implementation = SchoolContact.class)
+  SchoolContact updateSchoolContact(@PathVariable UUID schoolId, @PathVariable UUID contactId, @Validated @RequestBody SchoolContact contact);
 
   @DeleteMapping("/{schoolId}/contact/{contactId}")
   @PreAuthorize("hasAuthority('SCOPE_DELETE_SCHOOL_CONTACT')")

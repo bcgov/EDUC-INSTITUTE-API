@@ -80,8 +80,8 @@ public class SchoolEntity {
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  @OneToMany(mappedBy = "schoolEntity", fetch = FetchType.EAGER, cascade = CascadeType.DETACH, targetEntity = ContactEntity.class)
-  private Set<ContactEntity> contacts;
+  @OneToMany(mappedBy = "schoolEntity", fetch = FetchType.EAGER, cascade = CascadeType.DETACH, targetEntity = SchoolContactEntity.class)
+  private Set<SchoolContactEntity> contacts;
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude

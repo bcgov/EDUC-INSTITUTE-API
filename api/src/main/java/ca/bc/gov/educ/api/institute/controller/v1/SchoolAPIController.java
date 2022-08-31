@@ -5,8 +5,8 @@ import ca.bc.gov.educ.api.institute.exception.EntityNotFoundException;
 import ca.bc.gov.educ.api.institute.exception.InvalidPayloadException;
 import ca.bc.gov.educ.api.institute.exception.errors.ApiError;
 import ca.bc.gov.educ.api.institute.mapper.v1.AddressMapper;
-import ca.bc.gov.educ.api.institute.mapper.v1.ContactMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.NoteMapper;
+import ca.bc.gov.educ.api.institute.mapper.v1.SchoolContactMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.SchoolMapper;
 import ca.bc.gov.educ.api.institute.model.v1.SchoolEntity;
 import ca.bc.gov.educ.api.institute.service.v1.SchoolHistoryService;
@@ -16,8 +16,8 @@ import ca.bc.gov.educ.api.institute.struct.v1.*;
 import ca.bc.gov.educ.api.institute.util.JsonUtil;
 import ca.bc.gov.educ.api.institute.util.RequestUtil;
 import ca.bc.gov.educ.api.institute.validator.AddressPayloadValidator;
-import ca.bc.gov.educ.api.institute.validator.ContactPayloadValidator;
 import ca.bc.gov.educ.api.institute.validator.NotePayloadValidator;
+import ca.bc.gov.educ.api.institute.validator.SchoolContactPayloadValidator;
 import ca.bc.gov.educ.api.institute.validator.SchoolPayloadValidator;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -48,7 +48,7 @@ public class SchoolAPIController implements SchoolAPIEndpoint {
 
   private static final SchoolMapper mapper = SchoolMapper.mapper;
 
-  private static final ContactMapper contactMapper = ContactMapper.mapper;
+  private static final SchoolContactMapper schoolContactMapper = SchoolContactMapper.mapper;
 
   private static final AddressMapper addressMapper = AddressMapper.mapper;
 
@@ -65,13 +65,13 @@ public class SchoolAPIController implements SchoolAPIEndpoint {
   @Getter(AccessLevel.PRIVATE)
   private final SchoolPayloadValidator payloadValidator;
 
-  private final ContactPayloadValidator contactPayloadValidator;
+  private final SchoolContactPayloadValidator contactPayloadValidator;
 
   private final AddressPayloadValidator addressPayloadValidator;
 
   private final NotePayloadValidator notePayloadValidator;
   @Autowired
-  public SchoolAPIController(final SchoolService schoolService, final SchoolHistoryService schoolHistoryService, SchoolSearchService schoolSearchService, final SchoolPayloadValidator payloadValidator, ContactPayloadValidator contactPayloadValidator, AddressPayloadValidator addressPayloadValidator, NotePayloadValidator notePayloadValidator) {
+  public SchoolAPIController(final SchoolService schoolService, final SchoolHistoryService schoolHistoryService, SchoolSearchService schoolSearchService, final SchoolPayloadValidator payloadValidator, SchoolContactPayloadValidator contactPayloadValidator, AddressPayloadValidator addressPayloadValidator, NotePayloadValidator notePayloadValidator) {
     this.schoolService = schoolService;
     this.schoolHistoryService = schoolHistoryService;
     this.schoolSearchService = schoolSearchService;
@@ -133,28 +133,28 @@ public class SchoolAPIController implements SchoolAPIEndpoint {
   }
 
   @Override
-  public Contact getSchoolContact(UUID schoolId, UUID contactId) {
+  public SchoolContact getSchoolContact(UUID schoolId, UUID contactId) {
     var contactEntity = this.schoolService.getSchoolContact(schoolId, contactId);
 
     if (contactEntity.isPresent()) {
-      return contactMapper.toStructure(contactEntity.get());
+      return schoolContactMapper.toStructure(contactEntity.get());
     } else {
       throw new EntityNotFoundException();
     }
   }
 
   @Override
-  public Contact createSchoolContact(UUID schoolId, Contact contact) {
+  public SchoolContact createSchoolContact(UUID schoolId, SchoolContact contact) {
     validatePayload(() -> this.contactPayloadValidator.validateCreatePayload(contact));
     RequestUtil.setAuditColumnsForCreate(contact);
-    return contactMapper.toStructure(schoolService.createSchoolContact(contact, schoolId));
+    return schoolContactMapper.toStructure(schoolService.createSchoolContact(contact, schoolId));
   }
 
   @Override
-  public Contact updateSchoolContact(UUID schoolId, UUID contactId, Contact contact) {
+  public SchoolContact updateSchoolContact(UUID schoolId, UUID contactId, SchoolContact contact) {
     validatePayload(() -> this.contactPayloadValidator.validateUpdatePayload(contact));
     RequestUtil.setAuditColumnsForUpdate(contact);
-    return contactMapper.toStructure(schoolService.updateSchoolContact(contact, schoolId, contactId));
+    return schoolContactMapper.toStructure(schoolService.updateSchoolContact(contact, schoolId, contactId));
   }
 
   @Override

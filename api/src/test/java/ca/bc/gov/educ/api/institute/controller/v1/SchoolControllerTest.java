@@ -84,10 +84,10 @@ public class SchoolControllerTest {
   FacilityTypeCodeRepository facilityTypeCodeRepository;
 
   @Autowired
-  ContactTypeCodeRepository contactTypeCodeRepository;
+  SchoolContactTypeCodeRepository schoolContactTypeCodeRepository;
 
   @Autowired
-  ContactRepository contactRepository;
+  SchoolContactRepository schoolContactRepository;
 
   @Autowired
   AddressRepository addressRepository;
@@ -117,7 +117,7 @@ public class SchoolControllerTest {
     this.schoolCategoryCodeRepository.save(this.createSchoolCategoryCodeData());
     this.schoolOrganizationCodeRepository.save(this.createSchoolOrganizationCodeData());
     this.facilityTypeCodeRepository.save(this.createFacilityTypeCodeData());
-    this.contactTypeCodeRepository.save(this.createContactTypeCodeData());
+    this.schoolContactTypeCodeRepository.save(this.createContactTypeCodeData());
     this.addressTypeCodeRepository.save(this.createAddressTypeCodeData());
     this.provinceCodeRepository.save(this.createProvinceCodeData());
     this.countryCodeRepository.save(this.createCountryCodeData());
@@ -131,7 +131,7 @@ public class SchoolControllerTest {
   @AfterEach
   public void after() {
     this.addressRepository.deleteAll();
-    this.contactRepository.deleteAll();
+    this.schoolContactRepository.deleteAll();
     this.noteRepository.deleteAll();
     this.schoolRepository.deleteAll();
     this.schoolHistoryRepository.deleteAll();
@@ -344,7 +344,7 @@ public class SchoolControllerTest {
   @Test
   void testCreateSchoolContact_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
     final SchoolEntity schoolEntity = this.schoolRepository.save(this.createSchoolData());
-    ContactEntity contactEntity = createContactData(schoolEntity);
+    SchoolContactEntity contactEntity = createContactData(schoolEntity);
 
     this.mockMvc.perform(post(URL.BASE_URL_SCHOOL + "/" + schoolEntity.getSchoolId() + "/contact")
         .contentType(MediaType.APPLICATION_JSON)
@@ -357,13 +357,43 @@ public class SchoolControllerTest {
   }
 
   @Test
+  void testCreateSchoolContact_GivenInvalidPayload_ShouldReturnStatusCreated() throws Exception {
+    final SchoolEntity schoolEntity = this.schoolRepository.save(this.createSchoolData());
+    SchoolContactEntity contactEntity = createContactData(schoolEntity);
+    contactEntity.setSchoolContactId(UUID.randomUUID());
+
+    this.mockMvc.perform(post(URL.BASE_URL_SCHOOL + "/" + schoolEntity.getSchoolId() + "/contact")
+        .contentType(MediaType.APPLICATION_JSON)
+        .accept(MediaType.APPLICATION_JSON)
+        .content(asJsonString(contactEntity))
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SCHOOL_CONTACT"))))
+      .andDo(print())
+      .andExpect(status().isBadRequest());
+  }
+
+  @Test
+  void testCreateSchoolContact_GivenInvalidTypeCodePayload_ShouldReturnStatusCreated() throws Exception {
+    final SchoolEntity schoolEntity = this.schoolRepository.save(this.createSchoolData());
+    SchoolContactEntity contactEntity = createContactData(schoolEntity);
+    contactEntity.setSchoolContactTypeCode("TESTER");
+
+    this.mockMvc.perform(post(URL.BASE_URL_SCHOOL + "/" + schoolEntity.getSchoolId() + "/contact")
+        .contentType(MediaType.APPLICATION_JSON)
+        .accept(MediaType.APPLICATION_JSON)
+        .content(asJsonString(contactEntity))
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SCHOOL_CONTACT"))))
+      .andDo(print())
+      .andExpect(status().isBadRequest());
+  }
+
+  @Test
   void testDeleteSchoolContact_GivenValidID_ShouldReturnStatusOK() throws Exception {
     final var school = this.createSchoolData();
     var schoolEntity = this.schoolRepository.save(school);
-    ContactEntity contactEntity = createContactData(schoolEntity);
-    var contact = this.contactRepository.save(contactEntity);
+    SchoolContactEntity contactEntity = createContactData(schoolEntity);
+    var contact = this.schoolContactRepository.save(contactEntity);
 
-    this.mockMvc.perform(delete(URL.BASE_URL_SCHOOL + "/" + schoolEntity.getSchoolId() + "/contact/" + contact.getContactId())
+    this.mockMvc.perform(delete(URL.BASE_URL_SCHOOL + "/" + schoolEntity.getSchoolId() + "/contact/" + contact.getSchoolContactId())
         .contentType(MediaType.APPLICATION_JSON)
         .accept(MediaType.APPLICATION_JSON)
         .content(asJsonString(schoolEntity))
@@ -371,7 +401,7 @@ public class SchoolControllerTest {
       .andDo(print())
       .andExpect(status().isNoContent());
 
-    var deletedContact = this.contactRepository.findById(contact.getContactId());
+    var deletedContact = this.schoolContactRepository.findById(contact.getSchoolContactId());
     Assertions.assertTrue(deletedContact.isEmpty());
   }
 
@@ -381,22 +411,22 @@ public class SchoolControllerTest {
     final var mockAuthority = oidcLogin().authorities(grantedAuthority);
     final var school = this.createSchoolData();
     var schoolEntity = this.schoolRepository.save(school);
-    ContactEntity contactEntity = createContactData(schoolEntity);
-    var contact = this.contactRepository.save(contactEntity);
-    this.mockMvc.perform(get(URL.BASE_URL_SCHOOL + "/" + schoolEntity.getSchoolId() + "/contact/" + contact.getContactId()).with(mockAuthority))
-      .andDo(print()).andExpect(status().isOk()).andExpect(MockMvcResultMatchers.jsonPath("$.contactId")
-        .value(contact.getContactId().toString()));
+    SchoolContactEntity contactEntity = createContactData(schoolEntity);
+    var contact = this.schoolContactRepository.save(contactEntity);
+    this.mockMvc.perform(get(URL.BASE_URL_SCHOOL + "/" + schoolEntity.getSchoolId() + "/contact/" + contact.getSchoolContactId()).with(mockAuthority))
+      .andDo(print()).andExpect(status().isOk()).andExpect(MockMvcResultMatchers.jsonPath("$.schoolContactId")
+        .value(contact.getSchoolContactId().toString()));
   }
 
   @Test
   void testUpdateSchoolContact_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
     final var school = this.createSchoolData();
     var schoolEntity = this.schoolRepository.save(school);
-    ContactEntity contactEntity = createContactData(schoolEntity);
-    var contact = this.contactRepository.save(contactEntity);
+    SchoolContactEntity contactEntity = createContactData(schoolEntity);
+    var contact = this.schoolContactRepository.save(contactEntity);
     contact.setFirstName("pete");
 
-    this.mockMvc.perform(put(URL.BASE_URL_SCHOOL + "/" + schoolEntity.getSchoolId() + "/contact/" + contact.getContactId())
+    this.mockMvc.perform(put(URL.BASE_URL_SCHOOL + "/" + schoolEntity.getSchoolId() + "/contact/" + contact.getSchoolContactId())
         .contentType(MediaType.APPLICATION_JSON)
         .accept(MediaType.APPLICATION_JSON)
         .content(asJsonString(contact))
@@ -636,8 +666,8 @@ public class SchoolControllerTest {
       .updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
   }
 
-  private ContactEntity createContactData(SchoolEntity entity) {
-    return ContactEntity.builder().schoolEntity(entity).contactTypeCode("PRINCIPAL").firstName("John").lastName("Wayne").createUser("TEST").updateUser("TEST").build();
+  private SchoolContactEntity createContactData(SchoolEntity entity) {
+    return SchoolContactEntity.builder().schoolEntity(entity).schoolContactTypeCode("PRINCIPAL").firstName("John").lastName("Wayne").createUser("TEST").updateUser("TEST").build();
   }
 
   private SchoolGradeEntity createSchoolGradeData(SchoolEntity entity) {
@@ -657,8 +687,8 @@ public class SchoolControllerTest {
     return NoteEntity.builder().schoolEntity(entity).content("This is a note.").createUser("TEST").updateUser("TEST").build();
   }
 
-  private ContactTypeCodeEntity createContactTypeCodeData() {
-    return ContactTypeCodeEntity.builder().contactTypeCode("PRINCIPAL").description("School Principal")
+  private SchoolContactTypeCodeEntity createContactTypeCodeData() {
+    return SchoolContactTypeCodeEntity.builder().schoolContactTypeCode("PRINCIPAL").description("School Principal")
       .effectiveDate(LocalDateTime.now()).expiryDate(LocalDateTime.MAX).displayOrder(1).label("Principal").createDate(LocalDateTime.now())
       .updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
   }

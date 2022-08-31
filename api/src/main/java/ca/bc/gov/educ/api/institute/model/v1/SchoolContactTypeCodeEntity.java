@@ -1,6 +1,9 @@
 package ca.bc.gov.educ.api.institute.model.v1;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.PastOrPresent;
@@ -11,11 +14,11 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "CONTACT_TYPE_CODE")
-public class ContactTypeCodeEntity {
+@Table(name = "SCHOOL_CONTACT_TYPE_CODE")
+public class SchoolContactTypeCodeEntity {
   @Id
-  @Column(name = "contact_type_code", unique = true, updatable = false)
-  private String contactTypeCode;
+  @Column(name = "school_contact_type_code", unique = true, updatable = false)
+  private String schoolContactTypeCode;
   @Basic
   @Column(name = "label")
   private String label;

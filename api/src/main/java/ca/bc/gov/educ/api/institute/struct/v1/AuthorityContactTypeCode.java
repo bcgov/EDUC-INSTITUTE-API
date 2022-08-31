@@ -12,11 +12,11 @@ import java.io.Serializable;
 @NoArgsConstructor
 @Builder
 @SuppressWarnings("squid:S1700")
-public class ContactTypeCode implements Serializable {
+public class AuthorityContactTypeCode implements Serializable {
 
   private static final long serialVersionUID = 6118916290604876032L;
 
-  private String contactTypeCode;
+  private String authorityContactTypeCode;
 
   private String label;
 

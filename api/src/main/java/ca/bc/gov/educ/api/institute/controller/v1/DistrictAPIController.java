@@ -5,7 +5,7 @@ import ca.bc.gov.educ.api.institute.exception.EntityNotFoundException;
 import ca.bc.gov.educ.api.institute.exception.InvalidPayloadException;
 import ca.bc.gov.educ.api.institute.exception.errors.ApiError;
 import ca.bc.gov.educ.api.institute.mapper.v1.AddressMapper;
-import ca.bc.gov.educ.api.institute.mapper.v1.ContactMapper;
+import ca.bc.gov.educ.api.institute.mapper.v1.DistrictContactMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.DistrictMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.NoteMapper;
 import ca.bc.gov.educ.api.institute.service.v1.DistrictHistoryService;
@@ -13,7 +13,7 @@ import ca.bc.gov.educ.api.institute.service.v1.DistrictService;
 import ca.bc.gov.educ.api.institute.struct.v1.*;
 import ca.bc.gov.educ.api.institute.util.RequestUtil;
 import ca.bc.gov.educ.api.institute.validator.AddressPayloadValidator;
-import ca.bc.gov.educ.api.institute.validator.ContactPayloadValidator;
+import ca.bc.gov.educ.api.institute.validator.DistrictContactPayloadValidator;
 import ca.bc.gov.educ.api.institute.validator.DistrictPayloadValidator;
 import ca.bc.gov.educ.api.institute.validator.NotePayloadValidator;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +37,8 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 public class DistrictAPIController implements DistrictAPIEndpoint {
 
   private static final DistrictMapper mapper = DistrictMapper.mapper;
-  private static final ContactMapper contactMapper = ContactMapper.mapper;
+
+  private static final DistrictContactMapper districtContactMapper = DistrictContactMapper.mapper;
 
   private static final AddressMapper addressMapper = AddressMapper.mapper;
 
@@ -47,18 +48,18 @@ public class DistrictAPIController implements DistrictAPIEndpoint {
 
   private final DistrictPayloadValidator districtPayloadValidator;
 
-  private final ContactPayloadValidator contactPayloadValidator;
+  private final DistrictContactPayloadValidator districtContactPayloadValidator;
 
   private final AddressPayloadValidator addressPayloadValidator;
 
   private final NotePayloadValidator notePayloadValidator;
 
   @Autowired
-  public DistrictAPIController(final DistrictService districtService, final DistrictHistoryService districtHistoryService, final DistrictPayloadValidator districtPayloadValidator, final ContactPayloadValidator contactPayloadValidator, AddressPayloadValidator addressPayloadValidator, NotePayloadValidator notePayloadValidator) {
+  public DistrictAPIController(final DistrictService districtService, final DistrictHistoryService districtHistoryService, final DistrictPayloadValidator districtPayloadValidator, DistrictContactPayloadValidator districtContactPayloadValidator, AddressPayloadValidator addressPayloadValidator, NotePayloadValidator notePayloadValidator) {
     this.districtService = districtService;
     this.districtHistoryService = districtHistoryService;
     this.districtPayloadValidator = districtPayloadValidator;
-    this.contactPayloadValidator = contactPayloadValidator;
+    this.districtContactPayloadValidator = districtContactPayloadValidator;
     this.addressPayloadValidator = addressPayloadValidator;
     this.notePayloadValidator = notePayloadValidator;
   }
@@ -115,28 +116,28 @@ public class DistrictAPIController implements DistrictAPIEndpoint {
   }
 
   @Override
-  public Contact getDistrictContact(UUID districtId, UUID contactId) {
+  public DistrictContact getDistrictContact(UUID districtId, UUID contactId) {
     var contactEntity = this.districtService.getDistrictContact(districtId, contactId);
 
     if (contactEntity.isPresent()) {
-      return contactMapper.toStructure(contactEntity.get());
+      return districtContactMapper.toStructure(contactEntity.get());
     } else {
       throw new EntityNotFoundException();
     }
   }
 
   @Override
-  public Contact createDistrictContact(UUID districtId, Contact contact) {
-    validatePayload(() -> this.contactPayloadValidator.validateCreatePayload(contact));
+  public DistrictContact createDistrictContact(UUID districtId, DistrictContact contact) {
+    validatePayload(() -> this.districtContactPayloadValidator.validateCreatePayload(contact));
     RequestUtil.setAuditColumnsForCreate(contact);
-    return contactMapper.toStructure(districtService.createDistrictContact(contact, districtId));
+    return districtContactMapper.toStructure(districtService.createDistrictContact(contact, districtId));
   }
 
   @Override
-  public Contact updateDistrictContact(UUID districtId, UUID contactId, Contact contact) {
-    validatePayload(() -> this.contactPayloadValidator.validateUpdatePayload(contact));
+  public DistrictContact updateDistrictContact(UUID districtId, UUID contactId, DistrictContact contact) {
+    validatePayload(() -> this.districtContactPayloadValidator.validateUpdatePayload(contact));
     RequestUtil.setAuditColumnsForUpdate(contact);
-    return contactMapper.toStructure(districtService.updateDistrictContact(contact, districtId, contactId));
+    return districtContactMapper.toStructure(districtService.updateDistrictContact(contact, districtId, contactId));
   }
 
   @Override

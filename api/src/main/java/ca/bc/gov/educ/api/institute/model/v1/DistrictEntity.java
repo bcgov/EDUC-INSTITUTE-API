@@ -61,9 +61,9 @@ public class DistrictEntity {
   private LocalDateTime updateDate;
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  @OneToMany(mappedBy = "districtEntity", fetch = FetchType.EAGER, cascade = CascadeType.DETACH, targetEntity = ContactEntity.class)
+  @OneToMany(mappedBy = "districtEntity", fetch = FetchType.EAGER, cascade = CascadeType.DETACH, targetEntity = DistrictContactEntity.class)
   @JsonIgnoreProperties("districtEntity")
-  private Set<ContactEntity> contacts;
+  private Set<DistrictContactEntity> contacts;
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude

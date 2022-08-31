@@ -37,9 +37,25 @@ public interface CodeTableMapper {
   @Mapping(target = "updateDate", ignore = true)
   @Mapping(target = "createUser", ignore = true)
   @Mapping(target = "createDate", ignore = true)
-  ContactTypeCodeEntity toModel(ContactTypeCode structure);
+  DistrictContactTypeCodeEntity toModel(DistrictContactTypeCode structure);
 
-  ContactTypeCode toStructure(ContactTypeCodeEntity entity);
+  DistrictContactTypeCode toStructure(DistrictContactTypeCodeEntity entity);
+
+  @Mapping(target = "updateUser", ignore = true)
+  @Mapping(target = "updateDate", ignore = true)
+  @Mapping(target = "createUser", ignore = true)
+  @Mapping(target = "createDate", ignore = true)
+  SchoolContactTypeCodeEntity toModel(SchoolContactTypeCode structure);
+
+  SchoolContactTypeCode toStructure(SchoolContactTypeCodeEntity entity);
+
+  @Mapping(target = "updateUser", ignore = true)
+  @Mapping(target = "updateDate", ignore = true)
+  @Mapping(target = "createUser", ignore = true)
+  @Mapping(target = "createDate", ignore = true)
+  AuthorityContactTypeCodeEntity toModel(AuthorityContactTypeCode structure);
+
+  AuthorityContactTypeCode toStructure(AuthorityContactTypeCodeEntity entity);
 
   @Mapping(target = "updateUser", ignore = true)
   @Mapping(target = "updateDate", ignore = true)

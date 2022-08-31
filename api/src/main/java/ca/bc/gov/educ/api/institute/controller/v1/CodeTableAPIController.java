@@ -50,8 +50,18 @@ public class CodeTableAPIController implements CodeTableAPIEndpoint {
   }
 
   @Override
-  public List<ContactTypeCode> getContactTypeCodes() {
-    return getService().getContactTypeCodesList().stream().map(mapper::toStructure).collect(Collectors.toList());
+  public List<DistrictContactTypeCode> getDistrictContactTypeCodes() {
+    return getService().getDistrictContactTypeCodesList().stream().map(mapper::toStructure).collect(Collectors.toList());
+  }
+
+  @Override
+  public List<SchoolContactTypeCode> getSchoolContactTypeCodes() {
+    return getService().getSchoolContactTypeCodesList().stream().map(mapper::toStructure).collect(Collectors.toList());
+  }
+
+  @Override
+  public List<AuthorityContactTypeCode> getAuthorityContactTypeCodes() {
+    return getService().getAuthorityContactTypeCodesList().stream().map(mapper::toStructure).collect(Collectors.toList());
   }
 
   @Override

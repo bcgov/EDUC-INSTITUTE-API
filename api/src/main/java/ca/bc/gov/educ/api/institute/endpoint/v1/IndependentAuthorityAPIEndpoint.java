@@ -69,23 +69,23 @@ public interface IndependentAuthorityAPIEndpoint {
   @PreAuthorize("hasAuthority('SCOPE_READ_INDEPENDENT_AUTHORITY_CONTACT')")
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
   @Tag(name = "Independent Authority Contact Entity", description = "Endpoints for independent authority contact entity.")
-  @Schema(name = "Contact", implementation = Contact.class)
-  Contact getIndependentAuthorityContact(@PathVariable UUID independentAuthorityId, @PathVariable UUID contactId);
+  @Schema(name = "AuthorityContact", implementation = AuthorityContact.class)
+  AuthorityContact getIndependentAuthorityContact(@PathVariable UUID independentAuthorityId, @PathVariable UUID contactId);
 
   @PostMapping("/{independentAuthorityId}/contact")
   @PreAuthorize("hasAuthority('SCOPE_WRITE_INDEPENDENT_AUTHORITY_CONTACT')")
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
   @Tag(name = "Independent Authority Contact Entity", description = "Endpoints for independent authority contact entity.")
-  @Schema(name = "Contact", implementation = Contact.class)
+  @Schema(name = "AuthorityContact", implementation = AuthorityContact.class)
   @ResponseStatus(CREATED)
-  Contact createIndependentAuthorityContact(@PathVariable UUID independentAuthorityId, @Validated @RequestBody Contact contact);
+  AuthorityContact createIndependentAuthorityContact(@PathVariable UUID independentAuthorityId, @Validated @RequestBody AuthorityContact contact);
 
   @PutMapping("/{independentAuthorityId}/contact/{contactId}")
   @PreAuthorize("hasAuthority('SCOPE_WRITE_INDEPENDENT_AUTHORITY_CONTACT')")
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
   @Tag(name = "Independent Authority Contact Entity", description = "Endpoints for independent authority contact entity.")
-  @Schema(name = "Contact", implementation = Contact.class)
-  Contact updateIndependentAuthorityContact(@PathVariable UUID independentAuthorityId, @PathVariable UUID contactId, @Validated @RequestBody Contact contact);
+  @Schema(name = "AuthorityContact", implementation = AuthorityContact.class)
+  AuthorityContact updateIndependentAuthorityContact(@PathVariable UUID independentAuthorityId, @PathVariable UUID contactId, @Validated @RequestBody AuthorityContact contact);
 
   @DeleteMapping("/{independentAuthorityId}/contact/{contactId}")
   @PreAuthorize("hasAuthority('SCOPE_DELETE_INDEPENDENT_AUTHORITY_CONTACT')")

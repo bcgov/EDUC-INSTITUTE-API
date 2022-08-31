@@ -61,8 +61,8 @@ public class IndependentAuthorityEntity {
   private LocalDateTime updateDate;
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  @OneToMany(mappedBy = "independentAuthorityEntity", fetch = FetchType.EAGER, cascade = CascadeType.DETACH, targetEntity = ContactEntity.class)
-  private Set<ContactEntity> contacts;
+  @OneToMany(mappedBy = "independentAuthorityEntity", fetch = FetchType.EAGER, cascade = CascadeType.DETACH, targetEntity = AuthorityContactEntity.class)
+  private Set<AuthorityContactEntity> contacts;
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude

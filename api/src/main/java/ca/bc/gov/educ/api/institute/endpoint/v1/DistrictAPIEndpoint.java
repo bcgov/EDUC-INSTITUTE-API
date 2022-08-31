@@ -69,23 +69,23 @@ public interface DistrictAPIEndpoint {
   @PreAuthorize("hasAuthority('SCOPE_READ_DISTRICT_CONTACT')")
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
   @Tag(name = "District Contact Entity", description = "Endpoints for district contact entity.")
-  @Schema(name = "Contact", implementation = Contact.class)
-  Contact getDistrictContact(@PathVariable UUID districtId, @PathVariable UUID contactId);
+  @Schema(name = "DistrictContact", implementation = DistrictContact.class)
+  DistrictContact getDistrictContact(@PathVariable UUID districtId, @PathVariable UUID contactId);
 
   @PostMapping("/{districtId}/contact")
   @PreAuthorize("hasAuthority('SCOPE_WRITE_DISTRICT_CONTACT')")
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
   @Tag(name = "District Contact Entity", description = "Endpoints for district contact entity.")
-  @Schema(name = "Contact", implementation = Contact.class)
+  @Schema(name = "DistrictContact", implementation = DistrictContact.class)
   @ResponseStatus(CREATED)
-  Contact createDistrictContact(@PathVariable UUID districtId, @Validated @RequestBody Contact contact);
+  DistrictContact createDistrictContact(@PathVariable UUID districtId, @Validated @RequestBody DistrictContact contact);
 
   @PutMapping("/{districtId}/contact/{contactId}")
   @PreAuthorize("hasAuthority('SCOPE_WRITE_DISTRICT_CONTACT')")
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
   @Tag(name = "District Contact Entity", description = "Endpoints for district contact entity.")
-  @Schema(name = "Contact", implementation = Contact.class)
-  Contact updateDistrictContact(@PathVariable UUID districtId, @PathVariable UUID contactId, @Validated @RequestBody Contact contact);
+  @Schema(name = "DistrictContact", implementation = DistrictContact.class)
+  DistrictContact updateDistrictContact(@PathVariable UUID districtId, @PathVariable UUID contactId, @Validated @RequestBody DistrictContact contact);
 
   @DeleteMapping("/{districtId}/contact/{contactId}")
   @PreAuthorize("hasAuthority('SCOPE_DELETE_DISTRICT_CONTACT')")

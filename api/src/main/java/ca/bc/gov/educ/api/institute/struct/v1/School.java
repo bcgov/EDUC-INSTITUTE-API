@@ -69,7 +69,7 @@ public class School extends BaseRequest implements Serializable {
 
   private LocalDateTime closedDate;
 
-  private List<Contact> contacts;
+  private List<SchoolContact> contacts;
 
   private List<Address> addresses;
 
