@@ -1,10 +1,8 @@
 package ca.bc.gov.educ.api.institute.struct.v1;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
@@ -15,10 +13,8 @@ import java.time.LocalDateTime;
 /**
  * The type Student.
  */
+@EqualsAndHashCode(callSuper = true)
 @Data
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SchoolContact extends BaseRequest implements Serializable {
   /**

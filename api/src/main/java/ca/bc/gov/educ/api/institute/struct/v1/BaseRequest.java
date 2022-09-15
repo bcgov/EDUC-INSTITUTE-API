@@ -1,9 +1,6 @@
 package ca.bc.gov.educ.api.institute.struct.v1;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 
 import javax.validation.constraints.Null;
 import javax.validation.constraints.Size;
@@ -12,9 +9,6 @@ import javax.validation.constraints.Size;
  * The type Base request.
  */
 @Data
-@SuperBuilder
-@AllArgsConstructor
-@NoArgsConstructor
 public abstract class BaseRequest {
   /**
    * The Create user.

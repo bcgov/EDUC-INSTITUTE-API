@@ -1,19 +1,16 @@
 package ca.bc.gov.educ.api.institute.struct.v1;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
-@SuppressWarnings("squid:S1700")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class SchoolGrade extends BaseRequest implements Serializable {
 
   private static final long serialVersionUID = 6118916290604876032L;
