@@ -24,11 +24,11 @@ TKN=$(curl -s \
   "https://$SOAM_KC/auth/realms/$SOAM_KC_REALM_ID/protocol/openid-connect/token" | jq -r '.access_token')
 
 echo
-echo Writing scope SCOPE_READ_INSTITUTE_CODES
+echo Writing scope READ_INSTITUTE_CODES
 curl -sX POST "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/client-scopes" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TKN" \
-  -d "{\"description\": \"Read scope for institute codes\",\"id\": \"SCOPE_READ_INSTITUTE_CODES\",\"name\": \"SCOPE_READ_INSTITUTE_CODES\",\"protocol\": \"openid-connect\",\"attributes\" : {\"include.in.token.scope\" : \"true\",\"display.on.consent.screen\" : \"false\"}}"
+  -d "{\"description\": \"Read scope for institute codes\",\"id\": \"READ_INSTITUTE_CODES\",\"name\": \"READ_INSTITUTE_CODES\",\"protocol\": \"openid-connect\",\"attributes\" : {\"include.in.token.scope\" : \"true\",\"display.on.consent.screen\" : \"false\"}}"
 
 echo
 echo Writing scope READ_DISTRICT
