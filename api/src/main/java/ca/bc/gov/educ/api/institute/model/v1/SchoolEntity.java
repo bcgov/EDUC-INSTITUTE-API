@@ -31,6 +31,9 @@ public class SchoolEntity {
   @Column(name = "independent_authority_id", columnDefinition = "BINARY(16)")
   private UUID independentAuthorityId;
   @Basic
+  @Column(name = "district_id", insertable=false, columnDefinition = "BINARY(16)", updatable = false)
+  private UUID districtID;
+  @Basic
   @Column(name = "school_number")
   private String schoolNumber;
   @Basic
