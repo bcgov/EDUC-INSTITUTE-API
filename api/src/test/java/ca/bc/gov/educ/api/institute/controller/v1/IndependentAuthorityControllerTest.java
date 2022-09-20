@@ -561,27 +561,6 @@ public class IndependentAuthorityControllerTest {
   }
 
   @Test
-  void testReadSchoolPaginated_givenValueDate_ShouldReturnStatusOk() throws Exception {
-    final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_INDEPENDENT_AUTHORITY";
-    final var mockAuthority = oidcLogin().authorities(grantedAuthority);
-
-    var entity = this.independentAuthorityRepository.save(createIndependentAuthorityData());
-    val entitiesFromDB = this.independentAuthorityRepository.findAll();
-    final SearchCriteria criteria = SearchCriteria.builder().key("openedDate").operation(FilterOperation.GREATER_THAN).value(entity.getOpenedDate().minusDays(2).toString()).valueType(ValueType.DATE).build();
-    final List<SearchCriteria> criteriaList = new ArrayList<>();
-    criteriaList.add(criteria);
-    final List<Search> searches = new LinkedList<>();
-    searches.add(Search.builder().searchCriteriaList(criteriaList).build());
-    final ObjectMapper objectMapper = new ObjectMapper();
-    final String criteriaJSON = objectMapper.writeValueAsString(searches);
-    final MvcResult result = this.mockMvc
-      .perform(get(URL.BASE_URL_AUTHORITY + "/paginated").with(mockAuthority).param("searchCriteriaList", criteriaJSON)
-        .contentType(APPLICATION_JSON))
-      .andReturn();
-    this.mockMvc.perform(asyncDispatch(result)).andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$.content", hasSize(1)));
-  }
-
-  @Test
   void testReadStudentPaginated_GivenFirstNameFilter_ShouldReturnStatusOk() throws Exception {
     final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_INDEPENDENT_AUTHORITY";
     final var mockAuthority = oidcLogin().authorities(grantedAuthority);
