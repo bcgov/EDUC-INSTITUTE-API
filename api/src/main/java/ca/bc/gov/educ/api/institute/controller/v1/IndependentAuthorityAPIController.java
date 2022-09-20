@@ -67,7 +67,6 @@ public class IndependentAuthorityAPIController implements IndependentAuthorityAP
 
   private final NotePayloadValidator notePayloadValidator;
 
-  @Getter(AccessLevel.PRIVATE)
   private final AuthoritySearchService authoritySearchService;
 
   @Autowired
