@@ -240,6 +240,33 @@ public class IndependentAuthorityControllerTest {
   }
 
   @Test
+  void testCreateIndependentAuthorityContactExtFields_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
+    final IndependentAuthorityEntity independentAuthorityEntity = this.independentAuthorityRepository.save(this.createIndependentAuthorityData());
+    AuthorityContactEntity contactEntity = createContactData(independentAuthorityEntity);
+    contactEntity.setPhoneNumber("9876541234");
+    contactEntity.setPhoneExtension("321");
+    contactEntity.setAlternatePhoneNumber("1234567891");
+    contactEntity.setAlternatePhoneExtension("123");
+    contactEntity.setJobTitle("Painter");
+    contactEntity.setPubliclyAvailable(true);
+
+    this.mockMvc.perform(post(URL.BASE_URL_AUTHORITY + "/" + independentAuthorityEntity.getIndependentAuthorityId() + "/contact")
+        .contentType(MediaType.APPLICATION_JSON)
+        .accept(MediaType.APPLICATION_JSON)
+        .content(asJsonString(contactEntity))
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_INDEPENDENT_AUTHORITY_CONTACT"))))
+      .andDo(print())
+      .andExpect(status().isCreated())
+      .andExpect(MockMvcResultMatchers.jsonPath("$.lastName").value(contactEntity.getLastName().toUpperCase()))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.phoneNumber").value(contactEntity.getPhoneNumber()))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.jobTitle").value(contactEntity.getJobTitle().toUpperCase()))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.phoneExtension").value(contactEntity.getPhoneExtension()))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.alternatePhoneNumber").value(contactEntity.getAlternatePhoneNumber()))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.alternatePhoneExtension").value(contactEntity.getAlternatePhoneExtension()))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.publiclyAvailable").value(contactEntity.isPubliclyAvailable()));
+  }
+
+  @Test
   void testCreateIndependentAuthorityContact_GivenInvalidPayload_ShouldReturnStatusCreated() throws Exception {
     final IndependentAuthorityEntity independentAuthorityEntity = this.independentAuthorityRepository.save(this.createIndependentAuthorityData());
     AuthorityContactEntity contactEntity = createContactData(independentAuthorityEntity);
