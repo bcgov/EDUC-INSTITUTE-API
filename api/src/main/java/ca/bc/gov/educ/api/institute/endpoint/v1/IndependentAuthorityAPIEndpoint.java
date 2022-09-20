@@ -6,7 +6,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 import static org.springframework.http.HttpStatus.CREATED;
 
@@ -149,5 +152,15 @@ public interface IndependentAuthorityAPIEndpoint {
   @Tag(name = "Independent Authority Note Entity", description = "Endpoints for independent authority note entity.")
   ResponseEntity<Void> deleteIndependentAuthorityNote(@PathVariable UUID independentAuthorityId, @PathVariable UUID noteId);
 
+  @GetMapping("/paginated")
+  @Async
+  @PreAuthorize("hasAuthority('SCOPE_READ_INDEPENDENT_AUTHORITY')")
+  @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR.")})
+  @Transactional(readOnly = true)
+  @Tag(name = "Independent Authority Entity", description = "Endpoints for school entity.")
+  CompletableFuture<Page<IndependentAuthority>> findAll(@RequestParam(name = "pageNumber", defaultValue = "0") Integer pageNumber,
+                                          @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
+                                          @RequestParam(name = "sort", defaultValue = "") String sortCriteriaJson,
+                                          @RequestParam(name = "searchCriteriaList", required = false) String searchCriteriaListJson);
 
 }

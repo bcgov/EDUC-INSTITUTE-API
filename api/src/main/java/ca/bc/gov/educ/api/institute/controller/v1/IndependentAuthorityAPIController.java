@@ -8,9 +8,12 @@ import ca.bc.gov.educ.api.institute.mapper.v1.AddressMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.AuthorityContactMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.IndependentAuthorityMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.NoteMapper;
+import ca.bc.gov.educ.api.institute.model.v1.IndependentAuthorityEntity;
+import ca.bc.gov.educ.api.institute.service.v1.AuthoritySearchService;
 import ca.bc.gov.educ.api.institute.service.v1.IndependentAuthorityHistoryService;
 import ca.bc.gov.educ.api.institute.service.v1.IndependentAuthorityService;
 import ca.bc.gov.educ.api.institute.struct.v1.*;
+import ca.bc.gov.educ.api.institute.util.JsonUtil;
 import ca.bc.gov.educ.api.institute.util.RequestUtil;
 import ca.bc.gov.educ.api.institute.validator.AddressPayloadValidator;
 import ca.bc.gov.educ.api.institute.validator.AuthorityContactPayloadValidator;
@@ -21,14 +24,19 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -59,14 +67,18 @@ public class IndependentAuthorityAPIController implements IndependentAuthorityAP
 
   private final NotePayloadValidator notePayloadValidator;
 
+  @Getter(AccessLevel.PRIVATE)
+  private final AuthoritySearchService authoritySearchService;
+
   @Autowired
-  public IndependentAuthorityAPIController(final IndependentAuthorityService independentAuthorityService, final IndependentAuthorityHistoryService independentAuthorityHistoryService, final IndependentAuthorityPayloadValidator payloadValidator, AuthorityContactPayloadValidator authorityContactPayloadValidator, AddressPayloadValidator addressPayloadValidator, NotePayloadValidator notePayloadValidator) {
+  public IndependentAuthorityAPIController(final IndependentAuthorityService independentAuthorityService, final IndependentAuthorityHistoryService independentAuthorityHistoryService, final IndependentAuthorityPayloadValidator payloadValidator, AuthorityContactPayloadValidator authorityContactPayloadValidator, AddressPayloadValidator addressPayloadValidator, NotePayloadValidator notePayloadValidator, AuthoritySearchService authoritySearchService) {
     this.independentAuthorityService = independentAuthorityService;
     this.independentAuthorityHistoryService = independentAuthorityHistoryService;
     this.payloadValidator = payloadValidator;
     this.authorityContactPayloadValidator = authorityContactPayloadValidator;
     this.addressPayloadValidator = addressPayloadValidator;
     this.notePayloadValidator = notePayloadValidator;
+    this.authoritySearchService = authoritySearchService;
   }
 
   @Override
@@ -211,5 +223,12 @@ public class IndependentAuthorityAPIController implements IndependentAuthorityAP
   public ResponseEntity<Void> deleteIndependentAuthorityNote(UUID independentAuthorityId, UUID noteId) {
     this.independentAuthorityService.deleteIndependentAuthorityNote(independentAuthorityId, noteId);
     return ResponseEntity.noContent().build();
+  }
+
+  @Override
+  public CompletableFuture<Page<IndependentAuthority>> findAll(Integer pageNumber, Integer pageSize, String sortCriteriaJson, String searchCriteriaListJson) {
+    final List<Sort.Order> sorts = new ArrayList<>();
+    Specification<IndependentAuthorityEntity> studentSpecs = authoritySearchService.setSpecificationAndSortCriteria(sortCriteriaJson, searchCriteriaListJson, JsonUtil.mapper, sorts);
+    return this.authoritySearchService.findAll(studentSpecs, pageNumber, pageSize, sorts).thenApplyAsync(schoolEntities -> schoolEntities.map(mapper::toStructure));
   }
 }

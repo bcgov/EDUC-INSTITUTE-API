@@ -2,13 +2,18 @@ package ca.bc.gov.educ.api.institute.controller.v1;
 
 import ca.bc.gov.educ.api.institute.InstituteApiResourceApplication;
 import ca.bc.gov.educ.api.institute.constants.v1.URL;
+import ca.bc.gov.educ.api.institute.filter.FilterOperation;
 import ca.bc.gov.educ.api.institute.mapper.v1.CodeTableMapper;
 import ca.bc.gov.educ.api.institute.model.v1.*;
 import ca.bc.gov.educ.api.institute.repository.v1.*;
 import ca.bc.gov.educ.api.institute.service.v1.CodeTableService;
+import ca.bc.gov.educ.api.institute.struct.v1.Search;
+import ca.bc.gov.educ.api.institute.struct.v1.SearchCriteria;
+import ca.bc.gov.educ.api.institute.struct.v1.ValueType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import lombok.val;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,15 +28,22 @@ import org.springframework.http.MediaType;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.UUID;
 
+import static org.hamcrest.Matchers.hasSize;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.oidcLogin;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(classes = { InstituteApiResourceApplication.class })
@@ -486,6 +498,48 @@ public class IndependentAuthorityControllerTest {
       .andDo(print())
       .andExpect(status().isOk())
       .andExpect(MockMvcResultMatchers.jsonPath("$.content").value(note.getContent()));
+  }
+
+  @Test
+  void testReadSchoolPaginated_givenValueNull_ShouldReturnStatusOk() throws Exception {
+    final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_INDEPENDENT_AUTHORITY";
+    final var mockAuthority = oidcLogin().authorities(grantedAuthority);
+
+    this.independentAuthorityRepository.save(createIndependentAuthorityData());
+    val entitiesFromDB = this.independentAuthorityRepository.findAll();
+    final SearchCriteria criteria = SearchCriteria.builder().key("phoneNumber").operation(FilterOperation.EQUAL).value(null).valueType(ValueType.STRING).build();
+    final List<SearchCriteria> criteriaList = new ArrayList<>();
+    criteriaList.add(criteria);
+    final List<Search> searches = new LinkedList<>();
+    searches.add(Search.builder().searchCriteriaList(criteriaList).build());
+    final ObjectMapper objectMapper = new ObjectMapper();
+    final String criteriaJSON = objectMapper.writeValueAsString(searches);
+    this.mockMvc.perform(get(URL.BASE_URL_AUTHORITY + "/paginated").with(mockAuthority).param("searchCriteriaList", criteriaJSON)
+      .contentType(APPLICATION_JSON)).andDo(print()).andExpect(status().isOk());
+  }
+
+  @Test
+  void testReadStudentPaginated_GivenFirstNameFilter_ShouldReturnStatusOk() throws Exception {
+    final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_INDEPENDENT_AUTHORITY";
+    final var mockAuthority = oidcLogin().authorities(grantedAuthority);
+
+    final SearchCriteria criteria = SearchCriteria.builder().key("displayName").operation(FilterOperation.EQUAL).value("School Name").valueType(ValueType.STRING).build();
+    final List<SearchCriteria> criteriaList = new ArrayList<>();
+    criteriaList.add(criteria);
+    final List<Search> searches = new LinkedList<>();
+    searches.add(Search.builder().searchCriteriaList(criteriaList).build());
+    final ObjectMapper objectMapper = new ObjectMapper();
+    final IndependentAuthorityEntity authority = this.independentAuthorityRepository.save(this.createIndependentAuthorityData());
+    final String criteriaJSON = objectMapper.writeValueAsString(searches);
+    var authorityData = createIndependentAuthorityData();
+    authorityData.setDisplayName("SCHOOL NAME");
+    this.independentAuthorityRepository.save(authorityData);
+
+    final MvcResult result = this.mockMvc
+      .perform(get(URL.BASE_URL_AUTHORITY + "/paginated").with(mockAuthority).param("searchCriteriaList", criteriaJSON)
+        .contentType(APPLICATION_JSON))
+      .andReturn();
+    this.mockMvc.perform(asyncDispatch(result)).andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$.content", hasSize(1)));
   }
 
   private IndependentAuthorityEntity createIndependentAuthorityData() {
