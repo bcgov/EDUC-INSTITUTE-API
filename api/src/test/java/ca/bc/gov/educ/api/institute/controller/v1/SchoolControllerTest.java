@@ -622,31 +622,6 @@ public class SchoolControllerTest {
   }
 
   @Test
-  void testReadStudentPaginated_GivenFirstNameFilter_ShouldReturnStatusOk() throws Exception {
-    final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_SCHOOL";
-    final var mockAuthority = oidcLogin().authorities(grantedAuthority);
-
-    final SearchCriteria criteria = SearchCriteria.builder().key("displayName").operation(FilterOperation.EQUAL).value("School Name").valueType(ValueType.STRING).build();
-    final List<SearchCriteria> criteriaList = new ArrayList<>();
-    criteriaList.add(criteria);
-    final List<Search> searches = new LinkedList<>();
-    searches.add(Search.builder().searchCriteriaList(criteriaList).build());
-    final ObjectMapper objectMapper = new ObjectMapper();
-    final DistrictEntity dist = this.districtRepository.save(this.createDistrictData());
-    final String criteriaJSON = objectMapper.writeValueAsString(searches);
-    var schoolData = createSchoolData();
-    schoolData.setDisplayName(schoolData.getDisplayName());
-    schoolData.setDistrictEntity(dist);
-    this.schoolRepository.save(schoolData);
-
-    final MvcResult result = this.mockMvc
-      .perform(get(URL.BASE_URL_SCHOOL + "/paginated").with(mockAuthority).param("searchCriteriaList", criteriaJSON)
-        .contentType(APPLICATION_JSON))
-      .andReturn();
-    this.mockMvc.perform(asyncDispatch(result)).andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$.content", hasSize(1)));
-  }
-
-  @Test
   void testReadStudentPaginated_GivenSchoolNameFilter_ShouldReturnStatusOk() throws Exception {
     final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_SCHOOL";
     final var mockAuthority = oidcLogin().authorities(grantedAuthority);
