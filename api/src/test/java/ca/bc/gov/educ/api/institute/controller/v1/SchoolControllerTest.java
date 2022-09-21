@@ -632,7 +632,7 @@ public class SchoolControllerTest {
     var schoolData = createSchoolData();
     schoolData.setDistrictEntity(dist);
     this.schoolRepository.save(schoolData);
-    final SearchCriteria criteria = SearchCriteria.builder().key("displayName").operation(FilterOperation.EQUAL).value(schoolData.getDisplayName().toLowerCase()).valueType(ValueType.STRING).build();
+    final SearchCriteria criteria = SearchCriteria.builder().key("displayName").operation(FilterOperation.EQUAL).value(schoolData.getDisplayName()).valueType(ValueType.STRING).build();
     final List<SearchCriteria> criteriaList = new ArrayList<>();
     criteriaList.add(criteria);
     final List<Search> searches = new LinkedList<>();

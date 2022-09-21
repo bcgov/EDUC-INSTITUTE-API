@@ -86,7 +86,7 @@ public class AuthoritySearchService {
       for (SearchCriteria criteria : criteriaList) {
         if (criteria.getKey() != null && criteria.getOperation() != null && criteria.getValueType() != null) {
           var criteriaValue = criteria.getValue();
-          if(StringUtils.isNotBlank(criteria.getValue()) && (TransformUtil.isUppercaseSearchField(SchoolEntity.class, criteria.getKey()) || TransformUtil.isUppercaseField(SchoolEntity.class, criteria.getKey()))) {
+          if(StringUtils.isNotBlank(criteria.getValue()) && TransformUtil.isUppercaseField(SchoolEntity.class, criteria.getKey())) {
             criteriaValue = criteriaValue.toUpperCase();
           }
           Specification<IndependentAuthorityEntity> typeSpecification = getTypeSpecification(criteria.getKey(), criteria.getOperation(), criteriaValue, criteria.getValueType());

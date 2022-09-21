@@ -1,10 +1,8 @@
 package ca.bc.gov.educ.api.institute.model.v1;
 
 import ca.bc.gov.educ.api.institute.util.UpperCase;
-import ca.bc.gov.educ.api.institute.util.UpperCaseSearch;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
-import org.hibernate.annotations.ColumnTransformer;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -37,18 +35,12 @@ public class DistrictEntity {
   private String phoneNumber;
   @Basic
   @Column(name = "email")
-  @ColumnTransformer(read = "UPPER(email)")
-  @UpperCaseSearch
   private String email;
   @Basic
   @Column(name = "website")
-  @ColumnTransformer(read = "UPPER(website)")
-  @UpperCaseSearch
   private String website;
   @Basic
   @Column(name = "display_name")
-  @ColumnTransformer(read = "UPPER(display_name)")
-  @UpperCaseSearch
   private String displayName;
   @Basic
   @Column(name = "district_region_code")
