@@ -203,7 +203,7 @@ public class IndependentAuthorityControllerTest {
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_INDEPENDENT_AUTHORITY"))))
       .andDo(print())
       .andExpect(status().isOk())
-      .andExpect(MockMvcResultMatchers.jsonPath("$.displayName").value(entity.getDisplayName().toUpperCase()));
+      .andExpect(MockMvcResultMatchers.jsonPath("$.displayName").value(entity.getDisplayName()));
   }
 
   @Test
@@ -218,7 +218,7 @@ public class IndependentAuthorityControllerTest {
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_INDEPENDENT_AUTHORITY"))))
       .andDo(print())
       .andExpect(status().isCreated())
-      .andExpect(MockMvcResultMatchers.jsonPath("$.displayName").value(independentAuthority.getDisplayName().toUpperCase()));
+      .andExpect(MockMvcResultMatchers.jsonPath("$.displayName").value(independentAuthority.getDisplayName()));
   }
 
 
@@ -249,7 +249,7 @@ public class IndependentAuthorityControllerTest {
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_INDEPENDENT_AUTHORITY_CONTACT"))))
       .andDo(print())
       .andExpect(status().isCreated())
-      .andExpect(MockMvcResultMatchers.jsonPath("$.lastName").value(contactEntity.getLastName().toUpperCase()));
+      .andExpect(MockMvcResultMatchers.jsonPath("$.lastName").value(contactEntity.getLastName()));
   }
 
   @Test
@@ -270,9 +270,9 @@ public class IndependentAuthorityControllerTest {
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_INDEPENDENT_AUTHORITY_CONTACT"))))
       .andDo(print())
       .andExpect(status().isCreated())
-      .andExpect(MockMvcResultMatchers.jsonPath("$.lastName").value(contactEntity.getLastName().toUpperCase()))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.lastName").value(contactEntity.getLastName()))
       .andExpect(MockMvcResultMatchers.jsonPath("$.phoneNumber").value(contactEntity.getPhoneNumber()))
-      .andExpect(MockMvcResultMatchers.jsonPath("$.jobTitle").value(contactEntity.getJobTitle().toUpperCase()))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.jobTitle").value(contactEntity.getJobTitle()))
       .andExpect(MockMvcResultMatchers.jsonPath("$.phoneExtension").value(contactEntity.getPhoneExtension()))
       .andExpect(MockMvcResultMatchers.jsonPath("$.alternatePhoneNumber").value(contactEntity.getAlternatePhoneNumber()))
       .andExpect(MockMvcResultMatchers.jsonPath("$.alternatePhoneExtension").value(contactEntity.getAlternatePhoneExtension()))
@@ -368,7 +368,7 @@ public class IndependentAuthorityControllerTest {
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_INDEPENDENT_AUTHORITY_CONTACT"))))
       .andDo(print())
       .andExpect(status().isOk())
-      .andExpect(MockMvcResultMatchers.jsonPath("$.firstName").value(contact.getFirstName().toUpperCase()));
+      .andExpect(MockMvcResultMatchers.jsonPath("$.firstName").value(contact.getFirstName()));
   }
 
   @Test
@@ -575,7 +575,7 @@ public class IndependentAuthorityControllerTest {
     final IndependentAuthorityEntity authority = this.independentAuthorityRepository.save(this.createIndependentAuthorityData());
     final String criteriaJSON = objectMapper.writeValueAsString(searches);
     var authorityData = createIndependentAuthorityData();
-    authorityData.setDisplayName("SCHOOL NAME");
+    authorityData.setDisplayName("School Name");
     this.independentAuthorityRepository.save(authorityData);
 
     final MvcResult result = this.mockMvc
@@ -603,7 +603,7 @@ public class IndependentAuthorityControllerTest {
 
     final String criteriaJSON = objectMapper.writeValueAsString(searches);
     var authorityData = createIndependentAuthorityData();
-    authorityData.setDisplayName("SCHOOL NAME");
+    authorityData.setDisplayName("School Name");
     this.independentAuthorityRepository.save(authorityData);
 
     final MvcResult result = this.mockMvc

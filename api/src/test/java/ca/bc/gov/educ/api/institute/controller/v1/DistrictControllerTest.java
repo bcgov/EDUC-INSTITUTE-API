@@ -207,7 +207,7 @@ public class DistrictControllerTest {
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_DISTRICT"))))
       .andDo(print())
       .andExpect(status().isOk())
-      .andExpect(MockMvcResultMatchers.jsonPath("$.displayName").value(entity.getDisplayName().toUpperCase()));
+      .andExpect(MockMvcResultMatchers.jsonPath("$.displayName").value(entity.getDisplayName()));
   }
 
   @Test
@@ -222,7 +222,7 @@ public class DistrictControllerTest {
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_DISTRICT"))))
       .andDo(print())
       .andExpect(status().isCreated())
-      .andExpect(MockMvcResultMatchers.jsonPath("$.displayName").value(district.getDisplayName().toUpperCase()));
+      .andExpect(MockMvcResultMatchers.jsonPath("$.displayName").value(district.getDisplayName()));
   }
 
   @Test
@@ -258,9 +258,9 @@ public class DistrictControllerTest {
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_DISTRICT_CONTACT"))))
       .andDo(print())
       .andExpect(status().isCreated())
-      .andExpect(MockMvcResultMatchers.jsonPath("$.lastName").value(contactEntity.getLastName().toUpperCase()))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.lastName").value(contactEntity.getLastName()))
       .andExpect(MockMvcResultMatchers.jsonPath("$.phoneNumber").value(contactEntity.getPhoneNumber()))
-      .andExpect(MockMvcResultMatchers.jsonPath("$.jobTitle").value(contactEntity.getJobTitle().toUpperCase()))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.jobTitle").value(contactEntity.getJobTitle()))
       .andExpect(MockMvcResultMatchers.jsonPath("$.phoneExtension").value(contactEntity.getPhoneExtension()))
       .andExpect(MockMvcResultMatchers.jsonPath("$.alternatePhoneNumber").value(contactEntity.getAlternatePhoneNumber()))
       .andExpect(MockMvcResultMatchers.jsonPath("$.alternatePhoneExtension").value(contactEntity.getAlternatePhoneExtension()))
@@ -279,7 +279,7 @@ public class DistrictControllerTest {
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_DISTRICT_CONTACT"))))
       .andDo(print())
       .andExpect(status().isCreated())
-      .andExpect(MockMvcResultMatchers.jsonPath("$.lastName").value(contactEntity.getLastName().toUpperCase()));
+      .andExpect(MockMvcResultMatchers.jsonPath("$.lastName").value(contactEntity.getLastName()));
   }
 
   @Test
@@ -370,7 +370,7 @@ public class DistrictControllerTest {
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_DISTRICT_CONTACT"))))
       .andDo(print())
       .andExpect(status().isOk())
-      .andExpect(MockMvcResultMatchers.jsonPath("$.firstName").value(contact.getFirstName().toUpperCase()));
+      .andExpect(MockMvcResultMatchers.jsonPath("$.firstName").value(contact.getFirstName()));
   }
 
   @Test

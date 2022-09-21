@@ -252,7 +252,7 @@ public class SchoolControllerTest {
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SCHOOL"))))
       .andDo(print())
       .andExpect(status().isOk())
-      .andExpect(MockMvcResultMatchers.jsonPath("$.displayName").value(entity.getDisplayName().toUpperCase()));
+      .andExpect(MockMvcResultMatchers.jsonPath("$.displayName").value(entity.getDisplayName()));
   }
 
   @Test
@@ -323,7 +323,7 @@ public class SchoolControllerTest {
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SCHOOL"))))
       .andDo(print())
       .andExpect(status().isCreated())
-      .andExpect(MockMvcResultMatchers.jsonPath("$.displayName").value(mappedSchool.getDisplayName().toUpperCase()));
+      .andExpect(MockMvcResultMatchers.jsonPath("$.displayName").value(mappedSchool.getDisplayName()));
   }
 
   @Test
@@ -353,7 +353,7 @@ public class SchoolControllerTest {
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SCHOOL_CONTACT"))))
       .andDo(print())
       .andExpect(status().isCreated())
-      .andExpect(MockMvcResultMatchers.jsonPath("$.lastName").value(contactEntity.getLastName().toUpperCase()));
+      .andExpect(MockMvcResultMatchers.jsonPath("$.lastName").value(contactEntity.getLastName()));
   }
 
   @Test
@@ -374,9 +374,9 @@ public class SchoolControllerTest {
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SCHOOL_CONTACT"))))
       .andDo(print())
       .andExpect(status().isCreated())
-      .andExpect(MockMvcResultMatchers.jsonPath("$.lastName").value(contactEntity.getLastName().toUpperCase()))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.lastName").value(contactEntity.getLastName()))
       .andExpect(MockMvcResultMatchers.jsonPath("$.phoneNumber").value(contactEntity.getPhoneNumber()))
-      .andExpect(MockMvcResultMatchers.jsonPath("$.jobTitle").value(contactEntity.getJobTitle().toUpperCase()))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.jobTitle").value(contactEntity.getJobTitle()))
       .andExpect(MockMvcResultMatchers.jsonPath("$.phoneExtension").value(contactEntity.getPhoneExtension()))
       .andExpect(MockMvcResultMatchers.jsonPath("$.alternatePhoneNumber").value(contactEntity.getAlternatePhoneNumber()))
       .andExpect(MockMvcResultMatchers.jsonPath("$.alternatePhoneExtension").value(contactEntity.getAlternatePhoneExtension()))
@@ -461,7 +461,7 @@ public class SchoolControllerTest {
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SCHOOL_CONTACT"))))
       .andDo(print())
       .andExpect(status().isOk())
-      .andExpect(MockMvcResultMatchers.jsonPath("$.firstName").value(contact.getFirstName().toUpperCase()));
+      .andExpect(MockMvcResultMatchers.jsonPath("$.firstName").value(contact.getFirstName()));
   }
 
   @Test
@@ -638,7 +638,7 @@ public class SchoolControllerTest {
     final DistrictEntity dist = this.districtRepository.save(this.createDistrictData());
     final String criteriaJSON = objectMapper.writeValueAsString(searches);
     var schoolData = createSchoolData();
-    schoolData.setDisplayName(schoolData.getDisplayName().toUpperCase());
+    schoolData.setDisplayName(schoolData.getDisplayName());
     schoolData.setDistrictEntity(dist);
     this.schoolRepository.save(schoolData);
 
