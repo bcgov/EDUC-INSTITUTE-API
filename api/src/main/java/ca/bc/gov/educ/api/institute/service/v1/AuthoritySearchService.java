@@ -5,6 +5,7 @@ import ca.bc.gov.educ.api.institute.exception.InvalidParameterException;
 import ca.bc.gov.educ.api.institute.filter.AuthorityFilterSpecs;
 import ca.bc.gov.educ.api.institute.filter.FilterOperation;
 import ca.bc.gov.educ.api.institute.model.v1.IndependentAuthorityEntity;
+import ca.bc.gov.educ.api.institute.model.v1.SchoolEntity;
 import ca.bc.gov.educ.api.institute.repository.v1.IndependentAuthorityRepository;
 import ca.bc.gov.educ.api.institute.struct.v1.Condition;
 import ca.bc.gov.educ.api.institute.struct.v1.Search;
@@ -85,7 +86,7 @@ public class AuthoritySearchService {
       for (SearchCriteria criteria : criteriaList) {
         if (criteria.getKey() != null && criteria.getOperation() != null && criteria.getValueType() != null) {
           var criteriaValue = criteria.getValue();
-          if(StringUtils.isNotBlank(criteria.getValue()) && TransformUtil.isUppercaseField(IndependentAuthorityEntity.class, criteria.getKey())) {
+          if(StringUtils.isNotBlank(criteria.getValue()) && (TransformUtil.isUppercaseSearchField(SchoolEntity.class, criteria.getKey()) || TransformUtil.isUppercaseField(SchoolEntity.class, criteria.getKey()))) {
             criteriaValue = criteriaValue.toUpperCase();
           }
           Specification<IndependentAuthorityEntity> typeSpecification = getTypeSpecification(criteria.getKey(), criteria.getOperation(), criteriaValue, criteria.getValueType());

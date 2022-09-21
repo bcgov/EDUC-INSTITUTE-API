@@ -34,10 +34,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -625,22 +622,22 @@ public class SchoolControllerTest {
   }
 
   @Test
-  void testReadStudentPaginated_GivenFirstNameFilter_ShouldReturnStatusOk() throws Exception {
+  void testReadStudentPaginated_GivenSchoolNameFilter_ShouldReturnStatusOk() throws Exception {
     final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_SCHOOL";
     final var mockAuthority = oidcLogin().authorities(grantedAuthority);
 
-    final SearchCriteria criteria = SearchCriteria.builder().key("displayName").operation(FilterOperation.EQUAL).value("School Name").valueType(ValueType.STRING).build();
+    final ObjectMapper objectMapper = new ObjectMapper();
+    final DistrictEntity dist = this.districtRepository.save(this.createDistrictData());
+
+    var schoolData = createSchoolData();
+    schoolData.setDistrictEntity(dist);
+    this.schoolRepository.save(schoolData);
+    final SearchCriteria criteria = SearchCriteria.builder().key("displayName").operation(FilterOperation.EQUAL).value(schoolData.getDisplayName().toLowerCase()).valueType(ValueType.STRING).build();
     final List<SearchCriteria> criteriaList = new ArrayList<>();
     criteriaList.add(criteria);
     final List<Search> searches = new LinkedList<>();
     searches.add(Search.builder().searchCriteriaList(criteriaList).build());
-    final ObjectMapper objectMapper = new ObjectMapper();
-    final DistrictEntity dist = this.districtRepository.save(this.createDistrictData());
     final String criteriaJSON = objectMapper.writeValueAsString(searches);
-    var schoolData = createSchoolData();
-    schoolData.setDisplayName(schoolData.getDisplayName());
-    schoolData.setDistrictEntity(dist);
-    this.schoolRepository.save(schoolData);
 
     final MvcResult result = this.mockMvc
       .perform(get(URL.BASE_URL_SCHOOL + "/paginated").with(mockAuthority).param("searchCriteriaList", criteriaJSON)

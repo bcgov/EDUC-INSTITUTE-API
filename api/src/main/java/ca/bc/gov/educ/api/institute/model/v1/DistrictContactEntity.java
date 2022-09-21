@@ -1,11 +1,13 @@
 package ca.bc.gov.educ.api.institute.model.v1;
 
 import ca.bc.gov.educ.api.institute.util.UpperCase;
+import ca.bc.gov.educ.api.institute.util.UpperCaseSearch;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnTransformer;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -34,12 +36,18 @@ public class DistrictContactEntity {
 
   @Basic
   @Column(name = "first_name")
+  @ColumnTransformer(read = "UPPER(first_name)")
+  @UpperCaseSearch
   private String firstName;
   @Basic
   @Column(name = "last_name")
+  @ColumnTransformer(read = "UPPER(last_name)")
+  @UpperCaseSearch
   private String lastName;
   @Basic
   @Column(name = "job_title")
+  @ColumnTransformer(read = "UPPER(job_title)")
+  @UpperCaseSearch
   private String jobTitle;
   @Basic
   @Column(name = "phone_number")
@@ -55,6 +63,8 @@ public class DistrictContactEntity {
   private String alternatePhoneExtension;
   @Basic
   @Column(name = "email")
+  @ColumnTransformer(read = "UPPER(email)")
+  @UpperCaseSearch
   private String email;
   @Column(name = "publicly_avail")
   private boolean publiclyAvailable;

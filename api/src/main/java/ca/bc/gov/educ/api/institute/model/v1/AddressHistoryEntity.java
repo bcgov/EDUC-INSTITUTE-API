@@ -39,18 +39,23 @@ public class AddressHistoryEntity {
   private UUID independentAuthorityId;
   @Basic
   @Column(name = "address_line_1")
+  @UpperCase
   private String addressLine1;
   @Basic
   @Column(name = "address_line_2")
+  @UpperCase
   private String addressLine2;
   @Basic
   @Column(name = "city")
+  @UpperCase
   private String city;
   @Basic
   @Column(name = "postal")
+  @UpperCase
   private String postal;
   @Basic
   @Column(name = "province_code")
+  @UpperCase
   private String provinceCode;
   @Basic
   @Column(name = "country_code")
@@ -58,6 +63,7 @@ public class AddressHistoryEntity {
   private String countryCode;
   @Basic
   @Column(name = "address_type_code")
+  @UpperCase
   private String addressTypeCode;
   @Column(name = "CREATE_USER", updatable = false)
   private String createUser;
