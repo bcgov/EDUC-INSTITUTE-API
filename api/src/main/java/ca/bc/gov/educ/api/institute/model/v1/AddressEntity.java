@@ -40,9 +40,11 @@ public class AddressEntity {
 
   @Basic
   @Column(name = "address_line_1")
+  @UpperCase
   private String addressLine1;
   @Basic
   @Column(name = "address_line_2")
+  @UpperCase
   private String addressLine2;
   @Basic
   @Column(name = "city")

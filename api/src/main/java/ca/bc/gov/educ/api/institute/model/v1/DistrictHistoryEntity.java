@@ -1,10 +1,12 @@
 package ca.bc.gov.educ.api.institute.model.v1;
 
 import ca.bc.gov.educ.api.institute.util.UpperCase;
+import ca.bc.gov.educ.api.institute.util.UpperCaseSearch;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnTransformer;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -39,17 +41,27 @@ public class DistrictHistoryEntity {
   private String phoneNumber;
   @Basic
   @Column(name = "email")
+  @ColumnTransformer(read = "UPPER(email)")
+  @UpperCaseSearch
   private String email;
   @Basic
   @Column(name = "website")
+  @ColumnTransformer(read = "UPPER(website)")
+  @UpperCaseSearch
   private String website;
   @Basic
   @Column(name = "display_name")
+  @ColumnTransformer(read = "UPPER(display_name)")
+  @UpperCaseSearch
   private String displayName;
   @Basic
   @Column(name = "district_region_code")
   @UpperCase
   private String districtRegionCode;
+  @Basic
+  @Column(name = "district_status_code")
+  @UpperCase
+  private String districtStatusCode;
   @Basic
   @Column(name = "opened_date")
   private LocalDateTime openedDate;
