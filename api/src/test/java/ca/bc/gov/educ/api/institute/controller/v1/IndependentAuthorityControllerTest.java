@@ -620,7 +620,7 @@ public class IndependentAuthorityControllerTest {
 
     final IndependentAuthorityEntity authority = this.independentAuthorityRepository.save(this.createIndependentAuthorityData());
 
-    final SearchCriteria criteria = SearchCriteria.builder().key("authorityNumber").operation(FilterOperation.EQUAL).value(authority.getAuthorityNumber()).valueType(ValueType.STRING).build();
+    final SearchCriteria criteria = SearchCriteria.builder().key("displayName").operation(FilterOperation.EQUAL).value(authority.getDisplayName()).valueType(ValueType.STRING).build();
     final SearchCriteria criteria2 = SearchCriteria.builder().key("independentAuthorityId").operation(FilterOperation.EQUAL).value(authority.getIndependentAuthorityId().toString()).valueType(ValueType.UUID).condition(Condition.AND).build();
     final List<SearchCriteria> criteriaList = new ArrayList<>();
     criteriaList.add(criteria);

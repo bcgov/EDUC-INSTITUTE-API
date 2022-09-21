@@ -32,15 +32,12 @@ public class SchoolContactEntity {
 
   @Basic
   @Column(name = "first_name")
-  @UpperCase
   private String firstName;
   @Basic
   @Column(name = "last_name")
-  @UpperCase
   private String lastName;
   @Basic
   @Column(name = "job_title")
-  @UpperCase
   private String jobTitle;
   @Basic
   @Column(name = "phone_number")

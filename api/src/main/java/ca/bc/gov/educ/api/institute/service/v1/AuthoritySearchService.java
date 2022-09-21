@@ -130,15 +130,6 @@ public class AuthoritySearchService {
       case DATE_TIME:
         authorityEntitySpecification = authorityFilterSpecs.getDateTimeTypeSpecification(key, value, filterOperation);
         break;
-      case LONG:
-        authorityEntitySpecification = authorityFilterSpecs.getLongTypeSpecification(key, value, filterOperation);
-        break;
-      case INTEGER:
-        authorityEntitySpecification = authorityFilterSpecs.getIntegerTypeSpecification(key, value, filterOperation);
-        break;
-      case DATE:
-        authorityEntitySpecification = authorityFilterSpecs.getDateTypeSpecification(key, value, filterOperation);
-        break;
       case UUID:
         authorityEntitySpecification = authorityFilterSpecs.getUUIDTypeSpecification(key, value, filterOperation);
         break;
