@@ -48,7 +48,6 @@ public class SchoolTombstoneEntity {
   private String website;
   @Basic
   @Column(name = "display_name")
-  @UpperCase
   private String displayName;
   @Basic
   @Column(name = "school_organization_code")

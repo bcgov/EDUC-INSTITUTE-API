@@ -37,7 +37,6 @@ public class IndependentAuthorityEntity {
   private String email;
   @Basic
   @Column(name = "display_name")
-  @UpperCase
   private String displayName;
   @Basic
   @Column(name = "authority_type_code")

@@ -45,7 +45,6 @@ public class DistrictHistoryEntity {
   private String website;
   @Basic
   @Column(name = "display_name")
-  @UpperCase
   private String displayName;
   @Basic
   @Column(name = "district_region_code")
