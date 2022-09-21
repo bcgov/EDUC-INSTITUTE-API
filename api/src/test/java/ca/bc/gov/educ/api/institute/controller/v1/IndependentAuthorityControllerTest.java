@@ -7,6 +7,7 @@ import ca.bc.gov.educ.api.institute.mapper.v1.CodeTableMapper;
 import ca.bc.gov.educ.api.institute.model.v1.*;
 import ca.bc.gov.educ.api.institute.repository.v1.*;
 import ca.bc.gov.educ.api.institute.service.v1.CodeTableService;
+import ca.bc.gov.educ.api.institute.struct.v1.Condition;
 import ca.bc.gov.educ.api.institute.struct.v1.Search;
 import ca.bc.gov.educ.api.institute.struct.v1.SearchCriteria;
 import ca.bc.gov.educ.api.institute.struct.v1.ValueType;
@@ -576,6 +577,59 @@ public class IndependentAuthorityControllerTest {
     var authorityData = createIndependentAuthorityData();
     authorityData.setDisplayName("SCHOOL NAME");
     this.independentAuthorityRepository.save(authorityData);
+
+    final MvcResult result = this.mockMvc
+      .perform(get(URL.BASE_URL_AUTHORITY + "/paginated").with(mockAuthority).param("searchCriteriaList", criteriaJSON)
+        .contentType(APPLICATION_JSON))
+      .andReturn();
+    this.mockMvc.perform(asyncDispatch(result)).andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$.content", hasSize(1)));
+  }
+
+  @Test
+  void testReadStudentPaginated_GivenFirstNameORCritFilter_ShouldReturnStatusOk() throws Exception {
+    final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_INDEPENDENT_AUTHORITY";
+    final var mockAuthority = oidcLogin().authorities(grantedAuthority);
+
+    final IndependentAuthorityEntity authority = this.independentAuthorityRepository.save(this.createIndependentAuthorityData());
+
+    final SearchCriteria criteria = SearchCriteria.builder().key("displayName").operation(FilterOperation.EQUAL).value("School Name").valueType(ValueType.STRING).build();
+    final SearchCriteria criteria2 = SearchCriteria.builder().key("independentAuthorityId").operation(FilterOperation.EQUAL).value(authority.getIndependentAuthorityId().toString()).valueType(ValueType.UUID).build();
+    final List<SearchCriteria> criteriaList = new ArrayList<>();
+    criteriaList.add(criteria);
+    criteriaList.add(criteria2);
+    final List<Search> searches = new LinkedList<>();
+    searches.add(Search.builder().searchCriteriaList(criteriaList).build());
+    final ObjectMapper objectMapper = new ObjectMapper();
+
+    final String criteriaJSON = objectMapper.writeValueAsString(searches);
+    var authorityData = createIndependentAuthorityData();
+    authorityData.setDisplayName("SCHOOL NAME");
+    this.independentAuthorityRepository.save(authorityData);
+
+    final MvcResult result = this.mockMvc
+      .perform(get(URL.BASE_URL_AUTHORITY + "/paginated").with(mockAuthority).param("searchCriteriaList", criteriaJSON)
+        .contentType(APPLICATION_JSON))
+      .andReturn();
+    this.mockMvc.perform(asyncDispatch(result)).andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$.content", hasSize(2)));
+  }
+
+  @Test
+  void testReadStudentPaginated_GivenFirstNameAndCritFilter_ShouldReturnStatusOk() throws Exception {
+    final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_INDEPENDENT_AUTHORITY";
+    final var mockAuthority = oidcLogin().authorities(grantedAuthority);
+
+    final IndependentAuthorityEntity authority = this.independentAuthorityRepository.save(this.createIndependentAuthorityData());
+
+    final SearchCriteria criteria = SearchCriteria.builder().key("authorityNumber").operation(FilterOperation.EQUAL).value(authority.getAuthorityNumber()).valueType(ValueType.STRING).build();
+    final SearchCriteria criteria2 = SearchCriteria.builder().key("independentAuthorityId").operation(FilterOperation.EQUAL).value(authority.getIndependentAuthorityId().toString()).valueType(ValueType.UUID).condition(Condition.AND).build();
+    final List<SearchCriteria> criteriaList = new ArrayList<>();
+    criteriaList.add(criteria);
+    criteriaList.add(criteria2);
+    final List<Search> searches = new LinkedList<>();
+    searches.add(Search.builder().searchCriteriaList(criteriaList).build());
+    final ObjectMapper objectMapper = new ObjectMapper();
+    final String criteriaJSON = objectMapper.writeValueAsString(searches);
+
 
     final MvcResult result = this.mockMvc
       .perform(get(URL.BASE_URL_AUTHORITY + "/paginated").with(mockAuthority).param("searchCriteriaList", criteriaJSON)
