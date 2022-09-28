@@ -61,7 +61,6 @@ public class School extends BaseRequest implements Serializable {
   @NotNull(message = "facilityTypeCode cannot be null")
   private String facilityTypeCode;
 
-  @NotNull(message = "openedDate cannot be null")
   private LocalDateTime openedDate;
 
   private LocalDateTime closedDate;
