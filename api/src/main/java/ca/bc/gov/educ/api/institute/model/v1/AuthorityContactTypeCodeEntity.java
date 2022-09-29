@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "AUHTORITY_CONTACT_TYPE_CODE")
+@Table(name = "AUTHORITY_CONTACT_TYPE_CODE")
 public class AuthorityContactTypeCodeEntity {
   @Id
   @Column(name = "authority_contact_type_code", unique = true, updatable = false)
