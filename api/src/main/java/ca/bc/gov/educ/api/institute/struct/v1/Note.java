@@ -22,8 +22,6 @@ public class Note extends BaseRequest implements Serializable {
 
   private String noteId;
 
-  private String addressId;
-
   private String schoolId;
 
   private String districtId;
