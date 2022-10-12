@@ -15,10 +15,6 @@ public interface AuthorityContactMapper {
 
   AuthorityContactMapper mapper = Mappers.getMapper(AuthorityContactMapper.class);
 
-  @Mapping(target = "updateUser", ignore = true)
-  @Mapping(target = "updateDate", ignore = true)
-  @Mapping(target = "createUser", ignore = true)
-  @Mapping(target = "createDate", ignore = true)
   AuthorityContactEntity toModel(AuthorityContact structure);
 
   AuthorityContact toStructure(AuthorityContactEntity entity);

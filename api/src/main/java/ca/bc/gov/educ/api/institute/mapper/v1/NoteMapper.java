@@ -15,10 +15,6 @@ public interface NoteMapper {
 
   NoteMapper mapper = Mappers.getMapper(NoteMapper.class);
 
-  @Mapping(target = "updateUser", ignore = true)
-  @Mapping(target = "updateDate", ignore = true)
-  @Mapping(target = "createUser", ignore = true)
-  @Mapping(target = "createDate", ignore = true)
   NoteEntity toModel(Note structure);
 
   Note toStructure(NoteEntity entity);

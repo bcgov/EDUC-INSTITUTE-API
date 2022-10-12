@@ -17,18 +17,12 @@ public interface IndependentAuthorityMapper {
 
   IndependentAuthorityMapper mapper = Mappers.getMapper(IndependentAuthorityMapper.class);
 
-  @Mapping(target = "updateUser", ignore = true)
-  @Mapping(target = "updateDate", ignore = true)
-  @Mapping(target = "createUser", ignore = true)
-  @Mapping(target = "createDate", ignore = true)
+
   IndependentAuthorityEntity toModel(IndependentAuthority structure);
 
   IndependentAuthority toStructure(IndependentAuthorityEntity entity);
 
-  @Mapping(target = "updateUser", ignore = true)
-  @Mapping(target = "updateDate", ignore = true)
-  @Mapping(target = "createUser", ignore = true)
-  @Mapping(target = "createDate", ignore = true)
+
   IndependentAuthorityHistoryEntity toModel(IndependentAuthorityHistory structure);
 
   IndependentAuthorityHistory toStructure(IndependentAuthorityHistoryEntity entity);

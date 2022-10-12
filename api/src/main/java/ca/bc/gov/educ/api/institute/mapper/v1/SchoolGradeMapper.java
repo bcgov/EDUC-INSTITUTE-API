@@ -15,10 +15,6 @@ public interface SchoolGradeMapper {
 
   SchoolGradeMapper mapper = Mappers.getMapper(SchoolGradeMapper.class);
 
-  @Mapping(target = "updateUser", ignore = true)
-  @Mapping(target = "updateDate", ignore = true)
-  @Mapping(target = "createUser", ignore = true)
-  @Mapping(target = "createDate", ignore = true)
   SchoolGradeEntity toModel(SchoolGrade structure);
 
   SchoolGrade toStructure(SchoolGradeEntity entity);

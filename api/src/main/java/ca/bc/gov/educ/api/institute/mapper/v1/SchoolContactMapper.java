@@ -15,10 +15,6 @@ public interface SchoolContactMapper {
 
   SchoolContactMapper mapper = Mappers.getMapper(SchoolContactMapper.class);
 
-  @Mapping(target = "updateUser", ignore = true)
-  @Mapping(target = "updateDate", ignore = true)
-  @Mapping(target = "createUser", ignore = true)
-  @Mapping(target = "createDate", ignore = true)
   SchoolContactEntity toModel(SchoolContact structure);
 
   SchoolContact toStructure(SchoolContactEntity entity);
