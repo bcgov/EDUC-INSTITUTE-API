@@ -1,15 +1,14 @@
 package ca.bc.gov.educ.api.institute.model.v1;
 
 import ca.bc.gov.educ.api.institute.util.UpperCase;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import javax.validation.constraints.PastOrPresent;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Data
@@ -80,4 +79,28 @@ public class SchoolHistoryEntity {
   @PastOrPresent
   @Column(name = "update_date")
   private LocalDateTime updateDate;
+
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
+  @OneToMany(mappedBy = "schoolHistoryEntity", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = SchoolGradeSchoolHistoryEntity.class)
+  private Set<SchoolGradeSchoolHistoryEntity> schoolGrades;
+
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
+  @OneToMany(mappedBy = "schoolHistoryEntity", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = NeighborhoodLearningEntity.class)
+  private Set<NeighbourhoodLearningSchoolHistoryEntity> neighbourhoodLearnings;
+
+  public Set<SchoolGradeSchoolHistoryEntity> getSchoolGrades() {
+    if (this.schoolGrades == null) {
+      this.schoolGrades = new HashSet<>();
+    }
+    return this.schoolGrades;
+  }
+
+  public Set<NeighbourhoodLearningSchoolHistoryEntity> getNeighbourhoodLearnings() {
+    if (this.neighbourhoodLearnings == null) {
+      this.neighbourhoodLearnings = new HashSet<>();
+    }
+    return this.neighbourhoodLearnings;
+  }
 }
