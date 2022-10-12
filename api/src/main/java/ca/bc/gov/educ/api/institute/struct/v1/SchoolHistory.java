@@ -9,6 +9,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -64,5 +65,9 @@ public class SchoolHistory extends BaseRequest implements Serializable {
   private LocalDateTime openedDate;
 
   private LocalDateTime closedDate;
+
+  private List<SchoolGradeSchoolHistory> schoolGrades;
+
+  private List<NeighbourhoodLearningSchoolHistory> neighbourhoodLearnings;
 
 }
