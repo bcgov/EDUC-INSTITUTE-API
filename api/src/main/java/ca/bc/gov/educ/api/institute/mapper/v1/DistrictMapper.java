@@ -11,7 +11,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
-@Mapper(uses = {UUIDMapper.class, LocalDateTimeMapper.class, StringMapper.class, DistrictContactMapper.class, SchoolGradeMapper.class, NeighborhoodLearningMapper.class})
+@Mapper(uses = {UUIDMapper.class, LocalDateTimeMapper.class, StringMapper.class, DistrictContactMapper.class, SchoolGradeMapper.class, NeighborhoodLearningMapper.class, NoteMapper.class})
 @SuppressWarnings("squid:S1214")
 public interface DistrictMapper {
 

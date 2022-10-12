@@ -57,5 +57,5 @@ public class District extends BaseRequest implements Serializable {
 
   private List<Address> addresses;
 
-  private List<Address> notes;
+  private List<Note> notes;
 }
