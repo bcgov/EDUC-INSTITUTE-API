@@ -87,7 +87,7 @@ public class SchoolHistoryEntity {
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  @OneToMany(mappedBy = "schoolHistoryEntity", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = NeighborhoodLearningEntity.class)
+  @OneToMany(mappedBy = "schoolHistoryEntity", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = NeighbourhoodLearningSchoolHistoryEntity.class)
   private Set<NeighbourhoodLearningSchoolHistoryEntity> neighbourhoodLearnings;
 
   public Set<SchoolGradeSchoolHistoryEntity> getSchoolGrades() {
