@@ -15,10 +15,6 @@ public interface AddressMapper {
 
   AddressMapper mapper = Mappers.getMapper(AddressMapper.class);
 
-  @Mapping(target = "updateUser", ignore = true)
-  @Mapping(target = "updateDate", ignore = true)
-  @Mapping(target = "createUser", ignore = true)
-  @Mapping(target = "createDate", ignore = true)
   AddressEntity toModel(Address structure);
 
   Address toStructure(AddressEntity entity);

@@ -22,7 +22,6 @@ public interface SchoolMapper {
 
   SchoolMapper mapper = Mappers.getMapper(SchoolMapper.class);
 
-
   SchoolEntity toModel(School structure);
 
   @Mapping(target = "districtId", source = "districtEntity.districtId")

@@ -15,10 +15,7 @@ public interface NeighborhoodLearningMapper {
 
   NeighborhoodLearningMapper mapper = Mappers.getMapper(NeighborhoodLearningMapper.class);
 
-  @Mapping(target = "updateUser", ignore = true)
-  @Mapping(target = "updateDate", ignore = true)
-  @Mapping(target = "createUser", ignore = true)
-  @Mapping(target = "createDate", ignore = true)
+
   NeighborhoodLearningEntity toModel(NeighborhoodLearning structure);
 
   NeighborhoodLearning toStructure(NeighborhoodLearningEntity entity);

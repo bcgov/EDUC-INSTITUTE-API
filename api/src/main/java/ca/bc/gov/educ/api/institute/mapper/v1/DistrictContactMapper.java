@@ -15,10 +15,7 @@ public interface DistrictContactMapper {
 
   DistrictContactMapper mapper = Mappers.getMapper(DistrictContactMapper.class);
 
-  @Mapping(target = "updateUser", ignore = true)
-  @Mapping(target = "updateDate", ignore = true)
-  @Mapping(target = "createUser", ignore = true)
-  @Mapping(target = "createDate", ignore = true)
+
   DistrictContactEntity toModel(DistrictContact structure);
 
   DistrictContact toStructure(DistrictContactEntity entity);

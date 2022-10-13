@@ -15,10 +15,6 @@ public interface SchoolTombstoneMapper {
 
   SchoolTombstoneMapper mapper = Mappers.getMapper(SchoolTombstoneMapper.class);
 
-  @Mapping(target = "updateUser", ignore = true)
-  @Mapping(target = "updateDate", ignore = true)
-  @Mapping(target = "createUser", ignore = true)
-  @Mapping(target = "createDate", ignore = true)
   SchoolTombstoneEntity toModel(SchoolTombstone structure);
 
   @Mapping(target = "districtId", source = "districtEntity.districtId")

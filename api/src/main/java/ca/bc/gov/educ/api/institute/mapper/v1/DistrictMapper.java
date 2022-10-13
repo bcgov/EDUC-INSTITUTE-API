@@ -17,18 +17,12 @@ public interface DistrictMapper {
 
   DistrictMapper mapper = Mappers.getMapper(DistrictMapper.class);
 
-  @Mapping(target = "updateUser", ignore = true)
-  @Mapping(target = "updateDate", ignore = true)
-  @Mapping(target = "createUser", ignore = true)
-  @Mapping(target = "createDate", ignore = true)
+
   DistrictEntity toModel(District structure);
 
   District toStructure(DistrictEntity entity);
 
-  @Mapping(target = "updateUser", ignore = true)
-  @Mapping(target = "updateDate", ignore = true)
-  @Mapping(target = "createUser", ignore = true)
-  @Mapping(target = "createDate", ignore = true)
+
   DistrictHistoryEntity toModel(DistrictHistory structure);
 
   DistrictHistory toStructure(DistrictHistoryEntity entity);
