@@ -1,10 +1,11 @@
 package ca.bc.gov.educ.api.institute.model.v1;
+
 import ca.bc.gov.educ.api.institute.util.UpperCase;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -24,16 +25,16 @@ public class SchoolGradeSchoolHistoryEntity {
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator", parameters = {
             @org.hibernate.annotations.Parameter(name = "uuid_gen_strategy_class", value = "org.hibernate.id.uuid.CustomVersionOneStrategy")})
-    @Column(name = "school_grade_history_id", unique = true, updatable = false, columnDefinition = "BINARY(16)")
+    @Column(name = "SCHOOL_GRADE_HISTORY_ID", unique = true, updatable = false, columnDefinition = "BINARY(16)")
     private UUID schoolGradeHistoryId;
 
-    @ManyToOne(optional = true, targetEntity = SchoolHistoryEntity.class)
-    @JoinColumn(name = "school_history_id", referencedColumnName = "school_history_id")
-    @JsonIgnoreProperties("schoolGrades")
+    @ManyToOne(optional = false, targetEntity = SchoolHistoryEntity.class)
+    @Cascade(org.hibernate.annotations.CascadeType.ALL)
+    @JoinColumn(name = "SCHOOL_HISTORY_ID", referencedColumnName = "SCHOOL_HISTORY_ID")
     SchoolHistoryEntity schoolHistoryEntity;
 
     @Basic
-    @Column(name = "school_grade_code")
+    @Column(name = "SCHOOL_GRADE_CODE")
     @UpperCase
     private String schoolGradeCode;
 
@@ -44,11 +45,11 @@ public class SchoolGradeSchoolHistoryEntity {
     @Column(name = "CREATE_DATE", updatable = false)
     private LocalDateTime createDate;
 
-    @Column(name = "update_user")
+    @Column(name = "UPDATE_USER")
     private String updateUser;
 
     @PastOrPresent
-    @Column(name = "update_date")
+    @Column(name = "UPDATE_DATE")
     private LocalDateTime updateDate;
 
 }
