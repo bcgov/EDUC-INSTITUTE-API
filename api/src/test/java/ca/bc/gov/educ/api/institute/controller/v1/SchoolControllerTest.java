@@ -8,10 +8,8 @@ import ca.bc.gov.educ.api.institute.mapper.v1.SchoolMapper;
 import ca.bc.gov.educ.api.institute.model.v1.*;
 import ca.bc.gov.educ.api.institute.repository.v1.*;
 import ca.bc.gov.educ.api.institute.service.v1.CodeTableService;
-import ca.bc.gov.educ.api.institute.struct.v1.School;
-import ca.bc.gov.educ.api.institute.struct.v1.Search;
-import ca.bc.gov.educ.api.institute.struct.v1.SearchCriteria;
-import ca.bc.gov.educ.api.institute.struct.v1.ValueType;
+import ca.bc.gov.educ.api.institute.struct.v1.*;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -32,6 +30,10 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import static org.hamcrest.Matchers.*;
+import static org.hamcrest.core.IsNull.notNullValue;
+
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -49,7 +51,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
 public class SchoolControllerTest {
-
+  protected final static ObjectMapper objectMapper = new ObjectMapper();
   private static final CodeTableMapper mapper = CodeTableMapper.mapper;
 
   private static final SchoolMapper schoolMapper = SchoolMapper.mapper;
@@ -646,10 +648,47 @@ public class SchoolControllerTest {
     this.mockMvc.perform(asyncDispatch(result)).andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$.content", hasSize(1)));
   }
 
+  @Test
+  void testCreateSchoolWithGradeAndNeighbourhoodLearning_GivenValidData_SchoolHistoryShouldBeCreatedWithGradeCodeAndNeighbourhoodLearningDataAndShouldReturnStatusOK() throws Exception {
+    var schoolEntity = this.createSchoolData();
+    final SchoolEntity entity = this.schoolRepository.save(schoolEntity);
+    final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_SCHOOL";
+    final var mockAuthority = oidcLogin().authorities(grantedAuthority);
+    val resultActions = this.mockMvc.perform(get(URL.BASE_URL_SCHOOL).with(mockAuthority))
+      .andDo(print()).andExpect(status().isOk()).andExpect(MockMvcResultMatchers.jsonPath("$.[0].schoolId")
+        .value(entity.getSchoolId().toString()));
+
+    val schools = objectMapper.readValue(resultActions.andReturn().getResponse().getContentAsByteArray(), new TypeReference<List<School>>() {
+    });
+    val school = schools.get(0);
+    school.setCreateDate(null);
+    school.setUpdateDate(null);
+    school.setGrades(List.of(createSchoolGrade(school.getSchoolId())));
+    school.setNeighborhoodLearning(List.of(createNeighborhoodLearning(school.getSchoolId())));
+
+    String updatedSchool = asJsonString(school);
+    this.mockMvc.perform(put(URL.BASE_URL_SCHOOL + "/" + entity.getSchoolId())
+        .contentType(MediaType.APPLICATION_JSON)
+        .accept(MediaType.APPLICATION_JSON)
+        .content(updatedSchool)
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SCHOOL"))))
+      .andDo(print())
+      .andExpect(status().isOk())
+      .andExpect(MockMvcResultMatchers.jsonPath("$.displayName").value(entity.getDisplayName()));
+
+    this.mockMvc.perform(get(URL.BASE_URL_SCHOOL + "/" + entity.getSchoolId() + "/history")
+        .with(mockAuthority))
+      .andDo(print()).andExpect(status().isOk())
+      .andExpect(jsonPath("$.[0].schoolId").value(entity.getSchoolId().toString()))
+      .andExpect(jsonPath("$.[0].schoolGrades.[0]", is(notNullValue())))
+      .andExpect(jsonPath("$.[0].neighbourhoodLearnings.[0]", is(notNullValue())));
+
+  }
+
   private SchoolEntity createSchoolData() {
-    return SchoolEntity.builder().schoolNumber("12345").displayName("School Name").openedDate(LocalDateTime.now().minusDays(1)).schoolCategoryCode("PUB_SCHL")
-      .schoolOrganizationCode("TWO_SEM").facilityTypeCode("STAND_SCHL").website("abc@sd99.edu").createDate(LocalDateTime.now())
-      .updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
+    return SchoolEntity.builder().schoolNumber("12345").displayName("School Name").openedDate(LocalDateTime.now().minusDays(1).withNano(0)).schoolCategoryCode("PUB_SCHL")
+      .schoolOrganizationCode("TWO_SEM").facilityTypeCode("STAND_SCHL").website("abc@sd99.edu").createDate(LocalDateTime.now().withNano(0))
+      .updateDate(LocalDateTime.now().withNano(0)).createUser("TEST").updateUser("TEST").build();
   }
 
   private SchoolHistoryEntity createHistorySchoolData(UUID schoolId) {
@@ -697,6 +736,25 @@ public class SchoolControllerTest {
 
   private SchoolGradeEntity createSchoolGradeData(SchoolEntity entity) {
     return SchoolGradeEntity.builder().schoolEntity(entity).schoolGradeCode("01").createUser("TEST").updateUser("TEST").build();
+  }
+
+  private SchoolGrade createSchoolGrade(String schoolId) {
+    SchoolGrade schoolGrade = new SchoolGrade();
+    schoolGrade.setSchoolGradeCode("01");
+    schoolGrade.setSchoolId(schoolId);
+    schoolGrade.setCreateUser("TEST");
+    schoolGrade.setUpdateUser("TEST");
+    schoolGrade.setCreateDate(String.valueOf(LocalDateTime.now()));
+    return schoolGrade;
+  }
+  private NeighborhoodLearning createNeighborhoodLearning(String schoolId) {
+    NeighborhoodLearning neighborhoodLearning = new NeighborhoodLearning();
+    neighborhoodLearning.setSchoolId(schoolId);
+    neighborhoodLearning.setNeighborhoodLearningTypeCode("COMM_USE");
+    neighborhoodLearning.setCreateUser("TEST");
+    neighborhoodLearning.setUpdateUser("TEST");
+    neighborhoodLearning.setCreateDate(String.valueOf(LocalDateTime.now()));
+    return neighborhoodLearning;
   }
 
   private NeighborhoodLearningEntity createNeighborhoodLearningData(SchoolEntity entity) {
