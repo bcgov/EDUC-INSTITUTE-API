@@ -25,7 +25,7 @@ public class School extends BaseRequest implements Serializable {
   private static final long serialVersionUID = 1L;
 
   private String schoolId;
-
+  @NotNull(message = "districtId can not be null.")
   private String districtId;
 
   private String mincode;
