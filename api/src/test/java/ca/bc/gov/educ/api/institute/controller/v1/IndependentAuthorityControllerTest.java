@@ -4,6 +4,7 @@ import ca.bc.gov.educ.api.institute.InstituteApiResourceApplication;
 import ca.bc.gov.educ.api.institute.constants.v1.URL;
 import ca.bc.gov.educ.api.institute.filter.FilterOperation;
 import ca.bc.gov.educ.api.institute.mapper.v1.CodeTableMapper;
+import ca.bc.gov.educ.api.institute.mapper.v1.IndependentAuthorityMapper;
 import ca.bc.gov.educ.api.institute.model.v1.*;
 import ca.bc.gov.educ.api.institute.repository.v1.*;
 import ca.bc.gov.educ.api.institute.service.v1.CodeTableService;
@@ -136,6 +137,23 @@ public class IndependentAuthorityControllerTest {
   }
 
   @Test
+  void testRetrieveIndependentAuthorityWithAddress_GivenValidID_ShouldReturnStatusOK() throws Exception {
+    final IndependentAuthorityEntity entity = this.independentAuthorityRepository.save(this.createIndependentAuthorityData());
+    entity.getAddresses().add(this.createIndependentAuthorityAddressData(entity));
+    entity.setCreateDate(null);
+    entity.setUpdateDate(null);
+    this.mockMvc.perform(put(URL.BASE_URL_AUTHORITY + "/" + entity.getIndependentAuthorityId())
+        .contentType(MediaType.APPLICATION_JSON)
+        .accept(MediaType.APPLICATION_JSON)
+        .content(asJsonString(entity))
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_INDEPENDENT_AUTHORITY"))))
+      .andDo(print())
+      .andExpect(status().isOk())
+      .andExpect(MockMvcResultMatchers.jsonPath("$.addresses.[0].addressLine1")
+        .value(entity.getAddresses().iterator().next().getAddressLine1()));
+  }
+
+  @Test
   void testRetrieveIndependentAuthority_GivenInvalidID_ShouldReturnStatusNotFound() throws Exception {
     final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_INDEPENDENT_AUTHORITY";
     final var mockAuthority = oidcLogin().authorities(grantedAuthority);
@@ -204,6 +222,47 @@ public class IndependentAuthorityControllerTest {
       .andDo(print())
       .andExpect(status().isOk())
       .andExpect(MockMvcResultMatchers.jsonPath("$.displayName").value(entity.getDisplayName()));
+  }
+
+  @Test
+  void testUpdateIndependentAuthorityWithAddress_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
+    final var independentAuthority = this.createIndependentAuthorityData();
+    var entity = this.independentAuthorityRepository.save(independentAuthority);
+    entity.setDisplayName("newdist");
+    entity.setCreateDate(null);
+    entity.setUpdateDate(null);
+    entity.getAddresses().add(this.createIndependentAuthorityAddressData(independentAuthority));
+
+    this.mockMvc.perform(put(URL.BASE_URL_AUTHORITY + "/" + entity.getIndependentAuthorityId())
+        .contentType(MediaType.APPLICATION_JSON)
+        .accept(MediaType.APPLICATION_JSON)
+        .content(asJsonString(entity))
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_INDEPENDENT_AUTHORITY"))))
+      .andDo(print())
+      .andExpect(status().isOk())
+      .andExpect(MockMvcResultMatchers.jsonPath("$.displayName").value(entity.getDisplayName()));
+
+    entity = this.independentAuthorityRepository.findById(independentAuthority.getIndependentAuthorityId()).get();
+    var addr = this.createIndependentAuthorityAddressData(independentAuthority);
+    addr.setAddressLine1("123 TESTING");
+    entity.getAddresses().iterator().next().setAddressLine1("123 TESTING");
+    entity.getAddresses().add(addr);
+
+    IndependentAuthorityMapper mapper = IndependentAuthorityMapper.mapper;
+
+    var auth = mapper.toStructure(entity);
+
+    auth.setCreateDate(null);
+    auth.setUpdateDate(null);
+
+    this.mockMvc.perform(put(URL.BASE_URL_AUTHORITY + "/" + entity.getIndependentAuthorityId())
+        .contentType(MediaType.APPLICATION_JSON)
+        .accept(MediaType.APPLICATION_JSON)
+        .content(asJsonString(auth))
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_INDEPENDENT_AUTHORITY"))))
+      .andDo(print())
+      .andExpect(status().isOk())
+      .andExpect(MockMvcResultMatchers.jsonPath("$.addresses.[1].addressLine1").value("123 TESTING"));
   }
 
   @Test
@@ -641,6 +700,11 @@ public class IndependentAuthorityControllerTest {
   private IndependentAuthorityEntity createIndependentAuthorityData() {
     return IndependentAuthorityEntity.builder().authorityNumber("003").displayName("IndependentAuthority Name").openedDate(LocalDateTime.now().minusDays(1))
       .authorityTypeCode("INDEPEND").createDate(LocalDateTime.now()).updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
+  }
+
+  private AddressEntity createIndependentAuthorityAddressData(IndependentAuthorityEntity indAuth) {
+    return AddressEntity.builder().independentAuthorityEntity(null).addressLine1("Line 1").city("City").provinceCode("BC").countryCode("CA").postal("V1V1V2").addressTypeCode("MAILING")
+      .createDate(LocalDateTime.now()).updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
   }
 
   private IndependentAuthorityHistoryEntity createHistoryIndependentAuthorityData(UUID independentAuthorityId) {

@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -35,6 +36,7 @@ public class AddressEntity {
   DistrictEntity districtEntity;
 
   @ManyToOne(optional = true, targetEntity = IndependentAuthorityEntity.class)
+  @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
   @JoinColumn(name = "independent_authority_id", referencedColumnName = "independent_authority_id")
   IndependentAuthorityEntity independentAuthorityEntity;
 
@@ -76,4 +78,18 @@ public class AddressEntity {
   @PastOrPresent
   @Column(name = "update_date")
   private LocalDateTime updateDate;
+
+  @PreRemove
+  public void preRemove() {
+    if(this.independentAuthorityEntity != null) {
+      this.independentAuthorityEntity.getAddresses().remove(this);
+      this.independentAuthorityEntity = null;
+    }else if(this.schoolEntity != null) {
+      this.schoolEntity.getAddresses().remove(this);
+      this.schoolEntity = null;
+    } else if(this.districtEntity != null) {
+      this.districtEntity.getAddresses().remove(this);
+      this.districtEntity = null;
+    }
+  }
 }
