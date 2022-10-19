@@ -106,7 +106,14 @@ public class DistrictService {
 
     if (curDistrictEntityOptional.isPresent()) {
       final DistrictEntity currentDistrictEntity = curDistrictEntityOptional.get();
-      BeanUtils.copyProperties(district, currentDistrictEntity, CREATE_DATE, CREATE_USER); // update current student entity with incoming payload ignoring the fields.
+      BeanUtils.copyProperties(district, currentDistrictEntity, CREATE_DATE, CREATE_USER, "addresses"); // update current student entity with incoming payload ignoring the fields.
+      currentDistrictEntity.getAddresses().clear();
+
+      for(AddressEntity address: district.getAddresses()){
+        address.setDistrictEntity(currentDistrictEntity);
+        currentDistrictEntity.getAddresses().add(address);
+      }
+
       TransformUtil.uppercaseFields(currentDistrictEntity); // convert the input to upper case.
       districtHistoryService.createDistrictHistory(currentDistrictEntity, currentDistrictEntity.getUpdateUser(), false);
       districtRepository.save(currentDistrictEntity);

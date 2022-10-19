@@ -28,10 +28,12 @@ public class AddressEntity {
   private UUID addressId;
 
   @ManyToOne(optional = true, targetEntity = SchoolEntity.class)
+  @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
   @JoinColumn(name = "school_id", referencedColumnName = "school_id")
   SchoolEntity schoolEntity;
 
   @ManyToOne(optional = true, targetEntity = DistrictEntity.class)
+  @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
   @JoinColumn(name = "district_id", referencedColumnName = "district_id")
   DistrictEntity districtEntity;
 

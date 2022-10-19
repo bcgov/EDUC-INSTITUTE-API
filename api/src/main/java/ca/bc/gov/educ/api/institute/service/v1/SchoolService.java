@@ -101,13 +101,20 @@ public class SchoolService {
 
     if (curSchoolEntityOptional.isPresent()) {
       final SchoolEntity currentSchoolEntity = curSchoolEntityOptional.get();
-      BeanUtils.copyProperties(school, currentSchoolEntity, CREATE_DATE, CREATE_USER, "grades", "neighborhoodLearning", "districtEntity"); // update current student entity with incoming payload ignoring the fields.
+      BeanUtils.copyProperties(school, currentSchoolEntity, CREATE_DATE, CREATE_USER, "grades", "neighborhoodLearning", "districtEntity", "addresses"); // update current student entity with incoming payload ignoring the fields.
 
       currentSchoolEntity.getGrades().clear();
       currentSchoolEntity.getNeighborhoodLearning().clear();
 
       currentSchoolEntity.getGrades().addAll(school.getGrades());
       currentSchoolEntity.getNeighborhoodLearning().addAll(school.getNeighborhoodLearning());
+
+      currentSchoolEntity.getAddresses().clear();
+
+      for(AddressEntity address: school.getAddresses()){
+        address.setSchoolEntity(currentSchoolEntity);
+        currentSchoolEntity.getAddresses().add(address);
+      }
 
       TransformUtil.uppercaseFields(currentSchoolEntity); // convert the input to upper case.
       schoolHistoryService.createSchoolHistory(currentSchoolEntity, currentSchoolEntity.getUpdateUser(), false);
