@@ -11,6 +11,7 @@ import ca.bc.gov.educ.api.institute.struct.v1.Address;
 import ca.bc.gov.educ.api.institute.struct.v1.Note;
 import ca.bc.gov.educ.api.institute.struct.v1.School;
 import ca.bc.gov.educ.api.institute.struct.v1.SchoolContact;
+import ca.bc.gov.educ.api.institute.model.v1.DistrictEntity;
 import ca.bc.gov.educ.api.institute.util.RequestUtil;
 import ca.bc.gov.educ.api.institute.util.TransformUtil;
 import lombok.AccessLevel;
@@ -55,8 +56,10 @@ public class SchoolService {
 
   private final NoteRepository noteRepository;
 
+  private final DistrictRepository districtRepository;
+
   @Autowired
-  public SchoolService(SchoolRepository schoolRepository, SchoolTombstoneRepository schoolTombstoneRepository, SchoolHistoryService schoolHistoryService, AddressHistoryService addressHistoryService, SchoolContactRepository schoolContactRepository, AddressRepository addressRepository, NoteRepository noteRepository) {
+  public SchoolService(SchoolRepository schoolRepository, SchoolTombstoneRepository schoolTombstoneRepository, SchoolHistoryService schoolHistoryService, AddressHistoryService addressHistoryService, SchoolContactRepository schoolContactRepository, AddressRepository addressRepository, NoteRepository noteRepository, DistrictRepository districtRepository) {
     this.schoolRepository = schoolRepository;
     this.schoolTombstoneRepository = schoolTombstoneRepository;
     this.schoolHistoryService = schoolHistoryService;
@@ -64,6 +67,7 @@ public class SchoolService {
     this.schoolContactRepository = schoolContactRepository;
     this.addressRepository = addressRepository;
     this.noteRepository = noteRepository;
+    this.districtRepository = districtRepository;
   }
 
   public List<SchoolTombstoneEntity> getAllSchoolsList() {
@@ -77,6 +81,8 @@ public class SchoolService {
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public SchoolEntity createSchool(School school) {
     var schoolEntity = SchoolMapper.mapper.toModel(school);
+    Optional<DistrictEntity> district = districtRepository.findById(UUID.fromString(school.getDistrictId()));
+    schoolEntity.setDistrictEntity(district.get());
     TransformUtil.uppercaseFields(schoolEntity);
     schoolRepository.save(schoolEntity);
     schoolHistoryService.createSchoolHistory(schoolEntity, school.getCreateUser(), false);
