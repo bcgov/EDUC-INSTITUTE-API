@@ -211,6 +211,25 @@ public class DistrictControllerTest {
   }
 
   @Test
+  void testUpdateDistrictWithAddress_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
+    final var district = this.createDistrictData();
+    var entity = this.districtRepository.save(district);
+    entity.getAddresses().add(this.createDistrictAddressData());
+    entity.setDisplayName("newdist");
+    entity.setCreateDate(null);
+    entity.setUpdateDate(null);
+
+    this.mockMvc.perform(put(URL.BASE_URL_DISTRICT + "/" + entity.getDistrictId())
+        .contentType(MediaType.APPLICATION_JSON)
+        .accept(MediaType.APPLICATION_JSON)
+        .content(asJsonString(entity))
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_DISTRICT"))))
+      .andDo(print())
+      .andExpect(status().isOk())
+      .andExpect(MockMvcResultMatchers.jsonPath("$.displayName").value(entity.getDisplayName()));
+  }
+
+  @Test
   void testCreateDistrict_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
     final var district = this.createDistrictData();
     district.setCreateDate(null);
@@ -567,6 +586,11 @@ public class DistrictControllerTest {
     return ProvinceCodeEntity.builder().provinceCode("BC").description("British Columbia")
       .effectiveDate(LocalDateTime.now()).expiryDate(LocalDateTime.MAX).displayOrder(1).label("British Columbia").createDate(LocalDateTime.now())
       .updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
+  }
+
+  private AddressEntity createDistrictAddressData() {
+    return AddressEntity.builder().independentAuthorityEntity(null).addressLine1("Line 1").city("City").provinceCode("BC").countryCode("CA").postal("V1V1V2").addressTypeCode("MAILING")
+      .createDate(LocalDateTime.now()).updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
   }
 
   private CountryCodeEntity createCountryCodeData() {

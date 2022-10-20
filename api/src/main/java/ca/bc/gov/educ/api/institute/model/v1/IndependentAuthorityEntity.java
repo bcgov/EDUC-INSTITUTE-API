@@ -7,6 +7,7 @@ import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.*;
 import javax.validation.constraints.PastOrPresent;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -65,8 +66,15 @@ public class IndependentAuthorityEntity {
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  @OneToMany(mappedBy = "independentAuthorityEntity", fetch = FetchType.EAGER, cascade = CascadeType.DETACH, targetEntity = AddressEntity.class)
+  @OneToMany(mappedBy = "independentAuthorityEntity", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = AddressEntity.class)
   private Set<AddressEntity> addresses;
+
+  public Set<AddressEntity> getAddresses() {
+    if(this.addresses== null){
+      this.addresses = new HashSet<>();
+    }
+    return this.addresses;
+  }
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude

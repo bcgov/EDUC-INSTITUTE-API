@@ -106,7 +106,15 @@ public class IndependentAuthorityService {
 
     if (curIndependentAuthorityEntityOptional.isPresent()) {
       final IndependentAuthorityEntity currentIndependentAuthorityEntity = curIndependentAuthorityEntityOptional.get();
-      BeanUtils.copyProperties(independentAuthority, currentIndependentAuthorityEntity, CREATE_DATE, CREATE_USER); // update current student entity with incoming payload ignoring the fields.
+      BeanUtils.copyProperties(independentAuthority, currentIndependentAuthorityEntity, CREATE_DATE, CREATE_USER, "addresses"); // update current student entity with incoming payload ignoring the fields.
+
+      currentIndependentAuthorityEntity.getAddresses().clear();
+
+      for(AddressEntity address: independentAuthority.getAddresses()){
+        address.setIndependentAuthorityEntity(currentIndependentAuthorityEntity);
+        currentIndependentAuthorityEntity.getAddresses().add(address);
+      }
+
       TransformUtil.uppercaseFields(currentIndependentAuthorityEntity); // convert the input to upper case.
       independentAuthorityHistoryService.createIndependentAuthorityHistory(currentIndependentAuthorityEntity, currentIndependentAuthorityEntity.getUpdateUser(), false);
       independentAuthorityRepository.save(currentIndependentAuthorityEntity);
