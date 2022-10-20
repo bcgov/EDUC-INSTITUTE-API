@@ -137,9 +137,9 @@ public class IndependentAuthorityControllerTest {
   }
 
   @Test
-  void testRetrieveIndependentAuthorityWithAddress_GivenValidID_ShouldReturnStatusOK() throws Exception {
+  void testUpdateIndependentAuthorityWithAddress_GivenValidID_ShouldReturnStatusOK() throws Exception {
     final IndependentAuthorityEntity entity = this.independentAuthorityRepository.save(this.createIndependentAuthorityData());
-    entity.getAddresses().add(this.createIndependentAuthorityAddressData(entity));
+    entity.getAddresses().add(this.createIndependentAuthorityAddressData());
     entity.setCreateDate(null);
     entity.setUpdateDate(null);
     this.mockMvc.perform(put(URL.BASE_URL_AUTHORITY + "/" + entity.getIndependentAuthorityId())
@@ -160,7 +160,6 @@ public class IndependentAuthorityControllerTest {
     this.mockMvc.perform(get(URL.BASE_URL_AUTHORITY + "/" + UUID.randomUUID()).with(mockAuthority))
       .andDo(print()).andExpect(status().isNotFound());
   }
-
 
   @Test
   void testRetrieveIndependentAuthorityHistory_GivenValidID_ShouldReturnStatusOK() throws Exception {
@@ -231,7 +230,7 @@ public class IndependentAuthorityControllerTest {
     entity.setDisplayName("newdist");
     entity.setCreateDate(null);
     entity.setUpdateDate(null);
-    entity.getAddresses().add(this.createIndependentAuthorityAddressData(independentAuthority));
+    entity.getAddresses().add(this.createIndependentAuthorityAddressData());
 
     this.mockMvc.perform(put(URL.BASE_URL_AUTHORITY + "/" + entity.getIndependentAuthorityId())
         .contentType(MediaType.APPLICATION_JSON)
@@ -243,7 +242,7 @@ public class IndependentAuthorityControllerTest {
       .andExpect(MockMvcResultMatchers.jsonPath("$.displayName").value(entity.getDisplayName()));
 
     entity = this.independentAuthorityRepository.findById(independentAuthority.getIndependentAuthorityId()).get();
-    var addr = this.createIndependentAuthorityAddressData(independentAuthority);
+    var addr = this.createIndependentAuthorityAddressData();
     addr.setAddressLine1("123 TESTING");
     entity.getAddresses().iterator().next().setAddressLine1("123 TESTING");
     entity.getAddresses().add(addr);
@@ -702,7 +701,7 @@ public class IndependentAuthorityControllerTest {
       .authorityTypeCode("INDEPEND").createDate(LocalDateTime.now()).updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
   }
 
-  private AddressEntity createIndependentAuthorityAddressData(IndependentAuthorityEntity indAuth) {
+  private AddressEntity createIndependentAuthorityAddressData() {
     return AddressEntity.builder().independentAuthorityEntity(null).addressLine1("Line 1").city("City").provinceCode("BC").countryCode("CA").postal("V1V1V2").addressTypeCode("MAILING")
       .createDate(LocalDateTime.now()).updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
   }
