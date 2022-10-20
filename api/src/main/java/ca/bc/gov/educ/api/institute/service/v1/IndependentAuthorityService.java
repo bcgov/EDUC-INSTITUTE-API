@@ -9,6 +9,7 @@ import ca.bc.gov.educ.api.institute.model.v1.AddressEntity;
 import ca.bc.gov.educ.api.institute.model.v1.AuthorityContactEntity;
 import ca.bc.gov.educ.api.institute.model.v1.IndependentAuthorityEntity;
 import ca.bc.gov.educ.api.institute.model.v1.NoteEntity;
+import ca.bc.gov.educ.api.institute.properties.ApplicationProperties;
 import ca.bc.gov.educ.api.institute.repository.v1.AddressRepository;
 import ca.bc.gov.educ.api.institute.repository.v1.AuthorityContactRepository;
 import ca.bc.gov.educ.api.institute.repository.v1.IndependentAuthorityRepository;
@@ -17,16 +18,19 @@ import ca.bc.gov.educ.api.institute.struct.v1.Address;
 import ca.bc.gov.educ.api.institute.struct.v1.AuthorityContact;
 import ca.bc.gov.educ.api.institute.struct.v1.IndependentAuthority;
 import ca.bc.gov.educ.api.institute.struct.v1.Note;
+import ca.bc.gov.educ.api.institute.util.RequestUtil;
 import ca.bc.gov.educ.api.institute.util.TransformUtil;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.val;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -112,6 +116,7 @@ public class IndependentAuthorityService {
 
       for(AddressEntity address: independentAuthority.getAddresses()){
         address.setIndependentAuthorityEntity(currentIndependentAuthorityEntity);
+        RequestUtil.setAuditColumnsForAddress(address);
         currentIndependentAuthorityEntity.getAddresses().add(address);
       }
 

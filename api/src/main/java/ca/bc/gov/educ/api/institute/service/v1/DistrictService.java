@@ -17,6 +17,7 @@ import ca.bc.gov.educ.api.institute.struct.v1.Address;
 import ca.bc.gov.educ.api.institute.struct.v1.District;
 import ca.bc.gov.educ.api.institute.struct.v1.DistrictContact;
 import ca.bc.gov.educ.api.institute.struct.v1.Note;
+import ca.bc.gov.educ.api.institute.util.RequestUtil;
 import ca.bc.gov.educ.api.institute.util.TransformUtil;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -111,6 +112,7 @@ public class DistrictService {
 
       for(AddressEntity address: district.getAddresses()){
         address.setDistrictEntity(currentDistrictEntity);
+        RequestUtil.setAuditColumnsForAddress(address);
         currentDistrictEntity.getAddresses().add(address);
       }
 

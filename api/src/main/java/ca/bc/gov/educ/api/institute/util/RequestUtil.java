@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.institute.util;
 
+import ca.bc.gov.educ.api.institute.model.v1.AddressEntity;
 import ca.bc.gov.educ.api.institute.properties.ApplicationProperties;
 import ca.bc.gov.educ.api.institute.struct.v1.BaseRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -43,6 +44,23 @@ public class RequestUtil {
       baseRequest.setUpdateUser(ApplicationProperties.INSTITUTE_API);
     }
     baseRequest.setUpdateDate(LocalDateTime.now().toString());
+  }
+
+  public static void setAuditColumnsForAddress(@NotNull AddressEntity address) {
+    if(address.getCreateDate() == null) {
+      if (StringUtils.isBlank(address.getCreateUser())) {
+        address.setCreateUser(ApplicationProperties.INSTITUTE_API);
+      }
+      address.setCreateDate(LocalDateTime.now());
+    }
+    setAuditColumnsForAddressUpdate(address);
+  }
+
+  private static void setAuditColumnsForAddressUpdate(@NotNull AddressEntity address) {
+    if (StringUtils.isBlank(address.getUpdateUser())) {
+      address.setUpdateUser(ApplicationProperties.INSTITUTE_API);
+    }
+    address.setUpdateDate(LocalDateTime.now());
   }
 
   /**

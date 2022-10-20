@@ -11,6 +11,7 @@ import ca.bc.gov.educ.api.institute.struct.v1.Address;
 import ca.bc.gov.educ.api.institute.struct.v1.Note;
 import ca.bc.gov.educ.api.institute.struct.v1.School;
 import ca.bc.gov.educ.api.institute.struct.v1.SchoolContact;
+import ca.bc.gov.educ.api.institute.util.RequestUtil;
 import ca.bc.gov.educ.api.institute.util.TransformUtil;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -113,6 +114,7 @@ public class SchoolService {
 
       for(AddressEntity address: school.getAddresses()){
         address.setSchoolEntity(currentSchoolEntity);
+        RequestUtil.setAuditColumnsForAddress(address);
         currentSchoolEntity.getAddresses().add(address);
       }
 
