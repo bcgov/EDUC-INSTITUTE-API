@@ -82,7 +82,9 @@ public class SchoolService {
   public SchoolEntity createSchool(School school) {
     var schoolEntity = SchoolMapper.mapper.toModel(school);
     Optional<DistrictEntity> district = districtRepository.findById(UUID.fromString(school.getDistrictId()));
-    schoolEntity.setDistrictEntity(district.get());
+    if(!district.isEmpty()) {
+      schoolEntity.setDistrictEntity(district.get());
+    }
     TransformUtil.uppercaseFields(schoolEntity);
     schoolRepository.save(schoolEntity);
     schoolHistoryService.createSchoolHistory(schoolEntity, school.getCreateUser(), false);
