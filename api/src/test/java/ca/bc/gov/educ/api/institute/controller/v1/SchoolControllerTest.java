@@ -4,6 +4,7 @@ import ca.bc.gov.educ.api.institute.InstituteApiResourceApplication;
 import ca.bc.gov.educ.api.institute.constants.v1.URL;
 import ca.bc.gov.educ.api.institute.filter.FilterOperation;
 import ca.bc.gov.educ.api.institute.mapper.v1.CodeTableMapper;
+import ca.bc.gov.educ.api.institute.mapper.v1.IndependentAuthorityMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.SchoolMapper;
 import ca.bc.gov.educ.api.institute.model.v1.*;
 import ca.bc.gov.educ.api.institute.repository.v1.*;
@@ -277,7 +278,7 @@ public class SchoolControllerTest {
     final DistrictEntity dist = this.districtRepository.save(this.createDistrictData());
     var schoolEntity = this.createSchoolData();
     schoolEntity.setDistrictEntity(dist);
-    final SchoolEntity entity = this.schoolRepository.save(schoolEntity);
+    SchoolEntity entity = this.schoolRepository.save(schoolEntity);
     entity.getAddresses().add(this.createSchoolAddressData());
     entity.setDisplayName("newdist");
     entity.setCreateDate(null);
@@ -294,6 +295,28 @@ public class SchoolControllerTest {
       .andDo(print())
       .andExpect(status().isOk())
       .andExpect(MockMvcResultMatchers.jsonPath("$.displayName").value(entity.getDisplayName()));
+
+    entity = this.schoolRepository.findById(entity.getSchoolId()).get();
+    var addr = this.createSchoolAddressData();
+    addr.setAddressLine1("123 TESTING");
+    entity.getAddresses().iterator().next().setAddressLine1("123 TESTING");
+    entity.getAddresses().add(addr);
+
+    SchoolMapper mapper = SchoolMapper.mapper;
+
+    var auth = mapper.toStructure(entity);
+
+    auth.setCreateDate(null);
+    auth.setUpdateDate(null);
+
+    this.mockMvc.perform(put(URL.BASE_URL_SCHOOL + "/" + entity.getSchoolId())
+        .contentType(MediaType.APPLICATION_JSON)
+        .accept(MediaType.APPLICATION_JSON)
+        .content(asJsonString(auth))
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SCHOOL"))))
+      .andDo(print())
+      .andExpect(status().isOk())
+      .andExpect(MockMvcResultMatchers.jsonPath("$.addresses.[1].addressLine1").value("123 TESTING"));
   }
 
   @Test
@@ -584,6 +607,8 @@ public class SchoolControllerTest {
       .andExpect(status().isOk())
       .andExpect(MockMvcResultMatchers.jsonPath("$.city").value(address.getCity().toUpperCase()));
   }
+
+
 
   @Test
   void testCreateSchoolNote_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {

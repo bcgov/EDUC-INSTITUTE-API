@@ -17,6 +17,7 @@ import ca.bc.gov.educ.api.institute.struct.v1.Address;
 import ca.bc.gov.educ.api.institute.struct.v1.District;
 import ca.bc.gov.educ.api.institute.struct.v1.DistrictContact;
 import ca.bc.gov.educ.api.institute.struct.v1.Note;
+import ca.bc.gov.educ.api.institute.util.BeanComparatorUtil;
 import ca.bc.gov.educ.api.institute.util.RequestUtil;
 import ca.bc.gov.educ.api.institute.util.TransformUtil;
 import lombok.AccessLevel;
@@ -28,9 +29,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class DistrictService {
@@ -108,12 +108,30 @@ public class DistrictService {
     if (curDistrictEntityOptional.isPresent()) {
       final DistrictEntity currentDistrictEntity = curDistrictEntityOptional.get();
       BeanUtils.copyProperties(district, currentDistrictEntity, CREATE_DATE, CREATE_USER, "addresses"); // update current student entity with incoming payload ignoring the fields.
+      Set<AddressEntity> addresses = new HashSet<>(currentDistrictEntity.getAddresses());
       currentDistrictEntity.getAddresses().clear();
 
       for(AddressEntity address: district.getAddresses()){
-        address.setDistrictEntity(currentDistrictEntity);
-        RequestUtil.setAuditColumnsForAddress(address);
-        currentDistrictEntity.getAddresses().add(address);
+        if(address.getAddressId() == null){
+          RequestUtil.setAuditColumnsForAddress(address);
+          address.setDistrictEntity(currentDistrictEntity);
+          TransformUtil.uppercaseFields(address);
+          currentDistrictEntity.getAddresses().add(address);
+          addressHistoryService.createAddressHistory(address, address.getUpdateUser(), false);
+        }else{
+          var currAddress = addresses.stream().filter(addy -> addy.getAddressId().equals(address.getAddressId())).collect(Collectors.toList()).get(0);
+          if(!BeanComparatorUtil.compare(address, currAddress)){
+            address.setCreateDate(currentDistrictEntity.getCreateDate());
+            address.setCreateUser(currentDistrictEntity.getCreateUser());
+            RequestUtil.setAuditColumnsForAddress(address);
+            TransformUtil.uppercaseFields(address);
+            address.setDistrictEntity(currentDistrictEntity);
+            currentDistrictEntity.getAddresses().add(address);
+            addressHistoryService.createAddressHistory(address, address.getUpdateUser(), false);
+          }else{
+            currentDistrictEntity.getAddresses().add(currAddress);
+          }
+        }
       }
 
       TransformUtil.uppercaseFields(currentDistrictEntity); // convert the input to upper case.

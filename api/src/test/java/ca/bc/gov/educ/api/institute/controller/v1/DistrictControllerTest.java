@@ -3,6 +3,8 @@ package ca.bc.gov.educ.api.institute.controller.v1;
 import ca.bc.gov.educ.api.institute.InstituteApiResourceApplication;
 import ca.bc.gov.educ.api.institute.constants.v1.URL;
 import ca.bc.gov.educ.api.institute.mapper.v1.CodeTableMapper;
+import ca.bc.gov.educ.api.institute.mapper.v1.DistrictMapper;
+import ca.bc.gov.educ.api.institute.mapper.v1.SchoolMapper;
 import ca.bc.gov.educ.api.institute.model.v1.*;
 import ca.bc.gov.educ.api.institute.repository.v1.*;
 import ca.bc.gov.educ.api.institute.service.v1.CodeTableService;
@@ -227,6 +229,28 @@ public class DistrictControllerTest {
       .andDo(print())
       .andExpect(status().isOk())
       .andExpect(MockMvcResultMatchers.jsonPath("$.displayName").value(entity.getDisplayName()));
+
+    entity = this.districtRepository.findById(entity.getDistrictId()).get();
+    var addr = this.createDistrictAddressData();
+    addr.setAddressLine1("123 TESTING");
+    entity.getAddresses().iterator().next().setAddressLine1("123 TESTING");
+    entity.getAddresses().add(addr);
+
+    DistrictMapper mapper = DistrictMapper.mapper;
+
+    var auth = mapper.toStructure(entity);
+
+    auth.setCreateDate(null);
+    auth.setUpdateDate(null);
+
+    this.mockMvc.perform(put(URL.BASE_URL_DISTRICT + "/" + entity.getDistrictId())
+        .contentType(MediaType.APPLICATION_JSON)
+        .accept(MediaType.APPLICATION_JSON)
+        .content(asJsonString(auth))
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_DISTRICT"))))
+      .andDo(print())
+      .andExpect(status().isOk())
+      .andExpect(MockMvcResultMatchers.jsonPath("$.addresses.[1].addressLine1").value("123 TESTING"));
   }
 
   @Test

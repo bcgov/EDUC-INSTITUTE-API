@@ -1,8 +1,10 @@
 package ca.bc.gov.educ.api.institute.validator;
 
+import ca.bc.gov.educ.api.institute.model.v1.DistrictEntity;
 import ca.bc.gov.educ.api.institute.model.v1.FacilityTypeCodeEntity;
 import ca.bc.gov.educ.api.institute.model.v1.SchoolCategoryCodeEntity;
 import ca.bc.gov.educ.api.institute.model.v1.SchoolOrganizationCodeEntity;
+import ca.bc.gov.educ.api.institute.repository.v1.DistrictRepository;
 import ca.bc.gov.educ.api.institute.service.v1.CodeTableService;
 import ca.bc.gov.educ.api.institute.service.v1.SchoolService;
 import ca.bc.gov.educ.api.institute.struct.v1.School;
@@ -16,6 +18,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 
 @Component
@@ -24,6 +27,7 @@ public class SchoolPayloadValidator {
   public static final String SCHOOL_ORGANIZATION_CODE = "schoolOrganizationCode";
   public static final String SCHOOL_CATEGORY_CODE = "schoolCategoryCode";
   public static final String FACILITY_TYPE_CODE = "facilityTypeCode";
+  public static final String DISTRICT_ID = "districtID";
 
   @Getter(AccessLevel.PRIVATE)
   private final SchoolService schoolService;
@@ -31,10 +35,13 @@ public class SchoolPayloadValidator {
   @Getter(AccessLevel.PRIVATE)
   private final CodeTableService codeTableService;
 
+  private final DistrictRepository districtRepository;
+
   @Autowired
-  public SchoolPayloadValidator(final SchoolService schoolService, final CodeTableService codeTableService) {
+  public SchoolPayloadValidator(final SchoolService schoolService, final CodeTableService codeTableService, DistrictRepository districtRepository) {
     this.schoolService = schoolService;
     this.codeTableService = codeTableService;
+    this.districtRepository = districtRepository;
   }
 
   public List<FieldError> validatePayload(School school, boolean isCreateOperation) {
@@ -42,10 +49,18 @@ public class SchoolPayloadValidator {
     if (isCreateOperation && school.getSchoolId() != null) {
       apiValidationErrors.add(createFieldError("schoolId", school.getSchoolId(), "schoolId should be null for post operation."));
     }
+    validateDistrict(school, apiValidationErrors);
     validateSchoolOrganizationCode(school, apiValidationErrors);
     validateSchoolCategoryCode(school, apiValidationErrors);
     validateFacilityTypeCode(school, apiValidationErrors);
     return apiValidationErrors;
+  }
+
+  private void validateDistrict(School school, List<FieldError> apiValidationErrors){
+    Optional<DistrictEntity> district = districtRepository.findById(UUID.fromString(school.getDistrictId()));
+    if(district.isEmpty()) {
+      apiValidationErrors.add(createFieldError(DISTRICT_ID, school.getDistrictId(), "Invalid district ID."));
+    }
   }
 
   public List<FieldError> validateUpdatePayload(School school) {
