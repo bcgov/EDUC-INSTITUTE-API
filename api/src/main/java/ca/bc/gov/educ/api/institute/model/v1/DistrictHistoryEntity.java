@@ -54,12 +54,6 @@ public class DistrictHistoryEntity {
   @Column(name = "district_status_code")
   @UpperCase
   private String districtStatusCode;
-  @Basic
-  @Column(name = "opened_date")
-  private LocalDateTime openedDate;
-  @Basic
-  @Column(name = "closed_date")
-  private LocalDateTime closedDate;
   @Column(name = "CREATE_USER", updatable = false)
   private String createUser;
   @PastOrPresent
