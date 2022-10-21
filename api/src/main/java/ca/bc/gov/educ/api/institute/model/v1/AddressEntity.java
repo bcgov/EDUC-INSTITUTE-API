@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.institute.model.v1;
 
+import ca.bc.gov.educ.api.institute.util.ComparableField;
 import ca.bc.gov.educ.api.institute.util.UpperCase;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,6 +28,7 @@ public class AddressEntity {
   @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator", parameters = {
     @org.hibernate.annotations.Parameter(name = "uuid_gen_strategy_class", value = "org.hibernate.id.uuid.CustomVersionOneStrategy")})
   @Column(name = "address_id", unique = true, updatable = false, columnDefinition = "BINARY(16)")
+  @ComparableField
   private UUID addressId;
 
   @ManyToOne(optional = true, targetEntity = SchoolEntity.class)
@@ -47,30 +49,37 @@ public class AddressEntity {
   @Basic
   @Column(name = "address_line_1")
   @UpperCase
+  @ComparableField
   private String addressLine1;
   @Basic
   @Column(name = "address_line_2")
   @UpperCase
+  @ComparableField
   private String addressLine2;
   @Basic
   @Column(name = "city")
   @UpperCase
+  @ComparableField
   private String city;
   @Basic
   @Column(name = "postal")
   @UpperCase
+  @ComparableField
   private String postal;
   @Basic
   @Column(name = "province_code")
   @UpperCase
+  @ComparableField
   private String provinceCode;
   @Basic
   @Column(name = "country_code")
   @UpperCase
+  @ComparableField
   private String countryCode;
   @Basic
   @Column(name = "address_type_code")
   @UpperCase
+  @ComparableField
   private String addressTypeCode;
   @Column(name = "CREATE_USER", updatable = false)
   private String createUser;

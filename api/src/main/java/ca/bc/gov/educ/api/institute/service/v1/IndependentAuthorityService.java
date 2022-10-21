@@ -9,7 +9,6 @@ import ca.bc.gov.educ.api.institute.model.v1.AddressEntity;
 import ca.bc.gov.educ.api.institute.model.v1.AuthorityContactEntity;
 import ca.bc.gov.educ.api.institute.model.v1.IndependentAuthorityEntity;
 import ca.bc.gov.educ.api.institute.model.v1.NoteEntity;
-import ca.bc.gov.educ.api.institute.properties.ApplicationProperties;
 import ca.bc.gov.educ.api.institute.repository.v1.AddressRepository;
 import ca.bc.gov.educ.api.institute.repository.v1.AuthorityContactRepository;
 import ca.bc.gov.educ.api.institute.repository.v1.IndependentAuthorityRepository;
@@ -18,22 +17,20 @@ import ca.bc.gov.educ.api.institute.struct.v1.Address;
 import ca.bc.gov.educ.api.institute.struct.v1.AuthorityContact;
 import ca.bc.gov.educ.api.institute.struct.v1.IndependentAuthority;
 import ca.bc.gov.educ.api.institute.struct.v1.Note;
+import ca.bc.gov.educ.api.institute.util.BeanComparatorUtil;
 import ca.bc.gov.educ.api.institute.util.RequestUtil;
 import ca.bc.gov.educ.api.institute.util.TransformUtil;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.val;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class IndependentAuthorityService {
@@ -112,12 +109,30 @@ public class IndependentAuthorityService {
       final IndependentAuthorityEntity currentIndependentAuthorityEntity = curIndependentAuthorityEntityOptional.get();
       BeanUtils.copyProperties(independentAuthority, currentIndependentAuthorityEntity, CREATE_DATE, CREATE_USER, "addresses"); // update current student entity with incoming payload ignoring the fields.
 
+      Set<AddressEntity> addresses = new HashSet<>(currentIndependentAuthorityEntity.getAddresses());
       currentIndependentAuthorityEntity.getAddresses().clear();
 
       for(AddressEntity address: independentAuthority.getAddresses()){
-        address.setIndependentAuthorityEntity(currentIndependentAuthorityEntity);
-        RequestUtil.setAuditColumnsForAddress(address);
-        currentIndependentAuthorityEntity.getAddresses().add(address);
+        if(address.getAddressId() == null){
+          RequestUtil.setAuditColumnsForAddress(address);
+          address.setIndependentAuthorityEntity(currentIndependentAuthorityEntity);
+          TransformUtil.uppercaseFields(address);
+          currentIndependentAuthorityEntity.getAddresses().add(address);
+          addressHistoryService.createAddressHistory(address, address.getUpdateUser(), false);
+        }else{
+          var currAddress = addresses.stream().filter(addy -> addy.getAddressId().equals(address.getAddressId())).collect(Collectors.toList()).get(0);
+          if(!BeanComparatorUtil.compare(address, currAddress)){
+            address.setCreateDate(currentIndependentAuthorityEntity.getCreateDate());
+            address.setCreateUser(currentIndependentAuthorityEntity.getCreateUser());
+            RequestUtil.setAuditColumnsForAddress(address);
+            TransformUtil.uppercaseFields(address);
+            address.setIndependentAuthorityEntity(currentIndependentAuthorityEntity);
+            currentIndependentAuthorityEntity.getAddresses().add(address);
+            addressHistoryService.createAddressHistory(address, address.getUpdateUser(), false);
+          }else{
+            currentIndependentAuthorityEntity.getAddresses().add(currAddress);
+          }
+        }
       }
 
       TransformUtil.uppercaseFields(currentIndependentAuthorityEntity); // convert the input to upper case.

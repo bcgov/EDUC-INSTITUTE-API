@@ -11,6 +11,7 @@ import ca.bc.gov.educ.api.institute.struct.v1.Address;
 import ca.bc.gov.educ.api.institute.struct.v1.Note;
 import ca.bc.gov.educ.api.institute.struct.v1.School;
 import ca.bc.gov.educ.api.institute.struct.v1.SchoolContact;
+import ca.bc.gov.educ.api.institute.util.BeanComparatorUtil;
 import ca.bc.gov.educ.api.institute.util.RequestUtil;
 import ca.bc.gov.educ.api.institute.util.TransformUtil;
 import lombok.AccessLevel;
@@ -22,9 +23,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class SchoolService {
@@ -55,8 +55,10 @@ public class SchoolService {
 
   private final NoteRepository noteRepository;
 
+  private final DistrictRepository districtRepository;
+
   @Autowired
-  public SchoolService(SchoolRepository schoolRepository, SchoolTombstoneRepository schoolTombstoneRepository, SchoolHistoryService schoolHistoryService, AddressHistoryService addressHistoryService, SchoolContactRepository schoolContactRepository, AddressRepository addressRepository, NoteRepository noteRepository) {
+  public SchoolService(SchoolRepository schoolRepository, SchoolTombstoneRepository schoolTombstoneRepository, SchoolHistoryService schoolHistoryService, AddressHistoryService addressHistoryService, SchoolContactRepository schoolContactRepository, AddressRepository addressRepository, NoteRepository noteRepository, DistrictRepository districtRepository) {
     this.schoolRepository = schoolRepository;
     this.schoolTombstoneRepository = schoolTombstoneRepository;
     this.schoolHistoryService = schoolHistoryService;
@@ -64,6 +66,7 @@ public class SchoolService {
     this.schoolContactRepository = schoolContactRepository;
     this.addressRepository = addressRepository;
     this.noteRepository = noteRepository;
+    this.districtRepository = districtRepository;
   }
 
   public List<SchoolTombstoneEntity> getAllSchoolsList() {
@@ -77,6 +80,10 @@ public class SchoolService {
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public SchoolEntity createSchool(School school) {
     var schoolEntity = SchoolMapper.mapper.toModel(school);
+    Optional<DistrictEntity> district = districtRepository.findById(UUID.fromString(school.getDistrictId()));
+    if(!district.isEmpty()) {
+      schoolEntity.setDistrictEntity(district.get());
+    }
     TransformUtil.uppercaseFields(schoolEntity);
     schoolRepository.save(schoolEntity);
     schoolHistoryService.createSchoolHistory(schoolEntity, school.getCreateUser(), false);
@@ -104,18 +111,76 @@ public class SchoolService {
       final SchoolEntity currentSchoolEntity = curSchoolEntityOptional.get();
       BeanUtils.copyProperties(school, currentSchoolEntity, CREATE_DATE, CREATE_USER, "grades", "neighborhoodLearning", "districtEntity", "addresses"); // update current student entity with incoming payload ignoring the fields.
 
+      Set<SchoolGradeEntity> grades = new HashSet<>(currentSchoolEntity.getGrades());
       currentSchoolEntity.getGrades().clear();
+      for(SchoolGradeEntity grade: school.getGrades()){
+        if(grade.getSchoolGradeId() == null){
+          RequestUtil.setAuditColumnsForGrades(grade);
+          grade.setSchoolEntity(currentSchoolEntity);
+          TransformUtil.uppercaseFields(grade);
+          currentSchoolEntity.getGrades().add(grade);
+        }else{
+          var currGrade = grades.stream().filter(gradeStream -> gradeStream.getSchoolGradeId().equals(grade.getSchoolGradeId())).collect(Collectors.toList()).get(0);
+          if(!BeanComparatorUtil.compare(grade, currGrade)){
+            grade.setCreateDate(currentSchoolEntity.getCreateDate());
+            grade.setCreateUser(currentSchoolEntity.getCreateUser());
+            RequestUtil.setAuditColumnsForGrades(grade);
+            TransformUtil.uppercaseFields(grade);
+            grade.setSchoolEntity(currentSchoolEntity);
+            currentSchoolEntity.getGrades().add(grade);
+          }else{
+            currentSchoolEntity.getGrades().add(currGrade);
+          }
+        }
+      }
+
+      Set<NeighborhoodLearningEntity> neighborhoodLearnings = new HashSet<>(currentSchoolEntity.getNeighborhoodLearning());
       currentSchoolEntity.getNeighborhoodLearning().clear();
+      for(NeighborhoodLearningEntity neighborhoodLearning: school.getNeighborhoodLearning()){
+        if(neighborhoodLearning.getNeighborhoodLearningId() == null){
+          RequestUtil.setAuditColumnsForNeighborhoodLearning(neighborhoodLearning);
+          neighborhoodLearning.setSchoolEntity(currentSchoolEntity);
+          TransformUtil.uppercaseFields(neighborhoodLearning);
+          currentSchoolEntity.getNeighborhoodLearning().add(neighborhoodLearning);
+        }else{
+          var currNeighborhoodLearning = neighborhoodLearnings.stream().filter(learningStream -> learningStream.getNeighborhoodLearningId().equals(neighborhoodLearning.getNeighborhoodLearningId())).collect(Collectors.toList()).get(0);
+          if(!BeanComparatorUtil.compare(neighborhoodLearning, currNeighborhoodLearning)){
+            neighborhoodLearning.setCreateDate(currentSchoolEntity.getCreateDate());
+            neighborhoodLearning.setCreateUser(currentSchoolEntity.getCreateUser());
+            RequestUtil.setAuditColumnsForNeighborhoodLearning(neighborhoodLearning);
+            TransformUtil.uppercaseFields(neighborhoodLearning);
+            neighborhoodLearning.setSchoolEntity(currentSchoolEntity);
+            currentSchoolEntity.getNeighborhoodLearning().add(neighborhoodLearning);
+          }else{
+            currentSchoolEntity.getNeighborhoodLearning().add(currNeighborhoodLearning);
+          }
+        }
+      }
 
-      currentSchoolEntity.getGrades().addAll(school.getGrades());
-      currentSchoolEntity.getNeighborhoodLearning().addAll(school.getNeighborhoodLearning());
-
+      Set<AddressEntity> addresses = new HashSet<>(currentSchoolEntity.getAddresses());
       currentSchoolEntity.getAddresses().clear();
 
       for(AddressEntity address: school.getAddresses()){
-        address.setSchoolEntity(currentSchoolEntity);
-        RequestUtil.setAuditColumnsForAddress(address);
-        currentSchoolEntity.getAddresses().add(address);
+        if(address.getAddressId() == null){
+          RequestUtil.setAuditColumnsForAddress(address);
+          address.setSchoolEntity(currentSchoolEntity);
+          TransformUtil.uppercaseFields(address);
+          currentSchoolEntity.getAddresses().add(address);
+          addressHistoryService.createAddressHistory(address, address.getUpdateUser(), false);
+        }else{
+          var currAddress = addresses.stream().filter(addy -> addy.getAddressId().equals(address.getAddressId())).collect(Collectors.toList()).get(0);
+          if(!BeanComparatorUtil.compare(address, currAddress)){
+            address.setCreateDate(currentSchoolEntity.getCreateDate());
+            address.setCreateUser(currentSchoolEntity.getCreateUser());
+            RequestUtil.setAuditColumnsForAddress(address);
+            TransformUtil.uppercaseFields(address);
+            address.setSchoolEntity(currentSchoolEntity);
+            currentSchoolEntity.getAddresses().add(address);
+            addressHistoryService.createAddressHistory(address, address.getUpdateUser(), false);
+          }else{
+            currentSchoolEntity.getAddresses().add(currAddress);
+          }
+        }
       }
 
       TransformUtil.uppercaseFields(currentSchoolEntity); // convert the input to upper case.

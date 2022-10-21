@@ -150,7 +150,7 @@ public class IndependentAuthorityControllerTest {
       .andDo(print())
       .andExpect(status().isOk())
       .andExpect(MockMvcResultMatchers.jsonPath("$.addresses.[0].addressLine1")
-        .value(entity.getAddresses().iterator().next().getAddressLine1()));
+        .value(entity.getAddresses().iterator().next().getAddressLine1().toUpperCase()));
   }
 
   @Test

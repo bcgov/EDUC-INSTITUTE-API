@@ -1,6 +1,8 @@
 package ca.bc.gov.educ.api.institute.util;
 
 import ca.bc.gov.educ.api.institute.model.v1.AddressEntity;
+import ca.bc.gov.educ.api.institute.model.v1.NeighborhoodLearningEntity;
+import ca.bc.gov.educ.api.institute.model.v1.SchoolGradeEntity;
 import ca.bc.gov.educ.api.institute.properties.ApplicationProperties;
 import ca.bc.gov.educ.api.institute.struct.v1.BaseRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -61,6 +63,40 @@ public class RequestUtil {
       address.setUpdateUser(ApplicationProperties.INSTITUTE_API);
     }
     address.setUpdateDate(LocalDateTime.now());
+  }
+
+  public static void setAuditColumnsForGrades(@NotNull SchoolGradeEntity grade) {
+    if(grade.getCreateDate() == null) {
+      if (StringUtils.isBlank(grade.getCreateUser())) {
+        grade.setCreateUser(ApplicationProperties.INSTITUTE_API);
+      }
+      grade.setCreateDate(LocalDateTime.now());
+    }
+    setAuditColumnsForGradeUpdate(grade);
+  }
+
+  private static void setAuditColumnsForGradeUpdate(@NotNull SchoolGradeEntity grade) {
+    if (StringUtils.isBlank(grade.getUpdateUser())) {
+      grade.setUpdateUser(ApplicationProperties.INSTITUTE_API);
+    }
+    grade.setUpdateDate(LocalDateTime.now());
+  }
+
+  public static void setAuditColumnsForNeighborhoodLearning(@NotNull NeighborhoodLearningEntity neighborhoodLearningEntity) {
+    if(neighborhoodLearningEntity.getCreateDate() == null) {
+      if (StringUtils.isBlank(neighborhoodLearningEntity.getCreateUser())) {
+        neighborhoodLearningEntity.setCreateUser(ApplicationProperties.INSTITUTE_API);
+      }
+      neighborhoodLearningEntity.setCreateDate(LocalDateTime.now());
+    }
+    setAuditColumnsForNeighborhoodLearningUpdate(neighborhoodLearningEntity);
+  }
+
+  private static void setAuditColumnsForNeighborhoodLearningUpdate(@NotNull NeighborhoodLearningEntity neighborhoodLearningEntity) {
+    if (StringUtils.isBlank(neighborhoodLearningEntity.getUpdateUser())) {
+      neighborhoodLearningEntity.setUpdateUser(ApplicationProperties.INSTITUTE_API);
+    }
+    neighborhoodLearningEntity.setUpdateDate(LocalDateTime.now());
   }
 
   /**
