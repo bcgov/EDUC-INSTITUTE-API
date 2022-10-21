@@ -111,51 +111,7 @@ public class SchoolService {
       final SchoolEntity currentSchoolEntity = curSchoolEntityOptional.get();
       BeanUtils.copyProperties(school, currentSchoolEntity, CREATE_DATE, CREATE_USER, "grades", "neighborhoodLearning", "districtEntity", "addresses"); // update current student entity with incoming payload ignoring the fields.
 
-      Set<SchoolGradeEntity> grades = new HashSet<>(currentSchoolEntity.getGrades());
-      currentSchoolEntity.getGrades().clear();
-      for(SchoolGradeEntity grade: school.getGrades()){
-        if(grade.getSchoolGradeId() == null){
-          RequestUtil.setAuditColumnsForGrades(grade);
-          grade.setSchoolEntity(currentSchoolEntity);
-          TransformUtil.uppercaseFields(grade);
-          currentSchoolEntity.getGrades().add(grade);
-        }else{
-          var currGrade = grades.stream().filter(gradeStream -> gradeStream.getSchoolGradeId().equals(grade.getSchoolGradeId())).collect(Collectors.toList()).get(0);
-          if(!BeanComparatorUtil.compare(grade, currGrade)){
-            grade.setCreateDate(currentSchoolEntity.getCreateDate());
-            grade.setCreateUser(currentSchoolEntity.getCreateUser());
-            RequestUtil.setAuditColumnsForGrades(grade);
-            TransformUtil.uppercaseFields(grade);
-            grade.setSchoolEntity(currentSchoolEntity);
-            currentSchoolEntity.getGrades().add(grade);
-          }else{
-            currentSchoolEntity.getGrades().add(currGrade);
-          }
-        }
-      }
-
-      Set<NeighborhoodLearningEntity> neighborhoodLearnings = new HashSet<>(currentSchoolEntity.getNeighborhoodLearning());
-      currentSchoolEntity.getNeighborhoodLearning().clear();
-      for(NeighborhoodLearningEntity neighborhoodLearning: school.getNeighborhoodLearning()){
-        if(neighborhoodLearning.getNeighborhoodLearningId() == null){
-          RequestUtil.setAuditColumnsForNeighborhoodLearning(neighborhoodLearning);
-          neighborhoodLearning.setSchoolEntity(currentSchoolEntity);
-          TransformUtil.uppercaseFields(neighborhoodLearning);
-          currentSchoolEntity.getNeighborhoodLearning().add(neighborhoodLearning);
-        }else{
-          var currNeighborhoodLearning = neighborhoodLearnings.stream().filter(learningStream -> learningStream.getNeighborhoodLearningId().equals(neighborhoodLearning.getNeighborhoodLearningId())).collect(Collectors.toList()).get(0);
-          if(!BeanComparatorUtil.compare(neighborhoodLearning, currNeighborhoodLearning)){
-            neighborhoodLearning.setCreateDate(currentSchoolEntity.getCreateDate());
-            neighborhoodLearning.setCreateUser(currentSchoolEntity.getCreateUser());
-            RequestUtil.setAuditColumnsForNeighborhoodLearning(neighborhoodLearning);
-            TransformUtil.uppercaseFields(neighborhoodLearning);
-            neighborhoodLearning.setSchoolEntity(currentSchoolEntity);
-            currentSchoolEntity.getNeighborhoodLearning().add(neighborhoodLearning);
-          }else{
-            currentSchoolEntity.getNeighborhoodLearning().add(currNeighborhoodLearning);
-          }
-        }
-      }
+      setGradesAndNeighborhoodLearning(currentSchoolEntity, school);
 
       Set<AddressEntity> addresses = new HashSet<>(currentSchoolEntity.getAddresses());
       currentSchoolEntity.getAddresses().clear();
@@ -189,6 +145,28 @@ public class SchoolService {
       return currentSchoolEntity;
     } else {
       throw new EntityNotFoundException(SchoolEntity.class, SCHOOL_ID_ATTR, String.valueOf(schoolId));
+    }
+  }
+
+  private void setGradesAndNeighborhoodLearning(SchoolEntity currentSchoolEntity, SchoolEntity school){
+    currentSchoolEntity.getGrades().clear();
+    for(SchoolGradeEntity grade: school.getGrades()){
+      if(grade.getSchoolGradeId() == null){
+        RequestUtil.setAuditColumnsForGrades(grade);
+        grade.setSchoolEntity(currentSchoolEntity);
+        TransformUtil.uppercaseFields(grade);
+        currentSchoolEntity.getGrades().add(grade);
+      }
+    }
+
+    currentSchoolEntity.getNeighborhoodLearning().clear();
+    for(NeighborhoodLearningEntity neighborhoodLearning: school.getNeighborhoodLearning()){
+      if(neighborhoodLearning.getNeighborhoodLearningId() == null){
+        RequestUtil.setAuditColumnsForNeighborhoodLearning(neighborhoodLearning);
+        neighborhoodLearning.setSchoolEntity(currentSchoolEntity);
+        TransformUtil.uppercaseFields(neighborhoodLearning);
+        currentSchoolEntity.getNeighborhoodLearning().add(neighborhoodLearning);
+      }
     }
   }
 
