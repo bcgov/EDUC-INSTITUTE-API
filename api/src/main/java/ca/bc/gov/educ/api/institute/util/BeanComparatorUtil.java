@@ -8,21 +8,20 @@ public class BeanComparatorUtil {
 
   }
 
+  @java.lang.SuppressWarnings("squid:S3011")
   public static <T> boolean compare(T t, T t2) {
     try {
       Field[] fields = t.getClass().getDeclaredFields();
       if (fields != null) {
         for (Field field : fields) {
           if (field.isAnnotationPresent(ComparableField.class)) {
+            field.setAccessible(true);
             var firstField = field.get(t);
             var secondField = field.get(t2);
-            if(firstField == null && secondField == null) {
-              //Do Nothing
-            } else if ((firstField == null && secondField != null) || (firstField != null && secondField == null))  {
-              return false;
-            } else if (!(field.get(t)).equals(field.get(t2))) {
+            if(!checkForNulls(firstField, secondField) && firstField != null && secondField != null && !(firstField.equals(secondField))) {
               return false;
             }
+            field.setAccessible(false);
           }
         }
       }
@@ -30,5 +29,9 @@ public class BeanComparatorUtil {
       return false;
     }
     return true;
+  }
+
+  private static boolean checkForNulls(Object firstField, Object secondField){
+   return ((firstField == null && secondField != null) || (firstField != null && secondField == null));
   }
 }
