@@ -278,7 +278,6 @@ public class IndependentAuthorityService {
 
     if (curIndependentAuthorityEntityOptional.isPresent() && curAddressEntityOptional.isPresent()) {
       final IndependentAuthorityEntity currentIndependentAuthorityEntity = curIndependentAuthorityEntityOptional.get();
-      addressHistoryService.deleteByAddressID(addressId);
       addressRepository.deleteByAddressIdAndIndependentAuthorityEntity(addressId, currentIndependentAuthorityEntity);
     } else {
       throw new EntityNotFoundException(IndependentAuthorityEntity.class, INDEPENDENT_AUTHORITY_ID_ATTR, String.valueOf(independentAuthorityId));

@@ -303,7 +303,6 @@ public class SchoolService {
 
     if (curSchoolEntityOptional.isPresent() && curAddressEntityOptional.isPresent()) {
       final SchoolEntity currentSchoolEntity = curSchoolEntityOptional.get();
-      addressHistoryService.deleteByAddressID(addressId);
       addressRepository.deleteByAddressIdAndSchoolEntity(addressId, currentSchoolEntity);
     } else {
       throw new EntityNotFoundException(SchoolEntity.class, SCHOOL_ID_ATTR, String.valueOf(schoolId));

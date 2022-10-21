@@ -23,8 +23,6 @@ public class AddressHistory extends BaseRequest implements Serializable {
 
   private String addressHistoryId;
 
-  private String addressId;
-
   private String schoolId;
 
   private String districtId;

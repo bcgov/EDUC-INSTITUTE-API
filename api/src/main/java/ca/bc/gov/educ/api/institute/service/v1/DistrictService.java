@@ -277,7 +277,6 @@ public class DistrictService {
 
     if (curDistrictEntityOptional.isPresent() && curAddressEntityOptional.isPresent()) {
       final DistrictEntity currentDistrictEntity = curDistrictEntityOptional.get();
-      addressHistoryService.deleteByAddressID(addressId);
       addressRepository.deleteByAddressIdAndDistrictEntity(addressId, currentDistrictEntity);
     } else {
       throw new EntityNotFoundException(DistrictEntity.class, DISTRICT_ID_ATTR, String.valueOf(districtId));

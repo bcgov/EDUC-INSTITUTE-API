@@ -10,7 +10,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Service
 public class AddressHistoryService {
@@ -20,11 +19,6 @@ public class AddressHistoryService {
   @Autowired
   public AddressHistoryService(AddressHistoryRepository addressHistoryRepository) {
     this.addressHistoryRepository = addressHistoryRepository;
-  }
-
-  @Transactional(propagation = Propagation.MANDATORY)
-  public void deleteByAddressID(final UUID addressId) {
-    addressHistoryRepository.deleteByAddressId(addressId);
   }
 
   @Transactional(propagation = Propagation.MANDATORY)
