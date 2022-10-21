@@ -568,7 +568,7 @@ public class DistrictControllerTest {
   }
 
   private DistrictHistoryEntity createHistoryDistrictData(UUID districtId) {
-    return DistrictHistoryEntity.builder().districtId(districtId).districtNumber("003").displayName("District Name").openedDate(LocalDateTime.now().minusDays(1)).districtRegionCode("KOOTENAYS")
+    return DistrictHistoryEntity.builder().districtId(districtId).districtNumber("003").displayName("District Name").districtRegionCode("KOOTENAYS").districtStatusCode("ACTIVE")
       .website("abc@sd99.edu").createDate(LocalDateTime.now()).updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
   }
 
