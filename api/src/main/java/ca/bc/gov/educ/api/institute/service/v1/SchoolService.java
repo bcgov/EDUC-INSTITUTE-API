@@ -81,7 +81,7 @@ public class SchoolService {
   public SchoolEntity createSchool(School school) {
     var schoolEntity = SchoolMapper.mapper.toModel(school);
     Optional<DistrictEntity> district = districtRepository.findById(UUID.fromString(school.getDistrictId()));
-    if(!district.isEmpty()) {
+    if(district.isPresent()) {
       schoolEntity.setDistrictEntity(district.get());
     }
     TransformUtil.uppercaseFields(schoolEntity);
