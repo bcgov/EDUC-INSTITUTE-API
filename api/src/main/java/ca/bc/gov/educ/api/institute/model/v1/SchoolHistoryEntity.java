@@ -29,7 +29,7 @@ public class SchoolHistoryEntity {
   private UUID schoolId;
   @Basic
   @Column(name = "district_id", columnDefinition = "BINARY(16)")
-  private UUID districtId;
+  private UUID districtID;
   @Basic
   @Column(name = "independent_authority_id", columnDefinition = "BINARY(16)")
   private UUID independentAuthorityId;
