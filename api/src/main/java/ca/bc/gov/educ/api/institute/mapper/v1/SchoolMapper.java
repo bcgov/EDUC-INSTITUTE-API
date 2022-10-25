@@ -22,6 +22,8 @@ public interface SchoolMapper {
 
   SchoolMapper mapper = Mappers.getMapper(SchoolMapper.class);
 
+  @InheritInverseConfiguration
+  @Mapping(target = "districtID", source = "districtId")
   SchoolEntity toModel(School structure);
 
   @Mapping(target = "districtId", source = "districtEntity.districtId")
