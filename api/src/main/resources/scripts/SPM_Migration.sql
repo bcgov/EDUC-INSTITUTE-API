@@ -488,7 +488,20 @@ CREATE TABLE ADDRESS_HISTORY
 as
 SELECT
     LOWER(REGEXP_REPLACE(dbms_crypto.randombytes(16), '(.{8})(.{4})(.{4})(.{4})(.{12})', '\1-\2-\3-\4-\5')) as ADDRESS_HISTORY_ID,
-    addr.*
+    addr.SCHOOL_ID,
+    addr.DISTRICT_ID,
+    addr.INDEPENDENT_AUTHORITY_ID,
+    addr.ADDRESS_LINE_1,
+    addr.ADDRESS_LINE_2,
+    addr.CITY,
+    addr.PROVINCE_CODE,
+    addr.COUNTRY_CODE,
+    addr.POSTAL,
+    addr.ADDRESS_TYPE_CODE,
+    addr.CREATE_USER,
+    addr.CREATE_DATE,
+    addr.UPDATE_USER,
+    addr.UPDATE_DATE
 FROM ADDRESS addr;
 
 CREATE TABLE SCHOOL_CONTACT
