@@ -33,8 +33,6 @@ public class SchoolContact extends BaseRequest implements Serializable {
   @Size(max = 10)
   private String phoneNumber;
 
-  private String jobTitle;
-
   @Size(max = 10)
   private String phoneExtension;
 
