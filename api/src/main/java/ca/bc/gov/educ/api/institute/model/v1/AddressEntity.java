@@ -48,22 +48,18 @@ public class AddressEntity {
 
   @Basic
   @Column(name = "address_line_1")
-  @UpperCase
   @ComparableField
   private String addressLine1;
   @Basic
   @Column(name = "address_line_2")
-  @UpperCase
   @ComparableField
   private String addressLine2;
   @Basic
   @Column(name = "city")
-  @UpperCase
   @ComparableField
   private String city;
   @Basic
   @Column(name = "postal")
-  @UpperCase
   @ComparableField
   private String postal;
   @Basic

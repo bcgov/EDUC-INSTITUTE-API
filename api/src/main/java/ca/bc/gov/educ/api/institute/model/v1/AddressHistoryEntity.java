@@ -36,19 +36,15 @@ public class AddressHistoryEntity {
   private UUID independentAuthorityId;
   @Basic
   @Column(name = "address_line_1")
-  @UpperCase
   private String addressLine1;
   @Basic
   @Column(name = "address_line_2")
-  @UpperCase
   private String addressLine2;
   @Basic
   @Column(name = "city")
-  @UpperCase
   private String city;
   @Basic
   @Column(name = "postal")
-  @UpperCase
   private String postal;
   @Basic
   @Column(name = "province_code")
