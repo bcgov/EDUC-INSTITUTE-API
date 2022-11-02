@@ -137,8 +137,7 @@ public class IndependentAuthorityService {
 
       TransformUtil.uppercaseFields(currentIndependentAuthorityEntity); // convert the input to upper case.
       independentAuthorityHistoryService.createIndependentAuthorityHistory(currentIndependentAuthorityEntity, currentIndependentAuthorityEntity.getUpdateUser(), false);
-      independentAuthorityRepository.save(currentIndependentAuthorityEntity);
-      return currentIndependentAuthorityEntity;
+      return independentAuthorityRepository.save(currentIndependentAuthorityEntity);
     } else {
       throw new EntityNotFoundException(IndependentAuthorityEntity.class, INDEPENDENT_AUTHORITY_ID_ATTR, String.valueOf(independentAuthorityId));
     }

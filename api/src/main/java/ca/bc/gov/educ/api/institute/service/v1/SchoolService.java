@@ -141,8 +141,7 @@ public class SchoolService {
 
       TransformUtil.uppercaseFields(currentSchoolEntity); // convert the input to upper case.
       schoolHistoryService.createSchoolHistory(currentSchoolEntity, currentSchoolEntity.getUpdateUser(), false);
-      schoolRepository.save(currentSchoolEntity);
-      return currentSchoolEntity;
+      return schoolRepository.save(currentSchoolEntity);
     } else {
       throw new EntityNotFoundException(SchoolEntity.class, SCHOOL_ID_ATTR, String.valueOf(schoolId));
     }

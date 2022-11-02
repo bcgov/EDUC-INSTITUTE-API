@@ -136,8 +136,7 @@ public class DistrictService {
 
       TransformUtil.uppercaseFields(currentDistrictEntity); // convert the input to upper case.
       districtHistoryService.createDistrictHistory(currentDistrictEntity, currentDistrictEntity.getUpdateUser(), false);
-      districtRepository.save(currentDistrictEntity);
-      return currentDistrictEntity;
+      return districtRepository.save(currentDistrictEntity);
     } else {
       throw new EntityNotFoundException(DistrictEntity.class, DISTRICT_ID_ATTR, String.valueOf(districtId));
     }
