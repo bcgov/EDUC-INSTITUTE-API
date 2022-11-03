@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.institute.model.v1;
 
+import ca.bc.gov.educ.api.institute.util.UpperCase;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -28,6 +29,10 @@ public class SchoolContactTypeCodeEntity {
   @Basic
   @Column(name = "display_order")
   private Integer displayOrder;
+  @Basic
+  @Column(name = "legacy_code")
+  @UpperCase
+  private String legacyCode;
   @Basic
   @Column(name = "effective_date")
   private LocalDateTime effectiveDate;
