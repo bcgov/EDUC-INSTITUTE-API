@@ -541,7 +541,7 @@ public class SchoolControllerTest {
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SCHOOL_ADDRESS"))))
       .andDo(print())
       .andExpect(status().isCreated())
-      .andExpect(MockMvcResultMatchers.jsonPath("$.city").value(addressEntity.getCity().toUpperCase()));
+      .andExpect(MockMvcResultMatchers.jsonPath("$.city").value(addressEntity.getCity()));
   }
 
   @Test
@@ -603,7 +603,7 @@ public class SchoolControllerTest {
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SCHOOL_ADDRESS"))))
       .andDo(print())
       .andExpect(status().isOk())
-      .andExpect(MockMvcResultMatchers.jsonPath("$.city").value(address.getCity().toUpperCase()));
+      .andExpect(MockMvcResultMatchers.jsonPath("$.city").value(address.getCity()));
   }
 
 

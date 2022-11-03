@@ -428,7 +428,7 @@ public class DistrictControllerTest {
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_DISTRICT_ADDRESS"))))
       .andDo(print())
       .andExpect(status().isCreated())
-      .andExpect(MockMvcResultMatchers.jsonPath("$.city").value(addressEntity.getCity().toUpperCase()));
+      .andExpect(MockMvcResultMatchers.jsonPath("$.city").value(addressEntity.getCity()));
 
     var historyAddress = this.addressHistoryRepository.findAll();
     assertThat(historyAddress).isNotNull().hasSize(1);
@@ -481,7 +481,7 @@ public class DistrictControllerTest {
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_DISTRICT_ADDRESS"))))
       .andDo(print())
       .andExpect(status().isOk())
-      .andExpect(MockMvcResultMatchers.jsonPath("$.city").value(address.getCity().toUpperCase()));
+      .andExpect(MockMvcResultMatchers.jsonPath("$.city").value(address.getCity()));
   }
 
   @Test

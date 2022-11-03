@@ -150,7 +150,7 @@ public class IndependentAuthorityControllerTest {
       .andDo(print())
       .andExpect(status().isOk())
       .andExpect(MockMvcResultMatchers.jsonPath("$.addresses.[0].addressLine1")
-        .value(entity.getAddresses().iterator().next().getAddressLine1().toUpperCase()));
+        .value(entity.getAddresses().iterator().next().getAddressLine1()));
   }
 
   @Test
@@ -441,7 +441,7 @@ public class IndependentAuthorityControllerTest {
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_INDEPENDENT_AUTHORITY_ADDRESS"))))
       .andDo(print())
       .andExpect(status().isCreated())
-      .andExpect(MockMvcResultMatchers.jsonPath("$.city").value(addressEntity.getCity().toUpperCase()));
+      .andExpect(MockMvcResultMatchers.jsonPath("$.city").value(addressEntity.getCity()));
   }
 
   @Test
@@ -491,7 +491,7 @@ public class IndependentAuthorityControllerTest {
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_INDEPENDENT_AUTHORITY_ADDRESS"))))
       .andDo(print())
       .andExpect(status().isOk())
-      .andExpect(MockMvcResultMatchers.jsonPath("$.city").value(address.getCity().toUpperCase()));
+      .andExpect(MockMvcResultMatchers.jsonPath("$.city").value(address.getCity()));
   }
 
   @Test
