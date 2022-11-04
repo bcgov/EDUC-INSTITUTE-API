@@ -311,6 +311,22 @@ public class IndependentAuthorityControllerTest {
   }
 
   @Test
+  void testCreateIndependentAuthorityContact_GivenValidPayloadNoFirstName_ShouldReturnStatusCreated() throws Exception {
+    final IndependentAuthorityEntity independentAuthorityEntity = this.independentAuthorityRepository.save(this.createIndependentAuthorityData());
+    AuthorityContactEntity contactEntity = createContactData(independentAuthorityEntity);
+    contactEntity.setFirstName(null);
+
+    this.mockMvc.perform(post(URL.BASE_URL_AUTHORITY + "/" + independentAuthorityEntity.getIndependentAuthorityId() + "/contact")
+        .contentType(MediaType.APPLICATION_JSON)
+        .accept(MediaType.APPLICATION_JSON)
+        .content(asJsonString(contactEntity))
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_INDEPENDENT_AUTHORITY_CONTACT"))))
+      .andDo(print())
+      .andExpect(status().isCreated())
+      .andExpect(MockMvcResultMatchers.jsonPath("$.lastName").value(contactEntity.getLastName()));
+  }
+
+  @Test
   void testCreateIndependentAuthorityContactExtFields_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
     final IndependentAuthorityEntity independentAuthorityEntity = this.independentAuthorityRepository.save(this.createIndependentAuthorityData());
     AuthorityContactEntity contactEntity = createContactData(independentAuthorityEntity);

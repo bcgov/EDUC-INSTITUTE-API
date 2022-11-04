@@ -424,6 +424,23 @@ public class SchoolControllerTest {
   }
 
   @Test
+  void testCreateSchoolContact_GivenValidPayloadNoFirstName_ShouldReturnStatusCreated() throws Exception {
+    final SchoolEntity schoolEntity = this.schoolRepository.save(this.createSchoolData());
+    SchoolContactEntity contactEntity = createContactData(schoolEntity);
+    contactEntity.setFirstName(null);
+
+    this.mockMvc.perform(post(URL.BASE_URL_SCHOOL + "/" + schoolEntity.getSchoolId() + "/contact")
+        .contentType(MediaType.APPLICATION_JSON)
+        .accept(MediaType.APPLICATION_JSON)
+        .content(asJsonString(contactEntity))
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SCHOOL_CONTACT"))))
+      .andDo(print())
+      .andExpect(status().isCreated())
+      .andExpect(MockMvcResultMatchers.jsonPath("$.lastName").value(contactEntity.getLastName()));
+  }
+
+
+  @Test
   void testCreateSchoolContactExtFields_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
     final SchoolEntity schoolEntity = this.schoolRepository.save(this.createSchoolData());
     SchoolContactEntity contactEntity = createContactData(schoolEntity);
@@ -605,8 +622,6 @@ public class SchoolControllerTest {
       .andExpect(status().isOk())
       .andExpect(MockMvcResultMatchers.jsonPath("$.city").value(address.getCity()));
   }
-
-
 
   @Test
   void testCreateSchoolNote_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
