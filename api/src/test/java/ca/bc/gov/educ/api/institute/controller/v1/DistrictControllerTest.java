@@ -311,6 +311,34 @@ public class DistrictControllerTest {
   }
 
   @Test
+  void testCreateDistrictContact_GivenValidPayloadNoFirstName_ShouldReturnStatusCreated() throws Exception {
+    final DistrictEntity districtEntity = this.districtRepository.save(this.createDistrictData());
+    DistrictContactEntity contactEntity = createContactData(districtEntity);
+    contactEntity.setPhoneNumber("9876541234");
+    contactEntity.setPhoneExtension("321");
+    contactEntity.setAlternatePhoneNumber("1234567891");
+    contactEntity.setAlternatePhoneExtension("123");
+    contactEntity.setJobTitle("Painter");
+    contactEntity.setPubliclyAvailable(true);
+    contactEntity.setFirstName(null);
+
+    this.mockMvc.perform(post(URL.BASE_URL_DISTRICT + "/" + districtEntity.getDistrictId() + "/contact")
+        .contentType(MediaType.APPLICATION_JSON)
+        .accept(MediaType.APPLICATION_JSON)
+        .content(asJsonString(contactEntity))
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_DISTRICT_CONTACT"))))
+      .andDo(print())
+      .andExpect(status().isCreated())
+      .andExpect(MockMvcResultMatchers.jsonPath("$.lastName").value(contactEntity.getLastName()))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.phoneNumber").value(contactEntity.getPhoneNumber()))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.jobTitle").value(contactEntity.getJobTitle()))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.phoneExtension").value(contactEntity.getPhoneExtension()))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.alternatePhoneNumber").value(contactEntity.getAlternatePhoneNumber()))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.alternatePhoneExtension").value(contactEntity.getAlternatePhoneExtension()))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.publiclyAvailable").value(contactEntity.isPubliclyAvailable()));
+  }
+
+  @Test
   void testCreateDistrictContactExtFields_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
     final DistrictEntity districtEntity = this.districtRepository.save(this.createDistrictData());
     DistrictContactEntity contactEntity = createContactData(districtEntity);

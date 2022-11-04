@@ -48,7 +48,6 @@ public class DistrictContact extends BaseRequest implements Serializable {
   private String email;
 
   @Size(max = 255)
-  @NotNull(message = "firstName cannot be null")
   private String firstName;
 
   @Size(max = 255)
