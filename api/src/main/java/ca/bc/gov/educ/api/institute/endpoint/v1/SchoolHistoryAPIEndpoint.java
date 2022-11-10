@@ -19,7 +19,7 @@ public interface SchoolHistoryAPIEndpoint {
 
   @GetMapping("/paginated")
   @Async
-  @PreAuthorize("hasAuthority('SCOPE_READ_SCHOOL')") //TODO change this scope to SCOPE_READ_SCHOOL_HISTORY
+  @PreAuthorize("hasAuthority('SCOPE_READ_SCHOOL_HISTORY')")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR.")})
   @Transactional(readOnly = true)
   @Tag(name = "School History Entity", description = "Endpoints for school history entity.")
