@@ -33,7 +33,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * The type School search service.
+ * The type School History search service.
  */
 @Service
 public class SchoolHistorySearchService {
@@ -46,7 +46,7 @@ public class SchoolHistorySearchService {
     .setCorePoolSize(2).setMaximumPoolSize(10).setKeepAliveTime(Duration.ofSeconds(60)).build();
 
   /**
-   * Instantiates a new School search service.
+   * Instantiates a new School History search service.
    *
    * @param schoolHistoryFilterSpecs the school filter specs
    * @param schoolHistoryRepository the school history repository
