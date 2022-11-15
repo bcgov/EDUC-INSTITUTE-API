@@ -27,6 +27,5 @@ public final class URL {
   public static final String BASE_URL="/api/v1/institute";
   public static final String BASE_URL_DISTRICT="/api/v1/institute/district";
   public static final String BASE_URL_SCHOOL="/api/v1/institute/school";
-  public static final String BASE_URL_SCHOOL_HISTORY="/api/v1/institute/school/history";
   public static final String BASE_URL_AUTHORITY="/api/v1/institute/authority";
 }

@@ -163,4 +163,15 @@ public interface SchoolAPIEndpoint {
                                            @RequestParam(name = "sort", defaultValue = "") String sortCriteriaJson,
                                            @RequestParam(name = "searchCriteriaList", required = false) String searchCriteriaListJson);
 
+  @GetMapping("history/paginated")
+  @Async
+  @PreAuthorize("hasAuthority('SCOPE_READ_SCHOOL_HISTORY')")
+  @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR.")})
+  @Transactional(readOnly = true)
+  @Tag(name = "School History Entity", description = "Endpoints for school history entity.")
+  CompletableFuture<Page<SchoolHistory>> schoolHistoryFindAll(@RequestParam(name = "pageNumber", defaultValue = "0") Integer pageNumber,
+      @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
+      @RequestParam(name = "sort", defaultValue = "") String sortCriteriaJson,
+      @RequestParam(name = "searchCriteriaList", required = false) String searchCriteriaListJson);
+
 }
