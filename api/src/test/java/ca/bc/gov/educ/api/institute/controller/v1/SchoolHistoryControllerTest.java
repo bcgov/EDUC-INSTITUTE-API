@@ -67,24 +67,24 @@ public class SchoolHistoryControllerTest {
     this.schoolHistoryRepository.deleteAll();
   }
 
-//  @Test
-//  void testReadSchoolHistoryPaginated_givenValueNull_ShouldReturnStatusOk() throws Exception {
-//    final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_SCHOOL_HISTORY";
-//    final var mockAuthority = oidcLogin().authorities(grantedAuthority);
-//
-//    final SchoolEntity entity = this.schoolRepository.save(this.createSchoolData());
-//    this.schoolHistoryRepository.save(createHistorySchoolData(entity.getSchoolId()));
-//    val entitiesFromDB = this.schoolHistoryRepository.findAll();
-//    final SearchCriteria criteria = SearchCriteria.builder().key("website").operation(FilterOperation.EQUAL).value(null).valueType(ValueType.STRING).build();
-//    final List<SearchCriteria> criteriaList = new ArrayList<>();
-//    criteriaList.add(criteria);
-//    final List<Search> searches = new LinkedList<>();
-//    searches.add(Search.builder().searchCriteriaList(criteriaList).build());
-//    final ObjectMapper objectMapper = new ObjectMapper();
-//    final String criteriaJSON = objectMapper.writeValueAsString(searches);
-//    this.mockMvc.perform(get(URL.BASE_URL_SCHOOL_HISTORY + "/paginated").with(mockAuthority).param("searchCriteriaList", criteriaJSON)
-//        .contentType(APPLICATION_JSON)).andDo(print()).andExpect(status().isOk());
-//  }
+  @Test
+  void testReadSchoolHistoryPaginated_givenValueNull_ShouldReturnStatusOk() throws Exception {
+    final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_SCHOOL_HISTORY";
+    final var mockAuthority = oidcLogin().authorities(grantedAuthority);
+
+    final SchoolEntity entity = this.schoolRepository.save(this.createSchoolData());
+    this.schoolHistoryRepository.save(createHistorySchoolData(entity.getSchoolId()));
+    val entitiesFromDB = this.schoolHistoryRepository.findAll();
+    final SearchCriteria criteria = SearchCriteria.builder().key("website").operation(FilterOperation.EQUAL).value(null).valueType(ValueType.STRING).build();
+    final List<SearchCriteria> criteriaList = new ArrayList<>();
+    criteriaList.add(criteria);
+    final List<Search> searches = new LinkedList<>();
+    searches.add(Search.builder().searchCriteriaList(criteriaList).build());
+    final ObjectMapper objectMapper = new ObjectMapper();
+    final String criteriaJSON = objectMapper.writeValueAsString(searches);
+    this.mockMvc.perform(get(URL.BASE_URL_SCHOOL_HISTORY + "/paginated").with(mockAuthority).param("searchCriteriaList", criteriaJSON)
+        .contentType(APPLICATION_JSON)).andDo(print()).andExpect(status().isOk());
+  }
 
   @Test
   void testReadSchoolHistoryPaginated_givenSchoolNumber_ShouldReturnStatusOk() throws Exception {
