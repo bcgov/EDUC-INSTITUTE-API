@@ -20,7 +20,6 @@ import org.springframework.security.web.SecurityFilterChain;
 @SpringBootApplication
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @EnableCaching
-@EnableAsync
 @EnableRetry
 @EnableScheduling
 public class InstituteApiResourceApplication {
