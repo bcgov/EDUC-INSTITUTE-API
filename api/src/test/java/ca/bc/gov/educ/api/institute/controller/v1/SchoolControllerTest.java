@@ -785,7 +785,7 @@ public class SchoolControllerTest {
     searches.add(Search.builder().searchCriteriaList(criteriaList).build());
     final ObjectMapper objectMapper = new ObjectMapper();
     final String criteriaJSON = objectMapper.writeValueAsString(searches);
-    this.mockMvc.perform(get(URL.BASE_URL_SCHOOL + "history/paginated").with(mockAuthority).param("searchCriteriaList", criteriaJSON)
+    this.mockMvc.perform(get(URL.BASE_URL_SCHOOL + "/history/paginated").with(mockAuthority).param("searchCriteriaList", criteriaJSON)
         .contentType(APPLICATION_JSON)).andDo(print()).andExpect(status().isOk());
   }
 
@@ -803,7 +803,7 @@ public class SchoolControllerTest {
     searches.add(Search.builder().searchCriteriaList(criteriaList).build());
     final ObjectMapper objectMapper = new ObjectMapper();
     final String criteriaJSON = objectMapper.writeValueAsString(searches);
-    final MvcResult result = this.mockMvc.perform(get(URL.BASE_URL_SCHOOL + "history/paginated").with(mockAuthority).param("searchCriteriaList", criteriaJSON)
+    final MvcResult result = this.mockMvc.perform(get(URL.BASE_URL_SCHOOL + "/history/paginated").with(mockAuthority).param("searchCriteriaList", criteriaJSON)
         .contentType(APPLICATION_JSON)).andReturn();
     this.mockMvc.perform(asyncDispatch(result)).andDo(print()).andExpect(jsonPath("$.content", hasSize(1)));
   }
