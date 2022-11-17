@@ -778,7 +778,6 @@ public class SchoolControllerTest {
 
     final SchoolEntity entity = this.schoolRepository.save(this.createSchoolData());
     this.schoolHistoryRepository.save(createHistorySchoolData(entity.getSchoolId()));
-    val entitiesFromDB = this.schoolHistoryRepository.findAll();
     final SearchCriteria criteria = SearchCriteria.builder().key("website").operation(FilterOperation.EQUAL).value(null).valueType(ValueType.STRING).build();
     final List<SearchCriteria> criteriaList = new ArrayList<>();
     criteriaList.add(criteria);
@@ -798,7 +797,6 @@ public class SchoolControllerTest {
 
     final SchoolEntity entity = this.schoolRepository.save(this.createSchoolData());
     this.schoolHistoryRepository.save(createHistorySchoolData(entity.getSchoolId()));
-    val entitiesFromDB = this.schoolHistoryRepository.findAll();
     final SearchCriteria criteria = SearchCriteria.builder().key("website").operation(FilterOperation.EQUAL).value(null).valueType(ValueType.STRING).build();
     final List<SearchCriteria> criteriaList = new ArrayList<>();
     criteriaList.add(criteria);
@@ -812,19 +810,21 @@ public class SchoolControllerTest {
   }
 
   @Test
-  void testReadSchoolHistoryPaginated_givenMultipleSearchCriteriaInlcudingLowerCase_ShouldReturnStatusOk() throws Exception {
+  void testReadSchoolHistoryPaginated_givenMultipleSearchCriteriaIncludingLowerCase_ShouldReturnStatusOk() throws Exception {
     final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_SCHOOL_HISTORY";
     final var mockAuthority = oidcLogin().authorities(grantedAuthority);
 
     final SchoolEntity entity = this.schoolRepository.save(this.createSchoolData());
     final SchoolHistoryEntity historyEntity = this.schoolHistoryRepository.save(createHistorySchoolData(entity.getSchoolId()));
     final SearchCriteria criteriaSchoolNumber = SearchCriteria.builder().key("schoolNumber").operation(FilterOperation.EQUAL).value(historyEntity.getSchoolNumber()).valueType(ValueType.STRING).build();
-    final SearchCriteria criteriaSchoolUUID = SearchCriteria.builder().key("schoolId").operation(FilterOperation.EQUAL).value(historyEntity.getSchoolId().toString().toLowerCase()).valueType(ValueType.UUID).build();
+    final SearchCriteria criteriaSchoolUUID = SearchCriteria.builder().key("schoolId").operation(FilterOperation.EQUAL).value(historyEntity.getSchoolId().toString()).valueType(ValueType.UUID).build();
     final SearchCriteria criteriaCreateDate = SearchCriteria.builder().key("createDate").operation(FilterOperation.LESS_THAN).value("2999-01-01T00:00:00").valueType(ValueType.DATE_TIME).condition(Condition.AND).build();
+    final SearchCriteria criteriaSchoolOrganizationCode = SearchCriteria.builder().key("schoolOrganizationCode").operation(FilterOperation.EQUAL).value(historyEntity.getSchoolOrganizationCode().toLowerCase()).valueType(ValueType.STRING).condition(Condition.OR).build();
     final List<SearchCriteria> criteriaList = new ArrayList<>();
     criteriaList.add(criteriaSchoolNumber);
     criteriaList.add(criteriaSchoolUUID);
     criteriaList.add(criteriaCreateDate);
+    criteriaList.add(criteriaSchoolOrganizationCode);
     final List<Search> searches = new LinkedList<>();
     searches.add(Search.builder().searchCriteriaList(criteriaList).build());
     final ObjectMapper objectMapper = new ObjectMapper();
@@ -840,7 +840,7 @@ public class SchoolControllerTest {
     final var mockAuthority = oidcLogin().authorities(grantedAuthority);
 
     final SchoolEntity entity = this.schoolRepository.save(this.createSchoolData());
-    final SchoolHistoryEntity historyEntity = this.schoolHistoryRepository.save(createHistorySchoolData(entity.getSchoolId()));
+    this.schoolHistoryRepository.save(createHistorySchoolData(entity.getSchoolId()));
     final SearchCriteria invalidCriteria = SearchCriteria.builder().key(null).operation(null).value(null).valueType(null).build();
     final List<SearchCriteria> criteriaList = new ArrayList<>();
     criteriaList.add(invalidCriteria);
