@@ -129,15 +129,6 @@ public class SchoolHistorySearchService {
       case DATE_TIME:
         schoolHistoryEntitySpecification = schoolHistoryFilterSpecs.getDateTimeTypeSpecification(key, value, filterOperation);
         break;
-      case LONG:
-        schoolHistoryEntitySpecification = schoolHistoryFilterSpecs.getLongTypeSpecification(key, value, filterOperation);
-        break;
-      case INTEGER:
-        schoolHistoryEntitySpecification = schoolHistoryFilterSpecs.getIntegerTypeSpecification(key, value, filterOperation);
-        break;
-      case DATE:
-        schoolHistoryEntitySpecification = schoolHistoryFilterSpecs.getDateTypeSpecification(key, value, filterOperation);
-        break;
       case UUID:
         schoolHistoryEntitySpecification = schoolHistoryFilterSpecs.getUUIDTypeSpecification(key, value, filterOperation);
         break;
