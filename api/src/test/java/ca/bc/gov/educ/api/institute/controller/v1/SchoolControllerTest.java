@@ -29,6 +29,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.IsNull.notNullValue;
@@ -785,8 +786,29 @@ public class SchoolControllerTest {
     searches.add(Search.builder().searchCriteriaList(criteriaList).build());
     final ObjectMapper objectMapper = new ObjectMapper();
     final String criteriaJSON = objectMapper.writeValueAsString(searches);
-    this.mockMvc.perform(get(URL.BASE_URL_SCHOOL + "/history/paginated").with(mockAuthority).param("searchCriteriaList", criteriaJSON)
-        .contentType(APPLICATION_JSON)).andDo(print()).andExpect(status().isOk());
+    final MvcResult result = this.mockMvc.perform(get(URL.BASE_URL_SCHOOL + "/history/paginated").with(mockAuthority).param("searchCriteriaList", criteriaJSON)
+        .contentType(APPLICATION_JSON)).andReturn();
+    this.mockMvc.perform(asyncDispatch(result)).andDo(print()).andExpect(status().isOk());
+  }
+
+  @Test
+  void testReadSchoolHistoryPaginated_givenWrongRole_ShouldReturnStatusForbidden() throws Exception {
+    final GrantedAuthority grantedAuthority = () -> "UNAUTHORIZED";
+    final var mockAuthority = oidcLogin().authorities(grantedAuthority);
+
+    final SchoolEntity entity = this.schoolRepository.save(this.createSchoolData());
+    this.schoolHistoryRepository.save(createHistorySchoolData(entity.getSchoolId()));
+    val entitiesFromDB = this.schoolHistoryRepository.findAll();
+    final SearchCriteria criteria = SearchCriteria.builder().key("website").operation(FilterOperation.EQUAL).value(null).valueType(ValueType.STRING).build();
+    final List<SearchCriteria> criteriaList = new ArrayList<>();
+    criteriaList.add(criteria);
+    final List<Search> searches = new LinkedList<>();
+    searches.add(Search.builder().searchCriteriaList(criteriaList).build());
+    final ObjectMapper objectMapper = new ObjectMapper();
+    final String criteriaJSON = objectMapper.writeValueAsString(searches);
+    final ResultActions result =  this.mockMvc.perform(get(URL.BASE_URL_SCHOOL + "/history/paginated").with(mockAuthority).param("searchCriteriaList", criteriaJSON)
+        .contentType(APPLICATION_JSON)).andDo(print());
+    result.andExpect(status().isForbidden());
   }
 
   @Test
@@ -796,9 +818,13 @@ public class SchoolControllerTest {
 
     final SchoolEntity entity = this.schoolRepository.save(this.createSchoolData());
     final SchoolHistoryEntity historyEntity = this.schoolHistoryRepository.save(createHistorySchoolData(entity.getSchoolId()));
-    final SearchCriteria criteria = SearchCriteria.builder().key("schoolNumber").operation(FilterOperation.EQUAL).value(historyEntity.getSchoolNumber()).valueType(ValueType.STRING).build();
+    final SearchCriteria criteriaSchoolNumber = SearchCriteria.builder().key("schoolNumber").operation(FilterOperation.EQUAL).value(historyEntity.getSchoolNumber()).valueType(ValueType.STRING).build();
+    final SearchCriteria criteriaSchoolUUID = SearchCriteria.builder().key("schoolId").operation(FilterOperation.EQUAL).value(historyEntity.getSchoolId().toString()).valueType(ValueType.UUID).build();
+    final SearchCriteria criteriaCreateDate = SearchCriteria.builder().key("createDate").operation(FilterOperation.LESS_THAN).value("2999-01-01T00:00:00").valueType(ValueType.DATE_TIME).build();
     final List<SearchCriteria> criteriaList = new ArrayList<>();
-    criteriaList.add(criteria);
+    criteriaList.add(criteriaSchoolNumber);
+    criteriaList.add(criteriaSchoolUUID);
+    criteriaList.add(criteriaCreateDate);
     final List<Search> searches = new LinkedList<>();
     searches.add(Search.builder().searchCriteriaList(criteriaList).build());
     final ObjectMapper objectMapper = new ObjectMapper();
