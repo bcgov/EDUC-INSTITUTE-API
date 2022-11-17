@@ -812,15 +812,15 @@ public class SchoolControllerTest {
   }
 
   @Test
-  void testReadSchoolHistoryPaginated_givenSchoolNumber_ShouldReturnStatusOk() throws Exception {
+  void testReadSchoolHistoryPaginated_givenMultipleSearchCriteriaInlcudingLowerCase_ShouldReturnStatusOk() throws Exception {
     final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_SCHOOL_HISTORY";
     final var mockAuthority = oidcLogin().authorities(grantedAuthority);
 
     final SchoolEntity entity = this.schoolRepository.save(this.createSchoolData());
     final SchoolHistoryEntity historyEntity = this.schoolHistoryRepository.save(createHistorySchoolData(entity.getSchoolId()));
     final SearchCriteria criteriaSchoolNumber = SearchCriteria.builder().key("schoolNumber").operation(FilterOperation.EQUAL).value(historyEntity.getSchoolNumber()).valueType(ValueType.STRING).build();
-    final SearchCriteria criteriaSchoolUUID = SearchCriteria.builder().key("schoolId").operation(FilterOperation.EQUAL).value(historyEntity.getSchoolId().toString()).valueType(ValueType.UUID).build();
-    final SearchCriteria criteriaCreateDate = SearchCriteria.builder().key("createDate").operation(FilterOperation.LESS_THAN).value("2999-01-01T00:00:00").valueType(ValueType.DATE_TIME).build();
+    final SearchCriteria criteriaSchoolUUID = SearchCriteria.builder().key("schoolId").operation(FilterOperation.EQUAL).value(historyEntity.getSchoolId().toString().toLowerCase()).valueType(ValueType.UUID).build();
+    final SearchCriteria criteriaCreateDate = SearchCriteria.builder().key("createDate").operation(FilterOperation.LESS_THAN).value("2999-01-01T00:00:00").valueType(ValueType.DATE_TIME).condition(Condition.AND).build();
     final List<SearchCriteria> criteriaList = new ArrayList<>();
     criteriaList.add(criteriaSchoolNumber);
     criteriaList.add(criteriaSchoolUUID);
@@ -832,6 +832,24 @@ public class SchoolControllerTest {
     final MvcResult result = this.mockMvc.perform(get(URL.BASE_URL_SCHOOL + "/history/paginated").with(mockAuthority).param("searchCriteriaList", criteriaJSON)
         .contentType(APPLICATION_JSON)).andReturn();
     this.mockMvc.perform(asyncDispatch(result)).andDo(print()).andExpect(jsonPath("$.content", hasSize(1)));
+  }
+
+  @Test
+  void testReadSchoolHistoryPaginated_givenInvalidSearchCriteria_ShouldThrowException() throws Exception {
+    final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_SCHOOL_HISTORY";
+    final var mockAuthority = oidcLogin().authorities(grantedAuthority);
+
+    final SchoolEntity entity = this.schoolRepository.save(this.createSchoolData());
+    final SchoolHistoryEntity historyEntity = this.schoolHistoryRepository.save(createHistorySchoolData(entity.getSchoolId()));
+    final SearchCriteria invalidCriteria = SearchCriteria.builder().key(null).operation(null).value(null).valueType(null).build();
+    final List<SearchCriteria> criteriaList = new ArrayList<>();
+    criteriaList.add(invalidCriteria);
+    final List<Search> searches = new LinkedList<>();
+    searches.add(Search.builder().searchCriteriaList(criteriaList).build());
+    final ObjectMapper objectMapper = new ObjectMapper();
+    final String criteriaJSON = objectMapper.writeValueAsString(searches);
+    this.mockMvc.perform(get(URL.BASE_URL_SCHOOL + "/history/paginated").with(mockAuthority).param("searchCriteriaList", criteriaJSON)
+        .contentType(APPLICATION_JSON)).andDo(print()).andExpect(status().isBadRequest());
   }
 
   private SchoolEntity createSchoolData() {
