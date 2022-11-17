@@ -47,6 +47,8 @@ public class SchoolAPIController implements SchoolAPIEndpoint {
 
   private static final SchoolMapper mapper = SchoolMapper.mapper;
 
+  private static final SchoolHistoryMapper schoolHistoryMapper = SchoolHistoryMapper.mapper;
+
   private static final SchoolTombstoneMapper tombstoneMapper = SchoolTombstoneMapper.mapper;
 
   private static final SchoolContactMapper schoolContactMapper = SchoolContactMapper.mapper;
@@ -60,10 +62,8 @@ public class SchoolAPIController implements SchoolAPIEndpoint {
   @Getter(AccessLevel.PRIVATE)
   private final SchoolHistoryService schoolHistoryService;
 
-  @Getter(AccessLevel.PRIVATE)
   private final SchoolHistorySearchService schoolHistorySearchService;
 
-  @Getter(AccessLevel.PRIVATE)
   private final SchoolSearchService schoolSearchService;
 
   @Getter(AccessLevel.PRIVATE)
@@ -241,7 +241,7 @@ public class SchoolAPIController implements SchoolAPIEndpoint {
   public CompletableFuture<Page<SchoolHistory>> schoolHistoryFindAll(Integer pageNumber, Integer pageSize, String sortCriteriaJson, String searchCriteriaListJson) {
     final List<Sort.Order> sorts = new ArrayList<>();
     Specification<SchoolHistoryEntity> schoolHistorySpecs = schoolHistorySearchService.setSpecificationAndSortCriteria(sortCriteriaJson, searchCriteriaListJson, JsonUtil.mapper, sorts);
-    return this.schoolHistorySearchService.findAll(schoolHistorySpecs, pageNumber, pageSize, sorts).thenApplyAsync(schoolHistoryEntities -> schoolHistoryEntities.map(mapper::toStructure));
+    return this.schoolHistorySearchService.findAll(schoolHistorySpecs, pageNumber, pageSize, sorts).thenApplyAsync(schoolHistoryEntities -> schoolHistoryEntities.map(schoolHistoryMapper::toStructure));
   }
 
 }
