@@ -4,7 +4,6 @@ import ca.bc.gov.educ.api.institute.InstituteApiResourceApplication;
 import ca.bc.gov.educ.api.institute.constants.v1.URL;
 import ca.bc.gov.educ.api.institute.filter.FilterOperation;
 import ca.bc.gov.educ.api.institute.mapper.v1.CodeTableMapper;
-import ca.bc.gov.educ.api.institute.mapper.v1.IndependentAuthorityMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.SchoolMapper;
 import ca.bc.gov.educ.api.institute.model.v1.*;
 import ca.bc.gov.educ.api.institute.repository.v1.*;
@@ -30,11 +29,10 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.IsNull.notNullValue;
-
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -773,6 +771,88 @@ public class SchoolControllerTest {
 
   }
 
+  @Test
+  void testReadSchoolHistoryPaginated_givenValueNull_ShouldReturnStatusOk() throws Exception {
+    final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_SCHOOL_HISTORY";
+    final var mockAuthority = oidcLogin().authorities(grantedAuthority);
+
+    final SchoolEntity entity = this.schoolRepository.save(this.createSchoolData());
+    this.schoolHistoryRepository.save(createHistorySchoolData(entity.getSchoolId()));
+    final SearchCriteria criteria = SearchCriteria.builder().key("website").operation(FilterOperation.EQUAL).value(null).valueType(ValueType.STRING).build();
+    final List<SearchCriteria> criteriaList = new ArrayList<>();
+    criteriaList.add(criteria);
+    final List<Search> searches = new LinkedList<>();
+    searches.add(Search.builder().searchCriteriaList(criteriaList).build());
+    final ObjectMapper objectMapper = new ObjectMapper();
+    final String criteriaJSON = objectMapper.writeValueAsString(searches);
+    final MvcResult result = this.mockMvc.perform(get(URL.BASE_URL_SCHOOL + "/history/paginated").with(mockAuthority).param("searchCriteriaList", criteriaJSON)
+        .contentType(APPLICATION_JSON)).andReturn();
+    this.mockMvc.perform(asyncDispatch(result)).andDo(print()).andExpect(status().isOk());
+  }
+
+  @Test
+  void testReadSchoolHistoryPaginated_givenWrongRole_ShouldReturnStatusForbidden() throws Exception {
+    final GrantedAuthority grantedAuthority = () -> "UNAUTHORIZED";
+    final var mockAuthority = oidcLogin().authorities(grantedAuthority);
+
+    final SchoolEntity entity = this.schoolRepository.save(this.createSchoolData());
+    this.schoolHistoryRepository.save(createHistorySchoolData(entity.getSchoolId()));
+    final SearchCriteria criteria = SearchCriteria.builder().key("website").operation(FilterOperation.EQUAL).value(null).valueType(ValueType.STRING).build();
+    final List<SearchCriteria> criteriaList = new ArrayList<>();
+    criteriaList.add(criteria);
+    final List<Search> searches = new LinkedList<>();
+    searches.add(Search.builder().searchCriteriaList(criteriaList).build());
+    final ObjectMapper objectMapper = new ObjectMapper();
+    final String criteriaJSON = objectMapper.writeValueAsString(searches);
+    final ResultActions result =  this.mockMvc.perform(get(URL.BASE_URL_SCHOOL + "/history/paginated").with(mockAuthority).param("searchCriteriaList", criteriaJSON)
+        .contentType(APPLICATION_JSON)).andDo(print());
+    result.andExpect(status().isForbidden());
+  }
+
+  @Test
+  void testReadSchoolHistoryPaginated_givenMultipleSearchCriteriaIncludingLowerCase_ShouldReturnStatusOk() throws Exception {
+    final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_SCHOOL_HISTORY";
+    final var mockAuthority = oidcLogin().authorities(grantedAuthority);
+
+    final SchoolEntity entity = this.schoolRepository.save(this.createSchoolData());
+    final SchoolHistoryEntity historyEntity = this.schoolHistoryRepository.save(createHistorySchoolData(entity.getSchoolId()));
+    final SearchCriteria criteriaSchoolNumber = SearchCriteria.builder().key("schoolNumber").operation(FilterOperation.EQUAL).value(historyEntity.getSchoolNumber()).valueType(ValueType.LONG).build();
+    final SearchCriteria criteriaSchoolUUID = SearchCriteria.builder().key("schoolId").operation(FilterOperation.EQUAL).value(historyEntity.getSchoolId().toString()).valueType(ValueType.UUID).build();
+    final SearchCriteria criteriaCreateDate = SearchCriteria.builder().key("createDate").operation(FilterOperation.LESS_THAN).value("2999-01-01T00:00:00").valueType(ValueType.DATE_TIME).condition(Condition.AND).build();
+    final SearchCriteria criteriaSchoolOrganizationCode = SearchCriteria.builder().key("schoolOrganizationCode").operation(FilterOperation.EQUAL).value(historyEntity.getSchoolOrganizationCode().toLowerCase()).valueType(ValueType.STRING).condition(Condition.OR).build();
+    final SearchCriteria criteriaSchoolPhoneNumber = SearchCriteria.builder().key("phoneNumber").operation(FilterOperation.EQUAL).value(historyEntity.getPhoneNumber()).valueType(ValueType.INTEGER).build();
+    final List<SearchCriteria> criteriaList = new ArrayList<>();
+    criteriaList.add(criteriaSchoolNumber);
+    criteriaList.add(criteriaSchoolUUID);
+    criteriaList.add(criteriaCreateDate);
+    criteriaList.add(criteriaSchoolOrganizationCode);
+    criteriaList.add(criteriaSchoolPhoneNumber);
+    final List<Search> searches = new LinkedList<>();
+    searches.add(Search.builder().searchCriteriaList(criteriaList).build());
+    final ObjectMapper objectMapper = new ObjectMapper();
+    final String criteriaJSON = objectMapper.writeValueAsString(searches);
+    final MvcResult result = this.mockMvc.perform(get(URL.BASE_URL_SCHOOL + "/history/paginated").with(mockAuthority).param("searchCriteriaList", criteriaJSON)
+        .contentType(APPLICATION_JSON)).andReturn();
+    this.mockMvc.perform(asyncDispatch(result)).andDo(print()).andExpect(jsonPath("$.content", hasSize(1)));
+  }
+
+  @Test
+  void testReadSchoolHistoryPaginated_givenInvalidSearchCriteria_ShouldThrowException() throws Exception {
+    final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_SCHOOL_HISTORY";
+    final var mockAuthority = oidcLogin().authorities(grantedAuthority);
+
+    final SchoolEntity entity = this.schoolRepository.save(this.createSchoolData());
+    final SearchCriteria invalidCriteria = SearchCriteria.builder().key(null).operation(null).value(null).valueType(null).build();
+    final List<SearchCriteria> criteriaList = new ArrayList<>();
+    criteriaList.add(invalidCriteria);
+    final List<Search> searches = new LinkedList<>();
+    searches.add(Search.builder().searchCriteriaList(criteriaList).build());
+    final ObjectMapper objectMapper = new ObjectMapper();
+    final String criteriaJSON = objectMapper.writeValueAsString(searches);
+    this.mockMvc.perform(get(URL.BASE_URL_SCHOOL + "/history/paginated").with(mockAuthority).param("searchCriteriaList", criteriaJSON)
+        .contentType(APPLICATION_JSON)).andDo(print()).andExpect(status().isBadRequest());
+  }
+
   private SchoolEntity createSchoolData() {
     return SchoolEntity.builder().schoolNumber("12345").displayName("School Name").openedDate(LocalDateTime.now().minusDays(1).withNano(0)).schoolCategoryCode("PUB_SCHL")
       .schoolOrganizationCode("TWO_SEM").facilityTypeCode("STAND_SCHL").website("abc@sd99.edu").createDate(LocalDateTime.now().withNano(0))
@@ -781,7 +861,7 @@ public class SchoolControllerTest {
 
   private SchoolHistoryEntity createHistorySchoolData(UUID schoolId) {
     return SchoolHistoryEntity.builder().schoolId(schoolId).schoolNumber("003").displayName("School Name").openedDate(LocalDateTime.now().minusDays(1)).schoolCategoryCode("PUB_SCHL")
-      .schoolOrganizationCode("TWO_SEM").facilityTypeCode("STAND_SCHL").website("abc@sd99.edu").createDate(LocalDateTime.now())
+      .schoolOrganizationCode("TWO_SEM").phoneNumber("1112223333").facilityTypeCode("STAND_SCHL").website("abc@sd99.edu").createDate(LocalDateTime.now())
       .updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
   }
 

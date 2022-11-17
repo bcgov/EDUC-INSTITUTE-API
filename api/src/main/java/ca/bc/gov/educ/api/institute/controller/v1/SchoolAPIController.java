@@ -6,7 +6,9 @@ import ca.bc.gov.educ.api.institute.exception.InvalidPayloadException;
 import ca.bc.gov.educ.api.institute.exception.errors.ApiError;
 import ca.bc.gov.educ.api.institute.mapper.v1.*;
 import ca.bc.gov.educ.api.institute.model.v1.SchoolEntity;
+import ca.bc.gov.educ.api.institute.model.v1.SchoolHistoryEntity;
 import ca.bc.gov.educ.api.institute.service.v1.SchoolHistoryService;
+import ca.bc.gov.educ.api.institute.service.v1.SchoolHistorySearchService;
 import ca.bc.gov.educ.api.institute.service.v1.SchoolSearchService;
 import ca.bc.gov.educ.api.institute.service.v1.SchoolService;
 import ca.bc.gov.educ.api.institute.struct.v1.*;
@@ -45,6 +47,8 @@ public class SchoolAPIController implements SchoolAPIEndpoint {
 
   private static final SchoolMapper mapper = SchoolMapper.mapper;
 
+  private static final SchoolHistoryMapper schoolHistoryMapper = SchoolHistoryMapper.mapper;
+
   private static final SchoolTombstoneMapper tombstoneMapper = SchoolTombstoneMapper.mapper;
 
   private static final SchoolContactMapper schoolContactMapper = SchoolContactMapper.mapper;
@@ -58,7 +62,8 @@ public class SchoolAPIController implements SchoolAPIEndpoint {
   @Getter(AccessLevel.PRIVATE)
   private final SchoolHistoryService schoolHistoryService;
 
-  @Getter(AccessLevel.PRIVATE)
+  private final SchoolHistorySearchService schoolHistorySearchService;
+
   private final SchoolSearchService schoolSearchService;
 
   @Getter(AccessLevel.PRIVATE)
@@ -70,10 +75,11 @@ public class SchoolAPIController implements SchoolAPIEndpoint {
 
   private final NotePayloadValidator notePayloadValidator;
   @Autowired
-  public SchoolAPIController(final SchoolService schoolService, final SchoolHistoryService schoolHistoryService, SchoolSearchService schoolSearchService, final SchoolPayloadValidator payloadValidator, SchoolContactPayloadValidator contactPayloadValidator, AddressPayloadValidator addressPayloadValidator, NotePayloadValidator notePayloadValidator) {
+  public SchoolAPIController(final SchoolService schoolService, final SchoolHistoryService schoolHistoryService, SchoolSearchService schoolSearchService, SchoolHistorySearchService schoolHistorySearchService, final SchoolPayloadValidator payloadValidator, SchoolContactPayloadValidator contactPayloadValidator, AddressPayloadValidator addressPayloadValidator, NotePayloadValidator notePayloadValidator) {
     this.schoolService = schoolService;
     this.schoolHistoryService = schoolHistoryService;
     this.schoolSearchService = schoolSearchService;
+    this.schoolHistorySearchService = schoolHistorySearchService;
     this.payloadValidator = payloadValidator;
     this.contactPayloadValidator = contactPayloadValidator;
     this.addressPayloadValidator = addressPayloadValidator;
@@ -229,6 +235,13 @@ public class SchoolAPIController implements SchoolAPIEndpoint {
     final List<Sort.Order> sorts = new ArrayList<>();
     Specification<SchoolEntity> studentSpecs = schoolSearchService.setSpecificationAndSortCriteria(sortCriteriaJson, searchCriteriaListJson, JsonUtil.mapper, sorts);
     return this.schoolSearchService.findAll(studentSpecs, pageNumber, pageSize, sorts).thenApplyAsync(schoolEntities -> schoolEntities.map(mapper::toStructure));
+  }
+
+  @Override
+  public CompletableFuture<Page<SchoolHistory>> schoolHistoryFindAll(Integer pageNumber, Integer pageSize, String sortCriteriaJson, String searchCriteriaListJson) {
+    final List<Sort.Order> sorts = new ArrayList<>();
+    Specification<SchoolHistoryEntity> schoolHistorySpecs = schoolHistorySearchService.setSpecificationAndSortCriteria(sortCriteriaJson, searchCriteriaListJson, JsonUtil.mapper, sorts);
+    return this.schoolHistorySearchService.findAll(schoolHistorySpecs, pageNumber, pageSize, sorts).thenApplyAsync(schoolHistoryEntities -> schoolHistoryEntities.map(schoolHistoryMapper::toStructure));
   }
 
 }
