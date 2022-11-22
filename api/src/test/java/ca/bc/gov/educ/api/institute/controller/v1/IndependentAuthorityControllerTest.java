@@ -254,6 +254,12 @@ public class IndependentAuthorityControllerTest {
     auth.setCreateDate(null);
     auth.setUpdateDate(null);
 
+    auth.getAddresses().stream().forEach(addy -> {
+      addy.setCreateDate(null);
+      addy.setUpdateDate(null);
+    }
+    );
+
     this.mockMvc.perform(put(URL.BASE_URL_AUTHORITY + "/" + entity.getIndependentAuthorityId())
         .contentType(MediaType.APPLICATION_JSON)
         .accept(MediaType.APPLICATION_JSON)
@@ -262,6 +268,43 @@ public class IndependentAuthorityControllerTest {
       .andDo(print())
       .andExpect(status().isOk())
       .andExpect(MockMvcResultMatchers.jsonPath("$.addresses.[1].addressLine1").value("123 TESTING"));
+  }
+
+  @Test
+  void testUpdateIndependentAuthorityWithAddress_UpdateAfter_GivenValidPayload_ShouldReturnStatusBadRequest() throws Exception {
+    final var independentAuthority = this.createIndependentAuthorityData();
+    var entity = this.independentAuthorityRepository.save(independentAuthority);
+    entity.setDisplayName("newdist");
+    entity.setCreateDate(null);
+    entity.setUpdateDate(null);
+    entity.getAddresses().add(this.createIndependentAuthorityAddressData());
+
+    this.mockMvc.perform(put(URL.BASE_URL_AUTHORITY + "/" + entity.getIndependentAuthorityId())
+        .contentType(MediaType.APPLICATION_JSON)
+        .accept(MediaType.APPLICATION_JSON)
+        .content(asJsonString(entity))
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_INDEPENDENT_AUTHORITY"))))
+      .andDo(print())
+      .andExpect(status().isOk())
+      .andExpect(MockMvcResultMatchers.jsonPath("$.displayName").value(entity.getDisplayName()));
+
+    entity = this.independentAuthorityRepository.findById(independentAuthority.getIndependentAuthorityId()).get();
+    entity.getAddresses().iterator().next().setAddressLine1(null);
+
+    IndependentAuthorityMapper mapper = IndependentAuthorityMapper.mapper;
+
+    var auth = mapper.toStructure(entity);
+
+    auth.setCreateDate(null);
+    auth.setUpdateDate(null);
+
+    this.mockMvc.perform(put(URL.BASE_URL_AUTHORITY + "/" + entity.getIndependentAuthorityId())
+        .contentType(MediaType.APPLICATION_JSON)
+        .accept(MediaType.APPLICATION_JSON)
+        .content(asJsonString(auth))
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_INDEPENDENT_AUTHORITY"))))
+      .andDo(print())
+      .andExpect(status().isBadRequest());
   }
 
   @Test
@@ -719,7 +762,7 @@ public class IndependentAuthorityControllerTest {
 
   private AddressEntity createIndependentAuthorityAddressData() {
     return AddressEntity.builder().independentAuthorityEntity(null).addressLine1("Line 1").city("City").provinceCode("BC").countryCode("CA").postal("V1V1V2").addressTypeCode("MAILING")
-      .createDate(LocalDateTime.now()).updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
+      .createUser("TEST").updateUser("TEST").build();
   }
 
   private IndependentAuthorityHistoryEntity createHistoryIndependentAuthorityData(UUID independentAuthorityId) {

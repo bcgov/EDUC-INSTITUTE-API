@@ -8,6 +8,7 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -73,14 +74,19 @@ public class School extends BaseRequest implements Serializable {
   @JsonSerialize(using = LocalDateTimeSerializer.class)
   private LocalDateTime closedDate;
 
+  @Valid
   private List<SchoolContact> contacts;
 
+  @Valid
   private List<Address> addresses;
 
+  @Valid
   private List<Note> notes;
 
+  @Valid
   private List<SchoolGrade> grades;
 
+  @Valid
   private List<NeighborhoodLearning> neighborhoodLearning;
 
 }

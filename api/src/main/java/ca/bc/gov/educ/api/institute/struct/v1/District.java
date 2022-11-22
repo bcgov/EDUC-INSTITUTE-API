@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -53,9 +54,12 @@ public class District extends BaseRequest implements Serializable {
   @NotNull(message = "districtStatusCode cannot be null")
   private String districtStatusCode;
 
+  @Valid
   private List<DistrictContact> contacts;
 
+  @Valid
   private List<Address> addresses;
 
+  @Valid
   private List<Note> notes;
 }
