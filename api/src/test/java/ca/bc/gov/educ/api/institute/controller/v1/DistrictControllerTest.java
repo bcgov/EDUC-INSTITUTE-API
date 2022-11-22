@@ -221,6 +221,12 @@ public class DistrictControllerTest {
     entity.setCreateDate(null);
     entity.setUpdateDate(null);
 
+    entity.getAddresses().stream().forEach(addy -> {
+        addy.setCreateDate(null);
+        addy.setUpdateDate(null);
+      }
+    );
+
     this.mockMvc.perform(put(URL.BASE_URL_DISTRICT + "/" + entity.getDistrictId())
         .contentType(MediaType.APPLICATION_JSON)
         .accept(MediaType.APPLICATION_JSON)
@@ -242,6 +248,12 @@ public class DistrictControllerTest {
 
     auth.setCreateDate(null);
     auth.setUpdateDate(null);
+
+    auth.getAddresses().stream().forEach(addy -> {
+        addy.setCreateDate(null);
+        addy.setUpdateDate(null);
+      }
+    );
 
     this.mockMvc.perform(put(URL.BASE_URL_DISTRICT + "/" + entity.getDistrictId())
         .contentType(MediaType.APPLICATION_JSON)

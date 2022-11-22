@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -52,9 +53,12 @@ public class IndependentAuthority extends BaseRequest implements Serializable {
 
   private LocalDateTime closedDate;
 
+  @Valid
   private List<AuthorityContact> contacts;
 
+  @Valid
   private List<Address> addresses;
 
+  @Valid
   private List<Note> notes;
 }

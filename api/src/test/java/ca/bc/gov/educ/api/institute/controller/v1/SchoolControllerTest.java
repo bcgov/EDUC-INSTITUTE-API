@@ -282,6 +282,12 @@ public class SchoolControllerTest {
     entity.setCreateDate(null);
     entity.setUpdateDate(null);
 
+    entity.getAddresses().stream().forEach(addy -> {
+        addy.setCreateDate(null);
+        addy.setUpdateDate(null);
+      }
+    );
+
     var schoolStruct = SchoolMapper.mapper.toStructure(entity);
     schoolStruct.setDistrictId(dist.getDistrictId().toString());
 
@@ -306,6 +312,13 @@ public class SchoolControllerTest {
 
     auth.setCreateDate(null);
     auth.setUpdateDate(null);
+
+    auth.getAddresses().stream().forEach(addy -> {
+        addy.setCreateDate(null);
+        addy.setUpdateDate(null);
+      }
+    );
+
 
     this.mockMvc.perform(put(URL.BASE_URL_SCHOOL + "/" + entity.getSchoolId())
         .contentType(MediaType.APPLICATION_JSON)
@@ -912,7 +925,6 @@ public class SchoolControllerTest {
     schoolGrade.setSchoolId(schoolId);
     schoolGrade.setCreateUser("TEST");
     schoolGrade.setUpdateUser("TEST");
-    schoolGrade.setCreateDate(String.valueOf(LocalDateTime.now()));
     return schoolGrade;
   }
   private NeighborhoodLearning createNeighborhoodLearning(String schoolId) {
@@ -921,7 +933,6 @@ public class SchoolControllerTest {
     neighborhoodLearning.setNeighborhoodLearningTypeCode("COMM_USE");
     neighborhoodLearning.setCreateUser("TEST");
     neighborhoodLearning.setUpdateUser("TEST");
-    neighborhoodLearning.setCreateDate(String.valueOf(LocalDateTime.now()));
     return neighborhoodLearning;
   }
 

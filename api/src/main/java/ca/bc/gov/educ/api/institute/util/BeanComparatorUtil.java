@@ -18,7 +18,7 @@ public class BeanComparatorUtil {
             field.setAccessible(true);
             var firstField = field.get(t);
             var secondField = field.get(t2);
-            if(!checkForNulls(firstField, secondField) && firstField != null && secondField != null && !(firstField.equals(secondField))) {
+            if(checkForNulls(firstField, secondField) || (firstField != null && secondField != null && !(firstField.equals(secondField)))) {
               return false;
             }
             field.setAccessible(false);
