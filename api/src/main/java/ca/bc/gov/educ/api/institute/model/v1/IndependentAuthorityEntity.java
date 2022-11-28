@@ -80,4 +80,12 @@ public class IndependentAuthorityEntity {
   @EqualsAndHashCode.Exclude
   @OneToMany(mappedBy = "independentAuthorityEntity", fetch = FetchType.EAGER, cascade = CascadeType.DETACH, targetEntity = NoteEntity.class)
   private Set<NoteEntity> notes;
+
+  public String getAuthorityNumber() {
+    return authorityNumber;
+  }
+
+  public void setAuthorityNumber(String authorityNumber) {
+    this.authorityNumber = authorityNumber;
+  }
 }
