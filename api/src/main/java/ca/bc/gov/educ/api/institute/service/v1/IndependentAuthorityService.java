@@ -83,7 +83,7 @@ public class IndependentAuthorityService {
   public IndependentAuthorityEntity createIndependentAuthority(IndependentAuthority independentAuthority) {
     var independentAuthorityEntity = IndependentAuthorityMapper.mapper.toModel(independentAuthority);
 
-    var independentAuthorityWithMaxNum = Collections.max(this.getAllIndependentAuthoritysList(), Comparator.comparing(i -> i.getAuthorityNumber()));
+    IndependentAuthorityEntity independentAuthorityWithMaxNum = independentAuthorityRepository.findFirstByOrderByAuthorityNumberDesc();
     independentAuthorityEntity.setAuthorityNumber(independentAuthorityWithMaxNum.getAuthorityNumber() + 1);
 
     TransformUtil.uppercaseFields(independentAuthorityEntity);
