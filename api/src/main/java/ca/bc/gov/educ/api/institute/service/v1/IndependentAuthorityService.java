@@ -82,6 +82,10 @@ public class IndependentAuthorityService {
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public IndependentAuthorityEntity createIndependentAuthority(IndependentAuthority independentAuthority) {
     var independentAuthorityEntity = IndependentAuthorityMapper.mapper.toModel(independentAuthority);
+
+    IndependentAuthorityEntity independentAuthorityWithMaxNum = independentAuthorityRepository.findFirstByOrderByAuthorityNumberDesc();
+    independentAuthorityEntity.setAuthorityNumber(independentAuthorityWithMaxNum.getAuthorityNumber() + 1);
+
     TransformUtil.uppercaseFields(independentAuthorityEntity);
     independentAuthorityRepository.save(independentAuthorityEntity);
     independentAuthorityHistoryService.createIndependentAuthorityHistory(independentAuthorityEntity, independentAuthority.getCreateUser(), false);

@@ -10,4 +10,5 @@ import java.util.UUID;
 @Repository
 public interface IndependentAuthorityRepository extends JpaRepository<IndependentAuthorityEntity, UUID>, JpaSpecificationExecutor<IndependentAuthorityEntity> {
 
+    IndependentAuthorityEntity findFirstByOrderByAuthorityNumberDesc();
 }

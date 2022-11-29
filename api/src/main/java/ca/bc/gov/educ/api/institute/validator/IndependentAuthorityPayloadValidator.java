@@ -39,6 +39,13 @@ public class IndependentAuthorityPayloadValidator {
     if (isCreateOperation && independentAuthority.getIndependentAuthorityId() != null) {
       apiValidationErrors.add(createFieldError("independentAuthorityId", independentAuthority.getIndependentAuthorityId(), "independentAuthorityId should be null for post operation."));
     }
+
+    if (isCreateOperation && independentAuthority.getAuthorityNumber() != null) {
+      apiValidationErrors.add(createFieldError("authorityNumber", independentAuthority.getAuthorityNumber(), "authorityNumber should be null for post operation."));
+    }
+    else if(!isCreateOperation && independentAuthority.getAuthorityNumber() == null) {
+        apiValidationErrors.add(createFieldError("authorityNumber", independentAuthority.getAuthorityNumber(), "authorityNumber can not be null for a put operation."));
+    }
     validateIndependentAuthorityTypeCode(independentAuthority, apiValidationErrors);
     return apiValidationErrors;
   }

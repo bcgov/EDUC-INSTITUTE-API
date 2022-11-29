@@ -26,8 +26,7 @@ public class IndependentAuthority extends BaseRequest implements Serializable {
 
   private String independentAuthorityId;
 
-  @Size(max = 3)
-  @NotNull(message = "authorityNumber can not be null.")
+  @Size(max = 4)
   private String authorityNumber;
 
   @Size(max = 10)
