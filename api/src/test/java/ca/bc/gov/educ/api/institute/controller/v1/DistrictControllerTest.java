@@ -600,7 +600,7 @@ public class DistrictControllerTest {
 
   private AddressEntity createAddressData(DistrictEntity entity) {
     return AddressEntity.builder().districtEntity(entity).addressTypeCode("MAILING").addressLine1("123 This Street").city("Compton")
-      .provinceCode("BC").countryCode("CA").postal("V1B9H2").createUser("TEST").updateUser("TEST").build();
+      .provinceCode("BC").countryCode("CA").postal("V1B9H2").build();
   }
 
   private NoteEntity createNoteData(DistrictEntity entity) {

@@ -942,7 +942,7 @@ public class SchoolControllerTest {
 
   private AddressEntity createAddressData(SchoolEntity entity) {
     return AddressEntity.builder().schoolEntity(entity).addressTypeCode("MAILING").addressLine1("123 This Street").city("Compton")
-      .provinceCode("BC").countryCode("CA").postal("V1B9H2").createUser("TEST").updateUser("TEST").build();
+      .provinceCode("BC").countryCode("CA").postal("V1B9H2").build();
   }
 
   private NoteEntity createNoteData(SchoolEntity entity) {
