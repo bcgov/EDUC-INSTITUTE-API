@@ -43,6 +43,12 @@ public class AddressPayloadValidator {
     if (isCreateOperation && address.getAddressId() != null) {
       apiValidationErrors.add(createFieldError("addressId", address.getAddressId(), "addressId should be null for post operation."));
     }
+    if (isCreateOperation && address.getCreateDate() != null) {
+      apiValidationErrors.add(createFieldError("createDate", address.getCreateDate(), "createDate should be null for post operation."));
+    }
+    if (isCreateOperation && address.getCreateUser() != null) {
+      apiValidationErrors.add(createFieldError("createUser", address.getCreateUser(), "createUser should be null for post operation."));
+    }
     validateAddressTypeCode(address, apiValidationErrors);
     validateProvinceCode(address, apiValidationErrors);
     validateCountryCode(address, apiValidationErrors);

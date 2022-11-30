@@ -8,10 +8,7 @@ import ca.bc.gov.educ.api.institute.mapper.v1.IndependentAuthorityMapper;
 import ca.bc.gov.educ.api.institute.model.v1.*;
 import ca.bc.gov.educ.api.institute.repository.v1.*;
 import ca.bc.gov.educ.api.institute.service.v1.CodeTableService;
-import ca.bc.gov.educ.api.institute.struct.v1.Condition;
-import ca.bc.gov.educ.api.institute.struct.v1.Search;
-import ca.bc.gov.educ.api.institute.struct.v1.SearchCriteria;
-import ca.bc.gov.educ.api.institute.struct.v1.ValueType;
+import ca.bc.gov.educ.api.institute.struct.v1.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -347,6 +344,29 @@ public class IndependentAuthorityControllerTest {
             .andExpect(status().isBadRequest());
   }
 
+  @Test
+  void testCreateIndependentAuthority_GivenInvalidPayload_WithAddress_CreateDate_CreateUser_ShouldReturnStatusBadRequest() throws Exception {
+    final var existingIndependentAuthority = this.createIndependentAuthorityData();
+    existingIndependentAuthority.setAuthorityNumber("1000");
+    existingIndependentAuthority.setCreateDate(null);
+    existingIndependentAuthority.setUpdateDate(null);
+    independentAuthorityRepository.save(existingIndependentAuthority);
+    final var independentAuthority = this.createIndependentAuthorityData();
+    independentAuthority.setCreateDate(null);
+    independentAuthority.setUpdateDate(null);
+    AddressEntity address = new AddressEntity();
+    address.setCreateDate(LocalDateTime.now());
+    address.setCreateUser("EDX");
+    independentAuthority.getAddresses().add(address);
+
+    this.mockMvc.perform(post(URL.BASE_URL_AUTHORITY)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .content(asJsonString(independentAuthority))
+                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_INDEPENDENT_AUTHORITY"))))
+            .andDo(print())
+            .andExpect(status().isBadRequest());
+  }
 
   @Test
   void testCreateIndependentAuthority_GivenInvalidPayload_ShouldReturnStatusBadRequest() throws Exception {
@@ -842,7 +862,7 @@ public class IndependentAuthorityControllerTest {
 
   private AddressEntity createAddressData(IndependentAuthorityEntity entity) {
     return AddressEntity.builder().independentAuthorityEntity(entity).addressTypeCode("MAILING").addressLine1("123 This Street").city("Compton")
-      .provinceCode("BC").countryCode("CA").postal("V1B9H2").createUser("TEST").updateUser("TEST").build();
+      .provinceCode("BC").countryCode("CA").postal("V1B9H2").build();
   }
 
   private NoteEntity createNoteData(IndependentAuthorityEntity entity) {
