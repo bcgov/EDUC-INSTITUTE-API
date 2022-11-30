@@ -85,7 +85,7 @@ public class IndependentAuthorityService {
 
     IndependentAuthorityEntity independentAuthorityWithMaxNum = independentAuthorityRepository.findFirstByOrderByAuthorityNumberDesc();
     independentAuthorityEntity.setAuthorityNumber(independentAuthorityWithMaxNum.getAuthorityNumber() + 1);
-    independentAuthorityEntity.getAddresses().stream().forEach((a) -> {RequestUtil.setAuditColumnsForAddress(a);});
+    independentAuthorityEntity.getAddresses().stream().forEach(a -> RequestUtil.setAuditColumnsForAddress(a));
     TransformUtil.uppercaseFields(independentAuthorityEntity);
     independentAuthorityRepository.save(independentAuthorityEntity);
     independentAuthorityHistoryService.createIndependentAuthorityHistory(independentAuthorityEntity, independentAuthority.getCreateUser(), false);
