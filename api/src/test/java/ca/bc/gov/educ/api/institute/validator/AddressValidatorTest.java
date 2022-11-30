@@ -18,7 +18,7 @@ public class AddressValidatorTest {
     private final AddressPayloadValidator addressValidator = new AddressPayloadValidator(null, null);
 
     @Test
-    public void testValidateCreatePayload_ValidAddress() {
+    public void testValidateCreatePayload_InvalidAddress() {
         Address address = new Address();
         address.setAddressLine1("123 Maple Dr");
         address.setCity("Victoria");
@@ -33,7 +33,7 @@ public class AddressValidatorTest {
     }
 
     @Test
-    public void testValidateCreatePayload_InvalidAddress() throws Exception {
+    public void testValidateCreatePayload_ValidAddress() throws Exception {
         Address address = new Address();
         address.setAddressLine1("123 Maple Dr");
         address.setCity("Victoria");
