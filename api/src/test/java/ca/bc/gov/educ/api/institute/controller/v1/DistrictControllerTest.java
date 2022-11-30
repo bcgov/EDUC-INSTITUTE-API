@@ -654,7 +654,7 @@ public class DistrictControllerTest {
 
   private AddressEntity createDistrictAddressData() {
     return AddressEntity.builder().independentAuthorityEntity(null).addressLine1("Line 1").city("City").provinceCode("BC").countryCode("CA").postal("V1V1V2").addressTypeCode("MAILING")
-      .createDate(LocalDateTime.now()).updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
+      .createDate(LocalDateTime.now()).updateDate(LocalDateTime.now()).build();
   }
 
   private CountryCodeEntity createCountryCodeData() {
