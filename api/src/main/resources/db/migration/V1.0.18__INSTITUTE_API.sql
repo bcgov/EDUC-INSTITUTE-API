@@ -1,0 +1,15 @@
+UPDATE SCHOOL_CATEGORY_CODE
+SET
+    LABEL = 'StrongStart Center',
+    DESCRIPTION = 'StrongStart center'
+WHERE
+    SCHOOL_CATEGORY_CODE= 'STRONG_CEN';
+
+UPDATE SCHOOL_CATEGORY_CODE
+SET
+    LABEL = 'StrongStart Outreach',
+    DESCRIPTION = 'StrongStart outreach'
+WHERE
+        SCHOOL_CATEGORY_CODE= 'STRONG_OUT';
+
+
