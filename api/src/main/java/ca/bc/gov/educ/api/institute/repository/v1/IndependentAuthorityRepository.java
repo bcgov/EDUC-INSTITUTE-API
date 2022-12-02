@@ -13,6 +13,6 @@ import java.util.UUID;
 public interface IndependentAuthorityRepository extends JpaRepository<IndependentAuthorityEntity, UUID>, JpaSpecificationExecutor<IndependentAuthorityEntity> {
 
     @Transactional
-    @Query(value = "select authority_number from INDEPENDENT_AUTHORITY order by CAST(authority_number as int) desc", nativeQuery = true)
+    @Query(value = "select authority_number from INDEPENDENT_AUTHORITY order by CAST(authority_number as int) desc LIMIT 1", nativeQuery = true)
     String findLastAuthorityNumber();
 }
