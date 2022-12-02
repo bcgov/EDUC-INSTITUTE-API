@@ -130,6 +130,7 @@ public class DistrictService {
             addressHistoryService.createAddressHistory(address, address.getUpdateUser(), false);
           }else{
             currentDistrictEntity.getAddresses().add(currAddress);
+            addressHistoryService.createAddressHistory(currAddress, currAddress.getUpdateUser(), false);
           }
         }
       }

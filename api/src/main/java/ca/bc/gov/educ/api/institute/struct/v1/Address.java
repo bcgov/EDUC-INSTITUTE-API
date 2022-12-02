@@ -29,13 +29,6 @@ public class Address extends BaseRequest implements Serializable {
 
   private String independentAuthorityId;
 
-  @Size(max = 10)
-  private String phoneNumber;
-
-  @Size(max = 255)
-  @Email(message = "Email address should be a valid email address")
-  private String email;
-
   @Size(max = 255)
   @NotNull(message = "addressLine1 cannot be null")
   private String addressLine1;

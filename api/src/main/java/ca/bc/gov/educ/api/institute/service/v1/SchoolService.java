@@ -135,6 +135,7 @@ public class SchoolService {
             addressHistoryService.createAddressHistory(address, address.getUpdateUser(), false);
           }else{
             currentSchoolEntity.getAddresses().add(currAddress);
+            addressHistoryService.createAddressHistory(currAddress, currAddress.getUpdateUser(), false);
           }
         }
       }

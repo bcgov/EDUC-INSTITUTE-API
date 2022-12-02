@@ -91,6 +91,9 @@ public class IndependentAuthorityService {
     TransformUtil.uppercaseFields(independentAuthorityEntity);
     independentAuthorityRepository.save(independentAuthorityEntity);
     independentAuthorityHistoryService.createIndependentAuthorityHistory(independentAuthorityEntity, independentAuthority.getCreateUser(), false);
+    independentAuthorityEntity.getAddresses().stream().forEach((addy) -> {
+      addressHistoryService.createAddressHistory(addy, addy.getUpdateUser(), false);
+    });
     return independentAuthorityEntity;
   }
 
@@ -137,6 +140,7 @@ public class IndependentAuthorityService {
             addressHistoryService.createAddressHistory(address, address.getUpdateUser(), false);
           }else{
             currentIndependentAuthorityEntity.getAddresses().add(currAddress);
+            addressHistoryService.createAddressHistory(currAddress, currAddress.getUpdateUser(), false);
           }
         }
       }
