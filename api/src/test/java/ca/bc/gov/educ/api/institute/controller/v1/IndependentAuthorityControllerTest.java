@@ -326,6 +326,29 @@ public class IndependentAuthorityControllerTest {
   }
 
   @Test
+  void testCreateIndependentAuthorityWithAddress_GivenValidPayload_ShouldReturnStatusOK() throws Exception {
+    final var existingIndependentAuthority = this.createIndependentAuthorityData();
+
+    existingIndependentAuthority.setAuthorityNumber("1000");
+    existingIndependentAuthority.setCreateDate(null);
+    existingIndependentAuthority.setUpdateDate(null);
+    independentAuthorityRepository.save(existingIndependentAuthority);
+    final var independentAuthority = this.createIndependentAuthorityData();
+    independentAuthority.getAddresses().add(this.createIndependentAuthorityAddressData());
+    independentAuthority.setAuthorityNumber(null);
+    independentAuthority.setCreateDate(null);
+    independentAuthority.setUpdateDate(null);
+    this.mockMvc.perform(post(URL.BASE_URL_AUTHORITY)
+        .contentType(MediaType.APPLICATION_JSON)
+        .accept(MediaType.APPLICATION_JSON)
+        .content(asJsonString(independentAuthority))
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_INDEPENDENT_AUTHORITY"))))
+      .andDo(print())
+      .andExpect(status().isCreated())
+      .andExpect(MockMvcResultMatchers.jsonPath("$.displayName").value(independentAuthority.getDisplayName()));
+  }
+
+  @Test
   void testCreateIndependentAuthority_GivenInvalidPayload_WithoutAuthorityNumber_ShouldReturnStatusBadRequest() throws Exception {
     final var existingIndependentAuthority = this.createIndependentAuthorityData();
     existingIndependentAuthority.setAuthorityNumber("1000");

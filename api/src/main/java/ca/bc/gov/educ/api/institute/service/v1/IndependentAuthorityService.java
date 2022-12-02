@@ -87,13 +87,15 @@ public class IndependentAuthorityService {
     Integer lastNum = Integer.parseInt(lastAuthorityNumber);
     lastNum = lastNum + 1;
     independentAuthorityEntity.setAuthorityNumber(lastNum.toString());
-    independentAuthorityEntity.getAddresses().stream().forEach(RequestUtil::setAuditColumnsForAddress);
+    independentAuthorityEntity.getAddresses().stream().forEach(addy -> {
+      RequestUtil.setAuditColumnsForAddress(addy);
+      TransformUtil.uppercaseFields(addy);
+      addy.setIndependentAuthorityEntity(independentAuthorityEntity);
+    });
     TransformUtil.uppercaseFields(independentAuthorityEntity);
     independentAuthorityRepository.save(independentAuthorityEntity);
     independentAuthorityHistoryService.createIndependentAuthorityHistory(independentAuthorityEntity, independentAuthority.getCreateUser(), false);
-    independentAuthorityEntity.getAddresses().stream().forEach((addy) -> {
-      addressHistoryService.createAddressHistory(addy, addy.getUpdateUser(), false);
-    });
+    independentAuthorityEntity.getAddresses().stream().forEach(addy -> addressHistoryService.createAddressHistory(addy, addy.getUpdateUser(), false));
     return independentAuthorityEntity;
   }
 
