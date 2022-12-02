@@ -83,8 +83,8 @@ public class IndependentAuthorityService {
   public IndependentAuthorityEntity createIndependentAuthority(IndependentAuthority independentAuthority) {
     var independentAuthorityEntity = IndependentAuthorityMapper.mapper.toModel(independentAuthority);
 
-    IndependentAuthorityEntity independentAuthorityWithMaxNum = independentAuthorityRepository.findFirstByOrderByAuthorityNumberDesc();
-    Integer lastNum = Integer.parseInt(independentAuthorityWithMaxNum.getAuthorityNumber());
+    String lastAuthorityNumber = independentAuthorityRepository.findLastAuthorityNumber();
+    Integer lastNum = Integer.parseInt(lastAuthorityNumber);
     lastNum = lastNum + 1;
     independentAuthorityEntity.setAuthorityNumber(lastNum.toString());
     independentAuthorityEntity.getAddresses().stream().forEach(RequestUtil::setAuditColumnsForAddress);
