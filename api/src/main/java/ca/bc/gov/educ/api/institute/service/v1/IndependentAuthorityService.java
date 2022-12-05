@@ -86,7 +86,7 @@ public class IndependentAuthorityService {
     String lastAuthorityNumber = independentAuthorityRepository.findLastAuthorityNumber();
     Integer lastNum = Integer.parseInt(lastAuthorityNumber);
     lastNum = lastNum + 1;
-    independentAuthorityEntity.setAuthorityNumber(lastNum.toString());
+    independentAuthorityEntity.setAuthorityNumber(lastNum);
     independentAuthorityEntity.getAddresses().stream().forEach(addy -> {
       RequestUtil.setAuditColumnsForAddress(addy);
       TransformUtil.uppercaseFields(addy);

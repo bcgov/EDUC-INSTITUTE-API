@@ -307,7 +307,7 @@ public class IndependentAuthorityControllerTest {
   @Test
   void testCreateIndependentAuthority_GivenValidPayload_ShouldReturnStatusOK() throws Exception {
     final var existingIndependentAuthority = this.createIndependentAuthorityData();
-    existingIndependentAuthority.setAuthorityNumber("1000");
+    existingIndependentAuthority.setAuthorityNumber(1000);
     existingIndependentAuthority.setCreateDate(null);
     existingIndependentAuthority.setUpdateDate(null);
     independentAuthorityRepository.save(existingIndependentAuthority);
@@ -329,7 +329,7 @@ public class IndependentAuthorityControllerTest {
   void testCreateIndependentAuthorityWithAddress_GivenValidPayload_ShouldReturnStatusOK() throws Exception {
     final var existingIndependentAuthority = this.createIndependentAuthorityData();
 
-    existingIndependentAuthority.setAuthorityNumber("1000");
+    existingIndependentAuthority.setAuthorityNumber(1000);
     existingIndependentAuthority.setCreateDate(null);
     existingIndependentAuthority.setUpdateDate(null);
     independentAuthorityRepository.save(existingIndependentAuthority);
@@ -351,7 +351,7 @@ public class IndependentAuthorityControllerTest {
   @Test
   void testCreateIndependentAuthority_GivenInvalidPayload_WithoutAuthorityNumber_ShouldReturnStatusBadRequest() throws Exception {
     final var existingIndependentAuthority = this.createIndependentAuthorityData();
-    existingIndependentAuthority.setAuthorityNumber("1000");
+    existingIndependentAuthority.setAuthorityNumber(1000);
     existingIndependentAuthority.setCreateDate(null);
     existingIndependentAuthority.setUpdateDate(null);
     independentAuthorityRepository.save(existingIndependentAuthority);
@@ -370,7 +370,7 @@ public class IndependentAuthorityControllerTest {
   @Test
   void testCreateIndependentAuthority_GivenInvalidPayload_WithAddress_CreateDate_CreateUser_ShouldReturnStatusBadRequest() throws Exception {
     final var existingIndependentAuthority = this.createIndependentAuthorityData();
-    existingIndependentAuthority.setAuthorityNumber("1000");
+    existingIndependentAuthority.setAuthorityNumber(1000);
     existingIndependentAuthority.setCreateDate(null);
     existingIndependentAuthority.setUpdateDate(null);
     independentAuthorityRepository.save(existingIndependentAuthority);
@@ -824,7 +824,7 @@ public class IndependentAuthorityControllerTest {
   }
 
   private IndependentAuthorityEntity createIndependentAuthorityData() {
-    return IndependentAuthorityEntity.builder().authorityNumber("003").displayName("IndependentAuthority Name").openedDate(LocalDateTime.now().minusDays(1))
+    return IndependentAuthorityEntity.builder().authorityNumber(003).displayName("IndependentAuthority Name").openedDate(LocalDateTime.now().minusDays(1))
       .authorityTypeCode("INDEPEND").createDate(LocalDateTime.now()).updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
   }
 
