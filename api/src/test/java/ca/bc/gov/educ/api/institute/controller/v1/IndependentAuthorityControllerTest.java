@@ -834,7 +834,7 @@ public class IndependentAuthorityControllerTest {
   }
 
   private IndependentAuthorityHistoryEntity createHistoryIndependentAuthorityData(UUID independentAuthorityId) {
-    return IndependentAuthorityHistoryEntity.builder().independentAuthorityId(independentAuthorityId).authorityNumber("003").displayName("IndependentAuthority Name")
+    return IndependentAuthorityHistoryEntity.builder().independentAuthorityId(independentAuthorityId).authorityNumber(003).displayName("IndependentAuthority Name")
       .openedDate(LocalDateTime.now().minusDays(1)).authorityTypeCode("INDEPEND")
       .createDate(LocalDateTime.now()).updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
   }

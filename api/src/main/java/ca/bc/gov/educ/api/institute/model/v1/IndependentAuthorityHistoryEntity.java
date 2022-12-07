@@ -30,7 +30,7 @@ public class IndependentAuthorityHistoryEntity {
   private UUID independentAuthorityId;
   @Basic
   @Column(name = "authority_number")
-  private String authorityNumber;
+  private Integer authorityNumber;
   @Basic
   @Column(name = "fax_number")
   private String faxNumber;

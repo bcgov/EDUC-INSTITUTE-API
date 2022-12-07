@@ -28,7 +28,7 @@ public class IndependentAuthorityHistory extends BaseRequest implements Serializ
 
   @Size(max = 4)
   @NotNull(message = "authorityNumber can not be null.")
-  private Integer authorityNumber;
+  private String authorityNumber;
 
   @Size(max = 10)
   private String faxNumber;
