@@ -29,4 +29,6 @@ public class AuthorityContactTypeCode implements Serializable {
   private String effectiveDate;
 
   private String expiryDate;
+
+  private boolean publiclyAvailable;
 }

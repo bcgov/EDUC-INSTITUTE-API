@@ -49,4 +49,6 @@ public class DistrictContactTypeCodeEntity {
   @PastOrPresent
   @Column(name = "update_date")
   private LocalDateTime updateDate;
+  @Column(name = "publicly_avail")
+  private boolean publiclyAvailable;
 }

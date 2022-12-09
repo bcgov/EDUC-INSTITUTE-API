@@ -56,8 +56,6 @@ public class DistrictContactEntity {
   @Basic
   @Column(name = "email")
   private String email;
-  @Column(name = "publicly_avail")
-  private boolean publiclyAvailable;
   @Basic
   @Column(name = "district_contact_type_code")
   @UpperCase

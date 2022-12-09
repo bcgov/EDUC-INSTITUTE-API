@@ -54,8 +54,6 @@ public class AuthorityContactEntity {
   @Basic
   @Column(name = "email")
   private String email;
-  @Column(name = "publicly_avail")
-  private boolean publiclyAvailable;
   @Basic
   @Column(name = "authority_contact_type_code")
   @UpperCase
