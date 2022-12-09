@@ -51,8 +51,6 @@ public class SchoolContactEntity {
   @Basic
   @Column(name = "email")
   private String email;
-  @Column(name = "publicly_avail")
-  private boolean publiclyAvailable;
   @Basic
   @Column(name = "school_contact_type_code")
   @UpperCase

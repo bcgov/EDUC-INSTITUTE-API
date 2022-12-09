@@ -446,7 +446,6 @@ public class IndependentAuthorityControllerTest {
     contactEntity.setAlternatePhoneNumber("1234567891");
     contactEntity.setAlternatePhoneExtension("123");
     contactEntity.setJobTitle("Painter");
-    contactEntity.setPubliclyAvailable(true);
 
     this.mockMvc.perform(post(URL.BASE_URL_AUTHORITY + "/" + independentAuthorityEntity.getIndependentAuthorityId() + "/contact")
         .contentType(MediaType.APPLICATION_JSON)
@@ -460,8 +459,7 @@ public class IndependentAuthorityControllerTest {
       .andExpect(MockMvcResultMatchers.jsonPath("$.jobTitle").value(contactEntity.getJobTitle()))
       .andExpect(MockMvcResultMatchers.jsonPath("$.phoneExtension").value(contactEntity.getPhoneExtension()))
       .andExpect(MockMvcResultMatchers.jsonPath("$.alternatePhoneNumber").value(contactEntity.getAlternatePhoneNumber()))
-      .andExpect(MockMvcResultMatchers.jsonPath("$.alternatePhoneExtension").value(contactEntity.getAlternatePhoneExtension()))
-      .andExpect(MockMvcResultMatchers.jsonPath("$.publiclyAvailable").value(contactEntity.isPubliclyAvailable()));
+      .andExpect(MockMvcResultMatchers.jsonPath("$.alternatePhoneExtension").value(contactEntity.getAlternatePhoneExtension()));
   }
 
   @Test

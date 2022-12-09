@@ -459,7 +459,6 @@ public class SchoolControllerTest {
     contactEntity.setPhoneExtension("321");
     contactEntity.setAlternatePhoneNumber("1234567891");
     contactEntity.setAlternatePhoneExtension("123");
-    contactEntity.setPubliclyAvailable(true);
 
     this.mockMvc.perform(post(URL.BASE_URL_SCHOOL + "/" + schoolEntity.getSchoolId() + "/contact")
         .contentType(MediaType.APPLICATION_JSON)
@@ -472,8 +471,7 @@ public class SchoolControllerTest {
       .andExpect(MockMvcResultMatchers.jsonPath("$.phoneNumber").value(contactEntity.getPhoneNumber()))
       .andExpect(MockMvcResultMatchers.jsonPath("$.phoneExtension").value(contactEntity.getPhoneExtension()))
       .andExpect(MockMvcResultMatchers.jsonPath("$.alternatePhoneNumber").value(contactEntity.getAlternatePhoneNumber()))
-      .andExpect(MockMvcResultMatchers.jsonPath("$.alternatePhoneExtension").value(contactEntity.getAlternatePhoneExtension()))
-      .andExpect(MockMvcResultMatchers.jsonPath("$.publiclyAvailable").value(contactEntity.isPubliclyAvailable()));
+      .andExpect(MockMvcResultMatchers.jsonPath("$.alternatePhoneExtension").value(contactEntity.getAlternatePhoneExtension()));
   }
 
 

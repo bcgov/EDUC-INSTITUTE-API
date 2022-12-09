@@ -41,8 +41,6 @@ public class DistrictContact extends BaseRequest implements Serializable {
   @Size(max = 10)
   private String alternatePhoneExtension;
 
-  private boolean publiclyAvailable;
-
   @Size(max = 255)
   @Email(message = "Email address should be a valid email address")
   private String email;
