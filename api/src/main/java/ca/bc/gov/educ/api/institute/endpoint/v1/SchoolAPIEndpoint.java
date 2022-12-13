@@ -163,7 +163,7 @@ public interface SchoolAPIEndpoint {
                                            @RequestParam(name = "sort", defaultValue = "") String sortCriteriaJson,
                                            @RequestParam(name = "searchCriteriaList", required = false) String searchCriteriaListJson);
 
-  @GetMapping("history/paginated")
+  @GetMapping("/history/paginated")
   @Async
   @PreAuthorize("hasAuthority('SCOPE_READ_SCHOOL_HISTORY')")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR.")})
