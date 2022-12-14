@@ -30,11 +30,9 @@ public interface SchoolMapper {
   @Mapping(target = "mincode", expression = "java(entity.getDistrictEntity() != null && entity.getSchoolNumber() != null ? entity.getDistrictEntity().getDistrictNumber() + entity.getSchoolNumber() : null)")
   School toStructure(SchoolEntity entity);
 
-  SchoolHistoryEntity toModel(SchoolHistory structure);
-
   @InheritInverseConfiguration
+  @Mapping(target = "districtId", source = "districtID")
   SchoolHistory toStructure(SchoolHistoryEntity entity);
-
 
   @Mapping(target = "schoolHistoryId", source = "schoolHistoryEntity.schoolHistoryId")
   SchoolGradeSchoolHistory toStructure(SchoolGradeSchoolHistoryEntity model);
