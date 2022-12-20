@@ -27,7 +27,7 @@ public class AuthorityAddressHistoryEntity extends BaseAddressEntity {
   @Column(name = "independent_authority_id", columnDefinition = "BINARY(16)")
   private UUID independentAuthorityId;
   @ManyToOne(optional = false, targetEntity = IndependentAuthorityHistoryEntity.class)
-  @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
+  @Cascade(org.hibernate.annotations.CascadeType.ALL)
   @JoinColumn(name = "independent_authority_history_id", referencedColumnName = "independent_authority_history_id")
   IndependentAuthorityHistoryEntity independentAuthorityHistoryEntity;
 }

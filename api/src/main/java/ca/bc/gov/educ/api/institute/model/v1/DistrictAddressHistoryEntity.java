@@ -27,7 +27,7 @@ public class DistrictAddressHistoryEntity extends BaseAddressEntity {
   @Column(name = "district_id", columnDefinition = "BINARY(16)")
   private UUID districtId;
   @ManyToOne(optional = false, targetEntity = DistrictHistoryEntity.class)
-  @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
+  @Cascade(org.hibernate.annotations.CascadeType.ALL)
   @JoinColumn(name = "district_history_id", referencedColumnName = "district_history_id")
   DistrictHistoryEntity districtHistoryEntity;
 }
