@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -17,6 +18,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 @Entity
+@DynamicUpdate
 @Table(name = "SCHOOL_CONTACT")
 public class SchoolContactEntity {
   @Id

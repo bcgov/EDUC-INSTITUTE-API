@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 import javax.validation.constraints.PastOrPresent;
@@ -14,6 +15,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Entity
+@DynamicUpdate
 @Table(name = "SCHOOL_GRADE_CODE")
 public class SchoolGradeCodeEntity {
   @Id
