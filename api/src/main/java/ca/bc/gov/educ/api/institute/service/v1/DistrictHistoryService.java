@@ -49,7 +49,6 @@ public class DistrictHistoryService {
         .addAll(curDistrictEntity.getAddresses().stream()
           .map(el -> DistrictAddressHistoryEntity.builder()
             .districtHistoryEntity(districtHistoryEntity)
-            .districtAddressId(el.getDistrictAddressId())
             .districtId(el.getDistrictEntity().getDistrictId())
             .addressLine1(el.getAddressLine1())
             .addressLine2(el.getAddressLine2())

@@ -49,7 +49,6 @@ public class SchoolHistoryService {
         .addAll(curSchoolEntity.getAddresses().stream()
           .map(el -> SchoolAddressHistoryEntity.builder()
             .schoolHistoryEntity(schoolHistoryEntity)
-            .schoolAddressId(el.getSchoolAddressId())
             .schoolId(el.getSchoolEntity().getSchoolId())
             .addressLine1(el.getAddressLine1())
             .addressLine2(el.getAddressLine2())

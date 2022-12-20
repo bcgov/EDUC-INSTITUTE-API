@@ -49,7 +49,6 @@ public class IndependentAuthorityHistoryService {
         .addAll(curIndependentAuthorityEntity.getAddresses().stream()
           .map(el -> AuthorityAddressHistoryEntity.builder()
             .independentAuthorityHistoryEntity(independentAuthorityHistoryEntity)
-            .independentAuthorityAddressId(el.getIndependentAuthorityAddressId())
             .independentAuthorityId(el.getIndependentAuthorityEntity().getIndependentAuthorityId())
             .addressLine1(el.getAddressLine1())
             .addressLine2(el.getAddressLine2())
