@@ -1,6 +1,6 @@
 package ca.bc.gov.educ.api.institute.util;
 
-import ca.bc.gov.educ.api.institute.model.v1.AddressEntity;
+import ca.bc.gov.educ.api.institute.model.v1.BaseAddressEntity;
 import ca.bc.gov.educ.api.institute.model.v1.NeighborhoodLearningEntity;
 import ca.bc.gov.educ.api.institute.model.v1.SchoolGradeEntity;
 import ca.bc.gov.educ.api.institute.properties.ApplicationProperties;
@@ -48,7 +48,7 @@ public class RequestUtil {
     baseRequest.setUpdateDate(LocalDateTime.now().toString());
   }
 
-  public static void setAuditColumnsForAddress(@NotNull AddressEntity address) {
+  public static void setAuditColumnsForAddress(@NotNull BaseAddressEntity address) {
     if(address.getCreateDate() == null) {
       if (StringUtils.isBlank(address.getCreateUser())) {
         address.setCreateUser(ApplicationProperties.INSTITUTE_API);
@@ -58,7 +58,7 @@ public class RequestUtil {
     setAuditColumnsForAddressUpdate(address);
   }
 
-  private static void setAuditColumnsForAddressUpdate(@NotNull AddressEntity address) {
+  private static void setAuditColumnsForAddressUpdate(@NotNull BaseAddressEntity address) {
     if (StringUtils.isBlank(address.getUpdateUser())) {
       address.setUpdateUser(ApplicationProperties.INSTITUTE_API);
     }

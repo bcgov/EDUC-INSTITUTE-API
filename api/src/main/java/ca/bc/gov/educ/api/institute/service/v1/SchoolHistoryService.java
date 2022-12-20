@@ -30,18 +30,41 @@ public class SchoolHistoryService {
   }
 
   @Transactional(propagation = Propagation.MANDATORY)
-  public void createSchoolHistory(SchoolEntity curSchoolEntity, String updateUser, boolean copyAudit) {
+  public void createSchoolHistory(SchoolEntity curSchoolEntity, String updateUser) {
     final SchoolHistoryEntity schoolHistoryEntity = new SchoolHistoryEntity();
     BeanUtils.copyProperties(curSchoolEntity, schoolHistoryEntity);
     schoolHistoryEntity.setCreateUser(updateUser);
-    if (!copyAudit) {
-      schoolHistoryEntity.setCreateDate(LocalDateTime.now());
-    }
+    schoolHistoryEntity.setCreateDate(LocalDateTime.now());
     schoolHistoryEntity.setUpdateUser(updateUser);
     schoolHistoryEntity.setUpdateDate(LocalDateTime.now());
     mapGradeCodeHistory(curSchoolEntity, schoolHistoryEntity);
     mapNeighbourhoodLearningHistory(curSchoolEntity, schoolHistoryEntity);
+    mapAddressHistory(curSchoolEntity, schoolHistoryEntity);
     schoolHistoryRepository.save(schoolHistoryEntity);
+  }
+
+  private void mapAddressHistory(SchoolEntity curSchoolEntity, SchoolHistoryEntity schoolHistoryEntity) {
+    if (!CollectionUtils.isEmpty(curSchoolEntity.getAddresses())) {
+      schoolHistoryEntity.getAddresses()
+        .addAll(curSchoolEntity.getAddresses().stream()
+          .map(el -> SchoolAddressHistoryEntity.builder()
+            .schoolHistoryEntity(schoolHistoryEntity)
+            .schoolAddressId(el.getSchoolAddressId())
+            .schoolId(el.getSchoolEntity().getSchoolId())
+            .addressLine1(el.getAddressLine1())
+            .addressLine2(el.getAddressLine2())
+            .city(el.getCity())
+            .provinceCode(el.getProvinceCode())
+            .postal(el.getPostal())
+            .countryCode(el.getCountryCode())
+            .addressTypeCode(el.getAddressTypeCode())
+            .createDate(schoolHistoryEntity.getCreateDate())
+            .updateDate(schoolHistoryEntity.getUpdateDate())
+            .createUser(schoolHistoryEntity.getCreateUser())
+            .updateUser(schoolHistoryEntity.getUpdateUser())
+            .build())
+          .collect(Collectors.toList()));
+    }
   }
 
   private void mapNeighbourhoodLearningHistory(SchoolEntity curSchoolEntity, SchoolHistoryEntity schoolHistoryEntity) {

@@ -4,7 +4,6 @@ import ca.bc.gov.educ.api.institute.endpoint.v1.IndependentAuthorityAPIEndpoint;
 import ca.bc.gov.educ.api.institute.exception.EntityNotFoundException;
 import ca.bc.gov.educ.api.institute.exception.InvalidPayloadException;
 import ca.bc.gov.educ.api.institute.exception.errors.ApiError;
-import ca.bc.gov.educ.api.institute.mapper.v1.AddressMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.AuthorityContactMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.IndependentAuthorityMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.NoteMapper;
@@ -12,10 +11,12 @@ import ca.bc.gov.educ.api.institute.model.v1.IndependentAuthorityEntity;
 import ca.bc.gov.educ.api.institute.service.v1.AuthoritySearchService;
 import ca.bc.gov.educ.api.institute.service.v1.IndependentAuthorityHistoryService;
 import ca.bc.gov.educ.api.institute.service.v1.IndependentAuthorityService;
-import ca.bc.gov.educ.api.institute.struct.v1.*;
+import ca.bc.gov.educ.api.institute.struct.v1.AuthorityContact;
+import ca.bc.gov.educ.api.institute.struct.v1.IndependentAuthority;
+import ca.bc.gov.educ.api.institute.struct.v1.IndependentAuthorityHistory;
+import ca.bc.gov.educ.api.institute.struct.v1.Note;
 import ca.bc.gov.educ.api.institute.util.JsonUtil;
 import ca.bc.gov.educ.api.institute.util.RequestUtil;
-import ca.bc.gov.educ.api.institute.validator.AddressPayloadValidator;
 import ca.bc.gov.educ.api.institute.validator.AuthorityContactPayloadValidator;
 import ca.bc.gov.educ.api.institute.validator.IndependentAuthorityPayloadValidator;
 import ca.bc.gov.educ.api.institute.validator.NotePayloadValidator;
@@ -54,8 +55,6 @@ public class IndependentAuthorityAPIController implements IndependentAuthorityAP
 
   private static final AuthorityContactMapper authorityContactMapper = AuthorityContactMapper.mapper;
 
-  private static final AddressMapper addressMapper = AddressMapper.mapper;
-
   private static final NoteMapper noteMapper = NoteMapper.mapper;
 
   @Getter(AccessLevel.PRIVATE)
@@ -63,19 +62,16 @@ public class IndependentAuthorityAPIController implements IndependentAuthorityAP
 
   private final AuthorityContactPayloadValidator authorityContactPayloadValidator;
 
-  private final AddressPayloadValidator addressPayloadValidator;
-
   private final NotePayloadValidator notePayloadValidator;
 
   private final AuthoritySearchService authoritySearchService;
 
   @Autowired
-  public IndependentAuthorityAPIController(final IndependentAuthorityService independentAuthorityService, final IndependentAuthorityHistoryService independentAuthorityHistoryService, final IndependentAuthorityPayloadValidator payloadValidator, AuthorityContactPayloadValidator authorityContactPayloadValidator, AddressPayloadValidator addressPayloadValidator, NotePayloadValidator notePayloadValidator, AuthoritySearchService authoritySearchService) {
+  public IndependentAuthorityAPIController(final IndependentAuthorityService independentAuthorityService, final IndependentAuthorityHistoryService independentAuthorityHistoryService, final IndependentAuthorityPayloadValidator payloadValidator, AuthorityContactPayloadValidator authorityContactPayloadValidator, NotePayloadValidator notePayloadValidator, AuthoritySearchService authoritySearchService) {
     this.independentAuthorityService = independentAuthorityService;
     this.independentAuthorityHistoryService = independentAuthorityHistoryService;
     this.payloadValidator = payloadValidator;
     this.authorityContactPayloadValidator = authorityContactPayloadValidator;
-    this.addressPayloadValidator = addressPayloadValidator;
     this.notePayloadValidator = notePayloadValidator;
     this.authoritySearchService = authoritySearchService;
   }
@@ -159,37 +155,6 @@ public class IndependentAuthorityAPIController implements IndependentAuthorityAP
   @Override
   public ResponseEntity<Void> deleteIndependentAuthorityContact(UUID independentAuthorityId, UUID contactId) {
     this.independentAuthorityService.deleteIndependentAuthorityContact(independentAuthorityId, contactId);
-    return ResponseEntity.noContent().build();
-  }
-
-  @Override
-  public Address getIndependentAuthorityAddress(UUID independentAuthorityId, UUID addressId) {
-    var addressEntity = this.independentAuthorityService.getIndependentAuthorityAddress(independentAuthorityId, addressId);
-
-    if (addressEntity.isPresent()) {
-      return addressMapper.toStructure(addressEntity.get());
-    } else {
-      throw new EntityNotFoundException();
-    }
-  }
-
-  @Override
-  public Address createIndependentAuthorityAddress(UUID independentAuthorityId, Address address) {
-    validatePayload(() -> this.addressPayloadValidator.validateCreatePayload(address));
-    RequestUtil.setAuditColumnsForCreate(address);
-    return addressMapper.toStructure(independentAuthorityService.createIndependentAuthorityAddress(address, independentAuthorityId));
-  }
-
-  @Override
-  public Address updateIndependentAuthorityAddress(UUID independentAuthorityId, UUID addressId, Address address) {
-    validatePayload(() -> this.addressPayloadValidator.validateUpdatePayload(address));
-    RequestUtil.setAuditColumnsForUpdate(address);
-    return addressMapper.toStructure(independentAuthorityService.updateIndependentAuthorityAddress(address, independentAuthorityId, addressId));
-  }
-
-  @Override
-  public ResponseEntity<Void> deleteIndependentAuthorityAddress(UUID independentAuthorityId, UUID addressId) {
-    this.independentAuthorityService.deleteIndependentAuthorityAddress(independentAuthorityId, addressId);
     return ResponseEntity.noContent().build();
   }
 

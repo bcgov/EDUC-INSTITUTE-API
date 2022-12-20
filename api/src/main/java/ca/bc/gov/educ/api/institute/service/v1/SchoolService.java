@@ -1,17 +1,14 @@
 package ca.bc.gov.educ.api.institute.service.v1;
 
 import ca.bc.gov.educ.api.institute.exception.EntityNotFoundException;
-import ca.bc.gov.educ.api.institute.mapper.v1.AddressMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.NoteMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.SchoolContactMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.SchoolMapper;
 import ca.bc.gov.educ.api.institute.model.v1.*;
 import ca.bc.gov.educ.api.institute.repository.v1.*;
-import ca.bc.gov.educ.api.institute.struct.v1.Address;
 import ca.bc.gov.educ.api.institute.struct.v1.Note;
 import ca.bc.gov.educ.api.institute.struct.v1.School;
 import ca.bc.gov.educ.api.institute.struct.v1.SchoolContact;
-import ca.bc.gov.educ.api.institute.util.BeanComparatorUtil;
 import ca.bc.gov.educ.api.institute.util.RequestUtil;
 import ca.bc.gov.educ.api.institute.util.TransformUtil;
 import lombok.AccessLevel;
@@ -23,8 +20,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class SchoolService {
@@ -32,8 +30,6 @@ public class SchoolService {
   private static final String SCHOOL_ID_ATTR = "schoolId";
 
   private static final String CONTACT_ID_ATTR = "contactId";
-
-  private static final String ADDRESS_ID_ATTR = "addressId";
 
   private static final String NOTE_ID_ATTR = "noteId";
 
@@ -47,24 +43,18 @@ public class SchoolService {
 
   private final SchoolHistoryService schoolHistoryService;
 
-  private final AddressHistoryService addressHistoryService;
-
   private final SchoolContactRepository schoolContactRepository;
-
-  private final AddressRepository addressRepository;
 
   private final NoteRepository noteRepository;
 
   private final DistrictRepository districtRepository;
 
   @Autowired
-  public SchoolService(SchoolRepository schoolRepository, SchoolTombstoneRepository schoolTombstoneRepository, SchoolHistoryService schoolHistoryService, AddressHistoryService addressHistoryService, SchoolContactRepository schoolContactRepository, AddressRepository addressRepository, NoteRepository noteRepository, DistrictRepository districtRepository) {
+  public SchoolService(SchoolRepository schoolRepository, SchoolTombstoneRepository schoolTombstoneRepository, SchoolHistoryService schoolHistoryService, SchoolContactRepository schoolContactRepository, NoteRepository noteRepository, DistrictRepository districtRepository) {
     this.schoolRepository = schoolRepository;
     this.schoolTombstoneRepository = schoolTombstoneRepository;
     this.schoolHistoryService = schoolHistoryService;
-    this.addressHistoryService = addressHistoryService;
     this.schoolContactRepository = schoolContactRepository;
-    this.addressRepository = addressRepository;
     this.noteRepository = noteRepository;
     this.districtRepository = districtRepository;
   }
@@ -86,7 +76,7 @@ public class SchoolService {
     }
     TransformUtil.uppercaseFields(schoolEntity);
     schoolRepository.save(schoolEntity);
-    schoolHistoryService.createSchoolHistory(schoolEntity, school.getCreateUser(), false);
+    schoolHistoryService.createSchoolHistory(schoolEntity, school.getCreateUser());
     return schoolEntity;
   }
 
@@ -112,62 +102,43 @@ public class SchoolService {
       BeanUtils.copyProperties(school, currentSchoolEntity, CREATE_DATE, CREATE_USER, "grades", "neighborhoodLearning", "districtEntity", "addresses"); // update current student entity with incoming payload ignoring the fields.
 
       setGradesAndNeighborhoodLearning(currentSchoolEntity, school);
-
-      Set<AddressEntity> addresses = new HashSet<>(currentSchoolEntity.getAddresses());
-      currentSchoolEntity.getAddresses().clear();
-
-      for(AddressEntity address: school.getAddresses()){
-        if(address.getAddressId() == null){
-          RequestUtil.setAuditColumnsForAddress(address);
-          address.setSchoolEntity(currentSchoolEntity);
-          TransformUtil.uppercaseFields(address);
-          currentSchoolEntity.getAddresses().add(address);
-          addressHistoryService.createAddressHistory(address, address.getUpdateUser(), false);
-        }else{
-          var currAddress = addresses.stream().filter(addy -> addy.getAddressId().equals(address.getAddressId())).collect(Collectors.toList()).get(0);
-          if(!BeanComparatorUtil.compare(address, currAddress)){
-            address.setCreateDate(currentSchoolEntity.getCreateDate());
-            address.setCreateUser(currentSchoolEntity.getCreateUser());
-            RequestUtil.setAuditColumnsForAddress(address);
-            TransformUtil.uppercaseFields(address);
-            address.setSchoolEntity(currentSchoolEntity);
-            currentSchoolEntity.getAddresses().add(address);
-            addressHistoryService.createAddressHistory(address, address.getUpdateUser(), false);
-          }else{
-            currentSchoolEntity.getAddresses().add(currAddress);
-            addressHistoryService.createAddressHistory(currAddress, currAddress.getUpdateUser(), false);
-          }
-        }
-      }
+      setAddresses(currentSchoolEntity, school);
 
       TransformUtil.uppercaseFields(currentSchoolEntity); // convert the input to upper case.
-      schoolHistoryService.createSchoolHistory(currentSchoolEntity, currentSchoolEntity.getUpdateUser(), false);
-      return schoolRepository.save(currentSchoolEntity);
+      var savedSchool = schoolRepository.save(currentSchoolEntity);
+      schoolHistoryService.createSchoolHistory(savedSchool, savedSchool.getUpdateUser());
+      return savedSchool;
     } else {
       throw new EntityNotFoundException(SchoolEntity.class, SCHOOL_ID_ATTR, String.valueOf(schoolId));
     }
   }
 
+  private void setAddresses(SchoolEntity currentSchoolEntity, SchoolEntity school){
+    currentSchoolEntity.getAddresses().clear();
+    school.getAddresses().stream().forEach(address -> {
+      RequestUtil.setAuditColumnsForAddress(address);
+      TransformUtil.uppercaseFields(address);
+      address.setSchoolEntity(currentSchoolEntity);
+      currentSchoolEntity.getAddresses().add(address);
+    });
+  }
+
   private void setGradesAndNeighborhoodLearning(SchoolEntity currentSchoolEntity, SchoolEntity school){
     currentSchoolEntity.getGrades().clear();
-    for(SchoolGradeEntity grade: school.getGrades()){
-      if(grade.getSchoolGradeId() == null){
-        RequestUtil.setAuditColumnsForGrades(grade);
-        grade.setSchoolEntity(currentSchoolEntity);
-        TransformUtil.uppercaseFields(grade);
-        currentSchoolEntity.getGrades().add(grade);
-      }
-    }
+    school.getGrades().stream().forEach(grade -> {
+      RequestUtil.setAuditColumnsForGrades(grade);
+      grade.setSchoolEntity(currentSchoolEntity);
+      TransformUtil.uppercaseFields(grade);
+      currentSchoolEntity.getGrades().add(grade);
+    });
 
     currentSchoolEntity.getNeighborhoodLearning().clear();
-    for(NeighborhoodLearningEntity neighborhoodLearning: school.getNeighborhoodLearning()){
-      if(neighborhoodLearning.getNeighborhoodLearningId() == null){
-        RequestUtil.setAuditColumnsForNeighborhoodLearning(neighborhoodLearning);
-        neighborhoodLearning.setSchoolEntity(currentSchoolEntity);
-        TransformUtil.uppercaseFields(neighborhoodLearning);
-        currentSchoolEntity.getNeighborhoodLearning().add(neighborhoodLearning);
-      }
-    }
+    school.getNeighborhoodLearning().stream().forEach(neighborhoodLearning -> {
+      RequestUtil.setAuditColumnsForNeighborhoodLearning(neighborhoodLearning);
+      neighborhoodLearning.setSchoolEntity(currentSchoolEntity);
+      TransformUtil.uppercaseFields(neighborhoodLearning);
+      currentSchoolEntity.getNeighborhoodLearning().add(neighborhoodLearning);
+    });
   }
 
   public Optional<SchoolContactEntity> getSchoolContact(UUID schoolId, UUID contactId) {
@@ -233,77 +204,6 @@ public class SchoolService {
     if (curSchoolEntityOptional.isPresent()) {
       final SchoolEntity currentSchoolEntity = curSchoolEntityOptional.get();
       schoolContactRepository.deleteBySchoolContactIdAndSchoolEntity(contactId, currentSchoolEntity);
-    } else {
-      throw new EntityNotFoundException(SchoolEntity.class, SCHOOL_ID_ATTR, String.valueOf(schoolId));
-    }
-  }
-
-  public Optional<AddressEntity> getSchoolAddress(UUID schoolId, UUID addressId) {
-    Optional<SchoolEntity> curSchoolEntityOptional = schoolRepository.findById(schoolId);
-
-    if (curSchoolEntityOptional.isPresent()) {
-      final SchoolEntity currentSchoolEntity = curSchoolEntityOptional.get();
-      return addressRepository.findByAddressIdAndSchoolEntity(addressId, currentSchoolEntity);
-    } else {
-      throw new EntityNotFoundException(SchoolEntity.class, SCHOOL_ID_ATTR, String.valueOf(schoolId));
-    }
-  }
-
-  @Transactional(propagation = Propagation.REQUIRES_NEW)
-  public AddressEntity createSchoolAddress(Address address, UUID schoolId) {
-    var addressEntity = AddressMapper.mapper.toModel(address);
-    Optional<SchoolEntity> curSchoolEntityOptional = schoolRepository.findById(schoolId);
-
-    if (curSchoolEntityOptional.isPresent()) {
-      addressEntity.setSchoolEntity(curSchoolEntityOptional.get());
-      TransformUtil.uppercaseFields(addressEntity);
-      addressRepository.save(addressEntity);
-      addressHistoryService.createAddressHistory(addressEntity, address.getCreateUser(), false);
-      return addressEntity;
-    } else {
-      throw new EntityNotFoundException(SchoolEntity.class, SCHOOL_ID_ATTR, String.valueOf(schoolId));
-    }
-  }
-
-  @Transactional(propagation = Propagation.REQUIRES_NEW)
-  public AddressEntity updateSchoolAddress(Address address, UUID schoolId, UUID addressId) {
-    var addressEntity = AddressMapper.mapper.toModel(address);
-    if (addressId == null || !addressId.equals(addressEntity.getAddressId())) {
-      throw new EntityNotFoundException(AddressEntity.class, ADDRESS_ID_ATTR, String.valueOf(addressId));
-    }
-
-    Optional<SchoolEntity> curSchoolEntityOptional = schoolRepository.findById(schoolId);
-
-    if (curSchoolEntityOptional.isEmpty()) {
-      throw new EntityNotFoundException(SchoolEntity.class, SCHOOL_ID_ATTR, String.valueOf(schoolId));
-    }
-
-    Optional<AddressEntity> curAddressEntityOptional = addressRepository.findById(addressEntity.getAddressId());
-
-    if (curAddressEntityOptional.isPresent()) {
-      if (!schoolId.equals(curAddressEntityOptional.get().getSchoolEntity().getSchoolId())) {
-        throw new EntityNotFoundException(SchoolEntity.class, SCHOOL_ID_ATTR, String.valueOf(schoolId));
-      }
-      final AddressEntity currentAddressEntity = curAddressEntityOptional.get();
-      BeanUtils.copyProperties(addressEntity, currentAddressEntity, CREATE_DATE, CREATE_USER); // update current student entity with incoming payload ignoring the fields.
-      TransformUtil.uppercaseFields(currentAddressEntity); // convert the input to upper case.
-      currentAddressEntity.setSchoolEntity(curSchoolEntityOptional.get());
-      addressHistoryService.createAddressHistory(currentAddressEntity, currentAddressEntity.getUpdateUser(), false);
-      addressRepository.save(currentAddressEntity);
-      return currentAddressEntity;
-    } else {
-      throw new EntityNotFoundException(AddressEntity.class, ADDRESS_ID_ATTR, String.valueOf(addressId));
-    }
-  }
-
-  @Transactional(propagation = Propagation.REQUIRES_NEW)
-  public void deleteSchoolAddress(UUID schoolId, UUID addressId) {
-    Optional<SchoolEntity> curSchoolEntityOptional = schoolRepository.findById(schoolId);
-    Optional<AddressEntity> curAddressEntityOptional = addressRepository.findById(addressId);
-
-    if (curSchoolEntityOptional.isPresent() && curAddressEntityOptional.isPresent()) {
-      final SchoolEntity currentSchoolEntity = curSchoolEntityOptional.get();
-      addressRepository.deleteByAddressIdAndSchoolEntity(addressId, currentSchoolEntity);
     } else {
       throw new EntityNotFoundException(SchoolEntity.class, SCHOOL_ID_ATTR, String.valueOf(schoolId));
     }

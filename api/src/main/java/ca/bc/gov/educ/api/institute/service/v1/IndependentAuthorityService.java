@@ -1,23 +1,18 @@
 package ca.bc.gov.educ.api.institute.service.v1;
 
 import ca.bc.gov.educ.api.institute.exception.EntityNotFoundException;
-import ca.bc.gov.educ.api.institute.mapper.v1.AddressMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.AuthorityContactMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.IndependentAuthorityMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.NoteMapper;
-import ca.bc.gov.educ.api.institute.model.v1.AddressEntity;
 import ca.bc.gov.educ.api.institute.model.v1.AuthorityContactEntity;
 import ca.bc.gov.educ.api.institute.model.v1.IndependentAuthorityEntity;
 import ca.bc.gov.educ.api.institute.model.v1.NoteEntity;
-import ca.bc.gov.educ.api.institute.repository.v1.AddressRepository;
 import ca.bc.gov.educ.api.institute.repository.v1.AuthorityContactRepository;
 import ca.bc.gov.educ.api.institute.repository.v1.IndependentAuthorityRepository;
 import ca.bc.gov.educ.api.institute.repository.v1.NoteRepository;
-import ca.bc.gov.educ.api.institute.struct.v1.Address;
 import ca.bc.gov.educ.api.institute.struct.v1.AuthorityContact;
 import ca.bc.gov.educ.api.institute.struct.v1.IndependentAuthority;
 import ca.bc.gov.educ.api.institute.struct.v1.Note;
-import ca.bc.gov.educ.api.institute.util.BeanComparatorUtil;
 import ca.bc.gov.educ.api.institute.util.RequestUtil;
 import ca.bc.gov.educ.api.institute.util.TransformUtil;
 import lombok.AccessLevel;
@@ -29,8 +24,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class IndependentAuthorityService {
@@ -39,15 +35,11 @@ public class IndependentAuthorityService {
 
   private static final String CONTACT_ID_ATTR = "contactId";
 
-  private static final String ADDRESS_ID_ATTR = "addressId";
-
   private static final String NOTE_ID_ATTR = "noteId";
 
   private static final String CREATE_DATE = "createDate";
 
   private static final String CREATE_USER = "createUser";
-
-  private final AddressHistoryService addressHistoryService;
 
   @Getter(AccessLevel.PRIVATE)
   private final IndependentAuthorityRepository independentAuthorityRepository;
@@ -56,18 +48,14 @@ public class IndependentAuthorityService {
 
   private final AuthorityContactRepository authorityContactRepository;
 
-  private final AddressRepository addressRepository;
-
   private final NoteRepository noteRepository;
 
 
   @Autowired
-  public IndependentAuthorityService(AddressHistoryService addressHistoryService, IndependentAuthorityRepository independentAuthorityRepository, IndependentAuthorityHistoryService independentAuthorityHistoryService, AuthorityContactRepository authorityContactRepository, AddressRepository addressRepository, NoteRepository noteRepository) {
-    this.addressHistoryService = addressHistoryService;
+  public IndependentAuthorityService(IndependentAuthorityRepository independentAuthorityRepository, IndependentAuthorityHistoryService independentAuthorityHistoryService, AuthorityContactRepository authorityContactRepository, NoteRepository noteRepository) {
     this.independentAuthorityRepository = independentAuthorityRepository;
     this.independentAuthorityHistoryService = independentAuthorityHistoryService;
     this.authorityContactRepository = authorityContactRepository;
-    this.addressRepository = addressRepository;
     this.noteRepository = noteRepository;
   }
 
@@ -94,8 +82,7 @@ public class IndependentAuthorityService {
     });
     TransformUtil.uppercaseFields(independentAuthorityEntity);
     independentAuthorityRepository.save(independentAuthorityEntity);
-    independentAuthorityHistoryService.createIndependentAuthorityHistory(independentAuthorityEntity, independentAuthority.getCreateUser(), false);
-    independentAuthorityEntity.getAddresses().stream().forEach(addy -> addressHistoryService.createAddressHistory(addy, addy.getUpdateUser(), false));
+    independentAuthorityHistoryService.createIndependentAuthorityHistory(independentAuthorityEntity, independentAuthority.getCreateUser());
     return independentAuthorityEntity;
   }
 
@@ -119,40 +106,24 @@ public class IndependentAuthorityService {
     if (curIndependentAuthorityEntityOptional.isPresent()) {
       final IndependentAuthorityEntity currentIndependentAuthorityEntity = curIndependentAuthorityEntityOptional.get();
       BeanUtils.copyProperties(independentAuthority, currentIndependentAuthorityEntity, CREATE_DATE, CREATE_USER, "addresses"); // update current student entity with incoming payload ignoring the fields.
-
-      Set<AddressEntity> addresses = new HashSet<>(currentIndependentAuthorityEntity.getAddresses());
-      currentIndependentAuthorityEntity.getAddresses().clear();
-
-      for(AddressEntity address: independentAuthority.getAddresses()){
-        if(address.getAddressId() == null){
-          RequestUtil.setAuditColumnsForAddress(address);
-          address.setIndependentAuthorityEntity(currentIndependentAuthorityEntity);
-          TransformUtil.uppercaseFields(address);
-          currentIndependentAuthorityEntity.getAddresses().add(address);
-          addressHistoryService.createAddressHistory(address, address.getUpdateUser(), false);
-        }else{
-          var currAddress = addresses.stream().filter(addy -> addy.getAddressId().equals(address.getAddressId())).collect(Collectors.toList()).get(0);
-          if(!BeanComparatorUtil.compare(address, currAddress)){
-            address.setCreateDate(currentIndependentAuthorityEntity.getCreateDate());
-            address.setCreateUser(currentIndependentAuthorityEntity.getCreateUser());
-            RequestUtil.setAuditColumnsForAddress(address);
-            TransformUtil.uppercaseFields(address);
-            address.setIndependentAuthorityEntity(currentIndependentAuthorityEntity);
-            currentIndependentAuthorityEntity.getAddresses().add(address);
-            addressHistoryService.createAddressHistory(address, address.getUpdateUser(), false);
-          }else{
-            currentIndependentAuthorityEntity.getAddresses().add(currAddress);
-            addressHistoryService.createAddressHistory(currAddress, currAddress.getUpdateUser(), false);
-          }
-        }
-      }
-
+      setAddresses(currentIndependentAuthorityEntity, independentAuthority);
       TransformUtil.uppercaseFields(currentIndependentAuthorityEntity); // convert the input to upper case.
-      independentAuthorityHistoryService.createIndependentAuthorityHistory(currentIndependentAuthorityEntity, currentIndependentAuthorityEntity.getUpdateUser(), false);
-      return independentAuthorityRepository.save(currentIndependentAuthorityEntity);
+      var savedAuthority = independentAuthorityRepository.save(currentIndependentAuthorityEntity);
+      independentAuthorityHistoryService.createIndependentAuthorityHistory(savedAuthority, savedAuthority.getUpdateUser());
+      return savedAuthority;
     } else {
       throw new EntityNotFoundException(IndependentAuthorityEntity.class, INDEPENDENT_AUTHORITY_ID_ATTR, String.valueOf(independentAuthorityId));
     }
+  }
+
+  private void setAddresses(IndependentAuthorityEntity currentAuthorityEntity, IndependentAuthorityEntity school){
+    currentAuthorityEntity.getAddresses().clear();
+    school.getAddresses().stream().forEach(address -> {
+      RequestUtil.setAuditColumnsForAddress(address);
+      TransformUtil.uppercaseFields(address);
+      address.setIndependentAuthorityEntity(currentAuthorityEntity);
+      currentAuthorityEntity.getAddresses().add(address);
+    });
   }
 
   public Optional<AuthorityContactEntity> getIndependentAuthorityContact(UUID independentAuthorityId, UUID contactId) {
@@ -222,77 +193,6 @@ public class IndependentAuthorityService {
       throw new EntityNotFoundException(IndependentAuthorityEntity.class, INDEPENDENT_AUTHORITY_ID_ATTR, String.valueOf(independentAuthorityId));
     }
 
-  }
-
-  public Optional<AddressEntity> getIndependentAuthorityAddress(UUID independentAuthorityId, UUID addressId) {
-    Optional<IndependentAuthorityEntity> curIndependentAuthorityEntityOptional = independentAuthorityRepository.findById(independentAuthorityId);
-
-    if (curIndependentAuthorityEntityOptional.isPresent()) {
-      final IndependentAuthorityEntity currentIndependentAuthorityEntity = curIndependentAuthorityEntityOptional.get();
-      return addressRepository.findByAddressIdAndIndependentAuthorityEntity(addressId, currentIndependentAuthorityEntity);
-    } else {
-      throw new EntityNotFoundException(IndependentAuthorityEntity.class, INDEPENDENT_AUTHORITY_ID_ATTR, String.valueOf(independentAuthorityId));
-    }
-  }
-
-  @Transactional(propagation = Propagation.REQUIRES_NEW)
-  public AddressEntity createIndependentAuthorityAddress(Address address, UUID independentAuthorityId) {
-    var addressEntity = AddressMapper.mapper.toModel(address);
-    Optional<IndependentAuthorityEntity> curIndependentAuthorityEntityOptional = independentAuthorityRepository.findById(independentAuthorityId);
-
-    if (curIndependentAuthorityEntityOptional.isPresent()) {
-      addressEntity.setIndependentAuthorityEntity(curIndependentAuthorityEntityOptional.get());
-      TransformUtil.uppercaseFields(addressEntity);
-      addressRepository.save(addressEntity);
-      addressHistoryService.createAddressHistory(addressEntity, address.getCreateUser(), false);
-      return addressEntity;
-    } else {
-      throw new EntityNotFoundException(IndependentAuthorityEntity.class, INDEPENDENT_AUTHORITY_ID_ATTR, String.valueOf(independentAuthorityId));
-    }
-  }
-
-  @Transactional(propagation = Propagation.REQUIRES_NEW)
-  public AddressEntity updateIndependentAuthorityAddress(Address address, UUID independentAuthorityId, UUID addressId) {
-    var addressEntity = AddressMapper.mapper.toModel(address);
-    if (addressId == null || !addressId.equals(addressEntity.getAddressId())) {
-      throw new EntityNotFoundException(AddressEntity.class, ADDRESS_ID_ATTR, String.valueOf(addressId));
-    }
-
-    Optional<IndependentAuthorityEntity> curIndependentAuthorityEntityOptional = independentAuthorityRepository.findById(independentAuthorityId);
-
-    if (curIndependentAuthorityEntityOptional.isEmpty()) {
-      throw new EntityNotFoundException(IndependentAuthorityEntity.class, INDEPENDENT_AUTHORITY_ID_ATTR, String.valueOf(independentAuthorityId));
-    }
-
-    Optional<AddressEntity> curAddressEntityOptional = addressRepository.findById(addressEntity.getAddressId());
-
-    if (curAddressEntityOptional.isPresent()) {
-      if (!independentAuthorityId.equals(curAddressEntityOptional.get().getIndependentAuthorityEntity().getIndependentAuthorityId())) {
-        throw new EntityNotFoundException(IndependentAuthorityEntity.class, INDEPENDENT_AUTHORITY_ID_ATTR, String.valueOf(independentAuthorityId));
-      }
-      final AddressEntity currentAddressEntity = curAddressEntityOptional.get();
-      BeanUtils.copyProperties(addressEntity, currentAddressEntity, CREATE_DATE, CREATE_USER); // update current student entity with incoming payload ignoring the fields.
-      TransformUtil.uppercaseFields(currentAddressEntity); // convert the input to upper case.
-      currentAddressEntity.setIndependentAuthorityEntity(curIndependentAuthorityEntityOptional.get());
-      addressHistoryService.createAddressHistory(currentAddressEntity, currentAddressEntity.getUpdateUser(), false);
-      addressRepository.save(currentAddressEntity);
-      return currentAddressEntity;
-    } else {
-      throw new EntityNotFoundException(AddressEntity.class, ADDRESS_ID_ATTR, String.valueOf(addressId));
-    }
-  }
-
-  @Transactional(propagation = Propagation.REQUIRES_NEW)
-  public void deleteIndependentAuthorityAddress(UUID independentAuthorityId, UUID addressId) {
-    Optional<IndependentAuthorityEntity> curIndependentAuthorityEntityOptional = independentAuthorityRepository.findById(independentAuthorityId);
-    Optional<AddressEntity> curAddressEntityOptional = addressRepository.findById(addressId);
-
-    if (curIndependentAuthorityEntityOptional.isPresent() && curAddressEntityOptional.isPresent()) {
-      final IndependentAuthorityEntity currentIndependentAuthorityEntity = curIndependentAuthorityEntityOptional.get();
-      addressRepository.deleteByAddressIdAndIndependentAuthorityEntity(addressId, currentIndependentAuthorityEntity);
-    } else {
-      throw new EntityNotFoundException(IndependentAuthorityEntity.class, INDEPENDENT_AUTHORITY_ID_ATTR, String.valueOf(independentAuthorityId));
-    }
   }
 
   public Optional<NoteEntity> getIndependentAuthorityNote(UUID independentAuthorityId, UUID noteId) {

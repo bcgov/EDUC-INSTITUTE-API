@@ -1,15 +1,14 @@
 package ca.bc.gov.educ.api.institute.model.v1;
 
 import ca.bc.gov.educ.api.institute.util.UpperCase;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import javax.validation.constraints.PastOrPresent;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Data
@@ -63,4 +62,16 @@ public class IndependentAuthorityHistoryEntity {
   @PastOrPresent
   @Column(name = "update_date")
   private LocalDateTime updateDate;
+
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
+  @OneToMany(mappedBy = "independentAuthorityHistoryEntity", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = AuthorityAddressHistoryEntity.class)
+  private Set<AuthorityAddressHistoryEntity> addresses;
+
+  public Set<AuthorityAddressHistoryEntity> getAddresses() {
+    if(this.addresses== null){
+      this.addresses = new HashSet<>();
+    }
+    return this.addresses;
+  }
 }

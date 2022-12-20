@@ -4,15 +4,16 @@ import ca.bc.gov.educ.api.institute.endpoint.v1.DistrictAPIEndpoint;
 import ca.bc.gov.educ.api.institute.exception.EntityNotFoundException;
 import ca.bc.gov.educ.api.institute.exception.InvalidPayloadException;
 import ca.bc.gov.educ.api.institute.exception.errors.ApiError;
-import ca.bc.gov.educ.api.institute.mapper.v1.AddressMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.DistrictContactMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.DistrictMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.NoteMapper;
 import ca.bc.gov.educ.api.institute.service.v1.DistrictHistoryService;
 import ca.bc.gov.educ.api.institute.service.v1.DistrictService;
-import ca.bc.gov.educ.api.institute.struct.v1.*;
+import ca.bc.gov.educ.api.institute.struct.v1.District;
+import ca.bc.gov.educ.api.institute.struct.v1.DistrictContact;
+import ca.bc.gov.educ.api.institute.struct.v1.DistrictHistory;
+import ca.bc.gov.educ.api.institute.struct.v1.Note;
 import ca.bc.gov.educ.api.institute.util.RequestUtil;
-import ca.bc.gov.educ.api.institute.validator.AddressPayloadValidator;
 import ca.bc.gov.educ.api.institute.validator.DistrictContactPayloadValidator;
 import ca.bc.gov.educ.api.institute.validator.DistrictPayloadValidator;
 import ca.bc.gov.educ.api.institute.validator.NotePayloadValidator;
@@ -40,8 +41,6 @@ public class DistrictAPIController implements DistrictAPIEndpoint {
 
   private static final DistrictContactMapper districtContactMapper = DistrictContactMapper.mapper;
 
-  private static final AddressMapper addressMapper = AddressMapper.mapper;
-
   private static final NoteMapper noteMapper = NoteMapper.mapper;
   private final DistrictService districtService;
   private final DistrictHistoryService districtHistoryService;
@@ -50,17 +49,14 @@ public class DistrictAPIController implements DistrictAPIEndpoint {
 
   private final DistrictContactPayloadValidator districtContactPayloadValidator;
 
-  private final AddressPayloadValidator addressPayloadValidator;
-
   private final NotePayloadValidator notePayloadValidator;
 
   @Autowired
-  public DistrictAPIController(final DistrictService districtService, final DistrictHistoryService districtHistoryService, final DistrictPayloadValidator districtPayloadValidator, DistrictContactPayloadValidator districtContactPayloadValidator, AddressPayloadValidator addressPayloadValidator, NotePayloadValidator notePayloadValidator) {
+  public DistrictAPIController(final DistrictService districtService, final DistrictHistoryService districtHistoryService, final DistrictPayloadValidator districtPayloadValidator, DistrictContactPayloadValidator districtContactPayloadValidator, NotePayloadValidator notePayloadValidator) {
     this.districtService = districtService;
     this.districtHistoryService = districtHistoryService;
     this.districtPayloadValidator = districtPayloadValidator;
     this.districtContactPayloadValidator = districtContactPayloadValidator;
-    this.addressPayloadValidator = addressPayloadValidator;
     this.notePayloadValidator = notePayloadValidator;
   }
 
@@ -143,37 +139,6 @@ public class DistrictAPIController implements DistrictAPIEndpoint {
   @Override
   public ResponseEntity<Void> deleteDistrictContact(UUID districtId, UUID contactId) {
     this.districtService.deleteDistrictContact(districtId, contactId);
-    return ResponseEntity.noContent().build();
-  }
-
-  @Override
-  public Address getDistrictAddress(UUID districtId, UUID addressId) {
-    var addressEntity = this.districtService.getDistrictAddress(districtId, addressId);
-
-    if (addressEntity.isPresent()) {
-      return addressMapper.toStructure(addressEntity.get());
-    } else {
-      throw new EntityNotFoundException();
-    }
-  }
-
-  @Override
-  public Address createDistrictAddress(UUID districtId, Address address) {
-    validatePayload(() -> this.addressPayloadValidator.validateCreatePayload(address));
-    RequestUtil.setAuditColumnsForCreate(address);
-    return addressMapper.toStructure(districtService.createDistrictAddress(address, districtId));
-  }
-
-  @Override
-  public Address updateDistrictAddress(UUID districtId, UUID addressId, Address address) {
-    validatePayload(() -> this.addressPayloadValidator.validateUpdatePayload(address));
-    RequestUtil.setAuditColumnsForUpdate(address);
-    return addressMapper.toStructure(districtService.updateDistrictAddress(address, districtId, addressId));
-  }
-
-  @Override
-  public ResponseEntity<Void> deleteDistrictAddress(UUID districtId, UUID addressId) {
-    this.districtService.deleteDistrictAddress(districtId, addressId);
     return ResponseEntity.noContent().build();
   }
 

@@ -1,7 +1,10 @@
 package ca.bc.gov.educ.api.institute.endpoint.v1;
 
 import ca.bc.gov.educ.api.institute.constants.v1.URL;
-import ca.bc.gov.educ.api.institute.struct.v1.*;
+import ca.bc.gov.educ.api.institute.struct.v1.District;
+import ca.bc.gov.educ.api.institute.struct.v1.DistrictContact;
+import ca.bc.gov.educ.api.institute.struct.v1.DistrictHistory;
+import ca.bc.gov.educ.api.institute.struct.v1.Note;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -92,34 +95,6 @@ public interface DistrictAPIEndpoint {
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
   @Tag(name = "District Contact Entity", description = "Endpoints for district contact entity.")
   ResponseEntity<Void> deleteDistrictContact(@PathVariable UUID districtId, @PathVariable UUID contactId);
-
-  @GetMapping("/{districtId}/address/{addressId}")
-  @PreAuthorize("hasAuthority('SCOPE_READ_DISTRICT_ADDRESS')")
-  @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
-  @Tag(name = "District Address Entity", description = "Endpoints for district address entity.")
-  @Schema(name = "Address", implementation = Address.class)
-  Address getDistrictAddress(@PathVariable UUID districtId, @PathVariable UUID addressId);
-
-  @PostMapping("/{districtId}/address")
-  @PreAuthorize("hasAuthority('SCOPE_WRITE_DISTRICT_ADDRESS')")
-  @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
-  @Tag(name = "District Address Entity", description = "Endpoints for district address entity.")
-  @Schema(name = "Address", implementation = Address.class)
-  @ResponseStatus(CREATED)
-  Address createDistrictAddress(@PathVariable UUID districtId, @Validated @RequestBody Address address);
-
-  @PutMapping("/{districtId}/address/{addressId}")
-  @PreAuthorize("hasAuthority('SCOPE_WRITE_DISTRICT_ADDRESS')")
-  @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
-  @Tag(name = "District Address Entity", description = "Endpoints for district address entity.")
-  @Schema(name = "Address", implementation = Address.class)
-  Address updateDistrictAddress(@PathVariable UUID districtId, @PathVariable UUID addressId, @Validated @RequestBody Address address);
-
-  @DeleteMapping("/{districtId}/address/{addressId}")
-  @PreAuthorize("hasAuthority('SCOPE_DELETE_DISTRICT_ADDRESS')")
-  @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
-  @Tag(name = "District Address Entity", description = "Endpoints for district address entity.")
-  ResponseEntity<Void> deleteDistrictAddress(@PathVariable UUID districtId, @PathVariable UUID addressId);
 
   @GetMapping("/{districtId}/note/{noteId}")
   @PreAuthorize("hasAuthority('SCOPE_READ_DISTRICT_NOTE')")

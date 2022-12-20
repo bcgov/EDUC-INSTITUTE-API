@@ -12,6 +12,7 @@ import org.springframework.validation.FieldError;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,7 +21,6 @@ import java.util.Optional;
 public class IndependentAuthorityPayloadValidator {
 
   public static final String AUTHORITY_TYPE_CODE = "authorityTypeCode";
-  public static final String AUTHORITY_GROUP_CODE = "authorityGroupCode";
 
   @Getter(AccessLevel.PRIVATE)
   private final IndependentAuthorityService independentAuthorityService;
@@ -28,10 +28,13 @@ public class IndependentAuthorityPayloadValidator {
   @Getter(AccessLevel.PRIVATE)
   private final CodeTableService codeTableService;
 
+  private final AddressPayloadValidator addressPayloadValidator;
+
   @Autowired
-  public IndependentAuthorityPayloadValidator(final IndependentAuthorityService independentAuthorityService, final CodeTableService codeTableService) {
+  public IndependentAuthorityPayloadValidator(final IndependentAuthorityService independentAuthorityService, final CodeTableService codeTableService, AddressPayloadValidator addressPayloadValidator) {
     this.independentAuthorityService = independentAuthorityService;
     this.codeTableService = codeTableService;
+    this.addressPayloadValidator = addressPayloadValidator;
   }
 
   public List<FieldError> validatePayload(IndependentAuthority independentAuthority, boolean isCreateOperation) {
@@ -47,6 +50,7 @@ public class IndependentAuthorityPayloadValidator {
         apiValidationErrors.add(createFieldError("authorityNumber", independentAuthority.getAuthorityNumber(), "authorityNumber can not be null for a put operation."));
     }
     validateIndependentAuthorityTypeCode(independentAuthority, apiValidationErrors);
+    Optional.ofNullable(independentAuthority.getAddresses()).orElse(Collections.emptyList()).stream().forEach(address -> addressPayloadValidator.validatePayload(address, apiValidationErrors));
     return apiValidationErrors;
   }
 

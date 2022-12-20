@@ -87,8 +87,8 @@ public class SchoolEntity {
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  @OneToMany(mappedBy = "schoolEntity", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = AddressEntity.class)
-  private Set<AddressEntity> addresses;
+  @OneToMany(mappedBy = "schoolEntity", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = SchoolAddressEntity.class)
+  private Set<SchoolAddressEntity> addresses;
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
@@ -119,7 +119,7 @@ public class SchoolEntity {
     return this.grades;
   }
 
-  public Set<AddressEntity> getAddresses() {
+  public Set<SchoolAddressEntity> getAddresses() {
     if(this.addresses== null){
       this.addresses = new HashSet<>();
     }

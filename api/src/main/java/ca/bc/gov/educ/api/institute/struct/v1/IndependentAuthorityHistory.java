@@ -4,11 +4,13 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * The type Student.
@@ -53,4 +55,6 @@ public class IndependentAuthorityHistory extends BaseRequest implements Serializ
 
   private LocalDateTime closedDate;
 
+  @Valid
+  private List<AuthorityAddressHistory> addresses;
 }

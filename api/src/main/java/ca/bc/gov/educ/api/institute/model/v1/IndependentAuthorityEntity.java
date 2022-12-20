@@ -66,19 +66,18 @@ public class IndependentAuthorityEntity {
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  @OneToMany(mappedBy = "independentAuthorityEntity", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = AddressEntity.class)
-  private Set<AddressEntity> addresses;
+  @OneToMany(mappedBy = "independentAuthorityEntity", fetch = FetchType.EAGER, cascade = CascadeType.DETACH, targetEntity = NoteEntity.class)
+  private Set<NoteEntity> notes;
 
-  public Set<AddressEntity> getAddresses() {
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
+  @OneToMany(mappedBy = "independentAuthorityEntity", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = AuthorityAddressEntity.class)
+  private Set<AuthorityAddressEntity> addresses;
+
+  public Set<AuthorityAddressEntity> getAddresses() {
     if(this.addresses== null){
       this.addresses = new HashSet<>();
     }
     return this.addresses;
   }
-
-  @ToString.Exclude
-  @EqualsAndHashCode.Exclude
-  @OneToMany(mappedBy = "independentAuthorityEntity", fetch = FetchType.EAGER, cascade = CascadeType.DETACH, targetEntity = NoteEntity.class)
-  private Set<NoteEntity> notes;
-
 }
