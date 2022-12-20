@@ -385,6 +385,47 @@ public class SchoolControllerTest {
   }
 
   @Test
+  void testUpdateSchoolNeighborhoodLearning_GivenValidPayload_ShouldReturnStatusOk() throws Exception {
+    final DistrictEntity dist = this.districtRepository.save(this.createDistrictData());
+    var schoolEntity = this.createSchoolData();
+    schoolEntity.setDistrictEntity(dist);
+    final SchoolEntity entity = this.schoolRepository.save(schoolEntity);
+    entity.setDisplayName("newdist");
+    entity.setCreateDate(null);
+    entity.setUpdateDate(null);
+    entity.getNeighborhoodLearning().add(createNeighborhoodLearningData(entity));
+
+    var school = SchoolMapper.mapper.toStructure(entity);
+    school.setDistrictId(dist.getDistrictId().toString());
+
+    var resultActions = this.mockMvc.perform(put(URL.BASE_URL_SCHOOL + "/" + entity.getSchoolId())
+        .contentType(MediaType.APPLICATION_JSON)
+        .accept(MediaType.APPLICATION_JSON)
+        .content(asJsonString(school))
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SCHOOL"))))
+      .andDo(print())
+      .andExpect(status().isOk())
+      .andExpect(MockMvcResultMatchers.jsonPath("$.neighborhoodLearning[0].neighborhoodLearningTypeCode").value("COMM_USE"));
+
+    val schoolReturn = objectMapper.readValue(resultActions.andReturn().getResponse().getContentAsByteArray(), new TypeReference<School>() {
+    });
+
+    schoolReturn.setCreateDate(null);
+    schoolReturn.setUpdateDate(null);
+    schoolReturn.getNeighborhoodLearning().get(0).setUpdateDate(null);
+    schoolReturn.getNeighborhoodLearning().get(0).setCreateDate(null);
+
+    this.mockMvc.perform(put(URL.BASE_URL_SCHOOL + "/" + entity.getSchoolId())
+        .contentType(MediaType.APPLICATION_JSON)
+        .accept(MediaType.APPLICATION_JSON)
+        .content(asJsonString(schoolReturn))
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SCHOOL"))))
+      .andDo(print())
+      .andExpect(status().isOk())
+      .andExpect(MockMvcResultMatchers.jsonPath("$.neighborhoodLearning[0].neighborhoodLearningId").value(schoolReturn.getNeighborhoodLearning().get(0).getNeighborhoodLearningId()));
+  }
+
+  @Test
   void testCreateSchool_GivenValidPayload_ShouldReturnStatusOK() throws Exception {
     final DistrictEntity dist = this.districtRepository.save(this.createDistrictData());
     var schoolEntity = this.createSchoolData();

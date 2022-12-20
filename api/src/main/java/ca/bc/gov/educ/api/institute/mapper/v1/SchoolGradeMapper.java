@@ -16,6 +16,6 @@ public interface SchoolGradeMapper {
   SchoolGradeMapper mapper = Mappers.getMapper(SchoolGradeMapper.class);
 
   SchoolGradeEntity toModel(SchoolGrade structure);
-
+  @Mapping(target = "schoolId", source = "schoolEntity.schoolId")
   SchoolGrade toStructure(SchoolGradeEntity entity);
 }

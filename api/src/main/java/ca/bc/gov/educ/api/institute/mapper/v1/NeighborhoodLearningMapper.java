@@ -18,5 +18,6 @@ public interface NeighborhoodLearningMapper {
 
   NeighborhoodLearningEntity toModel(NeighborhoodLearning structure);
 
+  @Mapping(target = "schoolId", source = "schoolEntity.schoolId")
   NeighborhoodLearning toStructure(NeighborhoodLearningEntity entity);
 }
