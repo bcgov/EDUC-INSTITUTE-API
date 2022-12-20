@@ -15,7 +15,5 @@ public class SchoolAddressHistory extends BaseAddress implements Serializable {
 
   private String schoolAddressHistoryId;
 
-  private String schoolAddressId;
-
   private String schoolId;
 }
