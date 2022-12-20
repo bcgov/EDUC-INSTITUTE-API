@@ -105,27 +105,13 @@ public class DistrictService {
   }
 
   private void setAddresses(DistrictEntity currentDistrictEntity, DistrictEntity district){
-    Set<DistrictAddressEntity> addresses = new HashSet<>(currentDistrictEntity.getAddresses());
     currentDistrictEntity.getAddresses().clear();
     district.getAddresses().stream().forEach(address -> {
-      if(address.getDistrictAddressId() == null) {
-        setupAddressForSave(address, currentDistrictEntity);
-      }else{
-        var currAddress = addresses.stream().filter(addy -> addy.getDistrictAddressId().equals(address.getDistrictAddressId())).collect(Collectors.toList()).get(0);
-        if(!BeanComparatorUtil.compare(address, currAddress)){
-          setupAddressForSave(address, currentDistrictEntity);
-        }else{
-          currentDistrictEntity.getAddresses().add(currAddress);
-        }
-      }
+      RequestUtil.setAuditColumnsForAddress(address);
+      TransformUtil.uppercaseFields(address);
+      address.setDistrictEntity(currentDistrictEntity);
+      currentDistrictEntity.getAddresses().add(address);
     });
-  }
-
-  private void setupAddressForSave(DistrictAddressEntity address, DistrictEntity currentDistrictEntity){
-    RequestUtil.setAuditColumnsForAddress(address);
-    TransformUtil.uppercaseFields(address);
-    address.setDistrictEntity(currentDistrictEntity);
-    currentDistrictEntity.getAddresses().add(address);
   }
 
   public Optional<DistrictContactEntity> getDistrictContact(UUID districtId, UUID contactId) {

@@ -115,27 +115,13 @@ public class SchoolService {
   }
 
   private void setAddresses(SchoolEntity currentSchoolEntity, SchoolEntity school){
-    Set<SchoolAddressEntity> addresses = new HashSet<>(currentSchoolEntity.getAddresses());
     currentSchoolEntity.getAddresses().clear();
     school.getAddresses().stream().forEach(address -> {
-      if(address.getSchoolAddressId() == null) {
-        setupAddressForSave(address, currentSchoolEntity);
-      }else{
-        var currAddress = addresses.stream().filter(addy -> addy.getSchoolAddressId().equals(address.getSchoolAddressId())).collect(Collectors.toList()).get(0);
-        if(!BeanComparatorUtil.compare(address, currAddress)){
-          setupAddressForSave(address, currentSchoolEntity);
-        }else{
-          currentSchoolEntity.getAddresses().add(currAddress);
-        }
-      }
+      RequestUtil.setAuditColumnsForAddress(address);
+      TransformUtil.uppercaseFields(address);
+      address.setSchoolEntity(currentSchoolEntity);
+      currentSchoolEntity.getAddresses().add(address);
     });
-  }
-
-  private void setupAddressForSave(SchoolAddressEntity address, SchoolEntity currentSchoolEntity){
-    RequestUtil.setAuditColumnsForAddress(address);
-    TransformUtil.uppercaseFields(address);
-    address.setSchoolEntity(currentSchoolEntity);
-    currentSchoolEntity.getAddresses().add(address);
   }
 
   private void setGradesAndNeighborhoodLearning(SchoolEntity currentSchoolEntity, SchoolEntity school){

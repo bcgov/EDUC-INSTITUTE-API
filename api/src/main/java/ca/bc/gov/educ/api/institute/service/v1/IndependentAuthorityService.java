@@ -114,28 +114,14 @@ public class IndependentAuthorityService {
     }
   }
 
-  private void setAddresses(IndependentAuthorityEntity currentDistrictEntity, IndependentAuthorityEntity authority){
-    Set<AuthorityAddressEntity> addresses = new HashSet<>(currentDistrictEntity.getAddresses());
-    currentDistrictEntity.getAddresses().clear();
+  private void setAddresses(IndependentAuthorityEntity currentAuthorityEntity, IndependentAuthorityEntity authority){
+    currentAuthorityEntity.getAddresses().clear();
     authority.getAddresses().stream().forEach(address -> {
-      if(address.getIndependentAuthorityAddressId() == null) {
-        setupAddressForSave(address, currentDistrictEntity);
-      }else{
-        var currAddress = addresses.stream().filter(addy -> addy.getIndependentAuthorityAddressId().equals(address.getIndependentAuthorityAddressId())).collect(Collectors.toList()).get(0);
-        if(!BeanComparatorUtil.compare(address, currAddress)){
-          setupAddressForSave(address, currentDistrictEntity);
-        }else{
-          currentDistrictEntity.getAddresses().add(currAddress);
-        }
-      }
+      RequestUtil.setAuditColumnsForAddress(address);
+      TransformUtil.uppercaseFields(address);
+      address.setIndependentAuthorityEntity(currentAuthorityEntity);
+      currentAuthorityEntity.getAddresses().add(address);
     });
-  }
-
-  private void setupAddressForSave(AuthorityAddressEntity address, IndependentAuthorityEntity currentAuthorityEntity){
-    RequestUtil.setAuditColumnsForAddress(address);
-    TransformUtil.uppercaseFields(address);
-    address.setIndependentAuthorityEntity(currentAuthorityEntity);
-    currentAuthorityEntity.getAddresses().add(address);
   }
 
   public Optional<AuthorityContactEntity> getIndependentAuthorityContact(UUID independentAuthorityId, UUID contactId) {
