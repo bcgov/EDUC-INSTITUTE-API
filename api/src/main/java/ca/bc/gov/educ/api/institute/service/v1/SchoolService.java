@@ -8,7 +8,9 @@ import ca.bc.gov.educ.api.institute.model.v1.*;
 import ca.bc.gov.educ.api.institute.repository.v1.*;
 import ca.bc.gov.educ.api.institute.struct.v1.Note;
 import ca.bc.gov.educ.api.institute.struct.v1.School;
+import ca.bc.gov.educ.api.institute.struct.v1.SchoolAddress;
 import ca.bc.gov.educ.api.institute.struct.v1.SchoolContact;
+import ca.bc.gov.educ.api.institute.util.BeanComparatorUtil;
 import ca.bc.gov.educ.api.institute.util.RequestUtil;
 import ca.bc.gov.educ.api.institute.util.TransformUtil;
 import lombok.AccessLevel;
@@ -20,9 +22,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class SchoolService {
@@ -114,30 +115,48 @@ public class SchoolService {
   }
 
   private void setAddresses(SchoolEntity currentSchoolEntity, SchoolEntity school){
+    Set<SchoolAddressEntity> addresses = new HashSet<>(currentSchoolEntity.getAddresses());
     currentSchoolEntity.getAddresses().clear();
     school.getAddresses().stream().forEach(address -> {
-      RequestUtil.setAuditColumnsForAddress(address);
-      TransformUtil.uppercaseFields(address);
-      address.setSchoolEntity(currentSchoolEntity);
-      currentSchoolEntity.getAddresses().add(address);
+      if(address.getSchoolAddressId() == null) {
+        setupAddressForSave(address, currentSchoolEntity);
+      }else{
+        var currAddress = addresses.stream().filter(addy -> addy.getSchoolAddressId().equals(address.getSchoolAddressId())).collect(Collectors.toList()).get(0);
+        if(!BeanComparatorUtil.compare(address, currAddress)){
+          setupAddressForSave(address, currentSchoolEntity);
+        }else{
+          currentSchoolEntity.getAddresses().add(currAddress);
+        }
+      }
     });
+  }
+
+  private void setupAddressForSave(SchoolAddressEntity address, SchoolEntity currentSchoolEntity){
+    RequestUtil.setAuditColumnsForAddress(address);
+    TransformUtil.uppercaseFields(address);
+    address.setSchoolEntity(currentSchoolEntity);
+    currentSchoolEntity.getAddresses().add(address);
   }
 
   private void setGradesAndNeighborhoodLearning(SchoolEntity currentSchoolEntity, SchoolEntity school){
     currentSchoolEntity.getGrades().clear();
     school.getGrades().stream().forEach(grade -> {
-      RequestUtil.setAuditColumnsForGrades(grade);
-      grade.setSchoolEntity(currentSchoolEntity);
-      TransformUtil.uppercaseFields(grade);
-      currentSchoolEntity.getGrades().add(grade);
+      if(grade.getSchoolGradeId() == null) {
+        RequestUtil.setAuditColumnsForGrades(grade);
+        grade.setSchoolEntity(currentSchoolEntity);
+        TransformUtil.uppercaseFields(grade);
+        currentSchoolEntity.getGrades().add(grade);
+      }
     });
 
     currentSchoolEntity.getNeighborhoodLearning().clear();
     school.getNeighborhoodLearning().stream().forEach(neighborhoodLearning -> {
-      RequestUtil.setAuditColumnsForNeighborhoodLearning(neighborhoodLearning);
-      neighborhoodLearning.setSchoolEntity(currentSchoolEntity);
-      TransformUtil.uppercaseFields(neighborhoodLearning);
-      currentSchoolEntity.getNeighborhoodLearning().add(neighborhoodLearning);
+      if(neighborhoodLearning.getNeighborhoodLearningId() == null) {
+        RequestUtil.setAuditColumnsForNeighborhoodLearning(neighborhoodLearning);
+        neighborhoodLearning.setSchoolEntity(currentSchoolEntity);
+        TransformUtil.uppercaseFields(neighborhoodLearning);
+        currentSchoolEntity.getNeighborhoodLearning().add(neighborhoodLearning);
+      }
     });
   }
 

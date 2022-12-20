@@ -4,15 +4,14 @@ import ca.bc.gov.educ.api.institute.exception.EntityNotFoundException;
 import ca.bc.gov.educ.api.institute.mapper.v1.DistrictContactMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.DistrictMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.NoteMapper;
-import ca.bc.gov.educ.api.institute.model.v1.DistrictContactEntity;
-import ca.bc.gov.educ.api.institute.model.v1.DistrictEntity;
-import ca.bc.gov.educ.api.institute.model.v1.NoteEntity;
+import ca.bc.gov.educ.api.institute.model.v1.*;
 import ca.bc.gov.educ.api.institute.repository.v1.DistrictContactRepository;
 import ca.bc.gov.educ.api.institute.repository.v1.DistrictRepository;
 import ca.bc.gov.educ.api.institute.repository.v1.NoteRepository;
 import ca.bc.gov.educ.api.institute.struct.v1.District;
 import ca.bc.gov.educ.api.institute.struct.v1.DistrictContact;
 import ca.bc.gov.educ.api.institute.struct.v1.Note;
+import ca.bc.gov.educ.api.institute.util.BeanComparatorUtil;
 import ca.bc.gov.educ.api.institute.util.RequestUtil;
 import ca.bc.gov.educ.api.institute.util.TransformUtil;
 import lombok.AccessLevel;
@@ -24,9 +23,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class DistrictService {
@@ -106,14 +104,28 @@ public class DistrictService {
     }
   }
 
-  private void setAddresses(DistrictEntity currentDistrictEntity, DistrictEntity school){
+  private void setAddresses(DistrictEntity currentDistrictEntity, DistrictEntity district){
+    Set<DistrictAddressEntity> addresses = new HashSet<>(currentDistrictEntity.getAddresses());
     currentDistrictEntity.getAddresses().clear();
-    school.getAddresses().stream().forEach(address -> {
-      RequestUtil.setAuditColumnsForAddress(address);
-      TransformUtil.uppercaseFields(address);
-      address.setDistrictEntity(currentDistrictEntity);
-      currentDistrictEntity.getAddresses().add(address);
+    district.getAddresses().stream().forEach(address -> {
+      if(address.getDistrictAddressId() == null) {
+        setupAddressForSave(address, currentDistrictEntity);
+      }else{
+        var currAddress = addresses.stream().filter(addy -> addy.getDistrictAddressId().equals(address.getDistrictAddressId())).collect(Collectors.toList()).get(0);
+        if(!BeanComparatorUtil.compare(address, currAddress)){
+          setupAddressForSave(address, currentDistrictEntity);
+        }else{
+          currentDistrictEntity.getAddresses().add(currAddress);
+        }
+      }
     });
+  }
+
+  private void setupAddressForSave(DistrictAddressEntity address, DistrictEntity currentDistrictEntity){
+    RequestUtil.setAuditColumnsForAddress(address);
+    TransformUtil.uppercaseFields(address);
+    address.setDistrictEntity(currentDistrictEntity);
+    currentDistrictEntity.getAddresses().add(address);
   }
 
   public Optional<DistrictContactEntity> getDistrictContact(UUID districtId, UUID contactId) {

@@ -6,6 +6,7 @@ import ca.bc.gov.educ.api.institute.mapper.UUIDMapper;
 import ca.bc.gov.educ.api.institute.model.v1.DistrictAddressEntity;
 import ca.bc.gov.educ.api.institute.struct.v1.DistrictAddress;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 @Mapper(uses = {UUIDMapper.class, LocalDateTimeMapper.class, StringMapper.class})
@@ -16,5 +17,6 @@ public interface DistrictAddressMapper {
 
   DistrictAddressEntity toModel(DistrictAddress structure);
 
+  @Mapping(target = "districtId", source = "districtEntity.districtId")
   DistrictAddress toStructure(DistrictAddressEntity entity);
 }

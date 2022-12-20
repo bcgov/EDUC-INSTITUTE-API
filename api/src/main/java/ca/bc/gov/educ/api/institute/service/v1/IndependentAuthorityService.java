@@ -4,15 +4,14 @@ import ca.bc.gov.educ.api.institute.exception.EntityNotFoundException;
 import ca.bc.gov.educ.api.institute.mapper.v1.AuthorityContactMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.IndependentAuthorityMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.NoteMapper;
-import ca.bc.gov.educ.api.institute.model.v1.AuthorityContactEntity;
-import ca.bc.gov.educ.api.institute.model.v1.IndependentAuthorityEntity;
-import ca.bc.gov.educ.api.institute.model.v1.NoteEntity;
+import ca.bc.gov.educ.api.institute.model.v1.*;
 import ca.bc.gov.educ.api.institute.repository.v1.AuthorityContactRepository;
 import ca.bc.gov.educ.api.institute.repository.v1.IndependentAuthorityRepository;
 import ca.bc.gov.educ.api.institute.repository.v1.NoteRepository;
 import ca.bc.gov.educ.api.institute.struct.v1.AuthorityContact;
 import ca.bc.gov.educ.api.institute.struct.v1.IndependentAuthority;
 import ca.bc.gov.educ.api.institute.struct.v1.Note;
+import ca.bc.gov.educ.api.institute.util.BeanComparatorUtil;
 import ca.bc.gov.educ.api.institute.util.RequestUtil;
 import ca.bc.gov.educ.api.institute.util.TransformUtil;
 import lombok.AccessLevel;
@@ -24,9 +23,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class IndependentAuthorityService {
@@ -116,14 +114,28 @@ public class IndependentAuthorityService {
     }
   }
 
-  private void setAddresses(IndependentAuthorityEntity currentAuthorityEntity, IndependentAuthorityEntity school){
-    currentAuthorityEntity.getAddresses().clear();
-    school.getAddresses().stream().forEach(address -> {
-      RequestUtil.setAuditColumnsForAddress(address);
-      TransformUtil.uppercaseFields(address);
-      address.setIndependentAuthorityEntity(currentAuthorityEntity);
-      currentAuthorityEntity.getAddresses().add(address);
+  private void setAddresses(IndependentAuthorityEntity currentDistrictEntity, IndependentAuthorityEntity authority){
+    Set<AuthorityAddressEntity> addresses = new HashSet<>(currentDistrictEntity.getAddresses());
+    currentDistrictEntity.getAddresses().clear();
+    authority.getAddresses().stream().forEach(address -> {
+      if(address.getIndependentAuthorityAddressId() == null) {
+        setupAddressForSave(address, currentDistrictEntity);
+      }else{
+        var currAddress = addresses.stream().filter(addy -> addy.getIndependentAuthorityAddressId().equals(address.getIndependentAuthorityAddressId())).collect(Collectors.toList()).get(0);
+        if(!BeanComparatorUtil.compare(address, currAddress)){
+          setupAddressForSave(address, currentDistrictEntity);
+        }else{
+          currentDistrictEntity.getAddresses().add(currAddress);
+        }
+      }
     });
+  }
+
+  private void setupAddressForSave(AuthorityAddressEntity address, IndependentAuthorityEntity currentAuthorityEntity){
+    RequestUtil.setAuditColumnsForAddress(address);
+    TransformUtil.uppercaseFields(address);
+    address.setIndependentAuthorityEntity(currentAuthorityEntity);
+    currentAuthorityEntity.getAddresses().add(address);
   }
 
   public Optional<AuthorityContactEntity> getIndependentAuthorityContact(UUID independentAuthorityId, UUID contactId) {
