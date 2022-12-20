@@ -30,7 +30,4 @@ public class AuthorityAddressHistoryEntity extends BaseAddressEntity {
   @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
   @JoinColumn(name = "independent_authority_history_id", referencedColumnName = "independent_authority_history_id")
   IndependentAuthorityHistoryEntity independentAuthorityHistoryEntity;
-  @Basic
-  @Column(name = "independent_authority_address_id", columnDefinition = "BINARY(16)")
-  private UUID independentAuthorityAddressId;
 }

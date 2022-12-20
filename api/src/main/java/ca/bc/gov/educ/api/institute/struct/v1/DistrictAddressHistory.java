@@ -15,7 +15,5 @@ public class DistrictAddressHistory extends BaseAddress implements Serializable 
 
   private String districtAddressHistoryId;
 
-  private String districtAddressId;
-
   private String districtId;
 }

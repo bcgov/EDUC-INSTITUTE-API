@@ -15,7 +15,5 @@ public class AuthorityAddressHistory extends BaseAddress implements Serializable
 
   private String independentAuthorityAddressHistoryId;
 
-  private String independentAuthorityAddressId;
-
   private String independentAuthorityId;
 }

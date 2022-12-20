@@ -127,22 +127,18 @@ public class SchoolService {
   private void setGradesAndNeighborhoodLearning(SchoolEntity currentSchoolEntity, SchoolEntity school){
     currentSchoolEntity.getGrades().clear();
     school.getGrades().stream().forEach(grade -> {
-      if(grade.getSchoolGradeId() == null) {
-        RequestUtil.setAuditColumnsForGrades(grade);
-        grade.setSchoolEntity(currentSchoolEntity);
-        TransformUtil.uppercaseFields(grade);
-        currentSchoolEntity.getGrades().add(grade);
-      }
+      RequestUtil.setAuditColumnsForGrades(grade);
+      grade.setSchoolEntity(currentSchoolEntity);
+      TransformUtil.uppercaseFields(grade);
+      currentSchoolEntity.getGrades().add(grade);
     });
 
     currentSchoolEntity.getNeighborhoodLearning().clear();
     school.getNeighborhoodLearning().stream().forEach(neighborhoodLearning -> {
-      if(neighborhoodLearning.getNeighborhoodLearningId() == null) {
-        RequestUtil.setAuditColumnsForNeighborhoodLearning(neighborhoodLearning);
-        neighborhoodLearning.setSchoolEntity(currentSchoolEntity);
-        TransformUtil.uppercaseFields(neighborhoodLearning);
-        currentSchoolEntity.getNeighborhoodLearning().add(neighborhoodLearning);
-      }
+      RequestUtil.setAuditColumnsForNeighborhoodLearning(neighborhoodLearning);
+      neighborhoodLearning.setSchoolEntity(currentSchoolEntity);
+      TransformUtil.uppercaseFields(neighborhoodLearning);
+      currentSchoolEntity.getNeighborhoodLearning().add(neighborhoodLearning);
     });
   }
 
