@@ -15,10 +15,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.FieldError;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 
 @Component
@@ -37,11 +34,14 @@ public class SchoolPayloadValidator {
 
   private final DistrictRepository districtRepository;
 
+  private final AddressPayloadValidator addressPayloadValidator;
+
   @Autowired
-  public SchoolPayloadValidator(final SchoolService schoolService, final CodeTableService codeTableService, DistrictRepository districtRepository) {
+  public SchoolPayloadValidator(final SchoolService schoolService, final CodeTableService codeTableService, DistrictRepository districtRepository, AddressPayloadValidator addressPayloadValidator) {
     this.schoolService = schoolService;
     this.codeTableService = codeTableService;
     this.districtRepository = districtRepository;
+    this.addressPayloadValidator = addressPayloadValidator;
   }
 
   public List<FieldError> validatePayload(School school, boolean isCreateOperation) {
@@ -53,6 +53,7 @@ public class SchoolPayloadValidator {
     validateSchoolOrganizationCode(school, apiValidationErrors);
     validateSchoolCategoryCode(school, apiValidationErrors);
     validateFacilityTypeCode(school, apiValidationErrors);
+    Optional.ofNullable(school.getAddresses()).orElse(Collections.emptyList()).stream().forEach(address -> addressPayloadValidator.validatePayload(address, apiValidationErrors));
     return apiValidationErrors;
   }
 

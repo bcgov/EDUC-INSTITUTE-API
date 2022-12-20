@@ -10,7 +10,7 @@ import ca.bc.gov.educ.api.institute.struct.v1.DistrictHistory;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
-@Mapper(uses = {UUIDMapper.class, LocalDateTimeMapper.class, StringMapper.class, DistrictContactMapper.class, SchoolGradeMapper.class, NeighborhoodLearningMapper.class, NoteMapper.class, AddressMapper.class})
+@Mapper(uses = {UUIDMapper.class, LocalDateTimeMapper.class, StringMapper.class, DistrictContactMapper.class, SchoolGradeMapper.class, NeighborhoodLearningMapper.class, NoteMapper.class, DistrictAddressMapper.class})
 @SuppressWarnings("squid:S1214")
 public interface DistrictMapper {
 

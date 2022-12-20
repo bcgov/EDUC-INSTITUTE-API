@@ -90,6 +90,11 @@ public class SchoolHistoryEntity {
   @OneToMany(mappedBy = "schoolHistoryEntity", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = NeighbourhoodLearningSchoolHistoryEntity.class)
   private Set<NeighbourhoodLearningSchoolHistoryEntity> neighbourhoodLearnings;
 
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
+  @OneToMany(mappedBy = "schoolHistoryEntity", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = SchoolAddressHistoryEntity.class)
+  private Set<SchoolAddressHistoryEntity> addresses;
+
   public Set<SchoolGradeSchoolHistoryEntity> getSchoolGrades() {
     if (this.schoolGrades == null) {
       this.schoolGrades = new HashSet<>();
@@ -102,5 +107,12 @@ public class SchoolHistoryEntity {
       this.neighbourhoodLearnings = new HashSet<>();
     }
     return this.neighbourhoodLearnings;
+  }
+
+  public Set<SchoolAddressHistoryEntity> getAddresses() {
+    if(this.addresses== null){
+      this.addresses = new HashSet<>();
+    }
+    return this.addresses;
   }
 }

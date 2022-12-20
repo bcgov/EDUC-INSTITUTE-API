@@ -31,13 +31,16 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import static org.hamcrest.Matchers.*;
-import static org.hamcrest.core.IsNull.notNullValue;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.UUID;
 
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.core.IsNull.notNullValue;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.oidcLogin;
@@ -88,7 +91,7 @@ public class SchoolControllerTest {
   SchoolContactRepository schoolContactRepository;
 
   @Autowired
-  AddressRepository addressRepository;
+  SchoolAddressRepository addressRepository;
 
   @Autowired
   NoteRepository noteRepository;
@@ -318,7 +321,6 @@ public class SchoolControllerTest {
         addy.setUpdateDate(null);
       }
     );
-
 
     this.mockMvc.perform(put(URL.BASE_URL_SCHOOL + "/" + entity.getSchoolId())
         .contentType(MediaType.APPLICATION_JSON)
@@ -555,53 +557,6 @@ public class SchoolControllerTest {
       .andExpect(MockMvcResultMatchers.jsonPath("$.firstName").value(contact.getFirstName()));
   }
 
-  @Test
-  void testCreateSchoolAddress_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
-    final SchoolEntity schoolEntity = this.schoolRepository.save(this.createSchoolData());
-    AddressEntity addressEntity = createAddressData(schoolEntity);
-
-    this.mockMvc.perform(post(URL.BASE_URL_SCHOOL + "/" + schoolEntity.getSchoolId() + "/address")
-        .contentType(MediaType.APPLICATION_JSON)
-        .accept(MediaType.APPLICATION_JSON)
-        .content(asJsonString(addressEntity))
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SCHOOL_ADDRESS"))))
-      .andDo(print())
-      .andExpect(status().isCreated())
-      .andExpect(MockMvcResultMatchers.jsonPath("$.city").value(addressEntity.getCity()));
-  }
-
-  @Test
-  void testDeleteSchoolAddress_GivenValidID_ShouldReturnStatusOK() throws Exception {
-    final var school = this.createSchoolData();
-    var schoolEntity = this.schoolRepository.save(school);
-    AddressEntity addressEntity = createAddressData(schoolEntity);
-    var address = this.addressRepository.save(addressEntity);
-
-    this.mockMvc.perform(delete(URL.BASE_URL_SCHOOL + "/" + schoolEntity.getSchoolId() + "/address/" + address.getAddressId())
-        .contentType(MediaType.APPLICATION_JSON)
-        .accept(MediaType.APPLICATION_JSON)
-        .content(asJsonString(schoolEntity))
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_SCHOOL_ADDRESS"))))
-      .andDo(print())
-      .andExpect(status().isNoContent());
-
-    var deletedAddress = this.addressRepository.findById(address.getAddressId());
-    Assertions.assertTrue(deletedAddress.isEmpty());
-  }
-
-  @Test
-  void testRetrieveSchoolAddress_GivenValidID_ShouldReturnStatusOK() throws Exception {
-    final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_SCHOOL_ADDRESS";
-    final var mockAuthority = oidcLogin().authorities(grantedAuthority);
-    final var school = this.createSchoolData();
-    var schoolEntity = this.schoolRepository.save(school);
-    AddressEntity addressEntity = createAddressData(schoolEntity);
-    var address = this.addressRepository.save(addressEntity);
-    this.mockMvc.perform(get(URL.BASE_URL_SCHOOL + "/" + schoolEntity.getSchoolId() + "/address/" + address.getAddressId()).with(mockAuthority))
-      .andDo(print()).andExpect(status().isOk()).andExpect(MockMvcResultMatchers.jsonPath("$.addressId")
-        .value(address.getAddressId().toString()));
-  }
-
   @ParameterizedTest
   @CsvSource(value = {"SCOPE_READ_SCHOOL_CONTACT:contact", "SCOPE_READ_SCHOOL_ADDRESS:address", "SCOPE_READ_SCHOOL_NOTE:note"}, delimiter = ':')
   void testRetrieveDistrictInstitute_GivenInvalidID_ShouldReturnStatusNotFound(String scope, String path) throws Exception {
@@ -612,24 +567,6 @@ public class SchoolControllerTest {
 
     this.mockMvc.perform(get(URL.BASE_URL_SCHOOL + "/" + schoolEntity.getSchoolId() + "/" + path + "/" + UUID.randomUUID()).with(mockAuthority))
       .andDo(print()).andExpect(status().isNotFound());
-  }
-
-  @Test
-  void testUpdateSchoolAddress_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
-    final var school = this.createSchoolData();
-    var schoolEntity = this.schoolRepository.save(school);
-    AddressEntity addressEntity = createAddressData(schoolEntity);
-    var address = this.addressRepository.save(addressEntity);
-    address.setCity("southshore");
-
-    this.mockMvc.perform(put(URL.BASE_URL_SCHOOL + "/" + schoolEntity.getSchoolId() + "/address/" + address.getAddressId())
-        .contentType(MediaType.APPLICATION_JSON)
-        .accept(MediaType.APPLICATION_JSON)
-        .content(asJsonString(address))
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SCHOOL_ADDRESS"))))
-      .andDo(print())
-      .andExpect(status().isOk())
-      .andExpect(MockMvcResultMatchers.jsonPath("$.city").value(address.getCity()));
   }
 
   @Test
@@ -938,8 +875,8 @@ public class SchoolControllerTest {
     return NeighborhoodLearningEntity.builder().schoolEntity(entity).neighborhoodLearningTypeCode("COMM_USE").createUser("TEST").updateUser("TEST").build();
   }
 
-  private AddressEntity createAddressData(SchoolEntity entity) {
-    return AddressEntity.builder().schoolEntity(entity).addressTypeCode("MAILING").addressLine1("123 This Street").city("Compton")
+  private SchoolAddressEntity createAddressData(SchoolEntity entity) {
+    return SchoolAddressEntity.builder().schoolEntity(entity).addressTypeCode("MAILING").addressLine1("123 This Street").city("Compton")
       .provinceCode("BC").countryCode("CA").postal("V1B9H2").build();
   }
 
@@ -977,8 +914,8 @@ public class SchoolControllerTest {
       .updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
   }
 
-  private AddressEntity createSchoolAddressData() {
-    return AddressEntity.builder().independentAuthorityEntity(null).addressLine1("Line 1").city("City").provinceCode("BC").countryCode("CA").postal("V1V1V2").addressTypeCode("MAILING")
+  private SchoolAddressEntity createSchoolAddressData() {
+    return SchoolAddressEntity.builder().addressLine1("Line 1").city("City").provinceCode("BC").countryCode("CA").postal("V1V1V2").addressTypeCode("MAILING")
       .createDate(LocalDateTime.now()).updateDate(LocalDateTime.now()).build();
   }
 

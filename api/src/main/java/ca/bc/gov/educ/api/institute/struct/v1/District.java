@@ -58,7 +58,7 @@ public class District extends BaseRequest implements Serializable {
   private List<DistrictContact> contacts;
 
   @Valid
-  private List<Address> addresses;
+  private List<DistrictAddress> addresses;
 
   @Valid
   private List<Note> notes;

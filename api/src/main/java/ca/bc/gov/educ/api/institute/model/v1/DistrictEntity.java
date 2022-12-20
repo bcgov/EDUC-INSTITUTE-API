@@ -69,15 +69,15 @@ public class DistrictEntity {
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  @OneToMany(mappedBy = "districtEntity", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = AddressEntity.class)
-  private Set<AddressEntity> addresses;
+  @OneToMany(mappedBy = "districtEntity", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = DistrictAddressEntity.class)
+  private Set<DistrictAddressEntity> addresses;
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
   @OneToMany(mappedBy = "districtEntity", fetch = FetchType.EAGER, cascade = CascadeType.DETACH, targetEntity = NoteEntity.class)
   private Set<NoteEntity> notes;
 
-  public Set<AddressEntity> getAddresses() {
+  public Set<DistrictAddressEntity> getAddresses() {
     if(this.addresses== null){
       this.addresses = new HashSet<>();
     }

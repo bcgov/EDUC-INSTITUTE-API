@@ -1,19 +1,13 @@
 package ca.bc.gov.educ.api.institute.service.v1;
 
 import ca.bc.gov.educ.api.institute.exception.EntityNotFoundException;
-import ca.bc.gov.educ.api.institute.mapper.v1.AddressMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.DistrictContactMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.DistrictMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.NoteMapper;
-import ca.bc.gov.educ.api.institute.model.v1.AddressEntity;
-import ca.bc.gov.educ.api.institute.model.v1.DistrictContactEntity;
-import ca.bc.gov.educ.api.institute.model.v1.DistrictEntity;
-import ca.bc.gov.educ.api.institute.model.v1.NoteEntity;
-import ca.bc.gov.educ.api.institute.repository.v1.AddressRepository;
+import ca.bc.gov.educ.api.institute.model.v1.*;
 import ca.bc.gov.educ.api.institute.repository.v1.DistrictContactRepository;
 import ca.bc.gov.educ.api.institute.repository.v1.DistrictRepository;
 import ca.bc.gov.educ.api.institute.repository.v1.NoteRepository;
-import ca.bc.gov.educ.api.institute.struct.v1.Address;
 import ca.bc.gov.educ.api.institute.struct.v1.District;
 import ca.bc.gov.educ.api.institute.struct.v1.DistrictContact;
 import ca.bc.gov.educ.api.institute.struct.v1.Note;
@@ -39,8 +33,6 @@ public class DistrictService {
 
   private static final String CONTACT_ID_ATTR = "contactId";
 
-  private static final String ADDRESS_ID_ATTR = "addressId";
-
   private static final String NOTE_ID_ATTR = "noteId";
 
   private static final String CREATE_DATE = "createDate";
@@ -52,22 +44,16 @@ public class DistrictService {
 
   private final DistrictHistoryService districtHistoryService;
 
-  private final AddressHistoryService addressHistoryService;
-
   private final DistrictContactRepository districtContactRepository;
-
-  private final AddressRepository addressRepository;
 
   private final NoteRepository noteRepository;
 
 
   @Autowired
-  public DistrictService(DistrictRepository districtRepository, DistrictHistoryService districtHistoryService, AddressRepository addressRepository, NoteRepository noteRepository, AddressHistoryService addressHistoryService, DistrictContactRepository districtContactRepository) {
+  public DistrictService(DistrictRepository districtRepository, DistrictHistoryService districtHistoryService, NoteRepository noteRepository, DistrictContactRepository districtContactRepository) {
     this.districtRepository = districtRepository;
     this.districtHistoryService = districtHistoryService;
-    this.addressRepository = addressRepository;
     this.noteRepository = noteRepository;
-    this.addressHistoryService = addressHistoryService;
     this.districtContactRepository = districtContactRepository;
   }
 
@@ -84,7 +70,7 @@ public class DistrictService {
     var districtEntity = DistrictMapper.mapper.toModel(district);
     TransformUtil.uppercaseFields(districtEntity);
     districtRepository.save(districtEntity);
-    districtHistoryService.createDistrictHistory(districtEntity, district.getCreateUser(), false);
+    districtHistoryService.createDistrictHistory(districtEntity, district.getCreateUser());
     return districtEntity;
   }
 
@@ -108,39 +94,24 @@ public class DistrictService {
     if (curDistrictEntityOptional.isPresent()) {
       final DistrictEntity currentDistrictEntity = curDistrictEntityOptional.get();
       BeanUtils.copyProperties(district, currentDistrictEntity, CREATE_DATE, CREATE_USER, "addresses"); // update current student entity with incoming payload ignoring the fields.
-      Set<AddressEntity> addresses = new HashSet<>(currentDistrictEntity.getAddresses());
-      currentDistrictEntity.getAddresses().clear();
-
-      for(AddressEntity address: district.getAddresses()){
-        if(address.getAddressId() == null){
-          RequestUtil.setAuditColumnsForAddress(address);
-          address.setDistrictEntity(currentDistrictEntity);
-          TransformUtil.uppercaseFields(address);
-          currentDistrictEntity.getAddresses().add(address);
-          addressHistoryService.createAddressHistory(address, address.getUpdateUser(), false);
-        }else{
-          var currAddress = addresses.stream().filter(addy -> addy.getAddressId().equals(address.getAddressId())).collect(Collectors.toList()).get(0);
-          if(!BeanComparatorUtil.compare(address, currAddress)){
-            address.setCreateDate(currentDistrictEntity.getCreateDate());
-            address.setCreateUser(currentDistrictEntity.getCreateUser());
-            RequestUtil.setAuditColumnsForAddress(address);
-            TransformUtil.uppercaseFields(address);
-            address.setDistrictEntity(currentDistrictEntity);
-            currentDistrictEntity.getAddresses().add(address);
-            addressHistoryService.createAddressHistory(address, address.getUpdateUser(), false);
-          }else{
-            currentDistrictEntity.getAddresses().add(currAddress);
-            addressHistoryService.createAddressHistory(currAddress, currAddress.getUpdateUser(), false);
-          }
-        }
-      }
-
+      setAddresses(currentDistrictEntity, district);
       TransformUtil.uppercaseFields(currentDistrictEntity); // convert the input to upper case.
-      districtHistoryService.createDistrictHistory(currentDistrictEntity, currentDistrictEntity.getUpdateUser(), false);
-      return districtRepository.save(currentDistrictEntity);
+      var savedDistrict = districtRepository.save(currentDistrictEntity);
+      districtHistoryService.createDistrictHistory(savedDistrict, savedDistrict.getUpdateUser());
+      return savedDistrict;
     } else {
       throw new EntityNotFoundException(DistrictEntity.class, DISTRICT_ID_ATTR, String.valueOf(districtId));
     }
+  }
+
+  private void setAddresses(DistrictEntity currentDistrictEntity, DistrictEntity district){
+    currentDistrictEntity.getAddresses().clear();
+    district.getAddresses().stream().forEach(address -> {
+      RequestUtil.setAuditColumnsForAddress(address);
+      TransformUtil.uppercaseFields(address);
+      address.setDistrictEntity(currentDistrictEntity);
+      currentDistrictEntity.getAddresses().add(address);
+    });
   }
 
   public Optional<DistrictContactEntity> getDistrictContact(UUID districtId, UUID contactId) {
@@ -210,77 +181,6 @@ public class DistrictService {
       throw new EntityNotFoundException(DistrictEntity.class, DISTRICT_ID_ATTR, String.valueOf(districtId));
     }
 
-  }
-
-  public Optional<AddressEntity> getDistrictAddress(UUID districtId, UUID addressId) {
-    Optional<DistrictEntity> curDistrictEntityOptional = districtRepository.findById(districtId);
-
-    if (curDistrictEntityOptional.isPresent()) {
-      final DistrictEntity currentDistrictEntity = curDistrictEntityOptional.get();
-      return addressRepository.findByAddressIdAndDistrictEntity(addressId, currentDistrictEntity);
-    } else {
-      throw new EntityNotFoundException(DistrictEntity.class, DISTRICT_ID_ATTR, String.valueOf(districtId));
-    }
-  }
-
-  @Transactional(propagation = Propagation.REQUIRES_NEW)
-  public AddressEntity createDistrictAddress(Address address, UUID districtId) {
-    var addressEntity = AddressMapper.mapper.toModel(address);
-    Optional<DistrictEntity> curDistrictEntityOptional = districtRepository.findById(districtId);
-
-    if (curDistrictEntityOptional.isPresent()) {
-      addressEntity.setDistrictEntity(curDistrictEntityOptional.get());
-      TransformUtil.uppercaseFields(addressEntity);
-      addressRepository.save(addressEntity);
-      addressHistoryService.createAddressHistory(addressEntity, address.getCreateUser(), false);
-      return addressEntity;
-    } else {
-      throw new EntityNotFoundException(DistrictEntity.class, DISTRICT_ID_ATTR, String.valueOf(districtId));
-    }
-  }
-
-  @Transactional(propagation = Propagation.REQUIRES_NEW)
-  public AddressEntity updateDistrictAddress(Address address, UUID districtId, UUID addressId) {
-    var addressEntity = AddressMapper.mapper.toModel(address);
-    if (addressId == null || !addressId.equals(addressEntity.getAddressId())) {
-      throw new EntityNotFoundException(AddressEntity.class, ADDRESS_ID_ATTR, String.valueOf(addressId));
-    }
-
-    Optional<DistrictEntity> curDistrictEntityOptional = districtRepository.findById(districtId);
-
-    if (curDistrictEntityOptional.isEmpty()) {
-      throw new EntityNotFoundException(DistrictEntity.class, DISTRICT_ID_ATTR, String.valueOf(districtId));
-    }
-
-    Optional<AddressEntity> curAddressEntityOptional = addressRepository.findById(addressEntity.getAddressId());
-
-    if (curAddressEntityOptional.isPresent()) {
-      if (!districtId.equals(curAddressEntityOptional.get().getDistrictEntity().getDistrictId())) {
-        throw new EntityNotFoundException(DistrictEntity.class, DISTRICT_ID_ATTR, String.valueOf(districtId));
-      }
-      final AddressEntity currentAddressEntity = curAddressEntityOptional.get();
-      BeanUtils.copyProperties(addressEntity, currentAddressEntity, CREATE_DATE, CREATE_USER); // update current student entity with incoming payload ignoring the fields.
-      TransformUtil.uppercaseFields(currentAddressEntity); // convert the input to upper case.
-      currentAddressEntity.setDistrictEntity(curDistrictEntityOptional.get());
-      addressHistoryService.createAddressHistory(currentAddressEntity, currentAddressEntity.getUpdateUser(), false);
-      addressRepository.save(currentAddressEntity);
-      return currentAddressEntity;
-    } else {
-      throw new EntityNotFoundException(AddressEntity.class, ADDRESS_ID_ATTR, String.valueOf(addressId));
-    }
-  }
-
-  @Transactional(propagation = Propagation.REQUIRES_NEW)
-  public void deleteDistrictAddress(UUID districtId, UUID addressId) {
-    Optional<DistrictEntity> curDistrictEntityOptional = districtRepository.findById(districtId);
-    Optional<AddressEntity> curAddressEntityOptional = addressRepository.findById(addressId);
-
-    if (curDistrictEntityOptional.isPresent() && curAddressEntityOptional.isPresent()) {
-      final DistrictEntity currentDistrictEntity = curDistrictEntityOptional.get();
-      addressRepository.deleteByAddressIdAndDistrictEntity(addressId, currentDistrictEntity);
-    } else {
-      throw new EntityNotFoundException(DistrictEntity.class, DISTRICT_ID_ATTR, String.valueOf(districtId));
-    }
   }
 
   public Optional<NoteEntity> getDistrictNote(UUID districtId, UUID noteId) {

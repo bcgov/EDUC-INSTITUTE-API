@@ -1,33 +1,15 @@
 package ca.bc.gov.educ.api.institute.struct.v1;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
-import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.io.Serializable;
 
 /**
- * The type Student.
+ * The type Base address.
  */
-@EqualsAndHashCode(callSuper = true)
 @Data
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class AddressHistory extends BaseRequest implements Serializable {
-  /**
-   * The constant serialVersionUID.
-   */
-  private static final long serialVersionUID = 1L;
-
-  private String addressHistoryId;
-
-  private String schoolId;
-
-  private String districtId;
-
-  private String independentAuthorityId;
+public abstract class BaseAddress extends BaseRequest {
 
   @Size(max = 255)
   @NotNull(message = "addressLine1 cannot be null")
@@ -55,5 +37,4 @@ public class AddressHistory extends BaseRequest implements Serializable {
   @Size(max = 10)
   @NotNull(message = "countryCode cannot be null")
   private String countryCode;
-
 }

@@ -78,7 +78,7 @@ public class School extends BaseRequest implements Serializable {
   private List<SchoolContact> contacts;
 
   @Valid
-  private List<Address> addresses;
+  private List<SchoolAddress> addresses;
 
   @Valid
   private List<Note> notes;

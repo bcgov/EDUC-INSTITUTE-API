@@ -13,6 +13,7 @@ import org.springframework.validation.FieldError;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,10 +31,13 @@ public class DistrictPayloadValidator {
   @Getter(AccessLevel.PRIVATE)
   private final CodeTableService codeTableService;
 
+  private final AddressPayloadValidator addressPayloadValidator;
+
   @Autowired
-  public DistrictPayloadValidator(final DistrictService districtService, final CodeTableService codeTableService) {
+  public DistrictPayloadValidator(final DistrictService districtService, final CodeTableService codeTableService, AddressPayloadValidator addressPayloadValidator) {
     this.districtService = districtService;
     this.codeTableService = codeTableService;
+    this.addressPayloadValidator = addressPayloadValidator;
   }
 
   public List<FieldError> validatePayload(District district, boolean isCreateOperation) {
@@ -43,6 +47,7 @@ public class DistrictPayloadValidator {
     }
     validateDistrictRegionCode(district, apiValidationErrors);
     validateDistrictStatusCode(district, apiValidationErrors);
+    Optional.ofNullable(district.getAddresses()).orElse(Collections.emptyList()).stream().forEach(address -> addressPayloadValidator.validatePayload(address, apiValidationErrors));
     return apiValidationErrors;
   }
 

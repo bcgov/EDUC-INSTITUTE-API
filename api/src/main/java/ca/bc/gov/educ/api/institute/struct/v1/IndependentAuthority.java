@@ -56,7 +56,7 @@ public class IndependentAuthority extends BaseRequest implements Serializable {
   private List<AuthorityContact> contacts;
 
   @Valid
-  private List<Address> addresses;
+  private List<AuthorityAddress> addresses;
 
   @Valid
   private List<Note> notes;

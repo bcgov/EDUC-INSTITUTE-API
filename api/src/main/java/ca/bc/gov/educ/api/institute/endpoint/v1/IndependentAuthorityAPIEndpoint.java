@@ -1,7 +1,10 @@
 package ca.bc.gov.educ.api.institute.endpoint.v1;
 
 import ca.bc.gov.educ.api.institute.constants.v1.URL;
-import ca.bc.gov.educ.api.institute.struct.v1.*;
+import ca.bc.gov.educ.api.institute.struct.v1.AuthorityContact;
+import ca.bc.gov.educ.api.institute.struct.v1.IndependentAuthority;
+import ca.bc.gov.educ.api.institute.struct.v1.IndependentAuthorityHistory;
+import ca.bc.gov.educ.api.institute.struct.v1.Note;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -95,34 +98,6 @@ public interface IndependentAuthorityAPIEndpoint {
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
   @Tag(name = "Independent Authority Contact Entity", description = "Endpoints for independent authority contact entity.")
   ResponseEntity<Void> deleteIndependentAuthorityContact(@PathVariable UUID independentAuthorityId, @PathVariable UUID contactId);
-
-  @GetMapping("/{independentAuthorityId}/address/{addressId}")
-  @PreAuthorize("hasAuthority('SCOPE_READ_INDEPENDENT_AUTHORITY_ADDRESS')")
-  @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
-  @Tag(name = "Independent Authority Address Entity", description = "Endpoints for independent authority address entity.")
-  @Schema(name = "Address", implementation = Address.class)
-  Address getIndependentAuthorityAddress(@PathVariable UUID independentAuthorityId, @PathVariable UUID addressId);
-
-  @PostMapping("/{independentAuthorityId}/address")
-  @PreAuthorize("hasAuthority('SCOPE_WRITE_INDEPENDENT_AUTHORITY_ADDRESS')")
-  @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
-  @Tag(name = "Independent Authority Address Entity", description = "Endpoints for independent authority address entity.")
-  @Schema(name = "Address", implementation = Address.class)
-  @ResponseStatus(CREATED)
-  Address createIndependentAuthorityAddress(@PathVariable UUID independentAuthorityId, @Validated @RequestBody Address address);
-
-  @PutMapping("/{independentAuthorityId}/address/{addressId}")
-  @PreAuthorize("hasAuthority('SCOPE_WRITE_INDEPENDENT_AUTHORITY_ADDRESS')")
-  @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
-  @Tag(name = "Independent Authority Address Entity", description = "Endpoints for independent authority address entity.")
-  @Schema(name = "Address", implementation = Address.class)
-  Address updateIndependentAuthorityAddress(@PathVariable UUID independentAuthorityId, @PathVariable UUID addressId, @Validated @RequestBody Address address);
-
-  @DeleteMapping("/{independentAuthorityId}/address/{addressId}")
-  @PreAuthorize("hasAuthority('SCOPE_DELETE_INDEPENDENT_AUTHORITY_ADDRESS')")
-  @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
-  @Tag(name = "Independent Authority Address Entity", description = "Endpoints for independent authority address entity.")
-  ResponseEntity<Void> deleteIndependentAuthorityAddress(@PathVariable UUID independentAuthorityId, @PathVariable UUID addressId);
 
   @GetMapping("/{independentAuthorityId}/note/{noteId}")
   @PreAuthorize("hasAuthority('SCOPE_READ_INDEPENDENT_AUTHORITY_NOTE')")

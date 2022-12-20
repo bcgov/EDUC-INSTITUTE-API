@@ -5,7 +5,7 @@ import ca.bc.gov.educ.api.institute.model.v1.CountryCodeEntity;
 import ca.bc.gov.educ.api.institute.model.v1.ProvinceCodeEntity;
 import ca.bc.gov.educ.api.institute.service.v1.CodeTableService;
 import ca.bc.gov.educ.api.institute.service.v1.DistrictService;
-import ca.bc.gov.educ.api.institute.struct.v1.Address;
+import ca.bc.gov.educ.api.institute.struct.v1.BaseAddress;
 import lombok.AccessLevel;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +13,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.FieldError;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,32 +37,14 @@ public class AddressPayloadValidator {
     this.codeTableService = codeTableService;
   }
 
-  public List<FieldError> validatePayload(Address address, boolean isCreateOperation) {
-    final List<FieldError> apiValidationErrors = new ArrayList<>();
-    if (isCreateOperation && address.getAddressId() != null) {
-      apiValidationErrors.add(createFieldError("addressId", address.getAddressId(), "addressId should be null for post operation."));
-    }
-    if (isCreateOperation && address.getCreateDate() != null) {
-      apiValidationErrors.add(createFieldError("createDate", address.getCreateDate(), "createDate should be null for post operation."));
-    }
-    if (isCreateOperation && address.getCreateUser() != null) {
-      apiValidationErrors.add(createFieldError("createUser", address.getCreateUser(), "createUser should be null for post operation."));
-    }
+  public List<FieldError> validatePayload(BaseAddress address, List<FieldError> apiValidationErrors) {
     validateAddressTypeCode(address, apiValidationErrors);
     validateProvinceCode(address, apiValidationErrors);
     validateCountryCode(address, apiValidationErrors);
     return apiValidationErrors;
   }
 
-  public List<FieldError> validateUpdatePayload(Address address) {
-    return validatePayload(address, false);
-  }
-
-  public List<FieldError> validateCreatePayload(Address address) {
-    return validatePayload(address, true);
-  }
-
-  protected void validateAddressTypeCode(Address address, List<FieldError> apiValidationErrors) {
+  protected void validateAddressTypeCode(BaseAddress address, List<FieldError> apiValidationErrors) {
     if (address.getAddressTypeCode() != null) {
       Optional<AddressTypeCodeEntity> addressTypeCodeEntity = codeTableService.getAddressTypeCode(address.getAddressTypeCode());
       if (addressTypeCodeEntity.isEmpty()) {
@@ -76,7 +57,7 @@ public class AddressPayloadValidator {
     }
   }
 
-  protected void validateProvinceCode(Address address, List<FieldError> apiValidationErrors) {
+  protected void validateProvinceCode(BaseAddress address, List<FieldError> apiValidationErrors) {
     if (address.getProvinceCode() != null) {
       Optional<ProvinceCodeEntity> provinceCodeEntity = codeTableService.getProvinceCode(address.getProvinceCode());
       if (provinceCodeEntity.isEmpty()) {
@@ -89,7 +70,7 @@ public class AddressPayloadValidator {
     }
   }
 
-  protected void validateCountryCode(Address address, List<FieldError> apiValidationErrors) {
+  protected void validateCountryCode(BaseAddress address, List<FieldError> apiValidationErrors) {
     if (address.getCountryCode() != null) {
       Optional<CountryCodeEntity> countryCodeEntity = codeTableService.getCountryCode(address.getCountryCode());
       if (countryCodeEntity.isEmpty()) {
