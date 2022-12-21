@@ -8,9 +8,7 @@ import ca.bc.gov.educ.api.institute.model.v1.*;
 import ca.bc.gov.educ.api.institute.repository.v1.*;
 import ca.bc.gov.educ.api.institute.struct.v1.Note;
 import ca.bc.gov.educ.api.institute.struct.v1.School;
-import ca.bc.gov.educ.api.institute.struct.v1.SchoolAddress;
 import ca.bc.gov.educ.api.institute.struct.v1.SchoolContact;
-import ca.bc.gov.educ.api.institute.util.BeanComparatorUtil;
 import ca.bc.gov.educ.api.institute.util.RequestUtil;
 import ca.bc.gov.educ.api.institute.util.TransformUtil;
 import lombok.AccessLevel;
@@ -23,7 +21,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class SchoolService {
@@ -75,10 +72,42 @@ public class SchoolService {
     if(district.isPresent()) {
       schoolEntity.setDistrictEntity(district.get());
     }
+
+    schoolEntity.setSchoolNumber(generateNextSchoolNumber());
+
+    schoolEntity.getAddresses().stream().forEach(address -> {
+      RequestUtil.setAuditColumnsForAddress(address);
+      TransformUtil.uppercaseFields(address);
+      address.setSchoolEntity(schoolEntity);
+    });
+    
+    schoolEntity.getGrades().stream().forEach(grade -> {
+      RequestUtil.setAuditColumnsForGrades(grade);
+      TransformUtil.uppercaseFields(grade);
+      grade.setSchoolEntity(schoolEntity);
+    });
+    
+    schoolEntity.getNeighborhoodLearning().stream().forEach(neighborhoodLearning -> {
+      RequestUtil.setAuditColumnsForNeighborhoodLearning(neighborhoodLearning);
+      TransformUtil.uppercaseFields(neighborhoodLearning);
+      neighborhoodLearning.setSchoolEntity(schoolEntity);
+    });
+
     TransformUtil.uppercaseFields(schoolEntity);
     schoolRepository.save(schoolEntity);
     schoolHistoryService.createSchoolHistory(schoolEntity, school.getCreateUser());
     return schoolEntity;
+  }
+
+  private String generateNextSchoolNumber() {
+    Integer nextSchoolNumber = 79051; //edx-609 we will start from 79051 to 80000. This is the range for data cleanup if necessary
+    Integer lastSchoolNumber = Integer.parseInt(schoolRepository.findLastSchoolNumber());
+
+    if (nextSchoolNumber < lastSchoolNumber) {
+      nextSchoolNumber = lastSchoolNumber + 1;
+    }
+
+    return nextSchoolNumber.toString();
   }
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)
