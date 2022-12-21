@@ -18,7 +18,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "NEIGHBOURHOOD_LEARNING_SCH_HIST")
+@Table(name = "NEIGHBOURHOOD_LEARNING_HISTORY")
 public class NeighbourhoodLearningSchoolHistoryEntity {
 
     @Id
