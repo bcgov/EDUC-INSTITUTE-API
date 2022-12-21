@@ -428,6 +428,9 @@ public class SchoolControllerTest {
   @Test
   void testCreateSchool_GivenValidPayload_ShouldReturnStatusOK() throws Exception {
     final DistrictEntity dist = this.districtRepository.save(this.createDistrictData());
+    final var existingSchool = this.createSchoolData();
+    this.schoolRepository.save(existingSchool);
+
     var schoolEntity = this.createSchoolData();
     SchoolMapper map = SchoolMapper.mapper;
 
@@ -436,6 +439,10 @@ public class SchoolControllerTest {
     mappedSchool.setDistrictId(dist.getDistrictId().toString());
     mappedSchool.setCreateDate(null);
     mappedSchool.setUpdateDate(null);
+    mappedSchool.setSchoolNumber(null);
+    mappedSchool.setGrades(List.of(createSchoolGrade()));
+    mappedSchool.setNeighborhoodLearning(List.of(createNeighborhoodLearning()));
+    mappedSchool.setAddresses(List.of(createSchoolAddress()));
 
     this.mockMvc.perform(post(URL.BASE_URL_SCHOOL)
         .contentType(MediaType.APPLICATION_JSON)
@@ -903,6 +910,13 @@ public class SchoolControllerTest {
     schoolGrade.setUpdateUser("TEST");
     return schoolGrade;
   }
+  private SchoolGrade createSchoolGrade() {
+    SchoolGrade schoolGrade = new SchoolGrade();
+    schoolGrade.setSchoolGradeCode("01");
+    schoolGrade.setCreateUser("TEST");
+    schoolGrade.setUpdateUser("TEST");
+    return schoolGrade;
+  }
   private NeighborhoodLearning createNeighborhoodLearning(String schoolId) {
     NeighborhoodLearning neighborhoodLearning = new NeighborhoodLearning();
     neighborhoodLearning.setSchoolId(schoolId);
@@ -910,6 +924,24 @@ public class SchoolControllerTest {
     neighborhoodLearning.setCreateUser("TEST");
     neighborhoodLearning.setUpdateUser("TEST");
     return neighborhoodLearning;
+  }
+  private NeighborhoodLearning createNeighborhoodLearning() {
+    NeighborhoodLearning neighborhoodLearning = new NeighborhoodLearning();
+    neighborhoodLearning.setNeighborhoodLearningTypeCode("COMM_USE");
+    neighborhoodLearning.setCreateUser("TEST");
+    neighborhoodLearning.setUpdateUser("TEST");
+    return neighborhoodLearning;
+  }
+  private SchoolAddress createSchoolAddress() {
+    SchoolAddress schoolAddress = new SchoolAddress();
+    schoolAddress.setAddressTypeCode("MAILING");
+    schoolAddress.setAddressLine1("123 This Street");
+    schoolAddress.setCity("Compton");
+    schoolAddress.setProvinceCode("BC");
+    schoolAddress.setCountryCode("CA");
+    schoolAddress.setPostal("v1B9H2");
+
+    return schoolAddress;
   }
 
   private NeighborhoodLearningEntity createNeighborhoodLearningData(SchoolEntity entity) {
