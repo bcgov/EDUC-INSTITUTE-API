@@ -34,7 +34,6 @@ public class School extends BaseRequest implements Serializable {
   private String independentAuthorityId;
 
   @Size(max = 5)
-  @NotNull(message = "schoolNumber can not be null.")
   private String schoolNumber;
 
   @Size(max = 10)
