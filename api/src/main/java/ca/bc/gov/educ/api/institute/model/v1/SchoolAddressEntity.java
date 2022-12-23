@@ -3,6 +3,7 @@ package ca.bc.gov.educ.api.institute.model.v1;
 import ca.bc.gov.educ.api.institute.util.ComparableField;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.DynamicUpdate;
@@ -17,6 +18,7 @@ import java.util.UUID;
 @SuperBuilder
 @Entity
 @DynamicUpdate
+@EqualsAndHashCode(callSuper = true)
 @Table(name = "SCHOOL_ADDRESS")
 public class SchoolAddressEntity extends BaseAddressEntity {
   @Id
