@@ -103,7 +103,7 @@ public class SchoolService {
     Integer nextSchoolNumber = 79051; //edx-609 we will start from 79051 to 80000. This is the range for data cleanup if necessary
     Integer lastSchoolNumber = Integer.parseInt(schoolRepository.findLastSchoolNumber());
 
-    if (nextSchoolNumber < lastSchoolNumber) {
+    if (nextSchoolNumber <= lastSchoolNumber) {
       nextSchoolNumber = lastSchoolNumber + 1;
     }
 
