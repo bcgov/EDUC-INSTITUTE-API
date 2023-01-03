@@ -2,6 +2,7 @@ package ca.bc.gov.educ.api.institute.model.v1;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.Cascade;
@@ -15,6 +16,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @SuperBuilder
 @Entity
+@EqualsAndHashCode(callSuper = true)
 @Table(name = "DISTRICT_ADDRESS_HISTORY")
 public class DistrictAddressHistoryEntity extends BaseAddressEntity {
   @Id
