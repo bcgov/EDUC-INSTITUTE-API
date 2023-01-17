@@ -521,7 +521,7 @@ public class DistrictControllerTest {
   }
 
   private NoteEntity createNoteData(DistrictEntity entity) {
-    return NoteEntity.builder().districtEntity(entity).content("This is a note.").createUser("TEST").updateUser("TEST").build();
+    return NoteEntity.builder().districtID(entity.getDistrictId()).content("This is a note.").createUser("TEST").updateUser("TEST").build();
   }
 
   private DistrictHistoryEntity createHistoryDistrictData(UUID districtId) {

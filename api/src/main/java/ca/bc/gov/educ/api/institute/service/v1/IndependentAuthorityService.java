@@ -4,14 +4,15 @@ import ca.bc.gov.educ.api.institute.exception.EntityNotFoundException;
 import ca.bc.gov.educ.api.institute.mapper.v1.AuthorityContactMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.IndependentAuthorityMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.NoteMapper;
-import ca.bc.gov.educ.api.institute.model.v1.*;
+import ca.bc.gov.educ.api.institute.model.v1.AuthorityContactEntity;
+import ca.bc.gov.educ.api.institute.model.v1.IndependentAuthorityEntity;
+import ca.bc.gov.educ.api.institute.model.v1.NoteEntity;
 import ca.bc.gov.educ.api.institute.repository.v1.AuthorityContactRepository;
 import ca.bc.gov.educ.api.institute.repository.v1.IndependentAuthorityRepository;
 import ca.bc.gov.educ.api.institute.repository.v1.NoteRepository;
 import ca.bc.gov.educ.api.institute.struct.v1.AuthorityContact;
 import ca.bc.gov.educ.api.institute.struct.v1.IndependentAuthority;
 import ca.bc.gov.educ.api.institute.struct.v1.Note;
-import ca.bc.gov.educ.api.institute.util.BeanComparatorUtil;
 import ca.bc.gov.educ.api.institute.util.RequestUtil;
 import ca.bc.gov.educ.api.institute.util.TransformUtil;
 import lombok.AccessLevel;
@@ -23,8 +24,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class IndependentAuthorityService {
@@ -198,7 +200,7 @@ public class IndependentAuthorityService {
 
     if (curIndependentAuthorityEntityOptional.isPresent()) {
       final IndependentAuthorityEntity currentIndependentAuthorityEntity = curIndependentAuthorityEntityOptional.get();
-      return noteRepository.findByNoteIdAndIndependentAuthorityEntity(noteId, currentIndependentAuthorityEntity);
+      return noteRepository.findByNoteIdAndIndependentAuthorityID(noteId, currentIndependentAuthorityEntity.getIndependentAuthorityId());
     } else {
       throw new EntityNotFoundException(IndependentAuthorityEntity.class, INDEPENDENT_AUTHORITY_ID_ATTR, String.valueOf(independentAuthorityId));
     }
@@ -210,7 +212,7 @@ public class IndependentAuthorityService {
     Optional<IndependentAuthorityEntity> curIndependentAuthorityEntityOptional = independentAuthorityRepository.findById(independentAuthorityId);
 
     if (curIndependentAuthorityEntityOptional.isPresent()) {
-      noteEntity.setIndependentAuthorityEntity(curIndependentAuthorityEntityOptional.get());
+      noteEntity.setIndependentAuthorityID(curIndependentAuthorityEntityOptional.get().getIndependentAuthorityId());
       TransformUtil.uppercaseFields(noteEntity);
       noteRepository.save(noteEntity);
       return noteEntity;
@@ -235,13 +237,13 @@ public class IndependentAuthorityService {
     Optional<NoteEntity> curNoteEntityOptional = noteRepository.findById(noteEntity.getNoteId());
 
     if (curNoteEntityOptional.isPresent()) {
-      if (!independentAuthorityId.equals(curNoteEntityOptional.get().getIndependentAuthorityEntity().getIndependentAuthorityId())) {
+      if (!independentAuthorityId.equals(curNoteEntityOptional.get().getIndependentAuthorityID())) {
         throw new EntityNotFoundException(IndependentAuthorityEntity.class, INDEPENDENT_AUTHORITY_ID_ATTR, String.valueOf(independentAuthorityId));
       }
       final NoteEntity currentNoteEntity = curNoteEntityOptional.get();
       BeanUtils.copyProperties(noteEntity, currentNoteEntity, CREATE_DATE, CREATE_USER); // update current student entity with incoming payload ignoring the fields.
       TransformUtil.uppercaseFields(currentNoteEntity); // convert the input to upper case.
-      currentNoteEntity.setIndependentAuthorityEntity(curIndependentAuthorityEntityOptional.get());
+      currentNoteEntity.setIndependentAuthorityID(curIndependentAuthorityEntityOptional.get().getIndependentAuthorityId());
       noteRepository.save(currentNoteEntity);
       return currentNoteEntity;
     } else {
@@ -256,7 +258,7 @@ public class IndependentAuthorityService {
 
     if (curIndependentAuthorityEntityOptional.isPresent() && curNoteEntityOptional.isPresent()) {
       final IndependentAuthorityEntity currentIndependentAuthorityEntity = curIndependentAuthorityEntityOptional.get();
-      noteRepository.deleteByNoteIdAndIndependentAuthorityEntity(noteId, currentIndependentAuthorityEntity);
+      noteRepository.deleteByNoteIdAndIndependentAuthorityID(noteId, currentIndependentAuthorityEntity.getIndependentAuthorityId());
     } else {
       throw new EntityNotFoundException(IndependentAuthorityEntity.class, INDEPENDENT_AUTHORITY_ID_ATTR, String.valueOf(independentAuthorityId));
     }

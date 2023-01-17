@@ -64,7 +64,7 @@ public class SchoolControllerTest {
   CodeTableAPIController controller;
 
   @Autowired
-  DistrictRepository districtRepository;
+  DistrictTombstoneRepository districtTombstoneRepository;
 
   @Autowired
   SchoolRepository schoolRepository;
@@ -147,7 +147,7 @@ public class SchoolControllerTest {
   void testAllSchools_GivenValidID_ShouldReturnStatusOK() throws Exception {
     final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_SCHOOL";
     final var mockAuthority = oidcLogin().authorities(grantedAuthority);
-    final DistrictEntity dist = this.districtRepository.save(this.createDistrictData());
+    final DistrictTombstoneEntity dist = this.districtTombstoneRepository.save(this.createDistrictData());
     var schoolEntity = this.createSchoolData();
     schoolEntity.setDistrictEntity(dist);
     final SchoolEntity entity = this.schoolRepository.save(schoolEntity);
@@ -160,7 +160,7 @@ public class SchoolControllerTest {
   void testAllSchoolsCheckDistrict_GivenValidID_ShouldReturnStatusOK() throws Exception {
     final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_SCHOOL";
     final var mockAuthority = oidcLogin().authorities(grantedAuthority);
-    final DistrictEntity dist = this.districtRepository.save(this.createDistrictData());
+    final DistrictTombstoneEntity dist = this.districtTombstoneRepository.save(this.createDistrictData());
     var schoolEntity = this.createSchoolData();
     schoolEntity.setDistrictEntity(dist);
     final SchoolEntity entity = this.schoolRepository.save(schoolEntity);
@@ -174,7 +174,7 @@ public class SchoolControllerTest {
   void testRetrieveSchool_GivenValidID_ShouldReturnStatusOK() throws Exception {
     final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_SCHOOL";
     final var mockAuthority = oidcLogin().authorities(grantedAuthority);
-    final DistrictEntity dist = this.districtRepository.save(this.createDistrictData());
+    final DistrictTombstoneEntity dist = this.districtTombstoneRepository.save(this.createDistrictData());
     var schoolEntity = this.createSchoolData();
     schoolEntity.setDistrictEntity(dist);
     final SchoolEntity entity = this.schoolRepository.save(schoolEntity);
@@ -187,7 +187,7 @@ public class SchoolControllerTest {
   void testRetrieveSchoolWithAddress_GivenValidID_ShouldReturnStatusOK() throws Exception {
     final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_SCHOOL";
     final var mockAuthority = oidcLogin().authorities(grantedAuthority);
-    final DistrictEntity dist = this.districtRepository.save(this.createDistrictData());
+    final DistrictTombstoneEntity dist = this.districtTombstoneRepository.save(this.createDistrictData());
     var schoolEntity = this.createSchoolData();
     schoolEntity.setDistrictEntity(dist);
     final SchoolEntity entity = this.schoolRepository.save(schoolEntity);
@@ -252,7 +252,7 @@ public class SchoolControllerTest {
   @Test
   void testUpdateSchool_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
     final var school = this.createSchoolData();
-    final DistrictEntity dist = this.districtRepository.save(this.createDistrictData());
+    final DistrictTombstoneEntity dist = this.districtTombstoneRepository.save(this.createDistrictData());
     var schoolEntity = this.createSchoolData();
     schoolEntity.setDistrictEntity(dist);
     final SchoolEntity entity = this.schoolRepository.save(schoolEntity);
@@ -276,7 +276,7 @@ public class SchoolControllerTest {
   @Test
   void testUpdateSchoolWithAddress_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
     final var school = this.createSchoolData();
-    final DistrictEntity dist = this.districtRepository.save(this.createDistrictData());
+    final DistrictTombstoneEntity dist = this.districtTombstoneRepository.save(this.createDistrictData());
     var schoolEntity = this.createSchoolData();
     schoolEntity.setDistrictEntity(dist);
     SchoolEntity entity = this.schoolRepository.save(schoolEntity);
@@ -334,7 +334,7 @@ public class SchoolControllerTest {
 
   @Test
   void testAddSchoolGrade_GivenValidPayload_ShouldReturnStatusOk() throws Exception {
-    final DistrictEntity dist = this.districtRepository.save(this.createDistrictData());
+    final DistrictTombstoneEntity dist = this.districtTombstoneRepository.save(this.createDistrictData());
     var schoolEntity = this.createSchoolData();
     schoolEntity.setDistrictEntity(dist);
     final SchoolEntity entity = this.schoolRepository.save(schoolEntity);
@@ -362,7 +362,7 @@ public class SchoolControllerTest {
 
   @Test
   void testAddSchoolNeighborhoodLearning_GivenValidPayload_ShouldReturnStatusOk() throws Exception {
-    final DistrictEntity dist = this.districtRepository.save(this.createDistrictData());
+    final DistrictTombstoneEntity dist = this.districtTombstoneRepository.save(this.createDistrictData());
     var schoolEntity = this.createSchoolData();
     schoolEntity.setDistrictEntity(dist);
     final SchoolEntity entity = this.schoolRepository.save(schoolEntity);
@@ -386,7 +386,7 @@ public class SchoolControllerTest {
 
   @Test
   void testUpdateSchoolNeighborhoodLearning_GivenValidPayload_ShouldReturnStatusOk() throws Exception {
-    final DistrictEntity dist = this.districtRepository.save(this.createDistrictData());
+    final DistrictTombstoneEntity dist = this.districtTombstoneRepository.save(this.createDistrictData());
     var schoolEntity = this.createSchoolData();
     schoolEntity.setDistrictEntity(dist);
     final SchoolEntity entity = this.schoolRepository.save(schoolEntity);
@@ -427,7 +427,7 @@ public class SchoolControllerTest {
 
   @Test
   void testCreateSchool_GivenValidPayload_ShouldReturnStatusOK() throws Exception {
-    final DistrictEntity dist = this.districtRepository.save(this.createDistrictData());
+    final DistrictTombstoneEntity dist = this.districtTombstoneRepository.save(this.createDistrictData());
     final var existingSchool = this.createSchoolData();
     this.schoolRepository.save(existingSchool);
 
@@ -706,7 +706,7 @@ public class SchoolControllerTest {
     final var mockAuthority = oidcLogin().authorities(grantedAuthority);
 
     final ObjectMapper objectMapper = new ObjectMapper();
-    final DistrictEntity dist = this.districtRepository.save(this.createDistrictData());
+    final DistrictTombstoneEntity dist = this.districtTombstoneRepository.save(this.createDistrictData());
 
     var schoolData = createSchoolData();
     schoolData.setDistrictEntity(dist);
@@ -743,7 +743,7 @@ public class SchoolControllerTest {
     school.setGrades(List.of(createSchoolGrade(school.getSchoolId())));
     school.setNeighborhoodLearning(List.of(createNeighborhoodLearning(school.getSchoolId())));
 
-    final DistrictEntity dist = this.districtRepository.save(this.createDistrictData());
+    final DistrictTombstoneEntity dist = this.districtTombstoneRepository.save(this.createDistrictData());
     school.setDistrictId(dist.getDistrictId().toString());
     school.setUpdateDate(null);
     school.setCreateDate(null);
@@ -861,8 +861,8 @@ public class SchoolControllerTest {
       .updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
   }
 
-  private DistrictEntity createDistrictData() {
-    return DistrictEntity.builder().districtNumber("003").displayName("District Name").districtStatusCode("OPEN").districtRegionCode("KOOTENAYS")
+  private DistrictTombstoneEntity createDistrictData() {
+    return DistrictTombstoneEntity.builder().districtNumber("003").displayName("District Name").districtStatusCode("OPEN").districtRegionCode("KOOTENAYS")
       .website("abc@sd99.edu").createDate(LocalDateTime.now()).updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
   }
 
@@ -954,7 +954,7 @@ public class SchoolControllerTest {
   }
 
   private NoteEntity createNoteData(SchoolEntity entity) {
-    return NoteEntity.builder().schoolEntity(entity).content("This is a note.").createUser("TEST").updateUser("TEST").build();
+    return NoteEntity.builder().schoolID(entity.getSchoolId()).content("This is a note.").createUser("TEST").updateUser("TEST").build();
   }
 
   private SchoolContactTypeCodeEntity createContactTypeCodeData() {

@@ -825,7 +825,7 @@ public class IndependentAuthorityControllerTest {
   }
 
   private NoteEntity createNoteData(IndependentAuthorityEntity entity) {
-    return NoteEntity.builder().independentAuthorityEntity(entity).content("This is a note.").createUser("TEST").updateUser("TEST").build();
+    return NoteEntity.builder().independentAuthorityID(entity.getIndependentAuthorityId()).content("This is a note.").createUser("TEST").updateUser("TEST").build();
   }
 }
 

@@ -25,17 +25,17 @@ public class NoteEntity {
   @Column(name = "note_id", unique = true, updatable = false, columnDefinition = "BINARY(16)")
   private UUID noteId;
 
-  @ManyToOne(optional = true, targetEntity = SchoolEntity.class)
-  @JoinColumn(name = "school_id", referencedColumnName = "school_id")
-  SchoolEntity schoolEntity;
+  @Basic
+  @Column(name = "school_id", columnDefinition = "BINARY(16)")
+  private UUID schoolID;
 
-  @ManyToOne(optional = true, targetEntity = DistrictEntity.class)
-  @JoinColumn(name = "district_id", referencedColumnName = "district_id")
-  DistrictEntity districtEntity;
+  @Basic
+  @Column(name = "district_id", columnDefinition = "BINARY(16)")
+  private UUID districtID;
 
-  @ManyToOne(optional = true, targetEntity = IndependentAuthorityEntity.class)
-  @JoinColumn(name = "independent_authority_id", referencedColumnName = "independent_authority_id")
-  IndependentAuthorityEntity independentAuthorityEntity;
+  @Basic
+  @Column(name = "independent_authority_id", columnDefinition = "BINARY(16)")
+  private UUID independentAuthorityID;
 
   @Basic
   @Column(name = "content")

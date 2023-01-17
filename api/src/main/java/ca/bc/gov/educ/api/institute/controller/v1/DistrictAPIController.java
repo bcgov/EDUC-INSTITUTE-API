@@ -6,6 +6,7 @@ import ca.bc.gov.educ.api.institute.exception.InvalidPayloadException;
 import ca.bc.gov.educ.api.institute.exception.errors.ApiError;
 import ca.bc.gov.educ.api.institute.mapper.v1.DistrictContactMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.DistrictMapper;
+import ca.bc.gov.educ.api.institute.mapper.v1.DistrictTombstoneMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.NoteMapper;
 import ca.bc.gov.educ.api.institute.service.v1.DistrictHistoryService;
 import ca.bc.gov.educ.api.institute.service.v1.DistrictService;
@@ -38,6 +39,8 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 public class DistrictAPIController implements DistrictAPIEndpoint {
 
   private static final DistrictMapper mapper = DistrictMapper.mapper;
+
+  private static final DistrictTombstoneMapper districtTombstoneMapper = DistrictTombstoneMapper.mapper;
 
   private static final DistrictContactMapper districtContactMapper = DistrictContactMapper.mapper;
 
@@ -108,7 +111,7 @@ public class DistrictAPIController implements DistrictAPIEndpoint {
 
   @Override
   public List<District> getAllDistricts() {
-    return this.districtService.getAllDistrictsList().stream().map(mapper::toStructure).collect(Collectors.toList());
+    return this.districtService.getAllDistrictsList().stream().map(districtTombstoneMapper::toStructure).collect(Collectors.toList());
   }
 
   @Override

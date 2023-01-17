@@ -66,7 +66,7 @@ public class IndependentAuthorityEntity {
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  @OneToMany(mappedBy = "independentAuthorityEntity", fetch = FetchType.EAGER, cascade = CascadeType.DETACH, targetEntity = NoteEntity.class)
+  @OneToMany(mappedBy = "independentAuthorityID", fetch = FetchType.EAGER, cascade = CascadeType.DETACH, targetEntity = NoteEntity.class)
   private Set<NoteEntity> notes;
 
   @ToString.Exclude

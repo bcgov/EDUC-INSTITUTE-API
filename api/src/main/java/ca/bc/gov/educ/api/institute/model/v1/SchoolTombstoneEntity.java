@@ -25,9 +25,9 @@ public class SchoolTombstoneEntity {
     @org.hibernate.annotations.Parameter(name = "uuid_gen_strategy_class", value = "org.hibernate.id.uuid.CustomVersionOneStrategy")})
   @Column(name = "school_id", unique = true, updatable = false, columnDefinition = "BINARY(16)")
   private UUID schoolId;
-  @ManyToOne(optional = true,  targetEntity = DistrictEntity.class)
+  @ManyToOne(optional = true,  targetEntity = DistrictTombstoneEntity.class)
   @JoinColumn(name = "district_id", referencedColumnName = "district_id")
-  DistrictEntity districtEntity;
+  DistrictTombstoneEntity districtEntity;
   @Basic
   @Column(name = "independent_authority_id", columnDefinition = "BINARY(16)")
   private UUID independentAuthorityId;
