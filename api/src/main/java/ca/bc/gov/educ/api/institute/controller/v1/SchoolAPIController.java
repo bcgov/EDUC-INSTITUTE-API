@@ -8,6 +8,7 @@ import ca.bc.gov.educ.api.institute.mapper.v1.NoteMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.SchoolContactMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.SchoolMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.SchoolTombstoneMapper;
+import ca.bc.gov.educ.api.institute.messaging.jetstream.Publisher;
 import ca.bc.gov.educ.api.institute.model.v1.SchoolEntity;
 import ca.bc.gov.educ.api.institute.model.v1.SchoolHistoryEntity;
 import ca.bc.gov.educ.api.institute.service.v1.SchoolHistorySearchService;
@@ -20,6 +21,7 @@ import ca.bc.gov.educ.api.institute.util.RequestUtil;
 import ca.bc.gov.educ.api.institute.validator.NotePayloadValidator;
 import ca.bc.gov.educ.api.institute.validator.SchoolContactPayloadValidator;
 import ca.bc.gov.educ.api.institute.validator.SchoolPayloadValidator;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -47,6 +49,9 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 @Slf4j
 public class SchoolAPIController implements SchoolAPIEndpoint {
 
+  @Getter(AccessLevel.PRIVATE)
+  private final Publisher publisher;
+
   private static final SchoolMapper mapper = SchoolMapper.mapper;
 
   private static final SchoolTombstoneMapper tombstoneMapper = SchoolTombstoneMapper.mapper;
@@ -71,7 +76,8 @@ public class SchoolAPIController implements SchoolAPIEndpoint {
 
   private final NotePayloadValidator notePayloadValidator;
   @Autowired
-  public SchoolAPIController(final SchoolService schoolService, final SchoolHistoryService schoolHistoryService, SchoolSearchService schoolSearchService, SchoolHistorySearchService schoolHistorySearchService, final SchoolPayloadValidator payloadValidator, SchoolContactPayloadValidator contactPayloadValidator,  NotePayloadValidator notePayloadValidator) {
+  public SchoolAPIController(Publisher publisher, final SchoolService schoolService, final SchoolHistoryService schoolHistoryService, SchoolSearchService schoolSearchService, SchoolHistorySearchService schoolHistorySearchService, final SchoolPayloadValidator payloadValidator, SchoolContactPayloadValidator contactPayloadValidator, NotePayloadValidator notePayloadValidator) {
+    this.publisher = publisher;
     this.schoolService = schoolService;
     this.schoolHistoryService = schoolHistoryService;
     this.schoolSearchService = schoolSearchService;
@@ -105,11 +111,12 @@ public class SchoolAPIController implements SchoolAPIEndpoint {
   }
 
   @Override
-  public School updateSchool(UUID id, School school) {
+  public School updateSchool(UUID id, School school) throws JsonProcessingException {
     validatePayload(() -> getPayloadValidator().validateUpdatePayload(school));
     RequestUtil.setAuditColumnsForUpdate(school);
-    var savedSchool = schoolService.updateSchool(school, id);
-    return mapper.toStructure(savedSchool);
+    var pair = schoolService.updateSchool(school, id);
+    publisher.dispatchChoreographyEvent(pair.getRight());
+    return mapper.toStructure(pair.getLeft());
   }
 
   @Override
