@@ -4,6 +4,7 @@ package ca.bc.gov.educ.api.institute.support;
 import ca.bc.gov.educ.api.institute.messaging.MessagePublisher;
 import ca.bc.gov.educ.api.institute.messaging.NatsConnection;
 import ca.bc.gov.educ.api.institute.messaging.jetstream.Publisher;
+import ca.bc.gov.educ.api.institute.messaging.jetstream.Subscriber;
 import io.nats.client.Connection;
 import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
@@ -38,4 +39,9 @@ public class MockConfiguration {
     return Mockito.mock(Publisher.class);
   }
 
+  @Bean
+  @Primary
+  public Subscriber subscriber() {
+    return Mockito.mock(Subscriber.class);
+  }
 }
