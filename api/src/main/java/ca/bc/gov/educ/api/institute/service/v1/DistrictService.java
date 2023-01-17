@@ -4,14 +4,17 @@ import ca.bc.gov.educ.api.institute.exception.EntityNotFoundException;
 import ca.bc.gov.educ.api.institute.mapper.v1.DistrictContactMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.DistrictMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.NoteMapper;
-import ca.bc.gov.educ.api.institute.model.v1.*;
+import ca.bc.gov.educ.api.institute.model.v1.DistrictContactEntity;
+import ca.bc.gov.educ.api.institute.model.v1.DistrictEntity;
+import ca.bc.gov.educ.api.institute.model.v1.DistrictTombstoneEntity;
+import ca.bc.gov.educ.api.institute.model.v1.NoteEntity;
 import ca.bc.gov.educ.api.institute.repository.v1.DistrictContactRepository;
 import ca.bc.gov.educ.api.institute.repository.v1.DistrictRepository;
+import ca.bc.gov.educ.api.institute.repository.v1.DistrictTombstoneRepository;
 import ca.bc.gov.educ.api.institute.repository.v1.NoteRepository;
 import ca.bc.gov.educ.api.institute.struct.v1.District;
 import ca.bc.gov.educ.api.institute.struct.v1.DistrictContact;
 import ca.bc.gov.educ.api.institute.struct.v1.Note;
-import ca.bc.gov.educ.api.institute.util.BeanComparatorUtil;
 import ca.bc.gov.educ.api.institute.util.RequestUtil;
 import ca.bc.gov.educ.api.institute.util.TransformUtil;
 import lombok.AccessLevel;
@@ -23,8 +26,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class DistrictService {
@@ -42,6 +46,8 @@ public class DistrictService {
   @Getter(AccessLevel.PRIVATE)
   private final DistrictRepository districtRepository;
 
+  private final DistrictTombstoneRepository districtTombstoneRepository;
+
   private final DistrictHistoryService districtHistoryService;
 
   private final DistrictContactRepository districtContactRepository;
@@ -50,15 +56,16 @@ public class DistrictService {
 
 
   @Autowired
-  public DistrictService(DistrictRepository districtRepository, DistrictHistoryService districtHistoryService, NoteRepository noteRepository, DistrictContactRepository districtContactRepository) {
+  public DistrictService(DistrictRepository districtRepository, DistrictTombstoneRepository districtTombstoneRepository, DistrictHistoryService districtHistoryService, NoteRepository noteRepository, DistrictContactRepository districtContactRepository) {
     this.districtRepository = districtRepository;
+    this.districtTombstoneRepository = districtTombstoneRepository;
     this.districtHistoryService = districtHistoryService;
     this.noteRepository = noteRepository;
     this.districtContactRepository = districtContactRepository;
   }
 
-  public List<DistrictEntity> getAllDistrictsList() {
-    return districtRepository.findAll();
+  public List<DistrictTombstoneEntity> getAllDistrictsList() {
+    return districtTombstoneRepository.findAll();
   }
 
   public Optional<DistrictEntity> getDistrict(UUID districtId) {
@@ -188,7 +195,7 @@ public class DistrictService {
 
     if (curDistrictEntityOptional.isPresent()) {
       final DistrictEntity currentDistrictEntity = curDistrictEntityOptional.get();
-      return noteRepository.findByNoteIdAndDistrictEntity(noteId, currentDistrictEntity);
+      return noteRepository.findByNoteIdAndDistrictID(noteId, currentDistrictEntity.getDistrictId());
     } else {
       throw new EntityNotFoundException(DistrictEntity.class, DISTRICT_ID_ATTR, String.valueOf(districtId));
     }
@@ -200,7 +207,7 @@ public class DistrictService {
     Optional<DistrictEntity> curDistrictEntityOptional = districtRepository.findById(districtId);
 
     if (curDistrictEntityOptional.isPresent()) {
-      noteEntity.setDistrictEntity(curDistrictEntityOptional.get());
+      noteEntity.setDistrictID(curDistrictEntityOptional.get().getDistrictId());
       TransformUtil.uppercaseFields(noteEntity);
       noteRepository.save(noteEntity);
       return noteEntity;
@@ -225,13 +232,13 @@ public class DistrictService {
     Optional<NoteEntity> curNoteEntityOptional = noteRepository.findById(noteEntity.getNoteId());
 
     if (curNoteEntityOptional.isPresent()) {
-      if (!districtId.equals(curNoteEntityOptional.get().getDistrictEntity().getDistrictId())) {
+      if (!districtId.equals(curNoteEntityOptional.get().getDistrictID())) {
         throw new EntityNotFoundException(DistrictEntity.class, DISTRICT_ID_ATTR, String.valueOf(districtId));
       }
       final NoteEntity currentNoteEntity = curNoteEntityOptional.get();
       BeanUtils.copyProperties(noteEntity, currentNoteEntity, CREATE_DATE, CREATE_USER); // update current student entity with incoming payload ignoring the fields.
       TransformUtil.uppercaseFields(currentNoteEntity); // convert the input to upper case.
-      currentNoteEntity.setDistrictEntity(curDistrictEntityOptional.get());
+      currentNoteEntity.setDistrictID(curDistrictEntityOptional.get().getDistrictId());
       noteRepository.save(currentNoteEntity);
       return currentNoteEntity;
     } else {
@@ -246,7 +253,7 @@ public class DistrictService {
 
     if (curDistrictEntityOptional.isPresent() && curNoteEntityOptional.isPresent()) {
       final DistrictEntity currentDistrictEntity = curDistrictEntityOptional.get();
-      noteRepository.deleteByNoteIdAndDistrictEntity(noteId, currentDistrictEntity);
+      noteRepository.deleteByNoteIdAndDistrictID(noteId, currentDistrictEntity.getDistrictId());
     } else {
       throw new EntityNotFoundException(DistrictEntity.class, DISTRICT_ID_ATTR, String.valueOf(districtId));
     }

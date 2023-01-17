@@ -51,22 +51,23 @@ public class SchoolService {
 
   private final SchoolTombstoneRepository schoolTombstoneRepository;
 
+  private final DistrictTombstoneRepository districtTombstoneRepository;
+
   private final SchoolHistoryService schoolHistoryService;
 
   private final SchoolContactRepository schoolContactRepository;
 
   private final NoteRepository noteRepository;
 
-  private final DistrictRepository districtRepository;
 
   @Autowired
-  public SchoolService(SchoolRepository schoolRepository, SchoolTombstoneRepository schoolTombstoneRepository, SchoolHistoryService schoolHistoryService, SchoolContactRepository schoolContactRepository, NoteRepository noteRepository, DistrictRepository districtRepository) {
+  public SchoolService(SchoolRepository schoolRepository, SchoolTombstoneRepository schoolTombstoneRepository, DistrictTombstoneRepository districtTombstoneRepository, SchoolHistoryService schoolHistoryService, SchoolContactRepository schoolContactRepository, NoteRepository noteRepository, DistrictRepository districtRepository) {
     this.schoolRepository = schoolRepository;
     this.schoolTombstoneRepository = schoolTombstoneRepository;
+    this.districtTombstoneRepository = districtTombstoneRepository;
     this.schoolHistoryService = schoolHistoryService;
     this.schoolContactRepository = schoolContactRepository;
     this.noteRepository = noteRepository;
-    this.districtRepository = districtRepository;
   }
 
   public List<SchoolTombstoneEntity> getAllSchoolsList() {
@@ -80,7 +81,7 @@ public class SchoolService {
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public SchoolEntity createSchool(School school) {
     var schoolEntity = SchoolMapper.mapper.toModel(school);
-    Optional<DistrictEntity> district = districtRepository.findById(UUID.fromString(school.getDistrictId()));
+    Optional<DistrictTombstoneEntity> district = districtTombstoneRepository.findById(UUID.fromString(school.getDistrictId()));
     if(district.isPresent()) {
       schoolEntity.setDistrictEntity(district.get());
     }
@@ -271,7 +272,7 @@ public class SchoolService {
 
     if (curSchoolEntityOptional.isPresent()) {
       final SchoolEntity currentSchoolEntity = curSchoolEntityOptional.get();
-      return noteRepository.findByNoteIdAndSchoolEntity(noteId, currentSchoolEntity);
+      return noteRepository.findByNoteIdAndSchoolID(noteId, currentSchoolEntity.getSchoolId());
     } else {
       throw new EntityNotFoundException(SchoolEntity.class, SCHOOL_ID_ATTR, String.valueOf(schoolId));
     }
@@ -283,7 +284,7 @@ public class SchoolService {
     Optional<SchoolEntity> curSchoolEntityOptional = schoolRepository.findById(schoolId);
 
     if (curSchoolEntityOptional.isPresent()) {
-      noteEntity.setSchoolEntity(curSchoolEntityOptional.get());
+      noteEntity.setSchoolID(curSchoolEntityOptional.get().getSchoolId());
       TransformUtil.uppercaseFields(noteEntity);
       noteRepository.save(noteEntity);
       return noteEntity;
@@ -308,13 +309,13 @@ public class SchoolService {
     Optional<NoteEntity> curNoteEntityOptional = noteRepository.findById(noteEntity.getNoteId());
 
     if (curNoteEntityOptional.isPresent()) {
-      if (!schoolId.equals(curNoteEntityOptional.get().getSchoolEntity().getSchoolId())) {
+      if (!schoolId.equals(curNoteEntityOptional.get().getSchoolID())) {
         throw new EntityNotFoundException(SchoolEntity.class, SCHOOL_ID_ATTR, String.valueOf(schoolId));
       }
       final NoteEntity currentNoteEntity = curNoteEntityOptional.get();
       BeanUtils.copyProperties(noteEntity, currentNoteEntity, CREATE_DATE, CREATE_USER); // update current student entity with incoming payload ignoring the fields.
       TransformUtil.uppercaseFields(currentNoteEntity); // convert the input to upper case.
-      currentNoteEntity.setSchoolEntity(curSchoolEntityOptional.get());
+      currentNoteEntity.setSchoolID(curSchoolEntityOptional.get().getSchoolId());
       noteRepository.save(currentNoteEntity);
       return currentNoteEntity;
     } else {
@@ -329,7 +330,7 @@ public class SchoolService {
 
     if (curSchoolEntityOptional.isPresent() && curNoteEntityOptional.isPresent()) {
       final SchoolEntity currentSchoolEntity = curSchoolEntityOptional.get();
-      noteRepository.deleteByNoteIdAndSchoolEntity(noteId, currentSchoolEntity);
+      noteRepository.deleteByNoteIdAndSchoolID(noteId, currentSchoolEntity.getSchoolId());
     } else {
       throw new EntityNotFoundException(SchoolEntity.class, SCHOOL_ID_ATTR, String.valueOf(schoolId));
     }
