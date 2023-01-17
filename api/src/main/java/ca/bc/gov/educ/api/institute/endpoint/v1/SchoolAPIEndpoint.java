@@ -2,6 +2,7 @@ package ca.bc.gov.educ.api.institute.endpoint.v1;
 
 import ca.bc.gov.educ.api.institute.constants.v1.URL;
 import ca.bc.gov.educ.api.institute.struct.v1.*;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -52,7 +53,7 @@ public interface SchoolAPIEndpoint {
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "400", description = "BAD REQUEST"), @ApiResponse(responseCode = "404", description = "NOT FOUND")})
   @Tag(name = "School Entity", description = "Endpoints for school entity.")
   @Schema(name = "School", implementation = School.class)
-  School updateSchool(@PathVariable UUID id, @Validated @RequestBody School school);
+  School updateSchool(@PathVariable UUID id, @Validated @RequestBody School school) throws JsonProcessingException;
 
   @DeleteMapping("/{id}")
   @PreAuthorize("hasAuthority('SCOPE_DELETE_SCHOOL')")

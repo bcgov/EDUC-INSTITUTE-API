@@ -26,6 +26,7 @@
     <shedlock.version>4.15.1</shedlock.version>
     <springdoc.version>1.6.9</springdoc.version>
     <lombok.version>1.18.12</lombok.version>
+    <nats.version>2.11.0</nats.version>
     <log4j2.version>2.17.1</log4j2.version>
     <guava.version>30.1.1-jre</guava.version>
   </properties>
@@ -112,6 +113,11 @@
     <dependency>
       <groupId>javax.persistence</groupId>
       <artifactId>javax.persistence-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.nats</groupId>
+      <artifactId>jnats</artifactId>
+      <version>${nats.version}</version>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
