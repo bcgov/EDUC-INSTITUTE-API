@@ -49,6 +49,9 @@ public class SchoolService {
   @Getter(AccessLevel.PRIVATE)
   private final SchoolRepository schoolRepository;
 
+  private final InstituteEventRepository instituteEventRepository;
+
+
   private final SchoolTombstoneRepository schoolTombstoneRepository;
 
   private final DistrictTombstoneRepository districtTombstoneRepository;
@@ -61,13 +64,14 @@ public class SchoolService {
 
 
   @Autowired
-  public SchoolService(SchoolRepository schoolRepository, SchoolTombstoneRepository schoolTombstoneRepository, DistrictTombstoneRepository districtTombstoneRepository, SchoolHistoryService schoolHistoryService, SchoolContactRepository schoolContactRepository, NoteRepository noteRepository, DistrictRepository districtRepository) {
+  public SchoolService(SchoolRepository schoolRepository, SchoolTombstoneRepository schoolTombstoneRepository, DistrictTombstoneRepository districtTombstoneRepository, SchoolHistoryService schoolHistoryService, SchoolContactRepository schoolContactRepository, NoteRepository noteRepository, DistrictRepository districtRepository, InstituteEventRepository instituteEventRepository) {
     this.schoolRepository = schoolRepository;
     this.schoolTombstoneRepository = schoolTombstoneRepository;
     this.districtTombstoneRepository = districtTombstoneRepository;
     this.schoolHistoryService = schoolHistoryService;
     this.schoolContactRepository = schoolContactRepository;
     this.noteRepository = noteRepository;
+    this.instituteEventRepository = instituteEventRepository;
   }
 
   public List<SchoolTombstoneEntity> getAllSchoolsList() {
@@ -151,6 +155,7 @@ public class SchoolService {
       var savedSchool = schoolRepository.save(currentSchoolEntity);
       schoolHistoryService.createSchoolHistory(savedSchool, savedSchool.getUpdateUser());
       final InstituteEvent instituteEvent = createInstituteEvent(savedSchool.getUpdateUser(), savedSchool.getUpdateUser(), JsonUtil.getJsonStringFromObject(SchoolMapper.mapper.toStructure(savedSchool)), UPDATE_SCHOOL, SCHOOL_UPDATED);
+      instituteEventRepository.save(instituteEvent);
 
       return Pair.of(savedSchool, instituteEvent);
     } else {
