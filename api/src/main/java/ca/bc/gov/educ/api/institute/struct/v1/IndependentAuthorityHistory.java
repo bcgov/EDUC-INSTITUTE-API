@@ -9,7 +9,6 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
-import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -51,9 +50,9 @@ public class IndependentAuthorityHistory extends BaseRequest implements Serializ
   private String authorityTypeCode;
 
   @NotNull(message = "openedDate cannot be null")
-  private LocalDateTime openedDate;
+  private String openedDate;
 
-  private LocalDateTime closedDate;
+  private String closedDate;
 
   @Valid
   private List<AuthorityAddressHistory> addresses;

@@ -7,4 +7,8 @@ public enum EventOutcome {
 
   SCHOOL_UPDATED,
 
+  AUTHORITY_FOUND,
+
+  AUTHORITY_NOT_FOUND
+
 }

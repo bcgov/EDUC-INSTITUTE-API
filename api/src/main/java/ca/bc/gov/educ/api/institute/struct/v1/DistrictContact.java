@@ -8,7 +8,6 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
-import java.time.LocalDateTime;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -52,7 +51,7 @@ public class DistrictContact extends BaseRequest implements Serializable {
   @NotNull(message = "lastName cannot be null")
   private String lastName;
 
-  private LocalDateTime effectiveDate;
+  private String effectiveDate;
 
-  private LocalDateTime expiryDate;
+  private String expiryDate;
 }

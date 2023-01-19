@@ -1,6 +1,7 @@
 package ca.bc.gov.educ.api.institute.support;
 
 import ca.bc.gov.educ.api.institute.messaging.MessagePublisher;
+import ca.bc.gov.educ.api.institute.messaging.MessageSubscriber;
 import ca.bc.gov.educ.api.institute.messaging.NatsConnection;
 import ca.bc.gov.educ.api.institute.messaging.jetstream.Publisher;
 import ca.bc.gov.educ.api.institute.messaging.jetstream.Subscriber;
@@ -17,6 +18,12 @@ public class EventTaskSchedulerMockConfiguration {
   @Primary
   public MessagePublisher messagePublisher() {
     return Mockito.mock(MessagePublisher.class);
+  }
+
+  @Bean
+  @Primary
+  public MessageSubscriber messageSubscriber() {
+    return Mockito.mock(MessageSubscriber.class);
   }
 
   @Bean
