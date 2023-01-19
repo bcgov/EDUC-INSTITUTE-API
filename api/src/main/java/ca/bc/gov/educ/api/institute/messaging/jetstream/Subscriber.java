@@ -59,7 +59,7 @@ public class Subscriber {
     PushSubscribeOptions options = PushSubscribeOptions.builder().stream(ApplicationProperties.STREAM_NAME)
         .durable("INSTITUTE-API-INSTITUTE-EVENTS-TOPIC-DURABLE")
         .configuration(ConsumerConfiguration.builder().deliverPolicy(DeliverPolicy.New).build()).build();
-    this.natsConnection.jetStream().subscribe(INSTITUTE_EVENTS_TOPIC.toString(), qName, this.natsConnection.createDispatcher(), this::onStudentEventsTopicMessage,
+    this.natsConnection.jetStream().subscribe(INSTITUTE_EVENTS_TOPIC.toString(), qName, this.natsConnection.createDispatcher(), this::onInstituteEventsTopicMessage,
         autoAck, options);
   }
 
@@ -70,7 +70,7 @@ public class Subscriber {
    *
    * @param message the string representation of {@link Event} if it not type of event then it will throw exception and will be ignored.
    */
-  public void onStudentEventsTopicMessage(final Message message) {
+  public void onInstituteEventsTopicMessage(final Message message) {
     log.info("Received message Subject:: {} , SID :: {} , sequence :: {}, pending :: {} ", message.getSubject(), message.getSID(), message.metaData().consumerSequence(), message.metaData().pendingCount());
     try {
       val eventString = new String(message.getData());
