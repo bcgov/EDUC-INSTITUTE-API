@@ -7,27 +7,27 @@ VALUES ('SPEC_RPRT', 'Special Reporting', 'Special Reporting School', NULL, 10,
         to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/TRERICHA',
         to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'));
 
-UPDATE school
-SET school_category_code = 'SPEC_RPRT'
-WHERE district_id = (SELECT district_id FROM district WHERE district_number = '091')
-  AND school_number = '96531';
+UPDATE SCHOOL
+SET SCHOOL_CATEGORY_CODE = 'SPEC_RPRT'
+WHERE DISTRICT_ID = (SELECT DISTRICT_ID FROM DISTRICT WHERE DISTRICT_NUMBER = '091')
+  AND SCHOOL_NUMBER = '96531';
 
-UPDATE school
-SET school_category_code = 'SPEC_RPRT'
-WHERE district_id = (SELECT district_id FROM district WHERE district_number = '091')
-  AND school_number = '96532';
+UPDATE SCHOOL
+SET SCHOOL_CATEGORY_CODE = 'SPEC_RPRT'
+WHERE DISTRICT_ID = (SELECT DISTRICT_ID FROM DISTRICT WHERE DISTRICT_NUMBER = '091')
+  AND SCHOOL_NUMBER = '96532';
 
-UPDATE school
-SET school_category_code = 'SPEC_RPRT'
-WHERE district_id = (SELECT district_id FROM district WHERE district_number = '060')
-  AND school_number = '96658';
+UPDATE SCHOOL
+SET SCHOOL_CATEGORY_CODE = 'SPEC_RPRT'
+WHERE DISTRICT_ID = (SELECT DISTRICT_ID FROM DISTRICT WHERE DISTRICT_NUMBER = '060')
+  AND SCHOOL_NUMBER = '96658';
 
-UPDATE school
-SET school_category_code = 'SPEC_RPRT'
-WHERE district_id = (SELECT district_id FROM district WHERE district_number = '060')
-  AND school_number =  '96677';
+UPDATE SCHOOL
+SET SCHOOL_CATEGORY_CODE = 'SPEC_RPRT'
+WHERE DISTRICT_ID = (SELECT DISTRICT_ID FROM DISTRICT WHERE DISTRICT_NUMBER = '060')
+  AND SCHOOL_NUMBER =  '96677';
 
-UPDATE school
-SET school_category_code = 'SPEC_RPRT'
-WHERE district_id = (SELECT district_id FROM district WHERE district_number = '091')
+UPDATE SCHOOL
+SET SCHOOL_CATEGORY_CODE = 'SPEC_RPRT'
+WHERE DISTRICT_ID = (SELECT DISTRICT_ID FROM DISTRICT WHERE DISTRICT_NUMBER = '091')
   AND school_number = '96415';
