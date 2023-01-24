@@ -26,6 +26,9 @@ public class ProvinceCodeEntity {
   @Column(name = "description")
   private String description;
   @Basic
+  @Column(name = "legacy_code")
+  private String legacyCode;
+  @Basic
   @Column(name = "display_order")
   private Integer displayOrder;
   @Basic
