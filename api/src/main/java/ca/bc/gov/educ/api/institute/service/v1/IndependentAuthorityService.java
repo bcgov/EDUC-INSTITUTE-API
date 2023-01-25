@@ -6,18 +6,24 @@ import ca.bc.gov.educ.api.institute.mapper.v1.IndependentAuthorityMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.NoteMapper;
 import ca.bc.gov.educ.api.institute.model.v1.AuthorityContactEntity;
 import ca.bc.gov.educ.api.institute.model.v1.IndependentAuthorityEntity;
+import ca.bc.gov.educ.api.institute.model.v1.InstituteEvent;
 import ca.bc.gov.educ.api.institute.model.v1.NoteEntity;
 import ca.bc.gov.educ.api.institute.repository.v1.AuthorityContactRepository;
 import ca.bc.gov.educ.api.institute.repository.v1.IndependentAuthorityRepository;
+import ca.bc.gov.educ.api.institute.repository.v1.InstituteEventRepository;
 import ca.bc.gov.educ.api.institute.repository.v1.NoteRepository;
 import ca.bc.gov.educ.api.institute.struct.v1.AuthorityContact;
 import ca.bc.gov.educ.api.institute.struct.v1.IndependentAuthority;
 import ca.bc.gov.educ.api.institute.struct.v1.Note;
+import ca.bc.gov.educ.api.institute.util.EventUtil;
+import ca.bc.gov.educ.api.institute.util.JsonUtil;
 import ca.bc.gov.educ.api.institute.util.RequestUtil;
 import ca.bc.gov.educ.api.institute.util.TransformUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.val;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,6 +33,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+import static ca.bc.gov.educ.api.institute.constants.v1.EventOutcome.AUTHORITY_CREATED;
+import static ca.bc.gov.educ.api.institute.constants.v1.EventOutcome.AUTHORITY_UPDATED;
+import static ca.bc.gov.educ.api.institute.constants.v1.EventType.CREATE_AUTHORITY;
+import static ca.bc.gov.educ.api.institute.constants.v1.EventType.UPDATE_AUTHORITY;
 
 @Service
 public class IndependentAuthorityService {
@@ -50,13 +61,15 @@ public class IndependentAuthorityService {
 
   private final NoteRepository noteRepository;
 
+  private final InstituteEventRepository instituteEventRepository;
 
   @Autowired
-  public IndependentAuthorityService(IndependentAuthorityRepository independentAuthorityRepository, IndependentAuthorityHistoryService independentAuthorityHistoryService, AuthorityContactRepository authorityContactRepository, NoteRepository noteRepository) {
+  public IndependentAuthorityService(IndependentAuthorityRepository independentAuthorityRepository, IndependentAuthorityHistoryService independentAuthorityHistoryService, AuthorityContactRepository authorityContactRepository, NoteRepository noteRepository, InstituteEventRepository instituteEventRepository) {
     this.independentAuthorityRepository = independentAuthorityRepository;
     this.independentAuthorityHistoryService = independentAuthorityHistoryService;
     this.authorityContactRepository = authorityContactRepository;
     this.noteRepository = noteRepository;
+    this.instituteEventRepository = instituteEventRepository;
   }
 
   public List<IndependentAuthorityEntity> getAllIndependentAuthoritysList() {
@@ -68,7 +81,7 @@ public class IndependentAuthorityService {
   }
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)
-  public IndependentAuthorityEntity createIndependentAuthority(IndependentAuthority independentAuthority) {
+  public Pair<IndependentAuthorityEntity, InstituteEvent> createIndependentAuthority(IndependentAuthority independentAuthority) throws JsonProcessingException {
     var independentAuthorityEntity = IndependentAuthorityMapper.mapper.toModel(independentAuthority);
 
     String lastAuthorityNumber = independentAuthorityRepository.findLastAuthorityNumber();
@@ -83,7 +96,11 @@ public class IndependentAuthorityService {
     TransformUtil.uppercaseFields(independentAuthorityEntity);
     independentAuthorityRepository.save(independentAuthorityEntity);
     independentAuthorityHistoryService.createIndependentAuthorityHistory(independentAuthorityEntity, independentAuthority.getCreateUser());
-    return independentAuthorityEntity;
+
+    final InstituteEvent instituteEvent = EventUtil.createInstituteEvent(independentAuthorityEntity.getUpdateUser(), independentAuthorityEntity.getUpdateUser(), JsonUtil.getJsonStringFromObject(IndependentAuthorityMapper.mapper.toStructure(independentAuthorityEntity)), CREATE_AUTHORITY, AUTHORITY_CREATED);
+    instituteEventRepository.save(instituteEvent);
+
+    return Pair.of(independentAuthorityEntity, instituteEvent);
   }
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -95,7 +112,7 @@ public class IndependentAuthorityService {
   }
 
   @Transactional(propagation = Propagation.REQUIRES_NEW, noRollbackFor = {EntityNotFoundException.class})
-  public IndependentAuthorityEntity updateIndependentAuthority(IndependentAuthority independentAuthorityUpdate, UUID independentAuthorityId) {
+  public Pair<IndependentAuthorityEntity, InstituteEvent> updateIndependentAuthority(IndependentAuthority independentAuthorityUpdate, UUID independentAuthorityId) throws JsonProcessingException {
     var independentAuthority = IndependentAuthorityMapper.mapper.toModel(independentAuthorityUpdate);
     if (independentAuthorityId == null || !independentAuthorityId.equals(independentAuthority.getIndependentAuthorityId())) {
       throw new EntityNotFoundException(IndependentAuthorityEntity.class, INDEPENDENT_AUTHORITY_ID_ATTR, String.valueOf(independentAuthorityId));
@@ -110,7 +127,10 @@ public class IndependentAuthorityService {
       TransformUtil.uppercaseFields(currentIndependentAuthorityEntity); // convert the input to upper case.
       var savedAuthority = independentAuthorityRepository.save(currentIndependentAuthorityEntity);
       independentAuthorityHistoryService.createIndependentAuthorityHistory(savedAuthority, savedAuthority.getUpdateUser());
-      return savedAuthority;
+      final InstituteEvent instituteEvent = EventUtil.createInstituteEvent(savedAuthority.getUpdateUser(), savedAuthority.getUpdateUser(), JsonUtil.getJsonStringFromObject(IndependentAuthorityMapper.mapper.toStructure(savedAuthority)), UPDATE_AUTHORITY, AUTHORITY_UPDATED);
+      instituteEventRepository.save(instituteEvent);
+
+      return Pair.of(savedAuthority, instituteEvent);
     } else {
       throw new EntityNotFoundException(IndependentAuthorityEntity.class, INDEPENDENT_AUTHORITY_ID_ATTR, String.valueOf(independentAuthorityId));
     }

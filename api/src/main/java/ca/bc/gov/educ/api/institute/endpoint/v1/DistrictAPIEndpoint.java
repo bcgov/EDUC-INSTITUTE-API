@@ -5,6 +5,7 @@ import ca.bc.gov.educ.api.institute.struct.v1.District;
 import ca.bc.gov.educ.api.institute.struct.v1.DistrictContact;
 import ca.bc.gov.educ.api.institute.struct.v1.DistrictHistory;
 import ca.bc.gov.educ.api.institute.struct.v1.Note;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -45,14 +46,14 @@ public interface DistrictAPIEndpoint {
   @Tag(name = "District Entity", description = "Endpoints for district entity.")
   @Schema(name = "District", implementation = District.class)
   @ResponseStatus(CREATED)
-  District createDistrict(@Validated @RequestBody District district);
+  District createDistrict(@Validated @RequestBody District district) throws JsonProcessingException;
 
   @PutMapping("/{id}")
   @PreAuthorize("hasAuthority('SCOPE_WRITE_DISTRICT')")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "400", description = "BAD REQUEST"), @ApiResponse(responseCode = "404", description = "NOT FOUND")})
   @Tag(name = "District Entity", description = "Endpoints for district entity.")
   @Schema(name = "District", implementation = District.class)
-  District updateDistrict(@PathVariable UUID id, @Validated @RequestBody District district);
+  District updateDistrict(@PathVariable UUID id, @Validated @RequestBody District district) throws JsonProcessingException;
 
   @DeleteMapping("/{id}")
   @PreAuthorize("hasAuthority('SCOPE_DELETE_DISTRICT')")

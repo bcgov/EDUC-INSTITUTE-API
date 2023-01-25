@@ -1,7 +1,5 @@
 package ca.bc.gov.educ.api.institute.service.v1;
 
-import ca.bc.gov.educ.api.institute.constants.v1.EventOutcome;
-import ca.bc.gov.educ.api.institute.constants.v1.EventType;
 import ca.bc.gov.educ.api.institute.exception.EntityNotFoundException;
 import ca.bc.gov.educ.api.institute.mapper.v1.NoteMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.SchoolContactMapper;
@@ -11,6 +9,7 @@ import ca.bc.gov.educ.api.institute.repository.v1.*;
 import ca.bc.gov.educ.api.institute.struct.v1.Note;
 import ca.bc.gov.educ.api.institute.struct.v1.School;
 import ca.bc.gov.educ.api.institute.struct.v1.SchoolContact;
+import ca.bc.gov.educ.api.institute.util.EventUtil;
 import ca.bc.gov.educ.api.institute.util.JsonUtil;
 import ca.bc.gov.educ.api.institute.util.RequestUtil;
 import ca.bc.gov.educ.api.institute.util.TransformUtil;
@@ -25,13 +24,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static ca.bc.gov.educ.api.institute.constants.v1.EventOutcome.SCHOOL_CREATED;
 import static ca.bc.gov.educ.api.institute.constants.v1.EventOutcome.SCHOOL_UPDATED;
-import static ca.bc.gov.educ.api.institute.constants.v1.EventStatus.DB_COMMITTED;
+import static ca.bc.gov.educ.api.institute.constants.v1.EventType.CREATE_SCHOOL;
 import static ca.bc.gov.educ.api.institute.constants.v1.EventType.UPDATE_SCHOOL;
 
 @Service
@@ -83,7 +82,7 @@ public class SchoolService {
   }
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)
-  public SchoolEntity createSchool(School school) {
+  public Pair<SchoolEntity, InstituteEvent> createSchool(School school) throws JsonProcessingException {
     var schoolEntity = SchoolMapper.mapper.toModel(school);
     Optional<DistrictTombstoneEntity> district = districtTombstoneRepository.findById(UUID.fromString(school.getDistrictId()));
     if(district.isPresent()) {
@@ -113,7 +112,9 @@ public class SchoolService {
     TransformUtil.uppercaseFields(schoolEntity);
     schoolRepository.save(schoolEntity);
     schoolHistoryService.createSchoolHistory(schoolEntity, school.getCreateUser());
-    return schoolEntity;
+    final InstituteEvent instituteEvent = EventUtil.createInstituteEvent(schoolEntity.getUpdateUser(), schoolEntity.getUpdateUser(), JsonUtil.getJsonStringFromObject(SchoolMapper.mapper.toStructure(schoolEntity)), CREATE_SCHOOL, SCHOOL_CREATED);
+    instituteEventRepository.save(instituteEvent);
+    return Pair.of(schoolEntity, instituteEvent);
   }
 
   private String generateNextSchoolNumber() {
@@ -154,26 +155,13 @@ public class SchoolService {
       TransformUtil.uppercaseFields(currentSchoolEntity); // convert the input to upper case.
       var savedSchool = schoolRepository.save(currentSchoolEntity);
       schoolHistoryService.createSchoolHistory(savedSchool, savedSchool.getUpdateUser());
-      final InstituteEvent instituteEvent = createInstituteEvent(savedSchool.getUpdateUser(), savedSchool.getUpdateUser(), JsonUtil.getJsonStringFromObject(SchoolMapper.mapper.toStructure(savedSchool)), UPDATE_SCHOOL, SCHOOL_UPDATED);
+      final InstituteEvent instituteEvent = EventUtil.createInstituteEvent(savedSchool.getUpdateUser(), savedSchool.getUpdateUser(), JsonUtil.getJsonStringFromObject(SchoolMapper.mapper.toStructure(savedSchool)), UPDATE_SCHOOL, SCHOOL_UPDATED);
       instituteEventRepository.save(instituteEvent);
 
       return Pair.of(savedSchool, instituteEvent);
     } else {
       throw new EntityNotFoundException(SchoolEntity.class, SCHOOL_ID_ATTR, String.valueOf(schoolId));
     }
-  }
-
-  private InstituteEvent createInstituteEvent(String createUser, String updateUser, String jsonString, EventType eventType, EventOutcome eventOutcome) {
-    return InstituteEvent.builder()
-      .createDate(LocalDateTime.now())
-      .updateDate(LocalDateTime.now())
-      .createUser(createUser)
-      .updateUser(updateUser)
-      .eventPayload(jsonString)
-      .eventType(eventType.toString())
-      .eventStatus(DB_COMMITTED.toString())
-      .eventOutcome(eventOutcome.toString())
-      .build();
   }
 
   private void setAddresses(SchoolEntity currentSchoolEntity, SchoolEntity school){

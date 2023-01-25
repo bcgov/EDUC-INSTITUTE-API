@@ -104,10 +104,12 @@ public class SchoolAPIController implements SchoolAPIEndpoint {
   }
 
   @Override
-  public School createSchool(School school) {
+  public School createSchool(School school) throws JsonProcessingException {
     validatePayload(() -> getPayloadValidator().validateCreatePayload(school));
     RequestUtil.setAuditColumnsForCreate(school);
-    return mapper.toStructure(schoolService.createSchool(school));
+    var pair = schoolService.createSchool(school);
+    publisher.dispatchChoreographyEvent(pair.getRight());
+    return mapper.toStructure(pair.getLeft());
   }
 
   @Override

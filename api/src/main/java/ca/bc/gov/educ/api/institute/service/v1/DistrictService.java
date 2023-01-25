@@ -4,22 +4,20 @@ import ca.bc.gov.educ.api.institute.exception.EntityNotFoundException;
 import ca.bc.gov.educ.api.institute.mapper.v1.DistrictContactMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.DistrictMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.NoteMapper;
-import ca.bc.gov.educ.api.institute.model.v1.DistrictContactEntity;
-import ca.bc.gov.educ.api.institute.model.v1.DistrictEntity;
-import ca.bc.gov.educ.api.institute.model.v1.DistrictTombstoneEntity;
-import ca.bc.gov.educ.api.institute.model.v1.NoteEntity;
-import ca.bc.gov.educ.api.institute.repository.v1.DistrictContactRepository;
-import ca.bc.gov.educ.api.institute.repository.v1.DistrictRepository;
-import ca.bc.gov.educ.api.institute.repository.v1.DistrictTombstoneRepository;
-import ca.bc.gov.educ.api.institute.repository.v1.NoteRepository;
+import ca.bc.gov.educ.api.institute.model.v1.*;
+import ca.bc.gov.educ.api.institute.repository.v1.*;
 import ca.bc.gov.educ.api.institute.struct.v1.District;
 import ca.bc.gov.educ.api.institute.struct.v1.DistrictContact;
 import ca.bc.gov.educ.api.institute.struct.v1.Note;
+import ca.bc.gov.educ.api.institute.util.EventUtil;
+import ca.bc.gov.educ.api.institute.util.JsonUtil;
 import ca.bc.gov.educ.api.institute.util.RequestUtil;
 import ca.bc.gov.educ.api.institute.util.TransformUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.val;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,6 +27,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+import static ca.bc.gov.educ.api.institute.constants.v1.EventOutcome.DISTRICT_CREATED;
+import static ca.bc.gov.educ.api.institute.constants.v1.EventOutcome.DISTRICT_UPDATED;
+import static ca.bc.gov.educ.api.institute.constants.v1.EventType.CREATE_DISTRICT;
+import static ca.bc.gov.educ.api.institute.constants.v1.EventType.UPDATE_DISTRICT;
 
 @Service
 public class DistrictService {
@@ -54,14 +57,17 @@ public class DistrictService {
 
   private final NoteRepository noteRepository;
 
+  private final InstituteEventRepository instituteEventRepository;
+
 
   @Autowired
-  public DistrictService(DistrictRepository districtRepository, DistrictTombstoneRepository districtTombstoneRepository, DistrictHistoryService districtHistoryService, NoteRepository noteRepository, DistrictContactRepository districtContactRepository) {
+  public DistrictService(DistrictRepository districtRepository, DistrictTombstoneRepository districtTombstoneRepository, DistrictHistoryService districtHistoryService, NoteRepository noteRepository, DistrictContactRepository districtContactRepository, InstituteEventRepository instituteEventRepository) {
     this.districtRepository = districtRepository;
     this.districtTombstoneRepository = districtTombstoneRepository;
     this.districtHistoryService = districtHistoryService;
     this.noteRepository = noteRepository;
     this.districtContactRepository = districtContactRepository;
+    this.instituteEventRepository = instituteEventRepository;
   }
 
   public List<DistrictTombstoneEntity> getAllDistrictsList() {
@@ -73,12 +79,15 @@ public class DistrictService {
   }
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)
-  public DistrictEntity createDistrict(District district) {
+  public Pair<DistrictEntity, InstituteEvent> createDistrict(District district) throws JsonProcessingException {
     var districtEntity = DistrictMapper.mapper.toModel(district);
     TransformUtil.uppercaseFields(districtEntity);
     districtRepository.save(districtEntity);
     districtHistoryService.createDistrictHistory(districtEntity, district.getCreateUser());
-    return districtEntity;
+    final InstituteEvent instituteEvent = EventUtil.createInstituteEvent(districtEntity.getUpdateUser(), districtEntity.getUpdateUser(), JsonUtil.getJsonStringFromObject(DistrictMapper.mapper.toStructure(districtEntity)), CREATE_DISTRICT, DISTRICT_CREATED);
+    instituteEventRepository.save(instituteEvent);
+
+    return Pair.of(districtEntity, instituteEvent);
   }
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -90,7 +99,7 @@ public class DistrictService {
   }
 
   @Transactional(propagation = Propagation.REQUIRES_NEW, noRollbackFor = {EntityNotFoundException.class})
-  public DistrictEntity updateDistrict(District districtUpdate, UUID districtId) {
+  public Pair<DistrictEntity, InstituteEvent> updateDistrict(District districtUpdate, UUID districtId) throws JsonProcessingException {
     var district = DistrictMapper.mapper.toModel(districtUpdate);
     if (districtId == null || !districtId.equals(district.getDistrictId())) {
       throw new EntityNotFoundException(DistrictEntity.class, DISTRICT_ID_ATTR, String.valueOf(districtId));
@@ -105,7 +114,10 @@ public class DistrictService {
       TransformUtil.uppercaseFields(currentDistrictEntity); // convert the input to upper case.
       var savedDistrict = districtRepository.save(currentDistrictEntity);
       districtHistoryService.createDistrictHistory(savedDistrict, savedDistrict.getUpdateUser());
-      return savedDistrict;
+      final InstituteEvent instituteEvent = EventUtil.createInstituteEvent(savedDistrict.getUpdateUser(), savedDistrict.getUpdateUser(), JsonUtil.getJsonStringFromObject(DistrictMapper.mapper.toStructure(savedDistrict)), UPDATE_DISTRICT, DISTRICT_UPDATED);
+      instituteEventRepository.save(instituteEvent);
+
+      return Pair.of(savedDistrict, instituteEvent);
     } else {
       throw new EntityNotFoundException(DistrictEntity.class, DISTRICT_ID_ATTR, String.valueOf(districtId));
     }

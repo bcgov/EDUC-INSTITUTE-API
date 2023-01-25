@@ -5,6 +5,7 @@ import ca.bc.gov.educ.api.institute.struct.v1.AuthorityContact;
 import ca.bc.gov.educ.api.institute.struct.v1.IndependentAuthority;
 import ca.bc.gov.educ.api.institute.struct.v1.IndependentAuthorityHistory;
 import ca.bc.gov.educ.api.institute.struct.v1.Note;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -48,14 +49,14 @@ public interface IndependentAuthorityAPIEndpoint {
   @Tag(name = "Independent Authority Entity", description = "Endpoints for independent authority entity.")
   @Schema(name = "IndependentAuthority", implementation = IndependentAuthority.class)
   @ResponseStatus(CREATED)
-  IndependentAuthority createIndependentAuthority(@Validated @RequestBody IndependentAuthority independentAuthority);
+  IndependentAuthority createIndependentAuthority(@Validated @RequestBody IndependentAuthority independentAuthority) throws JsonProcessingException;
 
   @PutMapping("/{id}")
   @PreAuthorize("hasAuthority('SCOPE_WRITE_INDEPENDENT_AUTHORITY')")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "400", description = "BAD REQUEST"), @ApiResponse(responseCode = "404", description = "NOT FOUND")})
   @Tag(name = "Independent Authority Entity", description = "Endpoints for independent authority entity.")
   @Schema(name = "IndependentAuthority", implementation = IndependentAuthority.class)
-  IndependentAuthority updateIndependentAuthority(@PathVariable UUID id, @Validated @RequestBody IndependentAuthority independentAuthority);
+  IndependentAuthority updateIndependentAuthority(@PathVariable UUID id, @Validated @RequestBody IndependentAuthority independentAuthority) throws JsonProcessingException;
 
   @DeleteMapping("/{id}")
   @PreAuthorize("hasAuthority('SCOPE_DELETE_INDEPENDENT_AUTHORITY')")

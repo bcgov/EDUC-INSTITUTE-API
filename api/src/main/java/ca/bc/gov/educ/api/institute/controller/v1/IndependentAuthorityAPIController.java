@@ -7,6 +7,7 @@ import ca.bc.gov.educ.api.institute.exception.errors.ApiError;
 import ca.bc.gov.educ.api.institute.mapper.v1.AuthorityContactMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.IndependentAuthorityMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.NoteMapper;
+import ca.bc.gov.educ.api.institute.messaging.jetstream.Publisher;
 import ca.bc.gov.educ.api.institute.model.v1.IndependentAuthorityEntity;
 import ca.bc.gov.educ.api.institute.service.v1.AuthoritySearchService;
 import ca.bc.gov.educ.api.institute.service.v1.IndependentAuthorityHistoryService;
@@ -20,6 +21,7 @@ import ca.bc.gov.educ.api.institute.util.RequestUtil;
 import ca.bc.gov.educ.api.institute.validator.AuthorityContactPayloadValidator;
 import ca.bc.gov.educ.api.institute.validator.IndependentAuthorityPayloadValidator;
 import ca.bc.gov.educ.api.institute.validator.NotePayloadValidator;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -47,6 +49,8 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 @Slf4j
 public class IndependentAuthorityAPIController implements IndependentAuthorityAPIEndpoint {
 
+  @Getter(AccessLevel.PRIVATE)
+  private final Publisher publisher;
   private static final IndependentAuthorityMapper mapper = IndependentAuthorityMapper.mapper;
   @Getter(AccessLevel.PRIVATE)
   private final IndependentAuthorityService independentAuthorityService;
@@ -67,7 +71,8 @@ public class IndependentAuthorityAPIController implements IndependentAuthorityAP
   private final AuthoritySearchService authoritySearchService;
 
   @Autowired
-  public IndependentAuthorityAPIController(final IndependentAuthorityService independentAuthorityService, final IndependentAuthorityHistoryService independentAuthorityHistoryService, final IndependentAuthorityPayloadValidator payloadValidator, AuthorityContactPayloadValidator authorityContactPayloadValidator, NotePayloadValidator notePayloadValidator, AuthoritySearchService authoritySearchService) {
+  public IndependentAuthorityAPIController(Publisher publisher, final IndependentAuthorityService independentAuthorityService, final IndependentAuthorityHistoryService independentAuthorityHistoryService, final IndependentAuthorityPayloadValidator payloadValidator, AuthorityContactPayloadValidator authorityContactPayloadValidator, NotePayloadValidator notePayloadValidator, AuthoritySearchService authoritySearchService) {
+    this.publisher = publisher;
     this.independentAuthorityService = independentAuthorityService;
     this.independentAuthorityHistoryService = independentAuthorityHistoryService;
     this.payloadValidator = payloadValidator;
@@ -93,17 +98,21 @@ public class IndependentAuthorityAPIController implements IndependentAuthorityAP
   }
 
   @Override
-  public IndependentAuthority createIndependentAuthority(IndependentAuthority independentAuthority) {
+  public IndependentAuthority createIndependentAuthority(IndependentAuthority independentAuthority) throws JsonProcessingException {
     validatePayload(() -> getPayloadValidator().validateCreatePayload(independentAuthority));
     RequestUtil.setAuditColumnsForCreate(independentAuthority);
-    return mapper.toStructure(independentAuthorityService.createIndependentAuthority(independentAuthority));
+    var pair = independentAuthorityService.createIndependentAuthority(independentAuthority);
+    publisher.dispatchChoreographyEvent(pair.getRight());
+    return mapper.toStructure(pair.getLeft());
   }
 
   @Override
-  public IndependentAuthority updateIndependentAuthority(UUID id, IndependentAuthority independentAuthority) {
+  public IndependentAuthority updateIndependentAuthority(UUID id, IndependentAuthority independentAuthority) throws JsonProcessingException {
     validatePayload(() -> getPayloadValidator().validateUpdatePayload(independentAuthority));
     RequestUtil.setAuditColumnsForUpdate(independentAuthority);
-    return mapper.toStructure(independentAuthorityService.updateIndependentAuthority(independentAuthority, id));
+    var pair = independentAuthorityService.updateIndependentAuthority(independentAuthority, id);
+    publisher.dispatchChoreographyEvent(pair.getRight());
+    return mapper.toStructure(pair.getLeft());
   }
 
   @Override
