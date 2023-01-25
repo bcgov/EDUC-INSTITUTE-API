@@ -46,7 +46,7 @@ public interface SchoolAPIEndpoint {
   @Tag(name = "School Entity", description = "Endpoints for school entity.")
   @Schema(name = "School", implementation = School.class)
   @ResponseStatus(CREATED)
-  School createSchool(@Validated @RequestBody School school);
+  School createSchool(@Validated @RequestBody School school) throws JsonProcessingException;
 
   @PutMapping("/{id}")
   @PreAuthorize("hasAuthority('SCOPE_WRITE_SCHOOL')")

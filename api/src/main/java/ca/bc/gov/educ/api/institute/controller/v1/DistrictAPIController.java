@@ -8,6 +8,7 @@ import ca.bc.gov.educ.api.institute.mapper.v1.DistrictContactMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.DistrictMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.DistrictTombstoneMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.NoteMapper;
+import ca.bc.gov.educ.api.institute.messaging.jetstream.Publisher;
 import ca.bc.gov.educ.api.institute.service.v1.DistrictHistoryService;
 import ca.bc.gov.educ.api.institute.service.v1.DistrictService;
 import ca.bc.gov.educ.api.institute.struct.v1.District;
@@ -18,6 +19,9 @@ import ca.bc.gov.educ.api.institute.util.RequestUtil;
 import ca.bc.gov.educ.api.institute.validator.DistrictContactPayloadValidator;
 import ca.bc.gov.educ.api.institute.validator.DistrictPayloadValidator;
 import ca.bc.gov.educ.api.institute.validator.NotePayloadValidator;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +42,8 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 @Slf4j
 public class DistrictAPIController implements DistrictAPIEndpoint {
 
+  @Getter(AccessLevel.PRIVATE)
+  private final Publisher publisher;
   private static final DistrictMapper mapper = DistrictMapper.mapper;
 
   private static final DistrictTombstoneMapper districtTombstoneMapper = DistrictTombstoneMapper.mapper;
@@ -55,7 +61,8 @@ public class DistrictAPIController implements DistrictAPIEndpoint {
   private final NotePayloadValidator notePayloadValidator;
 
   @Autowired
-  public DistrictAPIController(final DistrictService districtService, final DistrictHistoryService districtHistoryService, final DistrictPayloadValidator districtPayloadValidator, DistrictContactPayloadValidator districtContactPayloadValidator, NotePayloadValidator notePayloadValidator) {
+  public DistrictAPIController(Publisher publisher, final DistrictService districtService, final DistrictHistoryService districtHistoryService, final DistrictPayloadValidator districtPayloadValidator, DistrictContactPayloadValidator districtContactPayloadValidator, NotePayloadValidator notePayloadValidator) {
+    this.publisher = publisher;
     this.districtService = districtService;
     this.districtHistoryService = districtHistoryService;
     this.districtPayloadValidator = districtPayloadValidator;
@@ -80,17 +87,21 @@ public class DistrictAPIController implements DistrictAPIEndpoint {
   }
 
   @Override
-  public District createDistrict(District district) {
+  public District createDistrict(District district) throws JsonProcessingException {
     validatePayload(() -> this.districtPayloadValidator.validateCreatePayload(district));
     RequestUtil.setAuditColumnsForCreate(district);
-    return mapper.toStructure(districtService.createDistrict(district));
+    var pair = districtService.createDistrict(district);
+    publisher.dispatchChoreographyEvent(pair.getRight());
+    return mapper.toStructure(pair.getLeft());
   }
 
   @Override
-  public District updateDistrict(UUID id, District district) {
+  public District updateDistrict(UUID id, District district) throws JsonProcessingException {
     validatePayload(() -> this.districtPayloadValidator.validateUpdatePayload(district));
     RequestUtil.setAuditColumnsForUpdate(district);
-    return mapper.toStructure(districtService.updateDistrict(district, id));
+    var pair = districtService.updateDistrict(district, id);
+    publisher.dispatchChoreographyEvent(pair.getRight());
+    return mapper.toStructure(pair.getLeft());
   }
 
   @Override

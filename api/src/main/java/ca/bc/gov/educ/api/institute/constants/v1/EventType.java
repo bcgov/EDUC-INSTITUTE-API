@@ -6,5 +6,15 @@ package ca.bc.gov.educ.api.institute.constants.v1;
 public enum EventType {
   UPDATE_SCHOOL,
 
+  CREATE_SCHOOL,
+
+  UPDATE_DISTRICT,
+
+  CREATE_DISTRICT,
+
+  UPDATE_AUTHORITY,
+
+  CREATE_AUTHORITY,
+
   GET_AUTHORITY
 }
