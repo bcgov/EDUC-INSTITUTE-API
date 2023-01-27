@@ -812,11 +812,11 @@ public class SchoolControllerTest {
 
     final SchoolEntity entity = this.schoolRepository.save(this.createSchoolData());
     final SchoolHistoryEntity historyEntity = this.schoolHistoryRepository.save(createHistorySchoolData(entity.getSchoolId()));
-    final SearchCriteria criteriaSchoolNumber = SearchCriteria.builder().key("schoolNumber").operation(FilterOperation.EQUAL).value(historyEntity.getSchoolNumber()).valueType(ValueType.LONG).build();
+    final SearchCriteria criteriaSchoolNumber = SearchCriteria.builder().key("schoolNumber").operation(FilterOperation.EQUAL).value(historyEntity.getSchoolNumber()).valueType(ValueType.STRING).build();
     final SearchCriteria criteriaSchoolUUID = SearchCriteria.builder().key("schoolId").operation(FilterOperation.EQUAL).value(historyEntity.getSchoolId().toString()).valueType(ValueType.UUID).build();
     final SearchCriteria criteriaCreateDate = SearchCriteria.builder().key("createDate").operation(FilterOperation.LESS_THAN).value("2999-01-01T00:00:00").valueType(ValueType.DATE_TIME).condition(Condition.AND).build();
     final SearchCriteria criteriaSchoolOrganizationCode = SearchCriteria.builder().key("schoolOrganizationCode").operation(FilterOperation.EQUAL).value(historyEntity.getSchoolOrganizationCode().toLowerCase()).valueType(ValueType.STRING).condition(Condition.OR).build();
-    final SearchCriteria criteriaSchoolPhoneNumber = SearchCriteria.builder().key("phoneNumber").operation(FilterOperation.EQUAL).value(historyEntity.getPhoneNumber()).valueType(ValueType.INTEGER).build();
+    final SearchCriteria criteriaSchoolPhoneNumber = SearchCriteria.builder().key("phoneNumber").operation(FilterOperation.EQUAL).value(historyEntity.getPhoneNumber()).valueType(ValueType.STRING).build();
     final List<SearchCriteria> criteriaList = new ArrayList<>();
     criteriaList.add(criteriaSchoolNumber);
     criteriaList.add(criteriaSchoolUUID);

@@ -1,9 +1,8 @@
 package ca.bc.gov.educ.api.institute.struct.v1;
 
+import jakarta.validation.constraints.Null;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
-
-import javax.validation.constraints.Null;
-import javax.validation.constraints.Size;
 
 /**
  * The type Base request.

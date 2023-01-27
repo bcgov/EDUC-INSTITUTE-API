@@ -7,17 +7,18 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 
 /**
  * The type School api resource application.
  */
 @SpringBootApplication
-@EnableGlobalMethodSecurity(prePostEnabled = true)
 @EnableCaching
 @EnableRetry
 @EnableScheduling
@@ -37,6 +38,7 @@ public class InstituteApiResourceApplication {
    * Add security exceptions for swagger UI and prometheus.
    */
   @Configuration
+  @EnableMethodSecurity
   static
   class WebSecurityConfiguration {
 
@@ -46,12 +48,11 @@ public class InstituteApiResourceApplication {
      */
     public WebSecurityConfiguration() {
       super();
-      SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
     }
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
-      return web -> web.ignoring().antMatchers("/v3/api-docs/**",
+      return web -> web.ignoring().requestMatchers("/v3/api-docs/**",
         "/actuator/health", "/actuator/prometheus","/actuator/**",
         "/swagger-ui/**");
     }
@@ -59,11 +60,15 @@ public class InstituteApiResourceApplication {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
       http
-        .authorizeRequests()
-        .anyRequest().authenticated().and()
-        .oauth2ResourceServer().jwt();
+        .csrf(AbstractHttpConfigurer::disable)
+        .authorizeHttpRequests(auth -> auth
+          .anyRequest().authenticated()
+        )
+        .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt);
       return http.build();
     }
+
   }
 
 }
