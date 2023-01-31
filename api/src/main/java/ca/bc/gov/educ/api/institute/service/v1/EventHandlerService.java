@@ -8,6 +8,7 @@ import ca.bc.gov.educ.api.institute.repository.v1.IndependentAuthorityRepository
 import ca.bc.gov.educ.api.institute.struct.v1.Event;
 import ca.bc.gov.educ.api.institute.util.JsonUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 import java.util.UUID;
 
 import static ca.bc.gov.educ.api.institute.constants.v1.EventStatus.MESSAGE_PUBLISHED;
@@ -51,6 +53,8 @@ public class EventHandlerService {
   @Getter(PRIVATE)
   private final IndependentAuthorityRepository independentAuthorityRepository;
 
+  private final ObjectMapper obMapper = new ObjectMapper();
+
   private static final IndependentAuthorityMapper independentAuthorityMapper = IndependentAuthorityMapper.mapper;
 
   @Autowired
@@ -69,8 +73,9 @@ public class EventHandlerService {
    */
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public byte[] handleGetAuthorityEvent(Event event, boolean isSynchronous) throws JsonProcessingException {
+    UUID authorityID = obMapper.readValue(event.getEventPayload(), new TypeReference<>() { });
     if (isSynchronous) {
-      val optionalAuthorityEntity = independentAuthorityRepository.findById(UUID.fromString(event.getEventPayload()));
+      val optionalAuthorityEntity = independentAuthorityRepository.findById(authorityID);
       if (optionalAuthorityEntity.isPresent()) {
         return JsonUtil.getJsonBytesFromObject(independentAuthorityMapper.toStructure(optionalAuthorityEntity.get()));
       } else {
@@ -79,7 +84,7 @@ public class EventHandlerService {
     }
 
     log.trace(EVENT_PAYLOAD, event);
-    val optionalAuthorityEntity = independentAuthorityRepository.findById(UUID.fromString(event.getEventPayload()));
+    val optionalAuthorityEntity = independentAuthorityRepository.findById(authorityID);
     if (optionalAuthorityEntity.isPresent()) {
       var authority = independentAuthorityMapper.toStructure(optionalAuthorityEntity.get()); // need to convert to structure MANDATORY otherwise jackson will break.
       event.setEventPayload(JsonUtil.getJsonStringFromObject(authority));
