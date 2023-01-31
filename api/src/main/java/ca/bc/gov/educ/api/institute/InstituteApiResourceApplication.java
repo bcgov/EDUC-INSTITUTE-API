@@ -9,7 +9,6 @@ import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -51,17 +50,13 @@ public class InstituteApiResourceApplication {
     }
 
     @Bean
-    public WebSecurityCustomizer webSecurityCustomizer() {
-      return web -> web.ignoring().requestMatchers("/v3/api-docs/**",
-        "/actuator/health", "/actuator/prometheus","/actuator/**",
-        "/swagger-ui/**");
-    }
-
-    @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
       http
         .csrf(AbstractHttpConfigurer::disable)
         .authorizeHttpRequests(auth -> auth
+          .requestMatchers("/v3/api-docs/**",
+            "/actuator/health", "/actuator/prometheus","/actuator/**",
+            "/swagger-ui/**").permitAll()
           .anyRequest().authenticated()
         )
         .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
