@@ -59,7 +59,7 @@ public class EventHandlerServiceTest {
   @Test
   public void testHandleEvent_givenEventTypeGET_AUTHORITY__whenNoStudentExist_shouldHaveEventOutcomeAUTHORITY_NOT_FOUND() throws JsonProcessingException, IOException {
     var sagaId = UUID.randomUUID();
-    final Event event = Event.builder().eventType(GET_AUTHORITY).sagaId(sagaId).replyTo(INSTITUTE_API_TOPIC).eventPayload(UUID.randomUUID().toString()).build();
+    final Event event = Event.builder().eventType(GET_AUTHORITY).sagaId(sagaId).replyTo(INSTITUTE_API_TOPIC).eventPayload(JsonUtil.getJsonStringFromObject(UUID.randomUUID().toString())).build();
     byte[] response = eventHandlerServiceUnderTest.handleGetAuthorityEvent(event, isSynchronous);
     assertThat(response).isNotEmpty();
     Event responseEvent = JsonUtil.getObjectFromJsonBytes(Event.class, response);
@@ -70,10 +70,10 @@ public class EventHandlerServiceTest {
 
 
   @Test
-  public void testHandleEvent_givenEventTypeGET_AUTHORITY__whenStudentExist_shouldHaveEventOutcomeAUTHORITY_FOUND() throws JsonProcessingException, IOException {
+  public void testHandleEvent_givenEventTypeGET_AUTHORITY__whenStudentExist_shouldHaveEventOutcomeAUTHORITY_FOUND() throws IOException {
     IndependentAuthorityEntity entity = independentAuthorityRepository.save(createIndependentAuthorityData());
     var sagaId = UUID.randomUUID();
-    final Event event = Event.builder().eventType(GET_AUTHORITY).sagaId(sagaId).replyTo(INSTITUTE_API_TOPIC).eventPayload(entity.getIndependentAuthorityId().toString()).build();
+    final Event event = Event.builder().eventType(GET_AUTHORITY).sagaId(sagaId).replyTo(INSTITUTE_API_TOPIC).eventPayload(JsonUtil.getJsonStringFromObject(entity.getIndependentAuthorityId().toString())).build();
     byte[] response = eventHandlerServiceUnderTest.handleGetAuthorityEvent(event, isSynchronous);
     assertThat(response).isNotEmpty();
     Event responseEvent = JsonUtil.getObjectFromJsonBytes(Event.class, response);
@@ -88,7 +88,7 @@ public class EventHandlerServiceTest {
     IndependentAuthorityEntity newEntity = independentAuthorityRepository.findById(entity.getIndependentAuthorityId()).get();
     var studentBytes = JsonUtil.getJsonBytesFromObject(independentAuthorityMapper.toStructure(newEntity));
     var sagaId = UUID.randomUUID();
-    final Event event = Event.builder().eventType(GET_AUTHORITY).sagaId(sagaId).eventPayload(entity.getIndependentAuthorityId().toString()).build();
+    final Event event = Event.builder().eventType(GET_AUTHORITY).sagaId(sagaId).eventPayload(JsonUtil.getJsonStringFromObject(entity.getIndependentAuthorityId().toString())).build();
     var response = eventHandlerServiceUnderTest.handleGetAuthorityEvent(event, true);
     assertThat(studentBytes).isEqualTo(response);
   }
@@ -97,7 +97,7 @@ public class EventHandlerServiceTest {
   public void testHandleEvent_givenEventTypeGET_AUTHORITY__whenAuthorityDoesNotExistAndSynchronousNatsMessage_shouldRespondWithBlankObjectData() throws JsonProcessingException {
     var studentBytes = new byte[0];
     var sagaId = UUID.randomUUID();
-    final Event event = Event.builder().eventType(GET_AUTHORITY).sagaId(sagaId).eventPayload(UUID.randomUUID().toString()).build();
+    final Event event = Event.builder().eventType(GET_AUTHORITY).sagaId(sagaId).eventPayload(JsonUtil.getJsonStringFromObject(UUID.randomUUID().toString())).build();
     var response = eventHandlerServiceUnderTest.handleGetAuthorityEvent(event, true);
     assertThat(studentBytes).isEqualTo(response);
   }
