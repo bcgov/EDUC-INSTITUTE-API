@@ -4,11 +4,15 @@ import ca.bc.gov.educ.api.institute.messaging.MessagePublisher;
 import ca.bc.gov.educ.api.institute.messaging.jetstream.Publisher;
 import ca.bc.gov.educ.api.institute.model.v1.InstituteEvent;
 import ca.bc.gov.educ.api.institute.struct.v1.Event;
+import ca.bc.gov.educ.api.institute.struct.v1.IndependentAuthority;
+import ca.bc.gov.educ.api.institute.util.JsonUtil;
 import io.nats.client.Message;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.io.IOException;
 
 import static ca.bc.gov.educ.api.institute.service.v1.EventHandlerService.PAYLOAD_LOG;
 
@@ -67,7 +71,8 @@ public class EventHandlerDelegatorService {
     }
   }
 
-  private void publishToNATS(Event event, Message message, boolean isSynchronous, byte[] left) {
+  private void publishToNATS(Event event, Message message, boolean isSynchronous, byte[] left) throws IOException {
+    log.info("Publishing event to NATS :: {} Payload :: {}", event, JsonUtil.getObjectFromJsonBytes(IndependentAuthority.class, left));
     if (isSynchronous) { // sync, req/reply pattern of nats
       messagePublisher.dispatchMessage(message.getReplyTo(), left);
     } else { // async, pub/sub

@@ -34,15 +34,6 @@ import static lombok.AccessLevel.PRIVATE;
 public class EventHandlerService {
 
   /**
-   * The constant NO_RECORD_SAGA_ID_EVENT_TYPE.
-   */
-  public static final String NO_RECORD_SAGA_ID_EVENT_TYPE = "no record found for the saga id and event type combination, processing.";
-  /**
-   * The constant RECORD_FOUND_FOR_SAGA_ID_EVENT_TYPE.
-   */
-  public static final String RECORD_FOUND_FOR_SAGA_ID_EVENT_TYPE = "record found for the saga id and event type combination, might be a duplicate or replay," +
-      " just updating the db status so that it will be polled and sent back again.";
-  /**
    * The constant PAYLOAD_LOG.
    */
   public static final String PAYLOAD_LOG = "payload is :: {}";
@@ -93,6 +84,7 @@ public class EventHandlerService {
       event.setEventOutcome(EventOutcome.AUTHORITY_NOT_FOUND);
     }
     val authorityEvent = createInstituteEventRecord(event);
+    log.info("Event outcome for saga ID :: {}, is :: {}", event.getSagaId(), event.getEventOutcome());
     return createResponseEvent(authorityEvent);
   }
 
