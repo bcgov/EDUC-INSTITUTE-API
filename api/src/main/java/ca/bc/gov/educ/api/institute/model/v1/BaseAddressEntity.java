@@ -30,6 +30,7 @@ public class BaseAddressEntity {
   private String city;
   @Basic
   @Column(name = "postal")
+  @UpperCase
   @ComparableField
   private String postal;
   @Basic
