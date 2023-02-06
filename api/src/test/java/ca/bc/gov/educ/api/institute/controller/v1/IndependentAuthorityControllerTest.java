@@ -382,7 +382,7 @@ public class IndependentAuthorityControllerTest {
     independentAuthority.setUpdateDate(null);
     AuthorityAddressEntity address = new AuthorityAddressEntity();
     address.setCreateDate(LocalDateTime.now());
-    address.setCreateUser("EDX");
+    address.setCreateUser("TEST");
     independentAuthority.getAddresses().add(address);
 
     this.mockMvc.perform(post(URL.BASE_URL_AUTHORITY)
