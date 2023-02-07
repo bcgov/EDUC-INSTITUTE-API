@@ -84,10 +84,8 @@ public class IndependentAuthorityService {
   public Pair<IndependentAuthorityEntity, InstituteEvent> createIndependentAuthority(IndependentAuthority independentAuthority) throws JsonProcessingException {
     var independentAuthorityEntity = IndependentAuthorityMapper.mapper.toModel(independentAuthority);
 
-    String lastAuthorityNumber = independentAuthorityRepository.findLastAuthorityNumber();
-    Integer lastNum = Integer.parseInt(lastAuthorityNumber);
-    lastNum = lastNum + 1;
-    independentAuthorityEntity.setAuthorityNumber(lastNum);
+    String nextAuthorityNumber = independentAuthorityRepository.findNextAuthorityNumber();
+    independentAuthorityEntity.setAuthorityNumber(Integer.valueOf(nextAuthorityNumber));
     independentAuthorityEntity.getAddresses().stream().forEach(addy -> {
       RequestUtil.setAuditColumnsForAddress(addy);
       TransformUtil.uppercaseFields(addy);
