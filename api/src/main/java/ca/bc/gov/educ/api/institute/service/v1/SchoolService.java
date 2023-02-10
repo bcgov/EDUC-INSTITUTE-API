@@ -92,8 +92,9 @@ public class SchoolService {
       schoolEntity.setDistrictEntity(district.get());
     }
 
-    schoolEntity.setSchoolNumber(schoolNumberGenerationService.generateSchoolNumber(district.get().getDistrictNumber(), school.getFacilityTypeCode(), school.getSchoolCategoryCode(), school.getIndependentAuthorityId()));
-
+    if(district.isPresent()) {
+      schoolEntity.setSchoolNumber(schoolNumberGenerationService.generateSchoolNumber(district.get().getDistrictNumber(), school.getFacilityTypeCode(), school.getSchoolCategoryCode(), school.getIndependentAuthorityId()));
+    }
     schoolEntity.getAddresses().stream().forEach(address -> {
       RequestUtil.setAuditColumnsForAddress(address);
       TransformUtil.uppercaseFields(address);
