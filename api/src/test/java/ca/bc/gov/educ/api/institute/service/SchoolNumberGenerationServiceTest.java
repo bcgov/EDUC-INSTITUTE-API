@@ -76,7 +76,7 @@ public class SchoolNumberGenerationServiceTest {
         FacilityTypeCodeEntity facilityTypeCodeEntity = this.facilityTypeCodeRepository.save(this.createFacilityTypeCodeData("STANDARD"));
         String schoolNumber = this.schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
         assertThat(schoolNumber).isNotEmpty();
-        assertThat(schoolNumber).isEqualTo("003011");
+        assertThat(schoolNumber).isEqualTo("03011");
     }
 
     @Test
@@ -112,7 +112,7 @@ public class SchoolNumberGenerationServiceTest {
         FacilityTypeCodeEntity facilityTypeCodeEntity = this.facilityTypeCodeRepository.save(this.createFacilityTypeCodeData("CONT_ED"));
         String schoolNumber = this.schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
         assertThat(schoolNumber).isNotEmpty();
-        assertThat(schoolNumber).isEqualTo("0030000");
+        assertThat(schoolNumber).isEqualTo("03000");
     }
 
     @Test
