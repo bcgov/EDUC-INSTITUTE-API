@@ -1,6 +1,7 @@
 package ca.bc.gov.educ.api.institute.service.v1;
 
 import ca.bc.gov.educ.api.institute.constants.v1.FacilityCategoryLookup;
+import ca.bc.gov.educ.api.institute.exception.InvalidParameterException;
 import ca.bc.gov.educ.api.institute.repository.v1.SchoolRepository;
 import ca.bc.gov.educ.api.institute.util.Rules;
 import jakarta.annotation.PostConstruct;
@@ -35,7 +36,11 @@ public class SchoolNumberGenerationService {
 
     public String generateSchoolNumber(String districtNumber, String facilityCode, String categoryCode, String independentAuthorityId) {
         FacilityCategoryLookup value = FacilityCategoryLookup.getRuleToBeExecuted(facilityCode, categoryCode);
-        return map.get(value).generateNumber(districtNumber, independentAuthorityId);
+        if(value != null) {
+            return map.get(value).generateNumber(districtNumber, independentAuthorityId);
+        } else {
+            throw new InvalidParameterException("School Number cannot be generated for this school category and facility type");
+        }
     }
 
     @PostConstruct

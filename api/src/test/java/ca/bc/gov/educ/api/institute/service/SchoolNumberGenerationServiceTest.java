@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.institute.service;
 
+import ca.bc.gov.educ.api.institute.exception.InvalidParameterException;
 import ca.bc.gov.educ.api.institute.model.v1.FacilityTypeCodeEntity;
 import ca.bc.gov.educ.api.institute.model.v1.SchoolCategoryCodeEntity;
 import ca.bc.gov.educ.api.institute.repository.v1.*;
@@ -44,7 +45,7 @@ public class SchoolNumberGenerationServiceTest {
     }
 
     @Test
-    public void testCreateSchool_givenSchoolCodePUBLIC_givenFacilityCodeDISTLEARN_shouldCreateValidSchoolNumber() throws Exception {
+    public void testCreateSchool_givenSchoolCodePUBLIC_givenFacilityCodeDISTLEARN_shouldCreateValidSchoolNumber() {
         SchoolCategoryCodeEntity schoolCategoryCodeEntity = this.schoolCategoryCodeRepository.save(this.createSchoolCategoryCodeData("PUBLIC"));
         FacilityTypeCodeEntity facilityTypeCodeEntity = this.facilityTypeCodeRepository.save(this.createFacilityTypeCodeData("DIST_LEARN"));
         String schoolNumber = this.schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
@@ -54,7 +55,7 @@ public class SchoolNumberGenerationServiceTest {
     }
 
     @Test
-    public void testCreateSchool_givenSchoolCodeYUKON_givenFacilityCodeDISTONLINE_shouldCreateValidSchoolNumber() throws Exception {
+    public void testCreateSchool_givenSchoolCodeYUKON_givenFacilityCodeDISTONLINE_shouldCreateValidSchoolNumber() {
         SchoolCategoryCodeEntity schoolCategoryCodeEntity = this.schoolCategoryCodeRepository.save(this.createSchoolCategoryCodeData("YUKON"));
         FacilityTypeCodeEntity facilityTypeCodeEntity = this.facilityTypeCodeRepository.save(this.createFacilityTypeCodeData("DISTONLINE"));
         String schoolNumber = this.schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
@@ -64,7 +65,7 @@ public class SchoolNumberGenerationServiceTest {
     }
 
     @Test
-    public void testCreateSchool_givenSchoolCodeINDEPEND_givenFacilityCodeALT_PROGS_shouldCreateValidSchoolNumber() throws Exception {
+    public void testCreateSchool_givenSchoolCodeINDEPEND_givenFacilityCodeALT_PROGS_shouldCreateValidSchoolNumber() {
         SchoolCategoryCodeEntity schoolCategoryCodeEntity = this.schoolCategoryCodeRepository.save(this.createSchoolCategoryCodeData("INDEPEND"));
         FacilityTypeCodeEntity facilityTypeCodeEntity = this.facilityTypeCodeRepository.save(this.createFacilityTypeCodeData("ALT_PROGS"));
         String schoolNumber = this.schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
@@ -74,7 +75,7 @@ public class SchoolNumberGenerationServiceTest {
     }
 
     @Test
-    public void testCreateSchool_givenSchoolCodePUBLIC_givenFacilityCodeSTANDARD_shouldCreateValidSchoolNumber() throws Exception {
+    public void testCreateSchool_givenSchoolCodePUBLIC_givenFacilityCodeSTANDARD_shouldCreateValidSchoolNumber() {
         SchoolCategoryCodeEntity schoolCategoryCodeEntity = this.schoolCategoryCodeRepository.save(this.createSchoolCategoryCodeData("PUBLIC"));
         FacilityTypeCodeEntity facilityTypeCodeEntity = this.facilityTypeCodeRepository.save(this.createFacilityTypeCodeData("STANDARD"));
         String schoolNumber = this.schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
@@ -84,7 +85,7 @@ public class SchoolNumberGenerationServiceTest {
     }
 
     @Test
-    public void testCreateSchool_givenSchoolCodeOFFSHORE_givenFacilityCodeSTANDARD_shouldCreateValidSchoolNumber() throws Exception {
+    public void testCreateSchool_givenSchoolCodeOFFSHORE_givenFacilityCodeSTANDARD_shouldCreateValidSchoolNumber() {
         SchoolCategoryCodeEntity schoolCategoryCodeEntity = this.schoolCategoryCodeRepository.save(this.createSchoolCategoryCodeData("OFFSHORE"));
         FacilityTypeCodeEntity facilityTypeCodeEntity = this.facilityTypeCodeRepository.save(this.createFacilityTypeCodeData("STANDARD"));
         String schoolNumber = this.schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), "d34972fe-49d7-9ef4-1e0f-e5a83ec77889");
@@ -94,7 +95,7 @@ public class SchoolNumberGenerationServiceTest {
     }
 
     @Test
-    public void testCreateSchool_givenSchoolCodeINDEPEND_givenFacilityCodeSTANDARD_shouldCreateValidSchoolNumber() throws Exception {
+    public void testCreateSchool_givenSchoolCodeINDEPEND_givenFacilityCodeSTANDARD_shouldCreateValidSchoolNumber() {
         SchoolCategoryCodeEntity schoolCategoryCodeEntity = this.schoolCategoryCodeRepository.save(this.createSchoolCategoryCodeData("INDEPEND"));
         FacilityTypeCodeEntity facilityTypeCodeEntity = this.facilityTypeCodeRepository.save(this.createFacilityTypeCodeData("STANDARD"));
         String schoolNumber = this.schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), "d34972fe-49d7-9ef4-1e0f-e5a83ec77889");
@@ -104,7 +105,7 @@ public class SchoolNumberGenerationServiceTest {
     }
 
     @Test
-    public void testCreateSchool_givenSchoolCodeINDP_FNS_givenFacilityCodeSTANDARD_shouldCreateValidSchoolNumber() throws Exception {
+    public void testCreateSchool_givenSchoolCodeINDP_FNS_givenFacilityCodeSTANDARD_shouldCreateValidSchoolNumber() {
         SchoolCategoryCodeEntity schoolCategoryCodeEntity = this.schoolCategoryCodeRepository.save(this.createSchoolCategoryCodeData("INDP_FNS"));
         FacilityTypeCodeEntity facilityTypeCodeEntity = this.facilityTypeCodeRepository.save(this.createFacilityTypeCodeData("STANDARD"));
         String schoolNumber = this.schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
@@ -114,7 +115,7 @@ public class SchoolNumberGenerationServiceTest {
     }
 
     @Test
-    public void testCreateSchool_givenSchoolCodePUBLIC_givenFacilityCodeCONT_ED_shouldCreateValidSchoolNumber() throws Exception {
+    public void testCreateSchool_givenSchoolCodePUBLIC_givenFacilityCodeCONT_ED_shouldCreateValidSchoolNumber() {
         SchoolCategoryCodeEntity schoolCategoryCodeEntity = this.schoolCategoryCodeRepository.save(this.createSchoolCategoryCodeData("PUBLIC"));
         FacilityTypeCodeEntity facilityTypeCodeEntity = this.facilityTypeCodeRepository.save(this.createFacilityTypeCodeData("CONT_ED"));
         String schoolNumber = this.schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
@@ -124,7 +125,7 @@ public class SchoolNumberGenerationServiceTest {
     }
 
     @Test
-    public void testCreateSchool_givenSchoolCodeEAR_LEARN_givenFacilityCodeSTRONG_CEN_shouldCreateValidSchoolNumber() throws Exception {
+    public void testCreateSchool_givenSchoolCodeEAR_LEARN_givenFacilityCodeSTRONG_CEN_shouldCreateValidSchoolNumber() {
         SchoolCategoryCodeEntity schoolCategoryCodeEntity = this.schoolCategoryCodeRepository.save(this.createSchoolCategoryCodeData("EAR_LEARN"));
         FacilityTypeCodeEntity facilityTypeCodeEntity = this.facilityTypeCodeRepository.save(this.createFacilityTypeCodeData("STRONG_CEN"));
         String schoolNumber = this.schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
@@ -134,7 +135,7 @@ public class SchoolNumberGenerationServiceTest {
     }
 
     @Test
-    public void testCreateSchool_givenSchoolCodePUBLIC_givenFacilityCodeSHORT_PRP_shouldCreateValidSchoolNumber() throws Exception {
+    public void testCreateSchool_givenSchoolCodePUBLIC_givenFacilityCodeSHORT_PRP_shouldCreateValidSchoolNumber() {
         SchoolCategoryCodeEntity schoolCategoryCodeEntity = this.schoolCategoryCodeRepository.save(this.createSchoolCategoryCodeData("PUBLIC"));
         FacilityTypeCodeEntity facilityTypeCodeEntity = this.facilityTypeCodeRepository.save(this.createFacilityTypeCodeData("SHORT_PRP"));
         String schoolNumber = this.schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
@@ -144,7 +145,7 @@ public class SchoolNumberGenerationServiceTest {
     }
 
     @Test
-    public void testCreateSchool_givenSchoolCodeYUKON_givenFacilityCodeSUMMER_shouldCreateValidSchoolNumber() throws Exception {
+    public void testCreateSchool_givenSchoolCodeYUKON_givenFacilityCodeSUMMER_shouldCreateValidSchoolNumber() {
         SchoolCategoryCodeEntity schoolCategoryCodeEntity = this.schoolCategoryCodeRepository.save(this.createSchoolCategoryCodeData("YUKON"));
         FacilityTypeCodeEntity facilityTypeCodeEntity = this.facilityTypeCodeRepository.save(this.createFacilityTypeCodeData("SUMMER"));
         String schoolNumber = this.schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
@@ -154,7 +155,7 @@ public class SchoolNumberGenerationServiceTest {
     }
 
     @Test
-    public void testCreateSchool_givenSchoolCodePUBLIC_givenFacilityCodeYOUTH_shouldCreateValidSchoolNumber() throws Exception {
+    public void testCreateSchool_givenSchoolCodePUBLIC_givenFacilityCodeYOUTH_shouldCreateValidSchoolNumber() {
         SchoolCategoryCodeEntity schoolCategoryCodeEntity = this.schoolCategoryCodeRepository.save(this.createSchoolCategoryCodeData("PUBLIC"));
         FacilityTypeCodeEntity facilityTypeCodeEntity = this.facilityTypeCodeRepository.save(this.createFacilityTypeCodeData("YOUTH"));
         String schoolNumber = this.schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
@@ -164,13 +165,20 @@ public class SchoolNumberGenerationServiceTest {
     }
 
     @Test
-    public void testCreateSchool_givenSchoolCodePOST_SEC_givenFacilityCodePOST_SEC_shouldCreateValidSchoolNumber() throws Exception {
+    public void testCreateSchool_givenSchoolCodePOST_SEC_givenFacilityCodePOST_SEC_shouldCreateValidSchoolNumber() {
         SchoolCategoryCodeEntity schoolCategoryCodeEntity = this.schoolCategoryCodeRepository.save(this.createSchoolCategoryCodeData("POST_SEC"));
         FacilityTypeCodeEntity facilityTypeCodeEntity = this.facilityTypeCodeRepository.save(this.createFacilityTypeCodeData("POST_SEC"));
         String schoolNumber = this.schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
         assertThat(schoolNumber)
                 .isNotEmpty()
                 .isEqualTo("00011");
+    }
+
+    @Test(expected = InvalidParameterException.class)
+    public void testCreateSchool_givenSchoolCode_givenFacilityCode_shouldThrowError() {
+        SchoolCategoryCodeEntity schoolCategoryCodeEntity = this.schoolCategoryCodeRepository.save(this.createSchoolCategoryCodeData("POST_SEC"));
+        FacilityTypeCodeEntity facilityTypeCodeEntity = this.facilityTypeCodeRepository.save(this.createFacilityTypeCodeData("YOUTH"));
+        String schoolNumber = this.schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
     }
 
     private SchoolCategoryCodeEntity createSchoolCategoryCodeData(String code) {
