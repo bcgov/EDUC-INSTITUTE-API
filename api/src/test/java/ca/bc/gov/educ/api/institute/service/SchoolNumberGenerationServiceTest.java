@@ -48,8 +48,9 @@ public class SchoolNumberGenerationServiceTest {
         SchoolCategoryCodeEntity schoolCategoryCodeEntity = this.schoolCategoryCodeRepository.save(this.createSchoolCategoryCodeData("PUBLIC"));
         FacilityTypeCodeEntity facilityTypeCodeEntity = this.facilityTypeCodeRepository.save(this.createFacilityTypeCodeData("DIST_LEARN"));
         String schoolNumber = this.schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
-        assertThat(schoolNumber).isNotEmpty();
-        assertThat(schoolNumber).isEqualTo("99011");
+        assertThat(schoolNumber)
+                .isNotEmpty()
+                .isEqualTo("99011");
     }
 
     @Test
@@ -57,8 +58,9 @@ public class SchoolNumberGenerationServiceTest {
         SchoolCategoryCodeEntity schoolCategoryCodeEntity = this.schoolCategoryCodeRepository.save(this.createSchoolCategoryCodeData("YUKON"));
         FacilityTypeCodeEntity facilityTypeCodeEntity = this.facilityTypeCodeRepository.save(this.createFacilityTypeCodeData("DISTONLINE"));
         String schoolNumber = this.schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
-        assertThat(schoolNumber).isNotEmpty();
-        assertThat(schoolNumber).isEqualTo("99011");
+        assertThat(schoolNumber)
+                .isNotEmpty()
+                .isEqualTo("99011");
     }
 
     @Test
@@ -66,8 +68,9 @@ public class SchoolNumberGenerationServiceTest {
         SchoolCategoryCodeEntity schoolCategoryCodeEntity = this.schoolCategoryCodeRepository.save(this.createSchoolCategoryCodeData("INDEPEND"));
         FacilityTypeCodeEntity facilityTypeCodeEntity = this.facilityTypeCodeRepository.save(this.createFacilityTypeCodeData("ALT_PROGS"));
         String schoolNumber = this.schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
-        assertThat(schoolNumber).isNotEmpty();
-        assertThat(schoolNumber).isEqualTo("99011");
+        assertThat(schoolNumber)
+                .isNotEmpty()
+                .isEqualTo("99011");
     }
 
     @Test
@@ -75,8 +78,9 @@ public class SchoolNumberGenerationServiceTest {
         SchoolCategoryCodeEntity schoolCategoryCodeEntity = this.schoolCategoryCodeRepository.save(this.createSchoolCategoryCodeData("PUBLIC"));
         FacilityTypeCodeEntity facilityTypeCodeEntity = this.facilityTypeCodeRepository.save(this.createFacilityTypeCodeData("STANDARD"));
         String schoolNumber = this.schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
-        assertThat(schoolNumber).isNotEmpty();
-        assertThat(schoolNumber).isEqualTo("03011");
+        assertThat(schoolNumber)
+                .isNotEmpty()
+                .isEqualTo("03011");
     }
 
     @Test
@@ -84,8 +88,9 @@ public class SchoolNumberGenerationServiceTest {
         SchoolCategoryCodeEntity schoolCategoryCodeEntity = this.schoolCategoryCodeRepository.save(this.createSchoolCategoryCodeData("OFFSHORE"));
         FacilityTypeCodeEntity facilityTypeCodeEntity = this.facilityTypeCodeRepository.save(this.createFacilityTypeCodeData("STANDARD"));
         String schoolNumber = this.schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), "d34972fe-49d7-9ef4-1e0f-e5a83ec77889");
-        assertThat(schoolNumber).isNotEmpty();
-        assertThat(schoolNumber).isEqualTo("96011");
+        assertThat(schoolNumber)
+                .isNotEmpty()
+                .isEqualTo("96011");
     }
 
     @Test
@@ -93,8 +98,9 @@ public class SchoolNumberGenerationServiceTest {
         SchoolCategoryCodeEntity schoolCategoryCodeEntity = this.schoolCategoryCodeRepository.save(this.createSchoolCategoryCodeData("INDEPEND"));
         FacilityTypeCodeEntity facilityTypeCodeEntity = this.facilityTypeCodeRepository.save(this.createFacilityTypeCodeData("STANDARD"));
         String schoolNumber = this.schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), "d34972fe-49d7-9ef4-1e0f-e5a83ec77889");
-        assertThat(schoolNumber).isNotEmpty();
-        assertThat(schoolNumber).isEqualTo("96011");
+        assertThat(schoolNumber)
+                .isNotEmpty()
+                .isEqualTo("96011");
     }
 
     @Test
@@ -102,8 +108,9 @@ public class SchoolNumberGenerationServiceTest {
         SchoolCategoryCodeEntity schoolCategoryCodeEntity = this.schoolCategoryCodeRepository.save(this.createSchoolCategoryCodeData("INDP_FNS"));
         FacilityTypeCodeEntity facilityTypeCodeEntity = this.facilityTypeCodeRepository.save(this.createFacilityTypeCodeData("STANDARD"));
         String schoolNumber = this.schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
-        assertThat(schoolNumber).isNotEmpty();
-        assertThat(schoolNumber).isEqualTo("97011");
+        assertThat(schoolNumber)
+                .isNotEmpty()
+                .isEqualTo("97011");
     }
 
     @Test
@@ -111,8 +118,9 @@ public class SchoolNumberGenerationServiceTest {
         SchoolCategoryCodeEntity schoolCategoryCodeEntity = this.schoolCategoryCodeRepository.save(this.createSchoolCategoryCodeData("PUBLIC"));
         FacilityTypeCodeEntity facilityTypeCodeEntity = this.facilityTypeCodeRepository.save(this.createFacilityTypeCodeData("CONT_ED"));
         String schoolNumber = this.schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
-        assertThat(schoolNumber).isNotEmpty();
-        assertThat(schoolNumber).isEqualTo("03000");
+        assertThat(schoolNumber)
+                .isNotEmpty()
+                .isEqualTo("03000");
     }
 
     @Test
@@ -120,8 +128,9 @@ public class SchoolNumberGenerationServiceTest {
         SchoolCategoryCodeEntity schoolCategoryCodeEntity = this.schoolCategoryCodeRepository.save(this.createSchoolCategoryCodeData("EAR_LEARN"));
         FacilityTypeCodeEntity facilityTypeCodeEntity = this.facilityTypeCodeRepository.save(this.createFacilityTypeCodeData("STRONG_CEN"));
         String schoolNumber = this.schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
-        assertThat(schoolNumber).isNotEmpty();
-        assertThat(schoolNumber).isEqualTo("25011");
+        assertThat(schoolNumber)
+                .isNotEmpty()
+                .isEqualTo("25011");
     }
 
     @Test
@@ -129,8 +138,9 @@ public class SchoolNumberGenerationServiceTest {
         SchoolCategoryCodeEntity schoolCategoryCodeEntity = this.schoolCategoryCodeRepository.save(this.createSchoolCategoryCodeData("PUBLIC"));
         FacilityTypeCodeEntity facilityTypeCodeEntity = this.facilityTypeCodeRepository.save(this.createFacilityTypeCodeData("SHORT_PRP"));
         String schoolNumber = this.schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
-        assertThat(schoolNumber).isNotEmpty();
-        assertThat(schoolNumber).isEqualTo("95011");
+        assertThat(schoolNumber)
+                .isNotEmpty()
+                .isEqualTo("95011");
     }
 
     @Test
@@ -138,8 +148,9 @@ public class SchoolNumberGenerationServiceTest {
         SchoolCategoryCodeEntity schoolCategoryCodeEntity = this.schoolCategoryCodeRepository.save(this.createSchoolCategoryCodeData("YUKON"));
         FacilityTypeCodeEntity facilityTypeCodeEntity = this.facilityTypeCodeRepository.save(this.createFacilityTypeCodeData("SUMMER"));
         String schoolNumber = this.schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
-        assertThat(schoolNumber).isNotEmpty();
-        assertThat(schoolNumber).isEqualTo("90011");
+        assertThat(schoolNumber)
+                .isNotEmpty()
+                .isEqualTo("90011");
     }
 
     @Test
@@ -147,8 +158,9 @@ public class SchoolNumberGenerationServiceTest {
         SchoolCategoryCodeEntity schoolCategoryCodeEntity = this.schoolCategoryCodeRepository.save(this.createSchoolCategoryCodeData("PUBLIC"));
         FacilityTypeCodeEntity facilityTypeCodeEntity = this.facilityTypeCodeRepository.save(this.createFacilityTypeCodeData("YOUTH"));
         String schoolNumber = this.schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
-        assertThat(schoolNumber).isNotEmpty();
-        assertThat(schoolNumber).isEqualTo("94011");
+        assertThat(schoolNumber)
+                .isNotEmpty()
+                .isEqualTo("94011");
     }
 
     @Test
@@ -156,8 +168,9 @@ public class SchoolNumberGenerationServiceTest {
         SchoolCategoryCodeEntity schoolCategoryCodeEntity = this.schoolCategoryCodeRepository.save(this.createSchoolCategoryCodeData("POST_SEC"));
         FacilityTypeCodeEntity facilityTypeCodeEntity = this.facilityTypeCodeRepository.save(this.createFacilityTypeCodeData("POST_SEC"));
         String schoolNumber = this.schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
-        assertThat(schoolNumber).isNotEmpty();
-        assertThat(schoolNumber).isEqualTo("00011");
+        assertThat(schoolNumber)
+                .isNotEmpty()
+                .isEqualTo("00011");
     }
 
     private SchoolCategoryCodeEntity createSchoolCategoryCodeData(String code) {
