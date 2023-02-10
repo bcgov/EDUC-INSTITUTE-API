@@ -82,7 +82,7 @@ public class SchoolNumberGenerationService {
             return Integer.toString(Integer.parseInt(schoolNumber) + 1);
         });
 
-        map.put(FacilityCategoryLookup.ENTRY5, (districtNumber, authorityId) -> {// check logic
+        map.put(FacilityCategoryLookup.ENTRY5, (districtNumber, authorityId) -> {
             String schoolNumber = getLastSchoolNumberWithPattern(districtNumber, null, districtNumber + "0000%");
             if(isNullEmptyOrBlank(schoolNumber)) {
                 return districtNumber + "0000";
