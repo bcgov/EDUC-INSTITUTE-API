@@ -61,9 +61,11 @@ public class SchoolService {
 
   private final NoteRepository noteRepository;
 
+  private final SchoolNumberGenerationService schoolNumberGenerationService;
+
 
   @Autowired
-  public SchoolService(SchoolRepository schoolRepository, SchoolTombstoneRepository schoolTombstoneRepository, DistrictTombstoneRepository districtTombstoneRepository, SchoolHistoryService schoolHistoryService, SchoolContactRepository schoolContactRepository, NoteRepository noteRepository, DistrictRepository districtRepository, InstituteEventRepository instituteEventRepository) {
+  public SchoolService(SchoolRepository schoolRepository, SchoolTombstoneRepository schoolTombstoneRepository, DistrictTombstoneRepository districtTombstoneRepository, SchoolHistoryService schoolHistoryService, SchoolContactRepository schoolContactRepository, NoteRepository noteRepository, DistrictRepository districtRepository, InstituteEventRepository instituteEventRepository, SchoolNumberGenerationService schoolNumberGenerationService) {
     this.schoolRepository = schoolRepository;
     this.schoolTombstoneRepository = schoolTombstoneRepository;
     this.districtTombstoneRepository = districtTombstoneRepository;
@@ -71,6 +73,7 @@ public class SchoolService {
     this.schoolContactRepository = schoolContactRepository;
     this.noteRepository = noteRepository;
     this.instituteEventRepository = instituteEventRepository;
+    this.schoolNumberGenerationService = schoolNumberGenerationService;
   }
 
   public List<SchoolTombstoneEntity> getAllSchoolsList() {
@@ -89,7 +92,7 @@ public class SchoolService {
       schoolEntity.setDistrictEntity(district.get());
     }
 
-    schoolEntity.setSchoolNumber(generateNextSchoolNumber());
+    schoolEntity.setSchoolNumber(schoolNumberGenerationService.generateSchoolNumber(district.get().getDistrictNumber(), school.getFacilityTypeCode(), school.getSchoolCategoryCode(), school.getIndependentAuthorityId()));
 
     schoolEntity.getAddresses().stream().forEach(address -> {
       RequestUtil.setAuditColumnsForAddress(address);
@@ -115,17 +118,6 @@ public class SchoolService {
     final InstituteEvent instituteEvent = EventUtil.createInstituteEvent(schoolEntity.getUpdateUser(), schoolEntity.getUpdateUser(), JsonUtil.getJsonStringFromObject(SchoolMapper.mapper.toStructure(schoolEntity)), CREATE_SCHOOL, SCHOOL_CREATED);
     instituteEventRepository.save(instituteEvent);
     return Pair.of(schoolEntity, instituteEvent);
-  }
-
-  private String generateNextSchoolNumber() {
-    Integer nextSchoolNumber = 79051; //edx-609 we will start from 79051 to 80000. This is the range for data cleanup if necessary
-    Integer lastSchoolNumber = Integer.parseInt(schoolRepository.findLastSchoolNumber());
-
-    if (nextSchoolNumber <= lastSchoolNumber) {
-      nextSchoolNumber = lastSchoolNumber + 1;
-    }
-
-    return nextSchoolNumber.toString();
   }
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)

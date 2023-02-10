@@ -8,6 +8,7 @@ import ca.bc.gov.educ.api.institute.mapper.v1.SchoolMapper;
 import ca.bc.gov.educ.api.institute.model.v1.*;
 import ca.bc.gov.educ.api.institute.repository.v1.*;
 import ca.bc.gov.educ.api.institute.service.v1.CodeTableService;
+import ca.bc.gov.educ.api.institute.service.v1.SchoolNumberGenerationService;
 import ca.bc.gov.educ.api.institute.struct.v1.*;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -107,6 +108,9 @@ public class SchoolControllerTest {
 
   @Autowired
   SchoolGradeCodeRepository schoolGradeCodeRepository;
+
+  @Autowired
+  SchoolNumberGenerationService schoolNumberGenerationService;
 
 
   @Autowired
@@ -428,10 +432,8 @@ public class SchoolControllerTest {
   @Test
   void testCreateSchool_GivenValidPayload_ShouldReturnStatusOK() throws Exception {
     final DistrictTombstoneEntity dist = this.districtTombstoneRepository.save(this.createDistrictData());
-    final var existingSchool = this.createSchoolData();
-    this.schoolRepository.save(existingSchool);
 
-    var schoolEntity = this.createSchoolData();
+    var schoolEntity = this.createNewSchoolData(null, "PUBLIC", "DISTONLINE");
     SchoolMapper map = SchoolMapper.mapper;
 
     School mappedSchool = map.toStructure(schoolEntity);
@@ -451,6 +453,7 @@ public class SchoolControllerTest {
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SCHOOL"))))
       .andDo(print())
       .andExpect(status().isCreated())
+      .andExpect(MockMvcResultMatchers.jsonPath("$.schoolNumber").exists())
       .andExpect(MockMvcResultMatchers.jsonPath("$.displayName").value(mappedSchool.getDisplayName()));
   }
 
@@ -850,14 +853,20 @@ public class SchoolControllerTest {
   }
 
   private SchoolEntity createSchoolData() {
-    return SchoolEntity.builder().schoolNumber("12345").displayName("School Name").openedDate(LocalDateTime.now().minusDays(1).withNano(0)).schoolCategoryCode("PUB_SCHL")
-      .schoolOrganizationCode("TWO_SEM").facilityTypeCode("STAND_SCHL").website("abc@sd99.edu").createDate(LocalDateTime.now().withNano(0))
+    return SchoolEntity.builder().schoolNumber("12345").displayName("School Name").openedDate(LocalDateTime.now().minusDays(1).withNano(0)).schoolCategoryCode("PUBLIC")
+      .schoolOrganizationCode("TWO_SEM").facilityTypeCode("DISTONLINE").website("abc@sd99.edu").createDate(LocalDateTime.now().withNano(0))
       .updateDate(LocalDateTime.now().withNano(0)).createUser("TEST").updateUser("TEST").build();
   }
 
+  private SchoolEntity createNewSchoolData(String schoolNumber, String schoolCategory, String facilityTypeCode) {
+    return SchoolEntity.builder().schoolNumber(schoolNumber).displayName("School Name").openedDate(LocalDateTime.now().minusDays(1).withNano(0)).schoolCategoryCode(schoolCategory)
+            .schoolOrganizationCode("TWO_SEM").facilityTypeCode(facilityTypeCode).website("abc@sd99.edu").createDate(LocalDateTime.now().withNano(0))
+            .updateDate(LocalDateTime.now().withNano(0)).createUser("TEST").updateUser("TEST").build();
+  }
+
   private SchoolHistoryEntity createHistorySchoolData(UUID schoolId) {
-    return SchoolHistoryEntity.builder().schoolId(schoolId).schoolNumber("003").displayName("School Name").openedDate(LocalDateTime.now().minusDays(1)).schoolCategoryCode("PUB_SCHL")
-      .schoolOrganizationCode("TWO_SEM").phoneNumber("1112223333").facilityTypeCode("STAND_SCHL").website("abc@sd99.edu").createDate(LocalDateTime.now())
+    return SchoolHistoryEntity.builder().schoolId(schoolId).schoolNumber("003").displayName("School Name").openedDate(LocalDateTime.now().minusDays(1)).schoolCategoryCode("PUBLIC")
+      .schoolOrganizationCode("TWO_SEM").phoneNumber("1112223333").facilityTypeCode("DISTONLINE").website("abc@sd99.edu").createDate(LocalDateTime.now())
       .updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
   }
 
@@ -883,13 +892,13 @@ public class SchoolControllerTest {
   }
 
   private SchoolCategoryCodeEntity createSchoolCategoryCodeData() {
-    return SchoolCategoryCodeEntity.builder().schoolCategoryCode("PUB_SCHL").description("Public School")
+    return SchoolCategoryCodeEntity.builder().schoolCategoryCode("PUBLIC").description("Public School")
       .effectiveDate(LocalDateTime.now()).expiryDate(LocalDateTime.MAX).displayOrder(1).label("Public School").createDate(LocalDateTime.now())
       .updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
   }
 
   private FacilityTypeCodeEntity createFacilityTypeCodeData() {
-    return FacilityTypeCodeEntity.builder().facilityTypeCode("STAND_SCHL").description("Standard School")
+    return FacilityTypeCodeEntity.builder().facilityTypeCode("DISTONLINE").description("Standard School")
       .effectiveDate(LocalDateTime.now()).expiryDate(LocalDateTime.MAX).displayOrder(1).label("Standard School").createDate(LocalDateTime.now())
       .updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
   }

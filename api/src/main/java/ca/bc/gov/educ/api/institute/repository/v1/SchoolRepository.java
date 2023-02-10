@@ -11,8 +11,31 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 public interface SchoolRepository extends JpaRepository<SchoolEntity, UUID>, JpaSpecificationExecutor<SchoolEntity> {
+  @Transactional
+  @Query(value = "SELECT MAX(S.SCHOOL_NUMBER)\n" +
+          "FROM SCHOOL S, DISTRICT D\n" +
+          "WHERE S.DISTRICT_ID = D.DISTRICT_ID\n" +
+          "AND D.DISTRICT_NUMBER = :districtNumber\n" +
+          "AND S.SCHOOL_NUMBER LIKE :pattern \n" +
+          "AND S.INDEPENDENT_AUTHORITY_ID IS NOT DISTINCT FROM :authorityId", nativeQuery = true)
+  String findLastSchoolNumberWithPattern(String districtNumber, UUID authorityId, String pattern);
 
   @Transactional
-  @Query(value = "select school_number from SCHOOL where CAST(school_number as int) < 80000 order by CAST(school_number as int) desc LIMIT 1", nativeQuery = true)
-  String findLastSchoolNumber();
+  @Query(value = "SELECT MAX(S.SCHOOL_NUMBER)\n" +
+          "FROM SCHOOL S, DISTRICT D\n" +
+          "WHERE S.DISTRICT_ID = D.DISTRICT_ID\n" +
+          "AND D.DISTRICT_NUMBER = :districtNumber\n" +
+          "AND S.INDEPENDENT_AUTHORITY_ID IS NOT DISTINCT FROM :authorityId", nativeQuery = true)
+  String findLastSchoolNumber(String districtNumber, UUID authorityId);
+
+  @Transactional
+  @Query(value = "SELECT MIN(S.ID) AS MISSING_NUM\n" +
+          "FROM generate_series(:lowerRange, :upperRange) S(ID)\n" +
+          "WHERE NOT EXISTS\n" +
+          "(SELECT 1 FROM SCHOOL SCH, DISTRICT DIS\n" +
+          "WHERE CAST(SCH.SCHOOL_NUMBER as INTEGER) = S.ID\n" +
+          "AND SCH.DISTRICT_ID = DIS.DISTRICT_ID\n" +
+          "AND DIS.DISTRICT_NUMBER = :districtNumber\n" +
+          "AND SCH.INDEPENDENT_AUTHORITY_ID IS NOT DISTINCT FROM :authorityId)", nativeQuery = true)
+  Integer findFirstAvailableSchoolNumber(String districtNumber, UUID authorityId, Integer lowerRange, Integer upperRange);
 }
