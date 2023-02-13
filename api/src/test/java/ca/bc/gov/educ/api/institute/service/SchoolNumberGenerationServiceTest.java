@@ -6,9 +6,9 @@ import ca.bc.gov.educ.api.institute.model.v1.SchoolCategoryCodeEntity;
 import ca.bc.gov.educ.api.institute.repository.v1.*;
 import ca.bc.gov.educ.api.institute.service.v1.SchoolNumberGenerationService;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,11 +34,11 @@ public class SchoolNumberGenerationServiceTest {
     @Autowired
     SchoolCategoryCodeRepository schoolCategoryCodeRepository;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
     }
-    @After
+    @AfterEach
     public void tearDown() {
         schoolCategoryCodeRepository.deleteAll();
         schoolCategoryCodeRepository.deleteAll();
