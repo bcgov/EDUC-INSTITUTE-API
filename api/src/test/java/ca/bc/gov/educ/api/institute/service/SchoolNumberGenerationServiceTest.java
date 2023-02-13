@@ -7,25 +7,21 @@ import ca.bc.gov.educ.api.institute.model.v1.SchoolCategoryCodeEntity;
 import ca.bc.gov.educ.api.institute.repository.v1.*;
 import ca.bc.gov.educ.api.institute.service.v1.SchoolNumberGenerationService;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.runner.RunWith;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@RunWith(SpringRunner.class)
 @ActiveProfiles("test")
 @SpringBootTest(classes = { InstituteApiResourceApplication.class })
-@AutoConfigureMockMvc
 public class SchoolNumberGenerationServiceTest {
 
     @Autowired
@@ -176,11 +172,14 @@ public class SchoolNumberGenerationServiceTest {
                 .isEqualTo("00011");
     }
 
-    @Test(expected = InvalidParameterException.class)
+    @Test
     public void testCreateSchool_givenSchoolCode_givenFacilityCode_shouldThrowError() {
         SchoolCategoryCodeEntity schoolCategoryCodeEntity = this.schoolCategoryCodeRepository.save(this.createSchoolCategoryCodeData("POST_SEC"));
         FacilityTypeCodeEntity facilityTypeCodeEntity = this.facilityTypeCodeRepository.save(this.createFacilityTypeCodeData("YOUTH"));
-        String schoolNumber = this.schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
+        Assertions.assertThrows(InvalidParameterException.class, () -> {
+            this.schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
+        });
+
     }
 
     private SchoolCategoryCodeEntity createSchoolCategoryCodeData(String code) {
