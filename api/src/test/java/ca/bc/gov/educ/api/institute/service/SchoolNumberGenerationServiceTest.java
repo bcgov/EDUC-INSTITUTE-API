@@ -2,8 +2,10 @@ package ca.bc.gov.educ.api.institute.service;
 
 import ca.bc.gov.educ.api.institute.InstituteApiResourceApplication;
 import ca.bc.gov.educ.api.institute.exception.InvalidParameterException;
+import ca.bc.gov.educ.api.institute.model.v1.DistrictTombstoneEntity;
 import ca.bc.gov.educ.api.institute.model.v1.FacilityTypeCodeEntity;
 import ca.bc.gov.educ.api.institute.model.v1.SchoolCategoryCodeEntity;
+import ca.bc.gov.educ.api.institute.model.v1.SchoolEntity;
 import ca.bc.gov.educ.api.institute.repository.v1.*;
 import ca.bc.gov.educ.api.institute.service.v1.SchoolNumberGenerationService;
 
@@ -35,6 +37,10 @@ public class SchoolNumberGenerationServiceTest {
 
     @Autowired
     private SchoolCategoryCodeRepository schoolCategoryCodeRepository;
+    @Autowired
+    SchoolRepository schoolRepository;
+    @Autowired
+    DistrictTombstoneRepository districtTombstoneRepository;
 
     @Before
     public void setUp() {
@@ -44,11 +50,17 @@ public class SchoolNumberGenerationServiceTest {
     public void tearDown() {
         schoolCategoryCodeRepository.deleteAll();
         facilityTypeCodeRepository.deleteAll();
+        schoolRepository.deleteAll();
+        districtTombstoneRepository.deleteAll();
     }
     @Test
     public void testCreateSchool_givenSchoolCodePUBLIC_givenFacilityCodeDISTLEARN_shouldCreateValidSchoolNumber() {
         SchoolCategoryCodeEntity schoolCategoryCodeEntity = schoolCategoryCodeRepository.save(createSchoolCategoryCodeData("PUBLIC"));
         FacilityTypeCodeEntity facilityTypeCodeEntity = facilityTypeCodeRepository.save(createFacilityTypeCodeData("DIST_LEARN"));
+        final DistrictTombstoneEntity dist = districtTombstoneRepository.save(createDistrictData());
+        var schoolEntity = this.createSchoolData("PUBLIC", "DIST_LEARN");
+        schoolEntity.setDistrictEntity(dist);
+        this.schoolRepository.save(schoolEntity);
         String schoolNumber = schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
         assertThat(schoolNumber)
                 .isNotEmpty()
@@ -192,5 +204,14 @@ public class SchoolNumberGenerationServiceTest {
         return FacilityTypeCodeEntity.builder().facilityTypeCode(code).description("Standard School")
                 .effectiveDate(LocalDateTime.now()).expiryDate(LocalDateTime.MAX).displayOrder(1).label("Standard School").createDate(LocalDateTime.now())
                 .updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
+    }
+    private DistrictTombstoneEntity createDistrictData() {
+        return DistrictTombstoneEntity.builder().districtNumber("003").displayName("District Name").districtStatusCode("OPEN").districtRegionCode("KOOTENAYS")
+                .website("abc@sd99.edu").createDate(LocalDateTime.now()).updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
+    }
+    private SchoolEntity createSchoolData(String schoolCategory, String facilityTypeCode) {
+        return SchoolEntity.builder().schoolNumber("12334").displayName("School Name").openedDate(LocalDateTime.now().minusDays(1).withNano(0)).schoolCategoryCode(schoolCategory)
+                .schoolOrganizationCode("TWO_SEM").facilityTypeCode(facilityTypeCode).website("abc@sd99.edu").createDate(LocalDateTime.now().withNano(0))
+                .updateDate(LocalDateTime.now().withNano(0)).createUser("TEST").updateUser("TEST").build();
     }
 }
