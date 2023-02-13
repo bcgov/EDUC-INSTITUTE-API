@@ -6,7 +6,7 @@ import ca.bc.gov.educ.api.institute.model.v1.FacilityTypeCodeEntity;
 import ca.bc.gov.educ.api.institute.model.v1.SchoolCategoryCodeEntity;
 import ca.bc.gov.educ.api.institute.repository.v1.*;
 import ca.bc.gov.educ.api.institute.service.v1.SchoolNumberGenerationService;
-import lombok.extern.slf4j.Slf4j;
+
 import org.junit.Test;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
