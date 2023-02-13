@@ -175,15 +175,12 @@ public class SchoolNumberGenerationServiceTest {
                 .isEqualTo("00011");
     }
 
-//    @Test
-//    public void testCreateSchool_givenSchoolCode_givenFacilityCode_shouldThrowError() {
-//        SchoolCategoryCodeEntity schoolCategoryCodeEntity = this.schoolCategoryCodeRepository.save(this.createSchoolCategoryCodeData("POST_SEC"));
-//        FacilityTypeCodeEntity facilityTypeCodeEntity = this.facilityTypeCodeRepository.save(this.createFacilityTypeCodeData("YOUTH"));
-//        Assertions.assertThrows(InvalidParameterException.class, () -> {
-//            this.schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
-//        });
-//
-//    }
+    @Test(expected = InvalidParameterException.class)
+    public void testCreateSchool_givenSchoolCode_givenFacilityCode_shouldThrowError() {
+        SchoolCategoryCodeEntity schoolCategoryCodeEntity = this.schoolCategoryCodeRepository.save(this.createSchoolCategoryCodeData("POST_SEC"));
+        FacilityTypeCodeEntity facilityTypeCodeEntity = this.facilityTypeCodeRepository.save(this.createFacilityTypeCodeData("YOUTH"));
+        this.schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
+    }
 
     private SchoolCategoryCodeEntity createSchoolCategoryCodeData(String code) {
         return SchoolCategoryCodeEntity.builder().schoolCategoryCode(code).description("Public School")
