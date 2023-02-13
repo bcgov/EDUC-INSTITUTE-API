@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.institute.service;
 
+import ca.bc.gov.educ.api.institute.InstituteApiResourceApplication;
 import ca.bc.gov.educ.api.institute.exception.InvalidParameterException;
 import ca.bc.gov.educ.api.institute.model.v1.FacilityTypeCodeEntity;
 import ca.bc.gov.educ.api.institute.model.v1.SchoolCategoryCodeEntity;
@@ -22,7 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
 @ActiveProfiles("test")
-@SpringBootTest
+@SpringBootTest(classes = { InstituteApiResourceApplication.class })
 @Slf4j
 public class SchoolNumberGenerationServiceTest {
 
