@@ -72,13 +72,27 @@ public class SchoolNumberGenerationServiceTest {
         SchoolCategoryCodeEntity schoolCategoryCodeEntity = schoolCategoryCodeRepository.save(createSchoolCategoryCodeData("PUBLIC"));
         FacilityTypeCodeEntity facilityTypeCodeEntity = facilityTypeCodeRepository.save(createFacilityTypeCodeData("DIST_LEARN"));
         final DistrictTombstoneEntity dist = districtTombstoneRepository.save(createDistrictData());
-        var schoolEntity = this.createSchoolDataWithMaxSchoolNumber("PUBLIC", "DIST_LEARN");
+        var schoolEntity = this.createSchoolDataWithSchoolNumber("99999","PUBLIC", "DIST_LEARN");
         schoolEntity.setDistrictEntity(dist);
         this.schoolRepository.save(schoolEntity);
         String schoolNumber = schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
         assertThat(schoolNumber)
                 .isNotEmpty()
                 .startsWith("990");
+    }
+
+    @Test
+    public void testCreateSchool_givenSchoolCodePUBLIC_givenFacilityCodeDISTLEARN_shouldGetNextSchoolNumber() {
+        SchoolCategoryCodeEntity schoolCategoryCodeEntity = schoolCategoryCodeRepository.save(createSchoolCategoryCodeData("PUBLIC"));
+        FacilityTypeCodeEntity facilityTypeCodeEntity = facilityTypeCodeRepository.save(createFacilityTypeCodeData("DIST_LEARN"));
+        final DistrictTombstoneEntity dist = districtTombstoneRepository.save(createDistrictData());
+        var schoolEntity = this.createSchoolDataWithSchoolNumber("99997","PUBLIC", "DIST_LEARN");
+        schoolEntity.setDistrictEntity(dist);
+        this.schoolRepository.save(schoolEntity);
+        String schoolNumber = schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
+        assertThat(schoolNumber)
+                .isNotEmpty()
+                .isEqualTo("99998");
     }
 
     @Test
@@ -229,8 +243,8 @@ public class SchoolNumberGenerationServiceTest {
                 .updateDate(LocalDateTime.now().withNano(0)).createUser("TEST").updateUser("TEST").build();
     }
 
-    private SchoolEntity createSchoolDataWithMaxSchoolNumber(String schoolCategory, String facilityTypeCode) {
-        return SchoolEntity.builder().schoolNumber("99999").displayName("School Name").openedDate(LocalDateTime.now().minusDays(1).withNano(0)).schoolCategoryCode(schoolCategory)
+    private SchoolEntity createSchoolDataWithSchoolNumber(String schoolNumber, String schoolCategory, String facilityTypeCode) {
+        return SchoolEntity.builder().schoolNumber(schoolNumber).displayName("School Name").openedDate(LocalDateTime.now().minusDays(1).withNano(0)).schoolCategoryCode(schoolCategory)
                 .schoolOrganizationCode("TWO_SEM").facilityTypeCode(facilityTypeCode).website("abc@sd99.edu").createDate(LocalDateTime.now().withNano(0))
                 .updateDate(LocalDateTime.now().withNano(0)).createUser("TEST").updateUser("TEST").build();
     }
