@@ -47,9 +47,9 @@ public class SchoolNumberGenerationServiceTest {
     }
     @Test
     public void testCreateSchool_givenSchoolCodePUBLIC_givenFacilityCodeDISTLEARN_shouldCreateValidSchoolNumber() {
-        SchoolCategoryCodeEntity schoolCategoryCodeEntity = this.schoolCategoryCodeRepository.save(this.createSchoolCategoryCodeData("PUBLIC"));
-        FacilityTypeCodeEntity facilityTypeCodeEntity = this.facilityTypeCodeRepository.save(this.createFacilityTypeCodeData("DIST_LEARN"));
-        String schoolNumber = this.schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
+        SchoolCategoryCodeEntity schoolCategoryCodeEntity = schoolCategoryCodeRepository.save(createSchoolCategoryCodeData("PUBLIC"));
+        FacilityTypeCodeEntity facilityTypeCodeEntity = facilityTypeCodeRepository.save(createFacilityTypeCodeData("DIST_LEARN"));
+        String schoolNumber = schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
         assertThat(schoolNumber)
                 .isNotEmpty()
                 .isEqualTo("99011");
@@ -57,9 +57,9 @@ public class SchoolNumberGenerationServiceTest {
 
     @Test
     public void testCreateSchool_givenSchoolCodeYUKON_givenFacilityCodeDISTONLINE_shouldCreateValidSchoolNumber() {
-        SchoolCategoryCodeEntity schoolCategoryCodeEntity = this.schoolCategoryCodeRepository.save(this.createSchoolCategoryCodeData("YUKON"));
-        FacilityTypeCodeEntity facilityTypeCodeEntity = this.facilityTypeCodeRepository.save(this.createFacilityTypeCodeData("DISTONLINE"));
-        String schoolNumber = this.schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
+        SchoolCategoryCodeEntity schoolCategoryCodeEntity = schoolCategoryCodeRepository.save(createSchoolCategoryCodeData("YUKON"));
+        FacilityTypeCodeEntity facilityTypeCodeEntity = facilityTypeCodeRepository.save(createFacilityTypeCodeData("DISTONLINE"));
+        String schoolNumber = schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
         assertThat(schoolNumber)
                 .isNotEmpty()
                 .isEqualTo("99011");
@@ -67,9 +67,9 @@ public class SchoolNumberGenerationServiceTest {
 
     @Test
     public void testCreateSchool_givenSchoolCodeINDEPEND_givenFacilityCodeALT_PROGS_shouldCreateValidSchoolNumber() {
-        SchoolCategoryCodeEntity schoolCategoryCodeEntity = this.schoolCategoryCodeRepository.save(this.createSchoolCategoryCodeData("INDEPEND"));
-        FacilityTypeCodeEntity facilityTypeCodeEntity = this.facilityTypeCodeRepository.save(this.createFacilityTypeCodeData("ALT_PROGS"));
-        String schoolNumber = this.schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
+        SchoolCategoryCodeEntity schoolCategoryCodeEntity = schoolCategoryCodeRepository.save(createSchoolCategoryCodeData("INDEPEND"));
+        FacilityTypeCodeEntity facilityTypeCodeEntity = facilityTypeCodeRepository.save(createFacilityTypeCodeData("ALT_PROGS"));
+        String schoolNumber = schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
         assertThat(schoolNumber)
                 .isNotEmpty()
                 .isEqualTo("99011");
@@ -77,9 +77,9 @@ public class SchoolNumberGenerationServiceTest {
 
     @Test
     public void testCreateSchool_givenSchoolCodePUBLIC_givenFacilityCodeSTANDARD_shouldCreateValidSchoolNumber() {
-        SchoolCategoryCodeEntity schoolCategoryCodeEntity = this.schoolCategoryCodeRepository.save(this.createSchoolCategoryCodeData("PUBLIC"));
-        FacilityTypeCodeEntity facilityTypeCodeEntity = this.facilityTypeCodeRepository.save(this.createFacilityTypeCodeData("STANDARD"));
-        String schoolNumber = this.schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
+        SchoolCategoryCodeEntity schoolCategoryCodeEntity = schoolCategoryCodeRepository.save(createSchoolCategoryCodeData("PUBLIC"));
+        FacilityTypeCodeEntity facilityTypeCodeEntity = facilityTypeCodeRepository.save(createFacilityTypeCodeData("STANDARD"));
+        String schoolNumber = schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
         assertThat(schoolNumber)
                 .isNotEmpty()
                 .isEqualTo("03011");
@@ -87,9 +87,9 @@ public class SchoolNumberGenerationServiceTest {
 
     @Test
     public void testCreateSchool_givenSchoolCodeOFFSHORE_givenFacilityCodeSTANDARD_shouldCreateValidSchoolNumber() {
-        SchoolCategoryCodeEntity schoolCategoryCodeEntity = this.schoolCategoryCodeRepository.save(this.createSchoolCategoryCodeData("OFFSHORE"));
-        FacilityTypeCodeEntity facilityTypeCodeEntity = this.facilityTypeCodeRepository.save(this.createFacilityTypeCodeData("STANDARD"));
-        String schoolNumber = this.schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), "d34972fe-49d7-9ef4-1e0f-e5a83ec77889");
+        SchoolCategoryCodeEntity schoolCategoryCodeEntity = schoolCategoryCodeRepository.save(createSchoolCategoryCodeData("OFFSHORE"));
+        FacilityTypeCodeEntity facilityTypeCodeEntity = facilityTypeCodeRepository.save(createFacilityTypeCodeData("STANDARD"));
+        String schoolNumber = schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), "d34972fe-49d7-9ef4-1e0f-e5a83ec77889");
         assertThat(schoolNumber)
                 .isNotEmpty()
                 .isEqualTo("96011");
@@ -97,9 +97,9 @@ public class SchoolNumberGenerationServiceTest {
 
     @Test
     public void testCreateSchool_givenSchoolCodeINDEPEND_givenFacilityCodeSTANDARD_shouldCreateValidSchoolNumber() {
-        SchoolCategoryCodeEntity schoolCategoryCodeEntity = this.schoolCategoryCodeRepository.save(this.createSchoolCategoryCodeData("INDEPEND"));
-        FacilityTypeCodeEntity facilityTypeCodeEntity = this.facilityTypeCodeRepository.save(this.createFacilityTypeCodeData("STANDARD"));
-        String schoolNumber = this.schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), "d34972fe-49d7-9ef4-1e0f-e5a83ec77889");
+        SchoolCategoryCodeEntity schoolCategoryCodeEntity = schoolCategoryCodeRepository.save(createSchoolCategoryCodeData("INDEPEND"));
+        FacilityTypeCodeEntity facilityTypeCodeEntity = facilityTypeCodeRepository.save(createFacilityTypeCodeData("STANDARD"));
+        String schoolNumber = schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), "d34972fe-49d7-9ef4-1e0f-e5a83ec77889");
         assertThat(schoolNumber)
                 .isNotEmpty()
                 .isEqualTo("96011");
@@ -107,9 +107,9 @@ public class SchoolNumberGenerationServiceTest {
 
     @Test
     public void testCreateSchool_givenSchoolCodeINDP_FNS_givenFacilityCodeSTANDARD_shouldCreateValidSchoolNumber() {
-        SchoolCategoryCodeEntity schoolCategoryCodeEntity = this.schoolCategoryCodeRepository.save(this.createSchoolCategoryCodeData("INDP_FNS"));
-        FacilityTypeCodeEntity facilityTypeCodeEntity = this.facilityTypeCodeRepository.save(this.createFacilityTypeCodeData("STANDARD"));
-        String schoolNumber = this.schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
+        SchoolCategoryCodeEntity schoolCategoryCodeEntity = schoolCategoryCodeRepository.save(createSchoolCategoryCodeData("INDP_FNS"));
+        FacilityTypeCodeEntity facilityTypeCodeEntity = facilityTypeCodeRepository.save(createFacilityTypeCodeData("STANDARD"));
+        String schoolNumber = schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
         assertThat(schoolNumber)
                 .isNotEmpty()
                 .isEqualTo("97011");
@@ -117,9 +117,9 @@ public class SchoolNumberGenerationServiceTest {
 
     @Test
     public void testCreateSchool_givenSchoolCodePUBLIC_givenFacilityCodeCONT_ED_shouldCreateValidSchoolNumber() {
-        SchoolCategoryCodeEntity schoolCategoryCodeEntity = this.schoolCategoryCodeRepository.save(this.createSchoolCategoryCodeData("PUBLIC"));
-        FacilityTypeCodeEntity facilityTypeCodeEntity = this.facilityTypeCodeRepository.save(this.createFacilityTypeCodeData("CONT_ED"));
-        String schoolNumber = this.schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
+        SchoolCategoryCodeEntity schoolCategoryCodeEntity = schoolCategoryCodeRepository.save(createSchoolCategoryCodeData("PUBLIC"));
+        FacilityTypeCodeEntity facilityTypeCodeEntity = facilityTypeCodeRepository.save(createFacilityTypeCodeData("CONT_ED"));
+        String schoolNumber = schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
         assertThat(schoolNumber)
                 .isNotEmpty()
                 .isEqualTo("03000");
@@ -127,9 +127,9 @@ public class SchoolNumberGenerationServiceTest {
 
     @Test
     public void testCreateSchool_givenSchoolCodeEAR_LEARN_givenFacilityCodeSTRONG_CEN_shouldCreateValidSchoolNumber() {
-        SchoolCategoryCodeEntity schoolCategoryCodeEntity = this.schoolCategoryCodeRepository.save(this.createSchoolCategoryCodeData("EAR_LEARN"));
-        FacilityTypeCodeEntity facilityTypeCodeEntity = this.facilityTypeCodeRepository.save(this.createFacilityTypeCodeData("STRONG_CEN"));
-        String schoolNumber = this.schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
+        SchoolCategoryCodeEntity schoolCategoryCodeEntity = schoolCategoryCodeRepository.save(createSchoolCategoryCodeData("EAR_LEARN"));
+        FacilityTypeCodeEntity facilityTypeCodeEntity = facilityTypeCodeRepository.save(createFacilityTypeCodeData("STRONG_CEN"));
+        String schoolNumber = schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
         assertThat(schoolNumber)
                 .isNotEmpty()
                 .isEqualTo("25011");
@@ -137,9 +137,9 @@ public class SchoolNumberGenerationServiceTest {
 
     @Test
     public void testCreateSchool_givenSchoolCodePUBLIC_givenFacilityCodeSHORT_PRP_shouldCreateValidSchoolNumber() {
-        SchoolCategoryCodeEntity schoolCategoryCodeEntity = this.schoolCategoryCodeRepository.save(this.createSchoolCategoryCodeData("PUBLIC"));
-        FacilityTypeCodeEntity facilityTypeCodeEntity = this.facilityTypeCodeRepository.save(this.createFacilityTypeCodeData("SHORT_PRP"));
-        String schoolNumber = this.schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
+        SchoolCategoryCodeEntity schoolCategoryCodeEntity = schoolCategoryCodeRepository.save(createSchoolCategoryCodeData("PUBLIC"));
+        FacilityTypeCodeEntity facilityTypeCodeEntity = facilityTypeCodeRepository.save(createFacilityTypeCodeData("SHORT_PRP"));
+        String schoolNumber = schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
         assertThat(schoolNumber)
                 .isNotEmpty()
                 .isEqualTo("95011");
@@ -147,9 +147,9 @@ public class SchoolNumberGenerationServiceTest {
 
     @Test
     public void testCreateSchool_givenSchoolCodeYUKON_givenFacilityCodeSUMMER_shouldCreateValidSchoolNumber() {
-        SchoolCategoryCodeEntity schoolCategoryCodeEntity = this.schoolCategoryCodeRepository.save(this.createSchoolCategoryCodeData("YUKON"));
-        FacilityTypeCodeEntity facilityTypeCodeEntity = this.facilityTypeCodeRepository.save(this.createFacilityTypeCodeData("SUMMER"));
-        String schoolNumber = this.schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
+        SchoolCategoryCodeEntity schoolCategoryCodeEntity = schoolCategoryCodeRepository.save(createSchoolCategoryCodeData("YUKON"));
+        FacilityTypeCodeEntity facilityTypeCodeEntity = facilityTypeCodeRepository.save(createFacilityTypeCodeData("SUMMER"));
+        String schoolNumber = schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
         assertThat(schoolNumber)
                 .isNotEmpty()
                 .isEqualTo("90011");
@@ -157,9 +157,9 @@ public class SchoolNumberGenerationServiceTest {
 
     @Test
     public void testCreateSchool_givenSchoolCodePUBLIC_givenFacilityCodeYOUTH_shouldCreateValidSchoolNumber() {
-        SchoolCategoryCodeEntity schoolCategoryCodeEntity = this.schoolCategoryCodeRepository.save(this.createSchoolCategoryCodeData("PUBLIC"));
-        FacilityTypeCodeEntity facilityTypeCodeEntity = this.facilityTypeCodeRepository.save(this.createFacilityTypeCodeData("YOUTH"));
-        String schoolNumber = this.schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
+        SchoolCategoryCodeEntity schoolCategoryCodeEntity = schoolCategoryCodeRepository.save(createSchoolCategoryCodeData("PUBLIC"));
+        FacilityTypeCodeEntity facilityTypeCodeEntity = facilityTypeCodeRepository.save(createFacilityTypeCodeData("YOUTH"));
+        String schoolNumber = schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
         assertThat(schoolNumber)
                 .isNotEmpty()
                 .isEqualTo("94011");
@@ -167,9 +167,9 @@ public class SchoolNumberGenerationServiceTest {
 
     @Test
     public void testCreateSchool_givenSchoolCodePOST_SEC_givenFacilityCodePOST_SEC_shouldCreateValidSchoolNumber() {
-        SchoolCategoryCodeEntity schoolCategoryCodeEntity = this.schoolCategoryCodeRepository.save(this.createSchoolCategoryCodeData("POST_SEC"));
-        FacilityTypeCodeEntity facilityTypeCodeEntity = this.facilityTypeCodeRepository.save(this.createFacilityTypeCodeData("POST_SEC"));
-        String schoolNumber = this.schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
+        SchoolCategoryCodeEntity schoolCategoryCodeEntity = schoolCategoryCodeRepository.save(createSchoolCategoryCodeData("POST_SEC"));
+        FacilityTypeCodeEntity facilityTypeCodeEntity = facilityTypeCodeRepository.save(createFacilityTypeCodeData("POST_SEC"));
+        String schoolNumber = schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
         assertThat(schoolNumber)
                 .isNotEmpty()
                 .isEqualTo("00011");
@@ -177,8 +177,8 @@ public class SchoolNumberGenerationServiceTest {
 
     @Test(expected = InvalidParameterException.class)
     public void testCreateSchool_givenSchoolCode_givenFacilityCode_shouldThrowError() {
-        SchoolCategoryCodeEntity schoolCategoryCodeEntity = this.schoolCategoryCodeRepository.save(this.createSchoolCategoryCodeData("POST_SEC"));
-        FacilityTypeCodeEntity facilityTypeCodeEntity = this.facilityTypeCodeRepository.save(this.createFacilityTypeCodeData("YOUTH"));
+        SchoolCategoryCodeEntity schoolCategoryCodeEntity = schoolCategoryCodeRepository.save(createSchoolCategoryCodeData("POST_SEC"));
+        FacilityTypeCodeEntity facilityTypeCodeEntity = facilityTypeCodeRepository.save(createFacilityTypeCodeData("YOUTH"));
         this.schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
     }
 
