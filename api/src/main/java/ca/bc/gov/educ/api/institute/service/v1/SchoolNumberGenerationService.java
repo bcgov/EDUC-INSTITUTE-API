@@ -63,9 +63,9 @@ public class SchoolNumberGenerationService {
             if(isNullEmptyOrBlank(schoolNumber)) {
                 return pattern + "011";
             } else if(Integer.parseInt(schoolNumber) == getUpperBoundNumber(pattern)) {
-                return getFirstAvailableSchoolNumber(districtNumber, null, getLowerBoundNumber(pattern), getUpperBoundNumber(pattern)).toString();
+                return String.format("%05d", getFirstAvailableSchoolNumber(districtNumber, null, getLowerBoundNumber(pattern), getUpperBoundNumber(pattern)));
             }
-            return Integer.toString(Integer.parseInt(schoolNumber) + 1);
+            return String.format("%05d", Integer.parseInt(schoolNumber) + 1);
         });
 
         map.put(FacilityCategoryLookup.ENTRY3, (districtNumber, authorityId) -> {
@@ -94,7 +94,7 @@ public class SchoolNumberGenerationService {
             if(isNullEmptyOrBlank(schoolNumber)) {
                 return pattern + "000";
             } else if(Integer.parseInt(schoolNumber) == Integer.parseInt(pattern + "000")) {
-                return Integer.toString(Integer.parseInt(schoolNumber) + 1);
+                return String.format("%05d", Integer.parseInt(schoolNumber) + 1);
             }
             return schoolNumber;
         });
