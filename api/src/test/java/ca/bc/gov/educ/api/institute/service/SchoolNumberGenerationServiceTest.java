@@ -203,6 +203,32 @@ public class SchoolNumberGenerationServiceTest {
     }
 
     @Test
+    public void testCreateSchool_givenSchoolCodeEAR_LEARN_givenFacilityCodeSTRONG_CEN_shouldGetAvailableSchoolNumber() {
+        SchoolCategoryCodeEntity schoolCategoryCodeEntity = schoolCategoryCodeRepository.save(createSchoolCategoryCodeData("EAR_LEARN"));
+        FacilityTypeCodeEntity facilityTypeCodeEntity = facilityTypeCodeRepository.save(createFacilityTypeCodeData("STRONG_CEN"));
+        final DistrictTombstoneEntity dist = districtTombstoneRepository.save(createPosSecDistrictData());
+        var schoolEntity = this.createSchoolDataWithSchoolNumber("25999","EAR_LEARN", "STRONG_CEN");
+        schoolEntity.setDistrictEntity(dist);
+        this.schoolRepository.save(schoolEntity);
+        String schoolNumber = schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
+        assertThat(schoolNumber)
+                .isNotEmpty();
+    }
+    @Test
+    public void testCreateSchool_givenSchoolCodeEAR_LEARN_givenFacilityCodeSTRONG_CEN_shouldGetNextSchoolNumber() {
+        SchoolCategoryCodeEntity schoolCategoryCodeEntity = schoolCategoryCodeRepository.save(createSchoolCategoryCodeData("EAR_LEARN"));
+        FacilityTypeCodeEntity facilityTypeCodeEntity = facilityTypeCodeRepository.save(createFacilityTypeCodeData("STRONG_CEN"));
+        final DistrictTombstoneEntity dist = districtTombstoneRepository.save(createDistrictData());
+        var schoolEntity = this.createSchoolDataWithSchoolNumber("25997","EAR_LEARN", "STRONG_CEN");
+        schoolEntity.setDistrictEntity(dist);
+        this.schoolRepository.save(schoolEntity);
+        String schoolNumber = schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
+        assertThat(schoolNumber)
+                .isNotEmpty()
+                .isEqualTo("25998");
+    }
+
+    @Test
     public void testCreateSchool_givenSchoolCodePUBLIC_givenFacilityCodeSHORT_PRP_shouldCreateValidSchoolNumber() {
         SchoolCategoryCodeEntity schoolCategoryCodeEntity = schoolCategoryCodeRepository.save(createSchoolCategoryCodeData("PUBLIC"));
         FacilityTypeCodeEntity facilityTypeCodeEntity = facilityTypeCodeRepository.save(createFacilityTypeCodeData("SHORT_PRP"));
@@ -210,6 +236,32 @@ public class SchoolNumberGenerationServiceTest {
         assertThat(schoolNumber)
                 .isNotEmpty()
                 .isEqualTo("95011");
+    }
+
+    @Test
+    public void testCreateSchool_givenSchoolCodePUBLIC_givenFacilityCodeSHORT_PRP_shouldGetAvailableSchoolNumber() {
+        SchoolCategoryCodeEntity schoolCategoryCodeEntity = schoolCategoryCodeRepository.save(createSchoolCategoryCodeData("PUBLIC"));
+        FacilityTypeCodeEntity facilityTypeCodeEntity = facilityTypeCodeRepository.save(createFacilityTypeCodeData("SHORT_PRP"));
+        final DistrictTombstoneEntity dist = districtTombstoneRepository.save(createPosSecDistrictData());
+        var schoolEntity = this.createSchoolDataWithSchoolNumber("95999","PUBLIC", "SHORT_PRP");
+        schoolEntity.setDistrictEntity(dist);
+        this.schoolRepository.save(schoolEntity);
+        String schoolNumber = schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
+        assertThat(schoolNumber)
+                .isNotEmpty();
+    }
+    @Test
+    public void testCreateSchool_givenSchoolCodePUBLIC_givenFacilityCodeSHORT_PRP_shouldGetNextSchoolNumber() {
+        SchoolCategoryCodeEntity schoolCategoryCodeEntity = schoolCategoryCodeRepository.save(createSchoolCategoryCodeData("PUBLIC"));
+        FacilityTypeCodeEntity facilityTypeCodeEntity = facilityTypeCodeRepository.save(createFacilityTypeCodeData("SHORT_PRP"));
+        final DistrictTombstoneEntity dist = districtTombstoneRepository.save(createDistrictData());
+        var schoolEntity = this.createSchoolDataWithSchoolNumber("95997","PUBLIC", "SHORT_PRP");
+        schoolEntity.setDistrictEntity(dist);
+        this.schoolRepository.save(schoolEntity);
+        String schoolNumber = schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
+        assertThat(schoolNumber)
+                .isNotEmpty()
+                .isEqualTo("95998");
     }
 
     @Test
@@ -223,6 +275,32 @@ public class SchoolNumberGenerationServiceTest {
     }
 
     @Test
+    public void testCreateSchool_givenSchoolCodeYUKON_givenFacilityCodeSUMMER_shouldGetAvailableSchoolNumber() {
+        SchoolCategoryCodeEntity schoolCategoryCodeEntity = schoolCategoryCodeRepository.save(createSchoolCategoryCodeData("YUKON"));
+        FacilityTypeCodeEntity facilityTypeCodeEntity = facilityTypeCodeRepository.save(createFacilityTypeCodeData("SUMMER"));
+        final DistrictTombstoneEntity dist = districtTombstoneRepository.save(createPosSecDistrictData());
+        var schoolEntity = this.createSchoolDataWithSchoolNumber("90999","YUKON", "SUMMER");
+        schoolEntity.setDistrictEntity(dist);
+        this.schoolRepository.save(schoolEntity);
+        String schoolNumber = schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
+        assertThat(schoolNumber)
+                .isNotEmpty();
+    }
+    @Test
+    public void testCreateSchool_givenSchoolCodeYUKON_givenFacilityCodeSUMMER_shouldGetNextSchoolNumber() {
+        SchoolCategoryCodeEntity schoolCategoryCodeEntity = schoolCategoryCodeRepository.save(createSchoolCategoryCodeData("YUKON"));
+        FacilityTypeCodeEntity facilityTypeCodeEntity = facilityTypeCodeRepository.save(createFacilityTypeCodeData("SUMMER"));
+        final DistrictTombstoneEntity dist = districtTombstoneRepository.save(createDistrictData());
+        var schoolEntity = this.createSchoolDataWithSchoolNumber("90997","YUKON", "SUMMER");
+        schoolEntity.setDistrictEntity(dist);
+        this.schoolRepository.save(schoolEntity);
+        String schoolNumber = schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
+        assertThat(schoolNumber)
+                .isNotEmpty()
+                .isEqualTo("90998");
+    }
+
+    @Test
     public void testCreateSchool_givenSchoolCodePUBLIC_givenFacilityCodeYOUTH_shouldCreateValidSchoolNumber() {
         SchoolCategoryCodeEntity schoolCategoryCodeEntity = schoolCategoryCodeRepository.save(createSchoolCategoryCodeData("PUBLIC"));
         FacilityTypeCodeEntity facilityTypeCodeEntity = facilityTypeCodeRepository.save(createFacilityTypeCodeData("YOUTH"));
@@ -230,6 +308,32 @@ public class SchoolNumberGenerationServiceTest {
         assertThat(schoolNumber)
                 .isNotEmpty()
                 .isEqualTo("94011");
+    }
+
+    @Test
+    public void testCreateSchool_givenSchoolCodePUBLIC_givenFacilityCodeYOUTH_shouldGetAvailableSchoolNumber() {
+        SchoolCategoryCodeEntity schoolCategoryCodeEntity = schoolCategoryCodeRepository.save(createSchoolCategoryCodeData("PUBLIC"));
+        FacilityTypeCodeEntity facilityTypeCodeEntity = facilityTypeCodeRepository.save(createFacilityTypeCodeData("YOUTH"));
+        final DistrictTombstoneEntity dist = districtTombstoneRepository.save(createPosSecDistrictData());
+        var schoolEntity = this.createSchoolDataWithSchoolNumber("94999","PUBLIC", "YOUTH");
+        schoolEntity.setDistrictEntity(dist);
+        this.schoolRepository.save(schoolEntity);
+        String schoolNumber = schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
+        assertThat(schoolNumber)
+                .isNotEmpty();
+    }
+    @Test
+    public void testCreateSchool_givenSchoolCodePUBLIC_givenFacilityCodeYOUTH_shouldGetNextSchoolNumber() {
+        SchoolCategoryCodeEntity schoolCategoryCodeEntity = schoolCategoryCodeRepository.save(createSchoolCategoryCodeData("PUBLIC"));
+        FacilityTypeCodeEntity facilityTypeCodeEntity = facilityTypeCodeRepository.save(createFacilityTypeCodeData("YOUTH"));
+        final DistrictTombstoneEntity dist = districtTombstoneRepository.save(createDistrictData());
+        var schoolEntity = this.createSchoolDataWithSchoolNumber("94997","PUBLIC", "YOUTH");
+        schoolEntity.setDistrictEntity(dist);
+        this.schoolRepository.save(schoolEntity);
+        String schoolNumber = schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
+        assertThat(schoolNumber)
+                .isNotEmpty()
+                .isEqualTo("94998");
     }
 
     @Test
