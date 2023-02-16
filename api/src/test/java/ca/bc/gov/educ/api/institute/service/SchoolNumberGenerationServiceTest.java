@@ -64,7 +64,7 @@ public class SchoolNumberGenerationServiceTest {
         String schoolNumber = schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
         assertThat(schoolNumber)
                 .isNotEmpty()
-                .isEqualTo("99011");
+                .isEqualTo("99000");
     }
 
     @Test
@@ -102,7 +102,7 @@ public class SchoolNumberGenerationServiceTest {
         String schoolNumber = schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
         assertThat(schoolNumber)
                 .isNotEmpty()
-                .isEqualTo("99011");
+                .isEqualTo("99000");
     }
 
     @Test
@@ -112,7 +112,7 @@ public class SchoolNumberGenerationServiceTest {
         String schoolNumber = schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
         assertThat(schoolNumber)
                 .isNotEmpty()
-                .isEqualTo("99011");
+                .isEqualTo("99000");
     }
 
     @Test
@@ -159,7 +159,7 @@ public class SchoolNumberGenerationServiceTest {
         String schoolNumber = schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), "d34972fe-49d7-9ef4-1e0f-e5a83ec77889");
         assertThat(schoolNumber)
                 .isNotEmpty()
-                .isEqualTo("96011");
+                .isEqualTo("96000");
     }
 
     @Test
@@ -169,7 +169,7 @@ public class SchoolNumberGenerationServiceTest {
         String schoolNumber = schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), "d34972fe-49d7-9ef4-1e0f-e5a83ec77889");
         assertThat(schoolNumber)
                 .isNotEmpty()
-                .isEqualTo("96011");
+                .isEqualTo("96000");
     }
 
     @Test
@@ -179,7 +179,7 @@ public class SchoolNumberGenerationServiceTest {
         String schoolNumber = schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
         assertThat(schoolNumber)
                 .isNotEmpty()
-                .isEqualTo("97011");
+                .isEqualTo("97000");
     }
 
     @Test
@@ -199,7 +199,7 @@ public class SchoolNumberGenerationServiceTest {
         String schoolNumber = schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
         assertThat(schoolNumber)
                 .isNotEmpty()
-                .isEqualTo("25011");
+                .isEqualTo("25000");
     }
 
     @Test
@@ -235,7 +235,7 @@ public class SchoolNumberGenerationServiceTest {
         String schoolNumber = schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
         assertThat(schoolNumber)
                 .isNotEmpty()
-                .isEqualTo("95011");
+                .isEqualTo("95000");
     }
 
     @Test
@@ -271,7 +271,7 @@ public class SchoolNumberGenerationServiceTest {
         String schoolNumber = schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
         assertThat(schoolNumber)
                 .isNotEmpty()
-                .isEqualTo("90011");
+                .isEqualTo("90000");
     }
 
     @Test
@@ -307,7 +307,7 @@ public class SchoolNumberGenerationServiceTest {
         String schoolNumber = schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
         assertThat(schoolNumber)
                 .isNotEmpty()
-                .isEqualTo("94011");
+                .isEqualTo("94000");
     }
 
     @Test
@@ -343,7 +343,7 @@ public class SchoolNumberGenerationServiceTest {
         String schoolNumber = schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
         assertThat(schoolNumber)
                 .isNotEmpty()
-                .isEqualTo("00011");
+                .isEqualTo("00001");
     }
     @Test
     public void testCreateSchool_givenSchoolCodePOST_SEC_givenFacilityCodePOST_shouldGetAvailableSchoolNumber() {
