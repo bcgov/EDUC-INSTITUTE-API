@@ -67,7 +67,7 @@ public class SchoolNumberGenerationServiceTest {
                 .isEqualTo("99000");
     }
 
-    @Test
+//    @Test
 //    public void testCreateSchool_givenSchoolCodePUBLIC_givenFacilityCodeDISTLEARN_shouldGetAvailableSchoolNumber() {
 //        SchoolCategoryCodeEntity schoolCategoryCodeEntity = schoolCategoryCodeRepository.save(createSchoolCategoryCodeData("PUBLIC"));
 //        FacilityTypeCodeEntity facilityTypeCodeEntity = facilityTypeCodeRepository.save(createFacilityTypeCodeData("DIST_LEARN"));
@@ -125,7 +125,7 @@ public class SchoolNumberGenerationServiceTest {
                 .isEqualTo("03011");
     }
 
-    @Test
+//    @Test
 //    public void testCreateSchool_givenSchoolCodePUBLIC_givenFacilityCodeSTANDARD_shouldGetAvailableSchoolNumber() {
 //        SchoolCategoryCodeEntity schoolCategoryCodeEntity = schoolCategoryCodeRepository.save(createSchoolCategoryCodeData("PUBLIC"));
 //        FacilityTypeCodeEntity facilityTypeCodeEntity = facilityTypeCodeRepository.save(createFacilityTypeCodeData("STANDARD"));
