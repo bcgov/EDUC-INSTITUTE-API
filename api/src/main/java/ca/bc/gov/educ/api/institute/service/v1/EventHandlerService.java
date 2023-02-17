@@ -136,6 +136,7 @@ public class EventHandlerService {
         } catch (JsonProcessingException e) {
           log.error("Error during get paginated schools :: {} {}", event, e);
         }
+        log.info("Found no schools for paginated query with saga {}", event.getSagaId());
         return new byte[0];
       });
 
