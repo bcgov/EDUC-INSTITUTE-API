@@ -12,8 +12,8 @@ public final class Constants {
     public static final String NINETYFIVE = "95";
     public static final String NINETYFOUR = "94";
     public static final String NINETYSEVEN = "97";
-    public static final String LOWERBOUND = "000";
+    public static final String LOWERBOUND = "990"; //TEMP-ActualValue:000
     public static final String TWENTYFIVE = "25";
-    public static final String UPPERBOUND = "030"; //TEMP-ActualValue:999
+    public static final String UPPERBOUND = "999";
     public static final String DEFAULTNUMBER = "000";
 }
