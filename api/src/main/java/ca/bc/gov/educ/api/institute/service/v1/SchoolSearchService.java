@@ -16,6 +16,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jboss.threads.EnhancedQueueExecutor;
 import org.springframework.data.domain.Page;
@@ -37,6 +38,7 @@ import java.util.concurrent.Executor;
  * The type School search service.
  */
 @Service
+@Slf4j
 public class SchoolSearchService {
   private final SchoolFilterSpecs schoolFilterSpecs;
 
@@ -150,9 +152,11 @@ public class SchoolSearchService {
 
   @Transactional(propagation = Propagation.SUPPORTS)
   public CompletableFuture<Page<SchoolEntity>> findAll(Specification<SchoolEntity> schoolSpecs, final Integer pageNumber, final Integer pageSize, final List<Sort.Order> sorts) {
+    log.info("In find all query: {}", schoolSpecs);
     return CompletableFuture.supplyAsync(() -> {
       Pageable paging = PageRequest.of(pageNumber, pageSize, Sort.by(sorts));
       try {
+        log.info("Running paginated query: {}", schoolSpecs);
         return this.schoolRepository.findAll(schoolSpecs, paging);
       } catch (final Exception ex) {
         throw new CompletionException(ex);
