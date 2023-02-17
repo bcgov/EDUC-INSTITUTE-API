@@ -126,7 +126,12 @@ public class EventHandlerService {
     log.info("Running query for paginated schools: {}", schoolSpecs);
     return schoolSearchService
       .findAll(schoolSpecs, pageNumber, pageSize, sorts)
-      .thenApplyAsync(schoolEntities -> schoolEntities.map(schoolMapper::toStructure))
+      .thenApplyAsync(schoolEntities -> {
+        log.info("Performing paginated school mapping: {}", schoolSpecs);
+        var schoolMap = schoolEntities.map(schoolMapper::toStructure);
+        log.info("Mapping complete");
+        return schoolMap;
+      })
       .thenApplyAsync(schoolEntities -> {
         try {
           log.info("Found {} schools for {}", schoolEntities.getContent().size(), event.getSagaId());
