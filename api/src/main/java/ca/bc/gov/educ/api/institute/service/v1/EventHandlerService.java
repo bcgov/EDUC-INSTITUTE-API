@@ -123,25 +123,25 @@ public class EventHandlerService {
 
     final List<Sort.Order> sorts = new ArrayList<>();
     Specification<SchoolEntity> schoolSpecs = schoolSearchService.setSpecificationAndSortCriteria(sortCriteriaJson, searchCriteriaListJson, obMapper, sorts);
-    log.info("Running query for paginated schools: {}", schoolSpecs);
+    log.trace("Running query for paginated schools: {}", schoolSpecs);
     return schoolSearchService
       .findAll(schoolSpecs, pageNumber, pageSize, sorts)
       .thenApplyAsync(schoolEntities -> {
-        log.info("Performing paginated school mapping: {}", schoolSpecs);
+        log.trace("Performing paginated school mapping: {}", schoolSpecs);
         var schoolMap = schoolEntities.map(schoolMapper::toStructure);
-        log.info("Mapping complete");
+        log.trace("Mapping complete");
         return schoolMap;
       })
       .thenApplyAsync(schoolEntities -> {
         try {
-          log.info("Found {} schools for {}", schoolEntities.getContent().size(), event.getSagaId());
+          log.trace("Found {} schools for {}", schoolEntities.getContent().size(), event.getSagaId());
           val resBytes = obMapper.writeValueAsBytes(schoolEntities.getContent());
-          log.info("Response prepared for {}, response length {}", event.getSagaId(), resBytes.length);
+          log.trace("Response prepared for {}, response length {}", event.getSagaId(), resBytes.length);
           return resBytes;
         } catch (JsonProcessingException e) {
           log.error("Error during get paginated schools :: {} {}", event, e);
         }
-        log.info("Found no schools for paginated query with saga {}", event.getSagaId());
+        log.trace("Found no schools for paginated query with saga {}", event.getSagaId());
         return new byte[0];
       });
 
