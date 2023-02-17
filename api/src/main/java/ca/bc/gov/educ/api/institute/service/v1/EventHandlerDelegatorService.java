@@ -62,6 +62,16 @@ public class EventHandlerDelegatorService {
           log.info(RESPONDING_BACK_TO_NATS_ON_CHANNEL, message.getReplyTo() != null ? message.getReplyTo() : event.getReplyTo());
           publishToNATS(event, message, isSynchronous, response);
           break;
+        case GET_PAGINATED_SCHOOLS:
+          log.info("received GET_PAGINATED_SCHOOLS event :: {}", event.getSagaId());
+          log.trace(PAYLOAD_LOG, event.getEventPayload());
+          eventHandlerService
+            .handleGetPaginatedSchools(event)
+            .thenAcceptAsync(resBytes -> {
+              log.info(RESPONDING_BACK_TO_NATS_ON_CHANNEL, message.getReplyTo() != null ? message.getReplyTo() : event.getReplyTo());
+              publishToNATS(event, message, isSynchronous, resBytes);
+            });
+          break;
         default:
           log.info("silently ignoring other events :: {}", event);
           break;
@@ -71,8 +81,8 @@ public class EventHandlerDelegatorService {
     }
   }
 
-  private void publishToNATS(Event event, Message message, boolean isSynchronous, byte[] left) throws IOException {
-    log.info("Publishing event to NATS :: {} Payload :: {}", event, JsonUtil.getObjectFromJsonBytes(IndependentAuthority.class, left));
+  private void publishToNATS(Event event, Message message, boolean isSynchronous, byte[] left) {
+    log.info("Publishing event to NATS :: {}", event);
     if (isSynchronous) { // sync, req/reply pattern of nats
       messagePublisher.dispatchMessage(message.getReplyTo(), left);
     } else { // async, pub/sub
