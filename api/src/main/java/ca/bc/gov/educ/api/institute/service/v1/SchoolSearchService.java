@@ -160,7 +160,8 @@ public class SchoolSearchService {
         var results = this.schoolRepository.findAll(schoolSpecs, paging);
         log.info("Paginated query returned with results: {}", results);
         return results;
-      } catch (final Exception ex) {
+      } catch (final Throwable ex) {
+        log.error("Failure querying for paginated schools: {}", ex.getMessage());
         throw new CompletionException(ex);
       }
     }, paginatedQueryExecutor);
