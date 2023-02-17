@@ -56,15 +56,15 @@ public class EventHandlerDelegatorService {
     try {
       switch (event.getEventType()) {
         case GET_AUTHORITY:
-          log.info("received GET_AUTHORITY event :: {}", event.getSagaId());
+          log.info("Received GET_AUTHORITY event :: {}", event.getSagaId());
           log.trace(PAYLOAD_LOG, event.getEventPayload());
           response = eventHandlerService.handleGetAuthorityEvent(event, isSynchronous);
           log.info(RESPONDING_BACK_TO_NATS_ON_CHANNEL, message.getReplyTo() != null ? message.getReplyTo() : event.getReplyTo());
           publishToNATS(event, message, isSynchronous, response);
           break;
         case GET_PAGINATED_SCHOOLS:
-          log.info("received GET_PAGINATED_SCHOOLS event :: {}", event.getSagaId());
-          log.trace(PAYLOAD_LOG, event.getEventPayload());
+          log.info("Received GET_PAGINATED_SCHOOLS event :: {}", event.getSagaId());
+          log.info(PAYLOAD_LOG, event.getEventPayload());
           eventHandlerService
             .handleGetPaginatedSchools(event)
             .thenAcceptAsync(resBytes -> {

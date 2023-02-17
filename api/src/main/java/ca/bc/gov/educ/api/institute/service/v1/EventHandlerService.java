@@ -123,6 +123,7 @@ public class EventHandlerService {
 
     final List<Sort.Order> sorts = new ArrayList<>();
     Specification<SchoolEntity> schoolSpecs = schoolSearchService.setSpecificationAndSortCriteria(sortCriteriaJson, searchCriteriaListJson, obMapper, sorts);
+    log.info("Running query for paginated schools: ", schoolSpecs);
     return schoolSearchService
       .findAll(schoolSpecs, pageNumber, pageSize, sorts)
       .thenApplyAsync(schoolEntities -> schoolEntities.map(schoolMapper::toStructure))
