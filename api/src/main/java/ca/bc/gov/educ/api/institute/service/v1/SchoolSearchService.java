@@ -157,7 +157,9 @@ public class SchoolSearchService {
       Pageable paging = PageRequest.of(pageNumber, pageSize, Sort.by(sorts));
       try {
         log.info("Running paginated query: {}", schoolSpecs);
-        return this.schoolRepository.findAll(schoolSpecs, paging);
+        var results = this.schoolRepository.findAll(schoolSpecs, paging);
+        log.info("Paginated query returned with results: {}", results);
+        return results;
       } catch (final Exception ex) {
         throw new CompletionException(ex);
       }
