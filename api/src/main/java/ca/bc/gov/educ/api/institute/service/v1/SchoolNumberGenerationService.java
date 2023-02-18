@@ -82,13 +82,7 @@ public class SchoolNumberGenerationService {
 
         map.put(FacilityCategoryLookup.ENTRY5, (districtNumber, authorityId) -> {
             String pattern = districtNumber.length() > 2 ? districtNumber.substring(1) : districtNumber;
-            String schoolNumber = getLastSchoolNumberWithPattern(districtNumber, null, pattern + Constants.DEFAULTNUMBER);
-            if(isNullEmptyOrBlank(schoolNumber)) {
-                return pattern + Constants.DEFAULTNUMBER;
-            } else if(Integer.parseInt(schoolNumber) == Integer.parseInt(pattern + Constants.DEFAULTNUMBER)) {
-                return String.format("%05d", Integer.parseInt(schoolNumber) + 1);
-            }
-            return schoolNumber;
+            return String.format("%05d", getFirstAvailableSchoolNumber(districtNumber, null, Integer.parseInt(pattern + "000"), Integer.parseInt(pattern + "010")));
         });
 
         map.put(FacilityCategoryLookup.ENTRY6, (districtNumber, authorityId) -> {
