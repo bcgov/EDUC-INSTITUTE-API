@@ -9,7 +9,7 @@ public enum FacilityCategoryLookup {
     ENTRY3(new String[] {Constants.STANDARD}, new String[]{"OFFSHORE", "INDEPEND"}),
     ENTRY4(new String[] {Constants.STANDARD}, new String[]{"INDP_FNS", "FED_BAND"}),
     ENTRY5(new String[] {"CONT_ED"}, new String[]{Constants.PUBLIC}),
-    ENTRY6(new String[] {"STRONG_CEN", "STRONG_OUT", "STRONG_OUT"}, new String[]{"EAR_LEARN"}),
+    ENTRY6(new String[] {"STRONG_CEN", "STRONG_OUT", "JUSTB4PRO"}, new String[]{"EAR_LEARN"}),
     ENTRY7(new String[] {"SHORT_PRP", "LONG_PRP" }, new String[]{Constants.PUBLIC}),
     ENTRY8(new String[] {"SUMMER"}, new String[]{Constants.PUBLIC, Constants.YUKON}),
     ENTRY9(new String[] {"YOUTH"}, new String[]{Constants.PUBLIC}),
