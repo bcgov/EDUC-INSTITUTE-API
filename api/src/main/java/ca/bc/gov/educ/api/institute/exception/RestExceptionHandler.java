@@ -15,8 +15,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.*;
 
 /**
  * The type Rest exception handler.
@@ -80,6 +79,20 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
   @ExceptionHandler(IllegalArgumentException.class)
   protected ResponseEntity<Object> handleInvalidParameter(IllegalArgumentException ex) {
     ApiError apiError = new ApiError(BAD_REQUEST);
+    apiError.setMessage(ex.getMessage());
+    log.error("{} ", apiError.getMessage(), ex);
+    return buildResponseEntity(apiError);
+  }
+
+  /**
+   * Handles IllegalArgumentException
+   *
+   * @param ex the InvalidParameterException
+   * @return the ApiError object
+   */
+  @ExceptionHandler(PreConditionFailedException.class)
+  protected ResponseEntity<Object> handlePreConditionFailed(PreConditionFailedException ex) {
+    ApiError apiError = new ApiError(PRECONDITION_FAILED);
     apiError.setMessage(ex.getMessage());
     log.error("{} ", apiError.getMessage(), ex);
     return buildResponseEntity(apiError);

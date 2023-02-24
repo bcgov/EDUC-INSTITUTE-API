@@ -17,10 +17,9 @@ public interface SchoolRepository extends JpaRepository<SchoolEntity, UUID>, Jpa
           FROM SCHOOL S, DISTRICT D
           WHERE S.DISTRICT_ID = D.DISTRICT_ID
           AND D.DISTRICT_NUMBER = :districtNumber
-          AND S.SCHOOL_NUMBER LIKE :pattern
-          AND S.INDEPENDENT_AUTHORITY_ID IS NOT DISTINCT FROM :authorityId"""
+          AND S.SCHOOL_NUMBER LIKE :pattern"""
           , nativeQuery = true)
-  String findLastSchoolNumberWithPattern(String districtNumber, UUID authorityId, String pattern);
+  String findLastSchoolNumberWithPattern(String districtNumber, String pattern);
 
   @Transactional
   @Query(value = """
@@ -41,7 +40,7 @@ public interface SchoolRepository extends JpaRepository<SchoolEntity, UUID>, Jpa
           WHERE CAST(SCH.SCHOOL_NUMBER as INTEGER) = S.ID
           AND SCH.DISTRICT_ID = DIS.DISTRICT_ID
           AND DIS.DISTRICT_NUMBER = :districtNumber
-          AND SCH.INDEPENDENT_AUTHORITY_ID IS NOT DISTINCT FROM :authorityId)"""
+          AND (SCH.INDEPENDENT_AUTHORITY_ID IS NULL OR SCH.INDEPENDENT_AUTHORITY_ID IS NOT DISTINCT FROM :authorityId))"""
           , nativeQuery = true)
   Integer findFirstAvailableSchoolNumber(String districtNumber, UUID authorityId, Integer lowerRange, Integer upperRange);
 }
