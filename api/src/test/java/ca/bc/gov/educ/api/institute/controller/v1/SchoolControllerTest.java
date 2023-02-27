@@ -512,6 +512,7 @@ public class SchoolControllerTest {
     contactEntity.setPhoneExtension("321");
     contactEntity.setAlternatePhoneNumber("1234567891");
     contactEntity.setAlternatePhoneExtension("123");
+    contactEntity.setJobTitle("Painter");
 
     this.mockMvc.perform(post(URL.BASE_URL_SCHOOL + "/" + schoolEntity.getSchoolId() + "/contact")
         .contentType(MediaType.APPLICATION_JSON)
@@ -521,6 +522,7 @@ public class SchoolControllerTest {
       .andDo(print())
       .andExpect(status().isCreated())
       .andExpect(MockMvcResultMatchers.jsonPath("$.lastName").value(contactEntity.getLastName()))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.jobTitle").value(contactEntity.getJobTitle()))
       .andExpect(MockMvcResultMatchers.jsonPath("$.phoneNumber").value(contactEntity.getPhoneNumber()))
       .andExpect(MockMvcResultMatchers.jsonPath("$.phoneExtension").value(contactEntity.getPhoneExtension()))
       .andExpect(MockMvcResultMatchers.jsonPath("$.alternatePhoneNumber").value(contactEntity.getAlternatePhoneNumber()))

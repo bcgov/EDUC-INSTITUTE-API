@@ -39,6 +39,9 @@ public class SchoolContactEntity {
   @Column(name = "last_name")
   private String lastName;
   @Basic
+  @Column(name = "job_title")
+  private String jobTitle;
+  @Basic
   @Column(name = "phone_number")
   private String phoneNumber;
   @Basic
