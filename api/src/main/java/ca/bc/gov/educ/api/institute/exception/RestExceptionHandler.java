@@ -99,6 +99,20 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
   }
 
   /**
+   * Handles ConflictFoundException
+   *
+   * @param ex the ConflictFoundException
+   * @return the ApiError object
+   */
+  @ExceptionHandler(ConflictFoundException.class)
+  protected ResponseEntity<Object> handleConflictFound(ConflictFoundException ex) {
+    ApiError apiError = new ApiError(CONFLICT);
+    apiError.setMessage(ex.getMessage());
+    log.error("{} ", apiError.getMessage(), ex);
+    return buildResponseEntity(apiError);
+  }
+
+  /**
    * Handles InvalidParameterException
    *
    * @param ex the InvalidParameterException

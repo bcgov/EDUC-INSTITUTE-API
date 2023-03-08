@@ -4,15 +4,11 @@ import ca.bc.gov.educ.api.institute.messaging.MessagePublisher;
 import ca.bc.gov.educ.api.institute.messaging.jetstream.Publisher;
 import ca.bc.gov.educ.api.institute.model.v1.InstituteEvent;
 import ca.bc.gov.educ.api.institute.struct.v1.Event;
-import ca.bc.gov.educ.api.institute.struct.v1.IndependentAuthority;
-import ca.bc.gov.educ.api.institute.util.JsonUtil;
 import io.nats.client.Message;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.io.IOException;
 
 import static ca.bc.gov.educ.api.institute.service.v1.EventHandlerService.PAYLOAD_LOG;
 
@@ -31,17 +27,20 @@ public class EventHandlerDelegatorService {
   public static final String RESPONDING_BACK_TO_NATS_ON_CHANNEL = "responding back to NATS on {} channel ";
   private final MessagePublisher messagePublisher;
   private final EventHandlerService eventHandlerService;
+  private final Publisher publisher;
 
   /**
    * Instantiates a new Event handler delegator service.
    *
    * @param messagePublisher    the message publisher
    * @param eventHandlerService the event handler service
+   * @param publisher
    */
   @Autowired
-  public EventHandlerDelegatorService(MessagePublisher messagePublisher, EventHandlerService eventHandlerService) {
+  public EventHandlerDelegatorService(MessagePublisher messagePublisher, EventHandlerService eventHandlerService, Publisher publisher) {
     this.messagePublisher = messagePublisher;
     this.eventHandlerService = eventHandlerService;
+    this.publisher = publisher;
   }
 
   /**
@@ -72,6 +71,22 @@ public class EventHandlerDelegatorService {
               publishToNATS(event, message, isSynchronous, resBytes);
             });
           break;
+        case CREATE_SCHOOL:
+          log.info("Received CREATE_SCHOOL event :: {}", event.getSagaId());
+          log.trace(PAYLOAD_LOG, event.getEventPayload());
+          Pair<byte[], InstituteEvent> pair = eventHandlerService.handleCreateSchoolEvent(event);
+          log.info(RESPONDING_BACK_TO_NATS_ON_CHANNEL, message.getReplyTo() != null ? message.getReplyTo() : event.getReplyTo());
+          publishToNATS(event, message, isSynchronous, pair.getLeft());
+          publishToJetStream(pair.getRight());
+          break;
+        case UPDATE_SCHOOL:
+          log.info("Received UPDATE_SCHOOL event :: {}", event.getSagaId());
+          log.trace(PAYLOAD_LOG, event.getEventPayload());
+          Pair<byte[], InstituteEvent> updatePair = eventHandlerService.handleUpdateSchoolEvent(event);
+          log.info(RESPONDING_BACK_TO_NATS_ON_CHANNEL, message.getReplyTo() != null ? message.getReplyTo() : event.getReplyTo());
+          publishToNATS(event, message, isSynchronous, updatePair.getLeft());
+          publishToJetStream(updatePair.getRight());
+          break;
         default:
           log.info("silently ignoring other events :: {}", event);
           break;
@@ -88,6 +103,10 @@ public class EventHandlerDelegatorService {
     } else { // async, pub/sub
       messagePublisher.dispatchMessage(event.getReplyTo(), left);
     }
+  }
+
+  private void publishToJetStream(final InstituteEvent event) {
+    publisher.dispatchChoreographyEvent(event);
   }
 
 }

@@ -2,19 +2,27 @@ package ca.bc.gov.educ.api.institute.service.v1;
 
 import ca.bc.gov.educ.api.institute.constants.v1.EventOutcome;
 import ca.bc.gov.educ.api.institute.constants.v1.EventType;
+import ca.bc.gov.educ.api.institute.exception.ConflictFoundException;
+import ca.bc.gov.educ.api.institute.exception.EntityNotFoundException;
 import ca.bc.gov.educ.api.institute.mapper.v1.IndependentAuthorityMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.SchoolMapper;
 import ca.bc.gov.educ.api.institute.model.v1.InstituteEvent;
 import ca.bc.gov.educ.api.institute.model.v1.SchoolEntity;
 import ca.bc.gov.educ.api.institute.repository.v1.IndependentAuthorityRepository;
+import ca.bc.gov.educ.api.institute.repository.v1.InstituteEventRepository;
+import ca.bc.gov.educ.api.institute.repository.v1.SchoolRepository;
 import ca.bc.gov.educ.api.institute.struct.v1.Event;
+import ca.bc.gov.educ.api.institute.struct.v1.School;
 import ca.bc.gov.educ.api.institute.util.JsonUtil;
+import ca.bc.gov.educ.api.institute.util.RequestUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
@@ -27,6 +35,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -56,8 +65,26 @@ public class EventHandlerService {
   public static final String PAGE_NUMBER = "pageNumber";
 
   public static final String SORT_CRITERIA = "sortCriteriaJson";
+
+  /**
+   * The constant NO_RECORD_SAGA_ID_EVENT_TYPE.
+   */
+  public static final String NO_RECORD_SAGA_ID_EVENT_TYPE = "no record found for the saga id and event type combination, processing.";
+  /**
+   * The constant RECORD_FOUND_FOR_SAGA_ID_EVENT_TYPE.
+   */
+  public static final String RECORD_FOUND_FOR_SAGA_ID_EVENT_TYPE = "record found for the saga id and event type combination, might be a duplicate or replay," +
+          " just updating the db status so that it will be polled and sent back again.";
   @Getter(PRIVATE)
   private final IndependentAuthorityRepository independentAuthorityRepository;
+
+  @Getter(PRIVATE)
+  private final InstituteEventRepository instituteEventRepository;
+
+  @Getter(AccessLevel.PRIVATE)
+  private final SchoolRepository schoolRepository;
+  @Getter(AccessLevel.PRIVATE)
+  private final SchoolService schoolService;
 
   private final SchoolSearchService schoolSearchService;
 
@@ -68,8 +95,11 @@ public class EventHandlerService {
   private static final IndependentAuthorityMapper independentAuthorityMapper = IndependentAuthorityMapper.mapper;
 
   @Autowired
-  public EventHandlerService(IndependentAuthorityRepository independentAuthorityRepository, SchoolSearchService schoolSearchService){
+  public EventHandlerService(IndependentAuthorityRepository independentAuthorityRepository, InstituteEventRepository instituteEventRepository, SchoolRepository schoolRepository, SchoolService schoolService, SchoolSearchService schoolSearchService){
     this.independentAuthorityRepository = independentAuthorityRepository;
+    this.instituteEventRepository = instituteEventRepository;
+    this.schoolRepository = schoolRepository;
+    this.schoolService = schoolService;
     this.schoolSearchService = schoolSearchService;
   }
 
@@ -145,6 +175,58 @@ public class EventHandlerService {
         return new byte[0];
       });
 
+  }
+
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
+  public Pair<byte[], InstituteEvent> handleCreateSchoolEvent(Event event) throws JsonProcessingException {
+    Optional<InstituteEvent> instituteEventOptional = getInstituteEventRepository().findBySagaIdAndEventType(event.getSagaId(), event.getEventType().toString());
+    InstituteEvent schoolEvent;
+    InstituteEvent choreographyEvent = null;
+    if (instituteEventOptional.isEmpty()) {
+      log.info(NO_RECORD_SAGA_ID_EVENT_TYPE);
+      log.trace(EVENT_PAYLOAD, event);
+      School school = JsonUtil.getJsonObjectFromString(School.class, event.getEventPayload());
+      if(school.getSchoolNumber() != null) {
+        List<SchoolEntity> schools = getSchoolRepository().findBySchoolNumberAndDistrictID(school.getSchoolNumber(), UUID.fromString(school.getDistrictId()));
+        if(!schools.isEmpty()) {
+          throw new ConflictFoundException("School Number already exists for this district.");
+        }
+      }
+      RequestUtil.setAuditColumnsForCreate(school);
+      Pair<SchoolEntity, InstituteEvent> schoolPair = getSchoolService().createSchool(school);
+      choreographyEvent = schoolPair.getRight();
+      event.setEventOutcome(EventOutcome.SCHOOL_CREATED);
+      event.setEventPayload(JsonUtil.getJsonStringFromObject(schoolMapper.toStructure(schoolPair.getLeft())));
+      schoolEvent = createInstituteEventRecord(event);
+    } else {
+      log.info(RECORD_FOUND_FOR_SAGA_ID_EVENT_TYPE);
+      log.trace(EVENT_PAYLOAD, event);
+      schoolEvent = instituteEventOptional.get();
+      schoolEvent.setUpdateDate(LocalDateTime.now());
+    }
+
+    getInstituteEventRepository().save(schoolEvent);
+    return Pair.of(createResponseEvent(schoolEvent), choreographyEvent);
+  }
+
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
+  public Pair<byte[], InstituteEvent> handleUpdateSchoolEvent(Event event) throws JsonProcessingException {
+    InstituteEvent choreographyEvent = null;
+    log.trace(EVENT_PAYLOAD, event);
+    School school = JsonUtil.getJsonObjectFromString(School.class, event.getEventPayload());
+    RequestUtil.setAuditColumnsForCreate(school);
+    try {
+      Pair<SchoolEntity, InstituteEvent> schoolPair = getSchoolService().updateSchool(school, UUID.fromString(school.getSchoolId()));
+      choreographyEvent = schoolPair.getRight();
+      event.setEventOutcome(EventOutcome.SCHOOL_UPDATED);
+      event.setEventPayload(JsonUtil.getJsonStringFromObject(schoolMapper.toStructure(schoolPair.getLeft())));
+    } catch (EntityNotFoundException ex) {
+      event.setEventOutcome(EventOutcome.SCHOOL_NOT_FOUND);
+    }
+
+    InstituteEvent schoolEvent = createInstituteEventRecord(event);
+    getInstituteEventRepository().save(schoolEvent);
+    return Pair.of(createResponseEvent(schoolEvent), choreographyEvent);
   }
 
   private InstituteEvent createInstituteEventRecord(Event event) {
