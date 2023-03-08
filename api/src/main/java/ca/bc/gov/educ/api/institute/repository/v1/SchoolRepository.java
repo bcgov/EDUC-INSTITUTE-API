@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.UUID;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,4 +44,6 @@ public interface SchoolRepository extends JpaRepository<SchoolEntity, UUID>, Jpa
           AND (SCH.INDEPENDENT_AUTHORITY_ID IS NULL OR SCH.INDEPENDENT_AUTHORITY_ID IS NOT DISTINCT FROM :authorityId))"""
           , nativeQuery = true)
   Integer findFirstAvailableSchoolNumber(String districtNumber, UUID authorityId, Integer lowerRange, Integer upperRange);
+
+  List<SchoolEntity> findBySchoolNumberAndDistrictID(String schoolNumber, UUID districtID);
 }
