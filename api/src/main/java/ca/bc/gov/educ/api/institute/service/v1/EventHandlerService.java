@@ -2,7 +2,6 @@ package ca.bc.gov.educ.api.institute.service.v1;
 
 import ca.bc.gov.educ.api.institute.constants.v1.EventOutcome;
 import ca.bc.gov.educ.api.institute.constants.v1.EventType;
-import ca.bc.gov.educ.api.institute.exception.ConflictFoundException;
 import ca.bc.gov.educ.api.institute.exception.EntityNotFoundException;
 import ca.bc.gov.educ.api.institute.mapper.v1.IndependentAuthorityMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.SchoolMapper;
@@ -10,7 +9,6 @@ import ca.bc.gov.educ.api.institute.model.v1.InstituteEvent;
 import ca.bc.gov.educ.api.institute.model.v1.SchoolEntity;
 import ca.bc.gov.educ.api.institute.repository.v1.IndependentAuthorityRepository;
 import ca.bc.gov.educ.api.institute.repository.v1.InstituteEventRepository;
-import ca.bc.gov.educ.api.institute.repository.v1.SchoolRepository;
 import ca.bc.gov.educ.api.institute.struct.v1.Event;
 import ca.bc.gov.educ.api.institute.struct.v1.School;
 import ca.bc.gov.educ.api.institute.util.JsonUtil;
@@ -82,8 +80,6 @@ public class EventHandlerService {
   private final InstituteEventRepository instituteEventRepository;
 
   @Getter(AccessLevel.PRIVATE)
-  private final SchoolRepository schoolRepository;
-  @Getter(AccessLevel.PRIVATE)
   private final SchoolService schoolService;
 
   private final SchoolSearchService schoolSearchService;
@@ -95,10 +91,9 @@ public class EventHandlerService {
   private static final IndependentAuthorityMapper independentAuthorityMapper = IndependentAuthorityMapper.mapper;
 
   @Autowired
-  public EventHandlerService(IndependentAuthorityRepository independentAuthorityRepository, InstituteEventRepository instituteEventRepository, SchoolRepository schoolRepository, SchoolService schoolService, SchoolSearchService schoolSearchService){
+  public EventHandlerService(IndependentAuthorityRepository independentAuthorityRepository, InstituteEventRepository instituteEventRepository, SchoolService schoolService, SchoolSearchService schoolSearchService){
     this.independentAuthorityRepository = independentAuthorityRepository;
     this.instituteEventRepository = instituteEventRepository;
-    this.schoolRepository = schoolRepository;
     this.schoolService = schoolService;
     this.schoolSearchService = schoolSearchService;
   }
@@ -186,12 +181,6 @@ public class EventHandlerService {
       log.info(NO_RECORD_SAGA_ID_EVENT_TYPE);
       log.trace(EVENT_PAYLOAD, event);
       School school = JsonUtil.getJsonObjectFromString(School.class, event.getEventPayload());
-      if(school.getSchoolNumber() != null) {
-        List<SchoolEntity> schools = getSchoolRepository().findBySchoolNumberAndDistrictID(school.getSchoolNumber(), UUID.fromString(school.getDistrictId()));
-        if(!schools.isEmpty()) {
-          throw new ConflictFoundException("School Number already exists for this district.");
-        }
-      }
       RequestUtil.setAuditColumnsForCreate(school);
       Pair<SchoolEntity, InstituteEvent> schoolPair = getSchoolService().createSchool(school);
       choreographyEvent = schoolPair.getRight();

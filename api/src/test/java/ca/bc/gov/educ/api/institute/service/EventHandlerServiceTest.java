@@ -215,7 +215,7 @@ public class EventHandlerServiceTest {
   }
 
   @Test(expected = ConflictFoundException.class)
-  public void testHandleEvent_givenEventTypeCREATE_SCHOOL_WITH_CONFLICTING_SCHOOL_NUMBER__DoesExistAndSynchronousNatsMessage_shouldRespondWithData() throws IOException, ExecutionException, InterruptedException {
+  public void testHandleEvent_givenEventTypeCREATE_SCHOOL_WITH_CONFLICTING_SCHOOL_NUMBER__DoesExistAndSynchronousNatsMessage_shouldThrowError() throws IOException, ExecutionException, InterruptedException {
     final DistrictTombstoneEntity dist = this.districtTombstoneRepository.save(this.createDistrictData());
     var existingSchoolEntity = this.createNewSchoolData("99000", "PUBLIC", "DISTONLINE");
     existingSchoolEntity.setDistrictEntity(dist);

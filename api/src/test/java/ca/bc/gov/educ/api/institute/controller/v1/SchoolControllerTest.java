@@ -2,6 +2,7 @@ package ca.bc.gov.educ.api.institute.controller.v1;
 
 import ca.bc.gov.educ.api.institute.InstituteApiResourceApplication;
 import ca.bc.gov.educ.api.institute.constants.v1.URL;
+import ca.bc.gov.educ.api.institute.exception.ConflictFoundException;
 import ca.bc.gov.educ.api.institute.filter.FilterOperation;
 import ca.bc.gov.educ.api.institute.mapper.v1.CodeTableMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.SchoolMapper;
@@ -455,6 +456,34 @@ public class SchoolControllerTest {
       .andExpect(status().isCreated())
       .andExpect(MockMvcResultMatchers.jsonPath("$.schoolNumber").exists())
       .andExpect(MockMvcResultMatchers.jsonPath("$.displayName").value(mappedSchool.getDisplayName()));
+  }
+
+  @Test
+  void testCreateSchoolWithSchoolNumberConflict_GivenValidPayload_ShouldReturnStatusCONFLICT() throws Exception {
+    final DistrictTombstoneEntity dist = this.districtTombstoneRepository.save(this.createDistrictData());
+    var existingSchoolEntity = this.createNewSchoolData("99000", "PUBLIC", "DISTONLINE");
+    existingSchoolEntity.setDistrictEntity(dist);
+    schoolRepository.save(existingSchoolEntity);
+
+    var schoolEntity = this.createNewSchoolData("99000", "PUBLIC", "DISTONLINE");
+    SchoolMapper map = SchoolMapper.mapper;
+
+    School mappedSchool = map.toStructure(schoolEntity);
+
+    mappedSchool.setDistrictId(dist.getDistrictId().toString());
+    mappedSchool.setCreateDate(null);
+    mappedSchool.setUpdateDate(null);
+    mappedSchool.setGrades(List.of(createSchoolGrade()));
+    mappedSchool.setNeighborhoodLearning(List.of(createNeighborhoodLearning()));
+    mappedSchool.setAddresses(List.of(createSchoolAddress()));
+
+    this.mockMvc.perform(post(URL.BASE_URL_SCHOOL)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .content(asJsonString(mappedSchool))
+                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SCHOOL"))))
+            .andDo(print())
+            .andExpect(status().isConflict());
   }
 
   @Test

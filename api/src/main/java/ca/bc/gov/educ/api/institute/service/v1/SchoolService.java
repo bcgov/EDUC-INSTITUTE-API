@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.institute.service.v1;
 
+import ca.bc.gov.educ.api.institute.exception.ConflictFoundException;
 import ca.bc.gov.educ.api.institute.exception.EntityNotFoundException;
 import ca.bc.gov.educ.api.institute.mapper.v1.NoteMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.SchoolContactMapper;
@@ -93,7 +94,16 @@ public class SchoolService {
     }
 
     if(district.isPresent()) {
-      schoolEntity.setSchoolNumber(schoolNumberGenerationService.generateSchoolNumber(district.get().getDistrictNumber(), school.getFacilityTypeCode(), school.getSchoolCategoryCode(), school.getIndependentAuthorityId()));
+      if(school.getSchoolNumber() != null) {
+        List<SchoolEntity> schools = schoolRepository.findBySchoolNumberAndDistrictID(school.getSchoolNumber(), UUID.fromString(school.getDistrictId()));
+        if(!schools.isEmpty()) {
+          throw new ConflictFoundException("School Number already exists for this district.");
+        }
+        schoolEntity.setSchoolNumber(school.getSchoolNumber());
+      } else {
+        schoolEntity.setSchoolNumber(schoolNumberGenerationService.generateSchoolNumber(district.get().getDistrictNumber(), school.getFacilityTypeCode(), school.getSchoolCategoryCode(), school.getIndependentAuthorityId()));
+      }
+
     }
     schoolEntity.getAddresses().stream().forEach(address -> {
       RequestUtil.setAuditColumnsForAddress(address);

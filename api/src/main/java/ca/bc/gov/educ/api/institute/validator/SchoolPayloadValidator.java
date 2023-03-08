@@ -50,10 +50,7 @@ public class SchoolPayloadValidator {
       apiValidationErrors.add(createFieldError("schoolId", school.getSchoolId(), "schoolId should be null for post operation."));
     }
 
-    if (isCreateOperation && school.getSchoolNumber() != null) {
-      apiValidationErrors.add(createFieldError("schoolNumber", school.getSchoolNumber(), "schoolNumber should be null for post operation."));
-    }
-    else if(!isCreateOperation && school.getSchoolNumber() == null) {
+    if(!isCreateOperation && school.getSchoolNumber() == null) {
       apiValidationErrors.add(createFieldError("schoolNumber", school.getSchoolNumber(), "schoolNumber can not be null for a put operation."));
     }
 
