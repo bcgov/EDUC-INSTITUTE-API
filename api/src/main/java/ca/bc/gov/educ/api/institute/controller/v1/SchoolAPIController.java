@@ -62,6 +62,7 @@ public class SchoolAPIController implements SchoolAPIEndpoint {
 
   @Getter(AccessLevel.PRIVATE)
   private final SchoolService schoolService;
+
   @Getter(AccessLevel.PRIVATE)
   private final SchoolHistoryService schoolHistoryService;
 
@@ -76,7 +77,16 @@ public class SchoolAPIController implements SchoolAPIEndpoint {
 
   private final NotePayloadValidator notePayloadValidator;
   @Autowired
-  public SchoolAPIController(Publisher publisher, final SchoolService schoolService, final SchoolHistoryService schoolHistoryService, SchoolSearchService schoolSearchService, SchoolHistorySearchService schoolHistorySearchService, final SchoolPayloadValidator payloadValidator, SchoolContactPayloadValidator contactPayloadValidator, NotePayloadValidator notePayloadValidator) {
+  public SchoolAPIController(
+    Publisher publisher,
+    final SchoolService schoolService,
+    final SchoolHistoryService schoolHistoryService,
+    SchoolSearchService schoolSearchService,
+    SchoolHistorySearchService schoolHistorySearchService,
+    final SchoolPayloadValidator payloadValidator,
+    SchoolContactPayloadValidator contactPayloadValidator,
+    NotePayloadValidator notePayloadValidator
+  ) {
     this.publisher = publisher;
     this.schoolService = schoolService;
     this.schoolHistoryService = schoolHistoryService;
@@ -100,7 +110,11 @@ public class SchoolAPIController implements SchoolAPIEndpoint {
 
   @Override
   public List<SchoolHistory> getSchoolHistory(UUID schoolId) {
-    return getSchoolHistoryService().getAllSchoolHistoryList(schoolId).stream().map(mapper::toStructure).collect(Collectors.toList());
+    return getSchoolHistoryService()
+      .getAllSchoolHistoryList(schoolId)
+      .stream()
+      .map(mapper::toStructure)
+      .collect(Collectors.toList());
   }
 
   @Override
@@ -131,7 +145,12 @@ public class SchoolAPIController implements SchoolAPIEndpoint {
   private void validatePayload(Supplier<List<FieldError>> validator) {
     val validationResult = validator.get();
     if (!validationResult.isEmpty()) {
-      ApiError error = ApiError.builder().timestamp(LocalDateTime.now()).message("Payload contains invalid data.").status(BAD_REQUEST).build();
+      ApiError error = ApiError
+        .builder()
+        .timestamp(LocalDateTime.now())
+        .message("Payload contains invalid data.")
+        .status(BAD_REQUEST)
+        .build();
       error.addValidationErrors(validationResult);
       throw new InvalidPayloadException(error);
     }
@@ -139,7 +158,11 @@ public class SchoolAPIController implements SchoolAPIEndpoint {
 
   @Override
   public List<SchoolTombstone> getAllSchools() {
-    return getSchoolService().getAllSchoolsList().stream().map(tombstoneMapper::toStructure).collect(Collectors.toList());
+    return getSchoolService()
+      .getAllSchoolsList()
+      .stream()
+      .map(tombstoneMapper::toStructure)
+      .collect(Collectors.toList());
   }
 
   @Override
@@ -157,14 +180,16 @@ public class SchoolAPIController implements SchoolAPIEndpoint {
   public SchoolContact createSchoolContact(UUID schoolId, SchoolContact contact) {
     validatePayload(() -> this.contactPayloadValidator.validateCreatePayload(contact));
     RequestUtil.setAuditColumnsForCreate(contact);
-    return schoolContactMapper.toStructure(schoolService.createSchoolContact(contact, schoolId));
+    return schoolContactMapper
+      .toStructure(schoolService.createSchoolContact(contact, schoolId));
   }
 
   @Override
   public SchoolContact updateSchoolContact(UUID schoolId, UUID contactId, SchoolContact contact) {
     validatePayload(() -> this.contactPayloadValidator.validateUpdatePayload(contact));
     RequestUtil.setAuditColumnsForUpdate(contact);
-    return schoolContactMapper.toStructure(schoolService.updateSchoolContact(contact, schoolId, contactId));
+    return schoolContactMapper
+      .toStructure(schoolService.updateSchoolContact(contact, schoolId, contactId));
   }
 
   @Override
@@ -205,17 +230,43 @@ public class SchoolAPIController implements SchoolAPIEndpoint {
   }
 
   @Override
-  public CompletableFuture<Page<School>> findAll(Integer pageNumber, Integer pageSize, String sortCriteriaJson, String searchCriteriaListJson) {
+  public CompletableFuture<Page<School>> findAll(
+    Integer pageNumber,
+    Integer pageSize,
+    String sortCriteriaJson,
+    String searchCriteriaListJson
+  ) {
     final List<Sort.Order> sorts = new ArrayList<>();
-    Specification<SchoolEntity> studentSpecs = schoolSearchService.setSpecificationAndSortCriteria(sortCriteriaJson, searchCriteriaListJson, JsonUtil.mapper, sorts);
-    return this.schoolSearchService.findAll(studentSpecs, pageNumber, pageSize, sorts).thenApplyAsync(schoolEntities -> schoolEntities.map(mapper::toStructure));
+    Specification<SchoolEntity> studentSpecs = schoolSearchService
+      .setSpecificationAndSortCriteria(
+        sortCriteriaJson,
+        searchCriteriaListJson,
+        JsonUtil.mapper,
+        sorts
+      );
+    return this.schoolSearchService
+      .findAll(studentSpecs, pageNumber, pageSize, sorts)
+      .thenApplyAsync(schoolEntities -> schoolEntities.map(mapper::toStructure));
   }
 
   @Override
-  public CompletableFuture<Page<SchoolHistory>> schoolHistoryFindAll(Integer pageNumber, Integer pageSize, String sortCriteriaJson, String searchCriteriaListJson) {
+  public CompletableFuture<Page<SchoolHistory>> schoolHistoryFindAll(
+    Integer pageNumber,
+    Integer pageSize,
+    String sortCriteriaJson,
+    String searchCriteriaListJson
+  ) {
     final List<Sort.Order> sorts = new ArrayList<>();
-    Specification<SchoolHistoryEntity> schoolHistorySpecs = schoolHistorySearchService.setSpecificationAndSortCriteria(sortCriteriaJson, searchCriteriaListJson, JsonUtil.mapper, sorts);
-    return this.schoolHistorySearchService.findAll(schoolHistorySpecs, pageNumber, pageSize, sorts).thenApplyAsync(schoolHistoryEntities -> schoolHistoryEntities.map(mapper::toStructure));
+    Specification<SchoolHistoryEntity> schoolHistorySpecs = schoolHistorySearchService
+      .setSpecificationAndSortCriteria(
+        sortCriteriaJson,
+        searchCriteriaListJson,
+        JsonUtil.mapper,
+        sorts
+      );
+    return this.schoolHistorySearchService
+      .findAll(schoolHistorySpecs, pageNumber, pageSize, sorts)
+      .thenApplyAsync(schoolHistoryEntities -> schoolHistoryEntities.map(mapper::toStructure));
   }
 
 }

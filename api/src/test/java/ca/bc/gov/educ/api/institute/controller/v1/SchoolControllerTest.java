@@ -57,8 +57,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class SchoolControllerTest {
   protected final static ObjectMapper objectMapper = new ObjectMapper();
   private static final CodeTableMapper mapper = CodeTableMapper.mapper;
-
   private static final SchoolMapper schoolMapper = SchoolMapper.mapper;
+
   @Autowired
   private MockMvc mockMvc;
 
@@ -112,7 +112,6 @@ public class SchoolControllerTest {
 
   @Autowired
   SchoolNumberGenerationService schoolNumberGenerationService;
-
 
   @Autowired
   NeighborhoodLearningTypeCodeRepository neighborhoodLearningTypeCodeRepository;
