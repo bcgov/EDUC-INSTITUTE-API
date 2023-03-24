@@ -83,6 +83,9 @@ public class CodeTableControllerTest {
   SchoolCategoryCodeRepository schoolCategoryCodeRepository;
 
   @Autowired
+  SchoolReportingRequirementCodeRepository schoolReportingRequirementCodeRepository;
+
+  @Autowired
   CodeTableService codeTableService;
 
   @Before
@@ -102,6 +105,8 @@ public class CodeTableControllerTest {
     this.schoolGradeCodeRepository.save(this.createSchoolGradeCodeData());
     this.schoolOrganizationCodeRepository.save(this.createSchoolOrganizationCodeData());
     this.schoolCategoryCodeRepository.save(this.createSchoolCategoryCodeData());
+    this.schoolReportingRequirementCodeRepository
+      .save(this.createSchoolReportingRequirementCodeData());
   }
 
   /**
@@ -195,6 +200,21 @@ public class CodeTableControllerTest {
     return SchoolGradeCodeEntity.builder().schoolGradeCode("01").description("First Grade")
       .effectiveDate(LocalDateTime.now()).expiryDate(LocalDateTime.MAX).displayOrder(1).label("First").createDate(LocalDateTime.now())
       .updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
+  }
+
+  private SchoolReportingRequirementCodeEntity createSchoolReportingRequirementCodeData() {
+    return SchoolReportingRequirementCodeEntity.builder()
+      .schoolReportingRequirementCode("REGULAR")
+      .description("The school submits a standard 1701 file")
+      .effectiveDate(LocalDateTime.now())
+      .expiryDate(LocalDateTime.MAX)
+      .displayOrder(1)
+      .label("Regular")
+      .createDate(LocalDateTime.now())
+      .updateDate(LocalDateTime.now())
+      .createUser("TEST")
+      .updateUser("TEST")
+      .build();
   }
 
   private SchoolOrganizationCodeEntity createSchoolOrganizationCodeData() {

@@ -84,6 +84,9 @@ public class SchoolControllerTest {
   SchoolOrganizationCodeRepository schoolOrganizationCodeRepository;
 
   @Autowired
+  SchoolReportingRequirementCodeRepository schoolReportingRequirementCodeRepository;
+
+  @Autowired
   FacilityTypeCodeRepository facilityTypeCodeRepository;
 
   @Autowired
@@ -121,6 +124,8 @@ public class SchoolControllerTest {
     MockitoAnnotations.openMocks(this);
     this.schoolCategoryCodeRepository.save(this.createSchoolCategoryCodeData());
     this.schoolOrganizationCodeRepository.save(this.createSchoolOrganizationCodeData());
+    this.schoolReportingRequirementCodeRepository
+      .save(this.createSchoolReportingRequirementCodeData());
     this.facilityTypeCodeRepository.save(this.createFacilityTypeCodeData());
     this.schoolContactTypeCodeRepository.save(this.createContactTypeCodeData());
     this.addressTypeCodeRepository.save(this.createAddressTypeCodeData());
@@ -144,6 +149,7 @@ public class SchoolControllerTest {
     this.neighborhoodLearningTypeCodeRepository.deleteAll();
     this.schoolCategoryCodeRepository.deleteAll();
     this.schoolOrganizationCodeRepository.deleteAll();
+    this.schoolReportingRequirementCodeRepository.deleteAll();
     this.facilityTypeCodeRepository.deleteAll();
   }
 
@@ -764,12 +770,19 @@ public class SchoolControllerTest {
     final SchoolEntity entity = this.schoolRepository.save(schoolEntity);
     final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_SCHOOL";
     final var mockAuthority = oidcLogin().authorities(grantedAuthority);
-    val resultActions = this.mockMvc.perform(get(URL.BASE_URL_SCHOOL).with(mockAuthority))
-      .andDo(print()).andExpect(status().isOk()).andExpect(MockMvcResultMatchers.jsonPath("$.[0].schoolId")
-        .value(entity.getSchoolId().toString()));
+    val resultActions = this.mockMvc
+      .perform(get(URL.BASE_URL_SCHOOL).with(mockAuthority))
+      .andDo(print())
+      .andExpect(status().isOk())
+      .andExpect(MockMvcResultMatchers
+          .jsonPath("$.[0].schoolId")
+          .value(entity.getSchoolId().toString()));
 
-    val schools = objectMapper.readValue(resultActions.andReturn().getResponse().getContentAsByteArray(), new TypeReference<List<School>>() {
-    });
+    val schools = objectMapper.readValue(
+      resultActions.andReturn().getResponse().getContentAsByteArray(),
+      new TypeReference<List<School>>() {}
+    );
+
     val school = schools.get(0);
     school.setCreateDate(null);
     school.setUpdateDate(null);
@@ -883,15 +896,39 @@ public class SchoolControllerTest {
   }
 
   private SchoolEntity createSchoolData() {
-    return SchoolEntity.builder().schoolNumber("12345").displayName("School Name").openedDate(LocalDateTime.now().minusDays(1).withNano(0)).schoolCategoryCode("PUBLIC")
-      .schoolOrganizationCode("TWO_SEM").facilityTypeCode("DISTONLINE").website("abc@sd99.edu").createDate(LocalDateTime.now().withNano(0))
-      .updateDate(LocalDateTime.now().withNano(0)).createUser("TEST").updateUser("TEST").build();
+    return SchoolEntity
+      .builder()
+      .schoolNumber("12345")
+      .displayName("School Name")
+      .openedDate(LocalDateTime.now().minusDays(1).withNano(0))
+      .schoolCategoryCode("PUBLIC")
+      .schoolOrganizationCode("TWO_SEM")
+      .schoolReportingRequirementCode("REGULAR")
+      .facilityTypeCode("DISTONLINE")
+      .website("abc@sd99.edu")
+      .createDate(LocalDateTime.now().withNano(0))
+      .updateDate(LocalDateTime.now().withNano(0))
+      .createUser("TEST")
+      .updateUser("TEST")
+      .build();
   }
 
   private SchoolEntity createNewSchoolData(String schoolNumber, String schoolCategory, String facilityTypeCode) {
-    return SchoolEntity.builder().schoolNumber(schoolNumber).displayName("School Name").openedDate(LocalDateTime.now().minusDays(1).withNano(0)).schoolCategoryCode(schoolCategory)
-            .schoolOrganizationCode("TWO_SEM").facilityTypeCode(facilityTypeCode).website("abc@sd99.edu").createDate(LocalDateTime.now().withNano(0))
-            .updateDate(LocalDateTime.now().withNano(0)).createUser("TEST").updateUser("TEST").build();
+    return SchoolEntity
+      .builder()
+      .schoolNumber(schoolNumber)
+      .displayName("School Name")
+      .openedDate(LocalDateTime.now().minusDays(1).withNano(0))
+      .schoolCategoryCode(schoolCategory)
+      .schoolOrganizationCode("TWO_SEM")
+      .schoolReportingRequirementCode("REGULAR")
+      .facilityTypeCode(facilityTypeCode)
+      .website("abc@sd99.edu")
+      .createDate(LocalDateTime.now().withNano(0))
+      .updateDate(LocalDateTime.now().withNano(0))
+      .createUser("TEST")
+      .updateUser("TEST")
+      .build();
   }
 
   private SchoolHistoryEntity createHistorySchoolData(UUID schoolId) {
@@ -913,6 +950,21 @@ public class SchoolControllerTest {
     } catch (final Exception e) {
       throw new RuntimeException(e);
     }
+  }
+
+  private SchoolReportingRequirementCodeEntity createSchoolReportingRequirementCodeData() {
+    return SchoolReportingRequirementCodeEntity.builder()
+      .schoolReportingRequirementCode("REGULAR")
+      .description("The school submits a standard 1701 file")
+      .effectiveDate(LocalDateTime.now())
+      .expiryDate(LocalDateTime.MAX)
+      .displayOrder(1)
+      .label("Regular")
+      .createDate(LocalDateTime.now())
+      .updateDate(LocalDateTime.now())
+      .createUser("TEST")
+      .updateUser("TEST")
+      .build();
   }
 
   private SchoolOrganizationCodeEntity createSchoolOrganizationCodeData() {
