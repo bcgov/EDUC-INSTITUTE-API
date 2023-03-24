@@ -38,6 +38,8 @@ public class CodeTableService {
 
   private final SchoolOrganizationCodeRepository schoolOrganizationCodeRepository;
 
+  private final SchoolReportingRequirementCodeRepository schoolReportingRequirementCodeRepository;
+
   private final SchoolCategoryCodeRepository schoolCategoryCodeRepository;
 
   /**
@@ -57,10 +59,23 @@ public class CodeTableService {
    * @param schoolCategoryCodeRepository
    */
   @Autowired
-  public CodeTableService(AddressTypeCodeRepository addressTypeCodeRepository, AuthorityTypeCodeRepository authorityTypeCodeRepository,
-                          DistrictContactTypeCodeRepository districtContactTypeCodeRepository, SchoolContactTypeCodeRepository schoolContactTypeCodeRepository, AuthorityContactTypeCodeRepository authorityContactTypeCodeRepository, DistrictRegionCodeRepository districtRegionCodeRepository, DistrictStatusCodeRepository districtStatusCodeRepository, FacilityTypeCodeRepository facilityTypeCodeRepository,
-                          NeighborhoodLearningTypeCodeRepository neighborhoodLearningTypeCodeRepository, ProvinceCodeRepository provinceCodeRepository,
-                          CountryCodeRepository countryCodeRepository, SchoolGradeCodeRepository schoolGradeCodeRepository, SchoolOrganizationCodeRepository schoolOrganizationCodeRepository, SchoolCategoryCodeRepository schoolCategoryCodeRepository) {
+  public CodeTableService(
+    AddressTypeCodeRepository addressTypeCodeRepository,
+    AuthorityTypeCodeRepository authorityTypeCodeRepository,
+    DistrictContactTypeCodeRepository districtContactTypeCodeRepository,
+    SchoolContactTypeCodeRepository schoolContactTypeCodeRepository,
+    AuthorityContactTypeCodeRepository authorityContactTypeCodeRepository,
+    DistrictRegionCodeRepository districtRegionCodeRepository,
+    DistrictStatusCodeRepository districtStatusCodeRepository,
+    FacilityTypeCodeRepository facilityTypeCodeRepository,
+    NeighborhoodLearningTypeCodeRepository neighborhoodLearningTypeCodeRepository,
+    ProvinceCodeRepository provinceCodeRepository,
+    CountryCodeRepository countryCodeRepository,
+    SchoolGradeCodeRepository schoolGradeCodeRepository,
+    SchoolOrganizationCodeRepository schoolOrganizationCodeRepository,
+    SchoolCategoryCodeRepository schoolCategoryCodeRepository,
+    SchoolReportingRequirementCodeRepository schoolReportingRequirementCodeRepository
+  ) {
     this.addressTypeCodeRepository = addressTypeCodeRepository;
     this.authorityTypeCodeRepository = authorityTypeCodeRepository;
     this.districtContactTypeCodeRepository = districtContactTypeCodeRepository;
@@ -74,6 +89,7 @@ public class CodeTableService {
     this.countryCodeRepository = countryCodeRepository;
     this.schoolGradeCodeRepository = schoolGradeCodeRepository;
     this.schoolOrganizationCodeRepository = schoolOrganizationCodeRepository;
+    this.schoolReportingRequirementCodeRepository = schoolReportingRequirementCodeRepository;
     this.schoolCategoryCodeRepository = schoolCategoryCodeRepository;
   }
 

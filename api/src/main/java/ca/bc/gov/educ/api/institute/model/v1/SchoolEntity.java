@@ -79,6 +79,12 @@ public class SchoolEntity {
   @Column(name = "school_category_code")
   @UpperCase
   private String schoolCategoryCode;
+
+  @Basic
+  @Column(name = "school_reporting_requirement_code")
+  @UpperCase
+  private String schoolReportingRequirementCode;
+
   @Basic
   @Column(name = "facility_type_code")
   @UpperCase
