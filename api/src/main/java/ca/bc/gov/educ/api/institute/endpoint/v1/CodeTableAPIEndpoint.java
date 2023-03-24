@@ -135,6 +135,20 @@ public interface CodeTableAPIEndpoint {
   List<SchoolOrganizationCode> getSchoolOrganizationCodes();
 
   @PreAuthorize("hasAuthority('SCOPE_READ_INSTITUTE_CODES')")
+  @GetMapping(URL.REPORTING_REQUIREMENT_CODES)
+  @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
+  @Transactional(readOnly = true)
+  @Tag(
+    name = "Reporting Requirement Codes",
+    description = "Endpoints to get school reporting requirement codes"
+  )
+  @Schema(
+    name = "SchoolReportingRequirementCode",
+    implementation = SchoolReportingRequirementCode.class
+  )
+  List<SchoolReportingRequirementCode> getSchoolReportingRequirementCodes();
+
+  @PreAuthorize("hasAuthority('SCOPE_READ_INSTITUTE_CODES')")
   @GetMapping(URL.GRADE_CODES)
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
   @Transactional(readOnly = true)

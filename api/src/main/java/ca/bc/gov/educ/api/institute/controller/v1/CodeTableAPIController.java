@@ -85,6 +85,15 @@ public class CodeTableAPIController implements CodeTableAPIEndpoint {
   }
 
   @Override
+  public List<SchoolReportingRequirementCode> getSchoolReportingRequirementCodes() {
+    return getService()
+    .getSchoolReportingRequirementCodes()
+    .stream()
+    .map(mapper::toStructure)
+    .collect(Collectors.toList());
+  }
+
+  @Override
   public List<SchoolOrganizationCode> getSchoolOrganizationCodes() {
     return getService().getSchoolOrganizationCodesList().stream().map(mapper::toStructure).collect(Collectors.toList());
   }

@@ -254,6 +254,19 @@ public class CodeTableControllerTest {
   }
 
   @Test
+  public void testGetSchoolReportingRequirementCodes_ShouldReturnCodes() throws Exception {
+    final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_INSTITUTE_CODES";
+    final var mockAuthority = oidcLogin().authorities(grantedAuthority);
+    this.mockMvc
+      .perform(get(URL.BASE_URL + URL.REPORTING_REQUIREMENT_CODES).with(mockAuthority))
+      .andDo(print())
+      .andExpect(status().isOk())
+      .andExpect(MockMvcResultMatchers.jsonPath(
+        "$[0].schoolReportingRequirementCode").value("REGULAR")
+      );
+  }
+
+  @Test
   public void testGetSchoolGradeCodes_ShouldReturnCodes() throws Exception {
     final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_INSTITUTE_CODES";
     final var mockAuthority = oidcLogin().authorities(grantedAuthority);

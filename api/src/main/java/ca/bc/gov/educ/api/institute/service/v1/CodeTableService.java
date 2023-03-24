@@ -163,6 +163,11 @@ public class CodeTableService {
     return schoolCategoryCodeRepository.findAll();
   }
 
+  @Cacheable("schoolCategoryCodes")
+  public List<SchoolReportingRequirementCodeEntity> getSchoolReportingRequirementCodes() {
+    return schoolReportingRequirementCodeRepository.findAll();
+  }
+
   public Optional<AddressTypeCodeEntity> getAddressTypeCode(String addressTypeCode) {
     return addressTypeCodeRepository.findById(addressTypeCode);
   }
