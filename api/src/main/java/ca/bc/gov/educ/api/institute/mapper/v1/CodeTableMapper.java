@@ -88,6 +88,7 @@ public interface CodeTableMapper {
 
   SchoolOrganizationCode toStructure(SchoolOrganizationCodeEntity entity);
 
+
   SchoolReportingRequirementCodeEntity toModel(SchoolReportingRequirementCode structure);
 
   SchoolReportingRequirementCode toStructure(SchoolReportingRequirementCodeEntity entity);
