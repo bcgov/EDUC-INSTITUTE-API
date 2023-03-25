@@ -38,6 +38,8 @@ public class CodeTableService {
 
   private final SchoolOrganizationCodeRepository schoolOrganizationCodeRepository;
 
+  private final SchoolReportingRequirementCodeRepository schoolReportingRequirementCodeRepository;
+
   private final SchoolCategoryCodeRepository schoolCategoryCodeRepository;
 
   /**
@@ -55,12 +57,26 @@ public class CodeTableService {
    * @param schoolGradeCodeRepository
    * @param schoolOrganizationCodeRepository
    * @param schoolCategoryCodeRepository
+   * @param schoolReportingRequirementCodeRepository
    */
   @Autowired
-  public CodeTableService(AddressTypeCodeRepository addressTypeCodeRepository, AuthorityTypeCodeRepository authorityTypeCodeRepository,
-                          DistrictContactTypeCodeRepository districtContactTypeCodeRepository, SchoolContactTypeCodeRepository schoolContactTypeCodeRepository, AuthorityContactTypeCodeRepository authorityContactTypeCodeRepository, DistrictRegionCodeRepository districtRegionCodeRepository, DistrictStatusCodeRepository districtStatusCodeRepository, FacilityTypeCodeRepository facilityTypeCodeRepository,
-                          NeighborhoodLearningTypeCodeRepository neighborhoodLearningTypeCodeRepository, ProvinceCodeRepository provinceCodeRepository,
-                          CountryCodeRepository countryCodeRepository, SchoolGradeCodeRepository schoolGradeCodeRepository, SchoolOrganizationCodeRepository schoolOrganizationCodeRepository, SchoolCategoryCodeRepository schoolCategoryCodeRepository) {
+  public CodeTableService(
+    AddressTypeCodeRepository addressTypeCodeRepository,
+    AuthorityTypeCodeRepository authorityTypeCodeRepository,
+    DistrictContactTypeCodeRepository districtContactTypeCodeRepository,
+    SchoolContactTypeCodeRepository schoolContactTypeCodeRepository,
+    AuthorityContactTypeCodeRepository authorityContactTypeCodeRepository,
+    DistrictRegionCodeRepository districtRegionCodeRepository,
+    DistrictStatusCodeRepository districtStatusCodeRepository,
+    FacilityTypeCodeRepository facilityTypeCodeRepository,
+    NeighborhoodLearningTypeCodeRepository neighborhoodLearningTypeCodeRepository,
+    ProvinceCodeRepository provinceCodeRepository,
+    CountryCodeRepository countryCodeRepository,
+    SchoolGradeCodeRepository schoolGradeCodeRepository,
+    SchoolOrganizationCodeRepository schoolOrganizationCodeRepository,
+    SchoolCategoryCodeRepository schoolCategoryCodeRepository,
+    SchoolReportingRequirementCodeRepository schoolReportingRequirementCodeRepository
+  ) {
     this.addressTypeCodeRepository = addressTypeCodeRepository;
     this.authorityTypeCodeRepository = authorityTypeCodeRepository;
     this.districtContactTypeCodeRepository = districtContactTypeCodeRepository;
@@ -74,6 +90,7 @@ public class CodeTableService {
     this.countryCodeRepository = countryCodeRepository;
     this.schoolGradeCodeRepository = schoolGradeCodeRepository;
     this.schoolOrganizationCodeRepository = schoolOrganizationCodeRepository;
+    this.schoolReportingRequirementCodeRepository = schoolReportingRequirementCodeRepository;
     this.schoolCategoryCodeRepository = schoolCategoryCodeRepository;
   }
 
@@ -147,6 +164,11 @@ public class CodeTableService {
     return schoolCategoryCodeRepository.findAll();
   }
 
+  @Cacheable("schoolReportingRequirementCodes")
+  public List<SchoolReportingRequirementCodeEntity> getSchoolReportingRequirementCodes() {
+    return schoolReportingRequirementCodeRepository.findAll();
+  }
+
   public Optional<AddressTypeCodeEntity> getAddressTypeCode(String addressTypeCode) {
     return addressTypeCodeRepository.findById(addressTypeCode);
   }
@@ -201,5 +223,10 @@ public class CodeTableService {
 
   public Optional<SchoolCategoryCodeEntity> getSchoolCategoryCode(String schoolCategoryCode) {
     return schoolCategoryCodeRepository.findById(schoolCategoryCode);
+  }
+
+  public Optional<SchoolReportingRequirementCodeEntity> getSchoolReportingRequirementCode(
+      String schoolRequirementCode) {
+    return schoolReportingRequirementCodeRepository.findById(schoolRequirementCode);
   }
 }

@@ -6,6 +6,7 @@ public final class URL {
   public static final String GRADE_CODES = "/grade-codes";
   public static final String FACILITY_TYPE_CODES = "/facility-codes";
   public static final String ORGANIZATION_CODES = "/organization-codes";
+  public static final String REPORTING_REQUIREMENT_CODES = "/reporting-requirement-codes";
   public static final String NEIGHBORHOOD_LEARNING_CODES = "/neighborhood-learning-codes";
   public static final String ADDRESS_TYPE_CODES = "/address-type-codes";
   public static final String AUTHORITY_GROUP_CODES = "/authority-group-codes";

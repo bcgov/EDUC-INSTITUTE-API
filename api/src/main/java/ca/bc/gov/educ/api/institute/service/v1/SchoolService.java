@@ -51,7 +51,6 @@ public class SchoolService {
 
   private final InstituteEventRepository instituteEventRepository;
 
-
   private final SchoolTombstoneRepository schoolTombstoneRepository;
 
   private final DistrictTombstoneRepository districtTombstoneRepository;

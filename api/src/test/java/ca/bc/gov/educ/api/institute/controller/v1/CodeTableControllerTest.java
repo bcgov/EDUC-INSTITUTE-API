@@ -83,6 +83,9 @@ public class CodeTableControllerTest {
   SchoolCategoryCodeRepository schoolCategoryCodeRepository;
 
   @Autowired
+  SchoolReportingRequirementCodeRepository schoolReportingRequirementCodeRepository;
+
+  @Autowired
   CodeTableService codeTableService;
 
   @Before
@@ -102,6 +105,8 @@ public class CodeTableControllerTest {
     this.schoolGradeCodeRepository.save(this.createSchoolGradeCodeData());
     this.schoolOrganizationCodeRepository.save(this.createSchoolOrganizationCodeData());
     this.schoolCategoryCodeRepository.save(this.createSchoolCategoryCodeData());
+    this.schoolReportingRequirementCodeRepository
+      .save(this.createSchoolReportingRequirementCodeData());
   }
 
   /**
@@ -123,6 +128,7 @@ public class CodeTableControllerTest {
     this.schoolGradeCodeRepository.deleteAll();
     this.schoolOrganizationCodeRepository.deleteAll();
     this.schoolCategoryCodeRepository.deleteAll();
+    this.schoolReportingRequirementCodeRepository.deleteAll();
   }
 
   private AddressTypeCodeEntity createAddressTypeCodeData() {
@@ -197,6 +203,21 @@ public class CodeTableControllerTest {
       .updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
   }
 
+  private SchoolReportingRequirementCodeEntity createSchoolReportingRequirementCodeData() {
+    return SchoolReportingRequirementCodeEntity.builder()
+      .schoolReportingRequirementCode("REGULAR")
+      .description("The school submits a standard 1701 file")
+      .effectiveDate(LocalDateTime.now())
+      .expiryDate(LocalDateTime.MAX)
+      .displayOrder(1)
+      .label("Regular")
+      .createDate(LocalDateTime.now())
+      .updateDate(LocalDateTime.now())
+      .createUser("TEST")
+      .updateUser("TEST")
+      .build();
+  }
+
   private SchoolOrganizationCodeEntity createSchoolOrganizationCodeData() {
     return SchoolOrganizationCodeEntity.builder().schoolOrganizationCode("TWO_SEM").description("Two Semesters")
       .effectiveDate(LocalDateTime.now()).expiryDate(LocalDateTime.MAX).displayOrder(1).label("Two Semesters").createDate(LocalDateTime.now())
@@ -231,6 +252,19 @@ public class CodeTableControllerTest {
     final var mockAuthority = oidcLogin().authorities(grantedAuthority);
     this.mockMvc.perform(get(URL.BASE_URL + URL.ORGANIZATION_CODES).with(mockAuthority)).andDo(print()).andExpect(status().isOk())
       .andExpect(MockMvcResultMatchers.jsonPath("$[0].schoolOrganizationCode").value("TWO_SEM"));
+  }
+
+  @Test
+  public void testGetSchoolReportingRequirementCodes_ShouldReturnCodes() throws Exception {
+    final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_INSTITUTE_CODES";
+    final var mockAuthority = oidcLogin().authorities(grantedAuthority);
+    this.mockMvc
+      .perform(get(URL.BASE_URL + URL.REPORTING_REQUIREMENT_CODES).with(mockAuthority))
+      .andDo(print())
+      .andExpect(status().isOk())
+      .andExpect(MockMvcResultMatchers.jsonPath(
+        "$[0].schoolReportingRequirementCode").value("REGULAR")
+      );
   }
 
   @Test
