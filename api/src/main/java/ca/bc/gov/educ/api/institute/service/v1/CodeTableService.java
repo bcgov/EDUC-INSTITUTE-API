@@ -57,6 +57,7 @@ public class CodeTableService {
    * @param schoolGradeCodeRepository
    * @param schoolOrganizationCodeRepository
    * @param schoolCategoryCodeRepository
+   * @param schoolReportingRequirementCodeRepository
    */
   @Autowired
   public CodeTableService(
@@ -163,7 +164,7 @@ public class CodeTableService {
     return schoolCategoryCodeRepository.findAll();
   }
 
-  @Cacheable("schoolCategoryCodes")
+  @Cacheable("schoolReportingRequirementCodes")
   public List<SchoolReportingRequirementCodeEntity> getSchoolReportingRequirementCodes() {
     return schoolReportingRequirementCodeRepository.findAll();
   }
@@ -222,5 +223,10 @@ public class CodeTableService {
 
   public Optional<SchoolCategoryCodeEntity> getSchoolCategoryCode(String schoolCategoryCode) {
     return schoolCategoryCodeRepository.findById(schoolCategoryCode);
+  }
+
+  public Optional<SchoolReportingRequirementCodeEntity> getSchoolReportingRequirementCode(
+      String schoolRequirementCode) {
+    return schoolReportingRequirementCodeRepository.findById(schoolRequirementCode);
   }
 }
