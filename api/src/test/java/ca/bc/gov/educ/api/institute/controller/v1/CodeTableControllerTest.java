@@ -128,6 +128,7 @@ public class CodeTableControllerTest {
     this.schoolGradeCodeRepository.deleteAll();
     this.schoolOrganizationCodeRepository.deleteAll();
     this.schoolCategoryCodeRepository.deleteAll();
+    this.schoolReportingRequirementCodeRepository.deleteAll();
   }
 
   private AddressTypeCodeEntity createAddressTypeCodeData() {
