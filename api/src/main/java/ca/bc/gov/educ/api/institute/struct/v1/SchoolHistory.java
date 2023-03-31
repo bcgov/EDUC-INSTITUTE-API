@@ -58,6 +58,10 @@ public class SchoolHistory extends BaseRequest implements Serializable {
   private String schoolCategoryCode;
 
   @Size(max = 10)
+  @NotNull(message = "schoolReportingRequirementCode cannot be null")
+  private String schoolReportingRequirementCode;
+
+  @Size(max = 10)
   @NotNull(message = "facilityTypeCode cannot be null")
   private String facilityTypeCode;
 
