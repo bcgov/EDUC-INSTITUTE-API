@@ -77,6 +77,11 @@ public class SchoolHistoryEntity {
   private String facilityTypeCode;
 
   @Basic
+  @Column(name = "school_reporting_requirement_code")
+  @UpperCase
+  private String schoolReportingRequirementCode;
+
+  @Basic
   @Column(name = "opened_date")
   private LocalDateTime openedDate;
 
