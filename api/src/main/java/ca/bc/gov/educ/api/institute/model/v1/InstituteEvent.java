@@ -11,7 +11,6 @@ import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -33,10 +32,9 @@ public class InstituteEvent {
   @Column(name = "EVENT_ID", unique = true, updatable = false, columnDefinition = "BINARY(16)")
   private UUID eventId;
 
-  @NotNull(message = "eventPayload cannot be null")
-  @Lob
-  @Column(name = "EVENT_PAYLOAD")
-  private byte[] eventPayloadBytes;
+  @NotNull(message = "payload cannot be null")
+  @Column(name = "EVENT_PAYLOAD",  length = 10485760)
+  private String eventPayload;
 
   @NotNull(message = "eventStatus cannot be null")
   @Column(name = "EVENT_STATUS")
@@ -74,42 +72,4 @@ public class InstituteEvent {
   @Column(name = "REPLY_CHANNEL")
   private String replyChannel;
 
-  /**
-   * Gets event payload.
-   *
-   * @return the event payload
-   */
-  public String getEventPayload() {
-    return new String(getEventPayloadBytes(), StandardCharsets.UTF_8);
-  }
-
-  /**
-   * Sets event payload.
-   *
-   * @param eventPayload the event payload
-   */
-  public void setEventPayload(String eventPayload) {
-    setEventPayloadBytes(eventPayload.getBytes(StandardCharsets.UTF_8));
-  }
-
-  /**
-   * The type Student event builder.
-   */
-  public static class InstituteEventBuilder {
-    /**
-     * The Event payload bytes.
-     */
-    byte[] eventPayloadBytes;
-
-    /**
-     * Event payload student event . student event builder.
-     *
-     * @param eventPayload the event payload
-     * @return the student event . student event builder
-     */
-    public InstituteEvent.InstituteEventBuilder eventPayload(String eventPayload) {
-      this.eventPayloadBytes = eventPayload.getBytes(StandardCharsets.UTF_8);
-      return this;
-    }
-  }
 }
