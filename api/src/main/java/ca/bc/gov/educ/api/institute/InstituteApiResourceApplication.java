@@ -1,10 +1,15 @@
 package ca.bc.gov.educ.api.institute;
 
+import net.javacrumbs.shedlock.core.LockProvider;
+import net.javacrumbs.shedlock.provider.jdbctemplate.JdbcTemplateLockProvider;
+import net.javacrumbs.shedlock.spring.annotation.EnableSchedulerLock;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -13,6 +18,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.transaction.PlatformTransactionManager;
 
 /**
  * The type School api resource application.
@@ -20,6 +26,7 @@ import org.springframework.security.web.SecurityFilterChain;
 @SpringBootApplication
 @EnableCaching
 @EnableRetry
+@EnableSchedulerLock(defaultLockAtMostFor = "1s")
 @EnableScheduling
 public class InstituteApiResourceApplication {
   /**
@@ -29,6 +36,20 @@ public class InstituteApiResourceApplication {
    */
   public static void main(String[] args) {
     SpringApplication.run(InstituteApiResourceApplication.class, args);
+  }
+
+  /**
+   * Lock provider For distributed lock, to avoid multiple pods executing the same scheduled task.
+   *
+   * @param jdbcTemplate       the jdbc template
+   * @param transactionManager the transaction manager
+   * @return the lock provider
+   */
+  @Bean
+  public LockProvider lockProvider(@Autowired final JdbcTemplate jdbcTemplate,
+      @Autowired final PlatformTransactionManager transactionManager) {
+    return new JdbcTemplateLockProvider(jdbcTemplate, transactionManager,
+        "INSTITUTE_SHEDLOCK");
   }
 
 
