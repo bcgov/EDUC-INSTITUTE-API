@@ -347,7 +347,7 @@ public class EventHandlerServiceTest {
       eventHandlerServiceUnderTest.handleMoveSchoolEvent(event).getLeft();
     } catch (EntityNotFoundException e) {
       assertThat(e.getMessage()).contains("SchoolEntity was not found for parameters");
-      assertThat(schoolRepository.findAll()).hasSize(0); //make sure school creation gets rolled back.
+      assertThat(schoolRepository.findAll()).isEmpty(); //make sure school isn't created when there is an error.
     }
   }
 

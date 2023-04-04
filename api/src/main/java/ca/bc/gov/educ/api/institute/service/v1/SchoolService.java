@@ -370,8 +370,9 @@ public class SchoolService {
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public Pair<MoveSchoolData, InstituteEvent> moveSchool(MoveSchoolData moveSchoolData) throws JsonProcessingException{
 
-    //check if school number exists in district
-    if (schoolRepository.existsBySchoolNumberAndDistrictID(moveSchoolData.getToSchool().getSchoolNumber(), UUID.fromString(moveSchoolData.getToSchool().getDistrictId()))) {
+    Boolean schoolNumberExistsInDistrict = schoolRepository.existsBySchoolNumberAndDistrictID(moveSchoolData.getToSchool().getSchoolNumber(), UUID.fromString(moveSchoolData.getToSchool().getDistrictId()));
+
+    if (Boolean.TRUE.equals(schoolNumberExistsInDistrict)) {
       log.info("School number {} exists in district {} setting school number to null", moveSchoolData.getToSchool().getSchoolNumber(), moveSchoolData.getToSchool().getDistrictId());
       moveSchoolData.getToSchool().setSchoolNumber(null);
     }
