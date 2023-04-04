@@ -1,28 +1,59 @@
 package ca.bc.gov.educ.api.institute.service;
 
+import static ca.bc.gov.educ.api.institute.constants.v1.EventOutcome.AUTHORITY_FOUND;
+import static ca.bc.gov.educ.api.institute.constants.v1.EventOutcome.AUTHORITY_NOT_FOUND;
+import static ca.bc.gov.educ.api.institute.constants.v1.EventOutcome.SCHOOL_CREATED;
+import static ca.bc.gov.educ.api.institute.constants.v1.EventOutcome.SCHOOL_MOVED;
+import static ca.bc.gov.educ.api.institute.constants.v1.EventOutcome.SCHOOL_UPDATED;
+import static ca.bc.gov.educ.api.institute.constants.v1.EventStatus.MESSAGE_PUBLISHED;
+import static ca.bc.gov.educ.api.institute.constants.v1.EventType.CREATE_SCHOOL;
+import static ca.bc.gov.educ.api.institute.constants.v1.EventType.GET_AUTHORITY;
+import static ca.bc.gov.educ.api.institute.constants.v1.EventType.GET_PAGINATED_SCHOOLS;
+import static ca.bc.gov.educ.api.institute.constants.v1.EventType.MOVE_SCHOOL;
+import static ca.bc.gov.educ.api.institute.constants.v1.EventType.UPDATE_SCHOOL;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import ca.bc.gov.educ.api.institute.constants.v1.Topics;
 import ca.bc.gov.educ.api.institute.exception.ConflictFoundException;
+import ca.bc.gov.educ.api.institute.exception.EntityNotFoundException;
 import ca.bc.gov.educ.api.institute.filter.FilterOperation;
 import ca.bc.gov.educ.api.institute.mapper.v1.IndependentAuthorityMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.SchoolMapper;
 import ca.bc.gov.educ.api.institute.model.v1.DistrictTombstoneEntity;
 import ca.bc.gov.educ.api.institute.model.v1.IndependentAuthorityEntity;
+import ca.bc.gov.educ.api.institute.model.v1.InstituteEvent;
 import ca.bc.gov.educ.api.institute.model.v1.SchoolEntity;
 import ca.bc.gov.educ.api.institute.repository.v1.DistrictTombstoneRepository;
 import ca.bc.gov.educ.api.institute.repository.v1.IndependentAuthorityRepository;
 import ca.bc.gov.educ.api.institute.repository.v1.InstituteEventRepository;
 import ca.bc.gov.educ.api.institute.repository.v1.SchoolRepository;
 import ca.bc.gov.educ.api.institute.service.v1.EventHandlerService;
-import ca.bc.gov.educ.api.institute.struct.v1.*;
+import ca.bc.gov.educ.api.institute.struct.v1.Event;
+import ca.bc.gov.educ.api.institute.struct.v1.MoveSchoolData;
+import ca.bc.gov.educ.api.institute.struct.v1.NeighborhoodLearning;
+import ca.bc.gov.educ.api.institute.struct.v1.School;
+import ca.bc.gov.educ.api.institute.struct.v1.SchoolAddress;
+import ca.bc.gov.educ.api.institute.struct.v1.SchoolGrade;
+import ca.bc.gov.educ.api.institute.struct.v1.Search;
+import ca.bc.gov.educ.api.institute.struct.v1.SearchCriteria;
+import ca.bc.gov.educ.api.institute.struct.v1.ValueType;
 import ca.bc.gov.educ.api.institute.util.JsonUtil;
-import ca.bc.gov.educ.api.institute.util.TransformUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,23 +64,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
-import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
-
-import static ca.bc.gov.educ.api.institute.constants.v1.EventOutcome.*;
-import static ca.bc.gov.educ.api.institute.constants.v1.EventStatus.MESSAGE_PUBLISHED;
-import static ca.bc.gov.educ.api.institute.constants.v1.EventType.*;
-import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
 @ActiveProfiles("test")
@@ -266,6 +280,78 @@ public class EventHandlerServiceTest {
     assertThat(schoolUpdatedEvent.get().getEventOutcome()).isEqualTo(SCHOOL_UPDATED.toString());
   }
 
+  @Test
+  public void testHandleEvent_givenEventTypeMOVE_SCHOOL__DoesExistAndSynchronousNatsMessage_shouldRespondWithData() throws IOException, ExecutionException, InterruptedException {
+    final DistrictTombstoneEntity dist = this.districtTombstoneRepository.save(this.createDistrictData());
+    SchoolEntity toSchoolEntity = this.createNewSchoolData("99000", "PUBLIC", "DISTONLINE");
+    SchoolEntity fromSchoolEntity = this.createNewSchoolData("99000", "PUBLIC", "DISTONLINE");
+    LocalDateTime moveDate = LocalDateTime.now().plusDays(1).truncatedTo(ChronoUnit.MILLIS);
+
+    toSchoolEntity.setDistrictEntity(dist);
+    fromSchoolEntity.setDistrictEntity(dist);
+    schoolRepository.save(fromSchoolEntity);
+
+    School toSchool = new School();
+    SchoolMapper map = SchoolMapper.mapper;
+
+    BeanUtils.copyProperties(map.toStructure(toSchoolEntity), toSchool);
+
+    ObjectMapper objectMapper = new ObjectMapper();
+    objectMapper.registerModule(new JavaTimeModule()).configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+
+    MoveSchoolData moveSchoolData = createMoveSchoolData(toSchool, fromSchoolEntity.getSchoolId(), moveDate);
+
+    UUID sagaId = UUID.randomUUID();
+    final Event event = Event.builder().eventType(MOVE_SCHOOL).sagaId(sagaId).eventPayload(objectMapper.writeValueAsString(moveSchoolData)).build();
+
+    eventHandlerServiceUnderTest.handleMoveSchoolEvent(event).getLeft();
+    Optional<InstituteEvent> schoolUpdatedEvent = instituteEventRepository.findBySagaIdAndEventType(sagaId, MOVE_SCHOOL.toString());
+    assertThat(schoolUpdatedEvent).isPresent();
+    assertThat(schoolUpdatedEvent.get().getEventStatus()).isEqualTo(MESSAGE_PUBLISHED.toString());
+    assertThat(schoolUpdatedEvent.get().getEventOutcome()).isEqualTo(SCHOOL_MOVED.toString());
+
+    //check that data in event payload is updated
+    MoveSchoolData moveSchoolEventData = JsonUtil.getJsonObjectFromString(MoveSchoolData.class, event.getEventPayload());
+    assertThat(moveSchoolEventData.getToSchool().getSchoolId()).isNotNull();
+    assertThat(moveSchoolEventData.getToSchool().getSchoolNumber()).isNotEqualTo("99000"); //new school number since school number already exists in district
+
+    //2 schools = 1 that was created + 1 that was closed for the move.
+    List<SchoolEntity> schoolEntities = schoolRepository.findAll();
+    assertThat(schoolEntities.size()).isEqualTo(2);
+
+    //confirm previous school has closed
+    assertThat(schoolRepository.findById(fromSchoolEntity.getSchoolId()).get().getClosedDate()).isEqualTo(moveDate);
+  }
+
+  @Test
+  public void testHandleEvent_givenEventTypeMOVE_SCHOOL__ToSchoolIdDoesNotExist_shouldThrowEntitynotFoundException() throws IOException, ExecutionException, InterruptedException {
+    final DistrictTombstoneEntity dist = this.districtTombstoneRepository.save(this.createDistrictData());
+    SchoolEntity toSchoolEntity = this.createNewSchoolData("99000", "PUBLIC", "DISTONLINE");
+    LocalDateTime moveDate = LocalDateTime.now().plusDays(1).truncatedTo(ChronoUnit.MILLIS);
+
+    toSchoolEntity.setDistrictEntity(dist);
+
+    School toSchool = new School();
+    SchoolMapper map = SchoolMapper.mapper;
+
+    BeanUtils.copyProperties(map.toStructure(toSchoolEntity), toSchool);
+
+    ObjectMapper objectMapper = new ObjectMapper();
+    objectMapper.registerModule(new JavaTimeModule()).configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+
+    MoveSchoolData moveSchoolData = createMoveSchoolData(toSchool, UUID.randomUUID(), moveDate);
+
+    UUID sagaId = UUID.randomUUID();
+    final Event event = Event.builder().eventType(MOVE_SCHOOL).sagaId(sagaId).eventPayload(objectMapper.writeValueAsString(moveSchoolData)).build();
+
+    try {
+      eventHandlerServiceUnderTest.handleMoveSchoolEvent(event).getLeft();
+    } catch (EntityNotFoundException e) {
+      assertThat(e.getMessage()).contains("SchoolEntity was not found for parameters");
+      assertThat(schoolRepository.findAll().size()).isEqualTo(0); //make sure school creation gets rolled back.
+    }
+  }
+
   private IndependentAuthorityEntity createIndependentAuthorityData() {
     return IndependentAuthorityEntity.builder().authorityNumber(003).displayName("IndependentAuthority Name").openedDate(LocalDateTime.now().minusDays(1))
       .authorityTypeCode("INDEPEND").createDate(LocalDateTime.now()).updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
@@ -304,5 +390,13 @@ public class EventHandlerServiceTest {
     schoolAddress.setPostal("v1B9H2");
 
     return schoolAddress;
+  }
+
+  private MoveSchoolData createMoveSchoolData(School toSchool, UUID fromSchoolId, LocalDateTime moveDate) {
+    MoveSchoolData moveSchoolData = MoveSchoolData.builder().toSchool(toSchool).fromSchoolId(fromSchoolId.toString()).moveDate(moveDate.toString()).build();
+    moveSchoolData.setCreateUser("MOVE_TEST");
+    moveSchoolData.setUpdateUser("MOVE_TEST");
+
+    return moveSchoolData;
   }
 }

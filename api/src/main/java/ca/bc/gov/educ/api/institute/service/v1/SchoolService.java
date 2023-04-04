@@ -1,12 +1,31 @@
 package ca.bc.gov.educ.api.institute.service.v1;
 
+import static ca.bc.gov.educ.api.institute.constants.v1.EventOutcome.SCHOOL_CREATED;
+import static ca.bc.gov.educ.api.institute.constants.v1.EventOutcome.SCHOOL_MOVED;
+import static ca.bc.gov.educ.api.institute.constants.v1.EventOutcome.SCHOOL_UPDATED;
+import static ca.bc.gov.educ.api.institute.constants.v1.EventType.CREATE_SCHOOL;
+import static ca.bc.gov.educ.api.institute.constants.v1.EventType.MOVE_SCHOOL;
+import static ca.bc.gov.educ.api.institute.constants.v1.EventType.UPDATE_SCHOOL;
+
 import ca.bc.gov.educ.api.institute.exception.ConflictFoundException;
 import ca.bc.gov.educ.api.institute.exception.EntityNotFoundException;
 import ca.bc.gov.educ.api.institute.mapper.v1.NoteMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.SchoolContactMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.SchoolMapper;
-import ca.bc.gov.educ.api.institute.model.v1.*;
-import ca.bc.gov.educ.api.institute.repository.v1.*;
+import ca.bc.gov.educ.api.institute.model.v1.DistrictTombstoneEntity;
+import ca.bc.gov.educ.api.institute.model.v1.InstituteEvent;
+import ca.bc.gov.educ.api.institute.model.v1.NoteEntity;
+import ca.bc.gov.educ.api.institute.model.v1.SchoolContactEntity;
+import ca.bc.gov.educ.api.institute.model.v1.SchoolEntity;
+import ca.bc.gov.educ.api.institute.model.v1.SchoolTombstoneEntity;
+import ca.bc.gov.educ.api.institute.repository.v1.DistrictRepository;
+import ca.bc.gov.educ.api.institute.repository.v1.DistrictTombstoneRepository;
+import ca.bc.gov.educ.api.institute.repository.v1.InstituteEventRepository;
+import ca.bc.gov.educ.api.institute.repository.v1.NoteRepository;
+import ca.bc.gov.educ.api.institute.repository.v1.SchoolContactRepository;
+import ca.bc.gov.educ.api.institute.repository.v1.SchoolRepository;
+import ca.bc.gov.educ.api.institute.repository.v1.SchoolTombstoneRepository;
+import ca.bc.gov.educ.api.institute.struct.v1.MoveSchoolData;
 import ca.bc.gov.educ.api.institute.struct.v1.Note;
 import ca.bc.gov.educ.api.institute.struct.v1.School;
 import ca.bc.gov.educ.api.institute.struct.v1.SchoolContact;
@@ -15,8 +34,13 @@ import ca.bc.gov.educ.api.institute.util.JsonUtil;
 import ca.bc.gov.educ.api.institute.util.RequestUtil;
 import ca.bc.gov.educ.api.institute.util.TransformUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.BeanUtils;
@@ -25,16 +49,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
-import static ca.bc.gov.educ.api.institute.constants.v1.EventOutcome.SCHOOL_CREATED;
-import static ca.bc.gov.educ.api.institute.constants.v1.EventOutcome.SCHOOL_UPDATED;
-import static ca.bc.gov.educ.api.institute.constants.v1.EventType.CREATE_SCHOOL;
-import static ca.bc.gov.educ.api.institute.constants.v1.EventType.UPDATE_SCHOOL;
-
 @Service
+@Slf4j
 public class SchoolService {
 
   private static final String SCHOOL_ID_ATTR = "schoolId";
@@ -46,6 +62,8 @@ public class SchoolService {
   private static final String CREATE_DATE = "createDate";
 
   private static final String CREATE_USER = "createUser";
+
+  private static final String FROM_SCHOOL_ID_ATTR = "fromSchoolId";
   @Getter(AccessLevel.PRIVATE)
   private final SchoolRepository schoolRepository;
 
@@ -86,6 +104,14 @@ public class SchoolService {
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public Pair<SchoolEntity, InstituteEvent> createSchool(School school) throws JsonProcessingException {
+
+    SchoolEntity schoolEntity = createSchoolHelper(school);
+    final InstituteEvent instituteEvent = EventUtil.createInstituteEvent(schoolEntity.getUpdateUser(), schoolEntity.getUpdateUser(), JsonUtil.getJsonStringFromObject(SchoolMapper.mapper.toStructure(schoolEntity)), CREATE_SCHOOL, SCHOOL_CREATED);
+    instituteEventRepository.save(instituteEvent);
+    return Pair.of(schoolEntity, instituteEvent);
+  }
+
+  private SchoolEntity createSchoolHelper(School school) {
     var schoolEntity = SchoolMapper.mapper.toModel(school);
     Optional<DistrictTombstoneEntity> district = districtTombstoneRepository.findById(UUID.fromString(school.getDistrictId()));
     if(district.isPresent()) {
@@ -109,13 +135,13 @@ public class SchoolService {
       TransformUtil.uppercaseFields(address);
       address.setSchoolEntity(schoolEntity);
     });
-    
+
     schoolEntity.getGrades().stream().forEach(grade -> {
       RequestUtil.setAuditColumnsForGrades(grade);
       TransformUtil.uppercaseFields(grade);
       grade.setSchoolEntity(schoolEntity);
     });
-    
+
     schoolEntity.getNeighborhoodLearning().stream().forEach(neighborhoodLearning -> {
       RequestUtil.setAuditColumnsForNeighborhoodLearning(neighborhoodLearning);
       TransformUtil.uppercaseFields(neighborhoodLearning);
@@ -125,9 +151,8 @@ public class SchoolService {
     TransformUtil.uppercaseFields(schoolEntity);
     schoolRepository.save(schoolEntity);
     schoolHistoryService.createSchoolHistory(schoolEntity, school.getCreateUser());
-    final InstituteEvent instituteEvent = EventUtil.createInstituteEvent(schoolEntity.getUpdateUser(), schoolEntity.getUpdateUser(), JsonUtil.getJsonStringFromObject(SchoolMapper.mapper.toStructure(schoolEntity)), CREATE_SCHOOL, SCHOOL_CREATED);
-    instituteEventRepository.save(instituteEvent);
-    return Pair.of(schoolEntity, instituteEvent);
+
+    return schoolEntity;
   }
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -145,11 +170,23 @@ public class SchoolService {
       throw new EntityNotFoundException(SchoolEntity.class, SCHOOL_ID_ATTR, String.valueOf(schoolId));
     }
 
-    Optional<SchoolEntity> curSchoolEntityOptional = schoolRepository.findById(school.getSchoolId());
+    var savedSchool = updateSchoolHelper(school);
+
+    final InstituteEvent instituteEvent = EventUtil.createInstituteEvent(savedSchool.getUpdateUser(), savedSchool.getUpdateUser(), JsonUtil.getJsonStringFromObject(SchoolMapper.mapper.toStructure(savedSchool)), UPDATE_SCHOOL, SCHOOL_UPDATED);
+    instituteEventRepository.save(instituteEvent);
+
+    return Pair.of(savedSchool, instituteEvent);
+  }
+
+  private SchoolEntity updateSchoolHelper(SchoolEntity school) {
+    Optional<SchoolEntity> curSchoolEntityOptional = schoolRepository.findById(
+        school.getSchoolId());
 
     if (curSchoolEntityOptional.isPresent()) {
       final SchoolEntity currentSchoolEntity = curSchoolEntityOptional.get();
-      BeanUtils.copyProperties(school, currentSchoolEntity, CREATE_DATE, CREATE_USER, "grades", "neighborhoodLearning", "districtEntity", "addresses"); // update current student entity with incoming payload ignoring the fields.
+      BeanUtils.copyProperties(school, currentSchoolEntity, CREATE_DATE, CREATE_USER, "grades",
+          "neighborhoodLearning", "districtEntity",
+          "addresses"); // update current student entity with incoming payload ignoring the fields.
 
       setGradesAndNeighborhoodLearning(currentSchoolEntity, school);
       setAddresses(currentSchoolEntity, school);
@@ -157,12 +194,11 @@ public class SchoolService {
       TransformUtil.uppercaseFields(currentSchoolEntity); // convert the input to upper case.
       var savedSchool = schoolRepository.save(currentSchoolEntity);
       schoolHistoryService.createSchoolHistory(savedSchool, savedSchool.getUpdateUser());
-      final InstituteEvent instituteEvent = EventUtil.createInstituteEvent(savedSchool.getUpdateUser(), savedSchool.getUpdateUser(), JsonUtil.getJsonStringFromObject(SchoolMapper.mapper.toStructure(savedSchool)), UPDATE_SCHOOL, SCHOOL_UPDATED);
-      instituteEventRepository.save(instituteEvent);
 
-      return Pair.of(savedSchool, instituteEvent);
+      return savedSchool;
     } else {
-      throw new EntityNotFoundException(SchoolEntity.class, SCHOOL_ID_ATTR, String.valueOf(schoolId));
+      throw new EntityNotFoundException(SchoolEntity.class, SCHOOL_ID_ATTR,
+          String.valueOf(school.getSchoolId()));
     }
   }
 
@@ -329,5 +365,36 @@ public class SchoolService {
     } else {
       throw new EntityNotFoundException(SchoolEntity.class, SCHOOL_ID_ATTR, String.valueOf(schoolId));
     }
+  }
+
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
+  public Pair<MoveSchoolData, InstituteEvent> moveSchool(MoveSchoolData moveSchoolData) throws JsonProcessingException{
+
+    Boolean schoolNumberExistsInDistrict = schoolRepository.existsBySchoolNumberAndDistrictID(moveSchoolData.getToSchool().getSchoolNumber(), UUID.fromString(moveSchoolData.getToSchool().getDistrictId()));
+
+    if (schoolNumberExistsInDistrict) {
+      log.info("School number {} exists in district {} setting school number to null", moveSchoolData.getToSchool().getSchoolNumber(), moveSchoolData.getToSchool().getDistrictId());
+      moveSchoolData.getToSchool().setSchoolNumber(null);
+    }
+
+    SchoolEntity movedSchool = createSchoolHelper(moveSchoolData.getToSchool());
+    log.info("School created for move schoolId :: {}", movedSchool.getSchoolId());
+
+    //create move history
+
+    val schoolEntityOptional = schoolRepository.findById(UUID.fromString(moveSchoolData.getFromSchoolId()));
+    SchoolEntity fromSchoolEntity = schoolEntityOptional.orElseThrow(() -> new EntityNotFoundException(SchoolEntity.class, FROM_SCHOOL_ID_ATTR, moveSchoolData.getFromSchoolId()));
+
+    fromSchoolEntity.setClosedDate(LocalDateTime.parse(moveSchoolData.getMoveDate()));
+    fromSchoolEntity.setUpdateUser(moveSchoolData.getToSchool().getCreateUser());
+    fromSchoolEntity.setUpdateDate(LocalDateTime.now());
+
+    updateSchoolHelper(fromSchoolEntity);
+    log.info("Close date set to {} for schoolId :: {}", moveSchoolData.getMoveDate(), fromSchoolEntity.getSchoolId());
+
+    moveSchoolData.setToSchool(SchoolMapper.mapper.toStructure(movedSchool));
+
+    final InstituteEvent instituteEvent = EventUtil.createInstituteEvent(movedSchool.getUpdateUser(), movedSchool.getUpdateUser(), JsonUtil.getJsonStringFromObject(moveSchoolData), MOVE_SCHOOL, SCHOOL_MOVED);
+    return Pair.of(moveSchoolData, instituteEvent);
   }
 }
