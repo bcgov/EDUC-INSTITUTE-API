@@ -316,8 +316,7 @@ public class EventHandlerServiceTest {
     assertThat(moveSchoolEventData.getToSchool().getSchoolNumber()).isNotEqualTo("99000"); //new school number since school number already exists in district
 
     //2 schools = 1 that was created + 1 that was closed for the move.
-    List<SchoolEntity> schoolEntities = schoolRepository.findAll();
-    assertThat(schoolEntities.size()).isEqualTo(2);
+    assertThat(schoolRepository.findAll()).hasSize(2);
 
     //confirm previous school has closed
     assertThat(schoolRepository.findById(fromSchoolEntity.getSchoolId()).get().getClosedDate()).isEqualTo(moveDate);
@@ -348,7 +347,7 @@ public class EventHandlerServiceTest {
       eventHandlerServiceUnderTest.handleMoveSchoolEvent(event).getLeft();
     } catch (EntityNotFoundException e) {
       assertThat(e.getMessage()).contains("SchoolEntity was not found for parameters");
-      assertThat(schoolRepository.findAll().size()).isEqualTo(0); //make sure school creation gets rolled back.
+      assertThat(schoolRepository.findAll()).hasSize(0); //make sure school creation gets rolled back.
     }
   }
 
