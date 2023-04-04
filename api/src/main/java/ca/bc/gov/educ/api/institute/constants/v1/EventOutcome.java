@@ -21,6 +21,8 @@ public enum EventOutcome {
 
   AUTHORITY_NOT_FOUND,
 
-  SCHOOL_NOT_FOUND
+  SCHOOL_NOT_FOUND,
+
+  SCHOOL_MOVED
 
 }

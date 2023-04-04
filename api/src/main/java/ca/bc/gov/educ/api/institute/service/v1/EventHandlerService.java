@@ -1,5 +1,8 @@
 package ca.bc.gov.educ.api.institute.service.v1;
 
+import static ca.bc.gov.educ.api.institute.constants.v1.EventStatus.MESSAGE_PUBLISHED;
+import static lombok.AccessLevel.PRIVATE;
+
 import ca.bc.gov.educ.api.institute.constants.v1.EventOutcome;
 import ca.bc.gov.educ.api.institute.constants.v1.EventType;
 import ca.bc.gov.educ.api.institute.exception.EntityNotFoundException;
@@ -10,12 +13,21 @@ import ca.bc.gov.educ.api.institute.model.v1.SchoolEntity;
 import ca.bc.gov.educ.api.institute.repository.v1.IndependentAuthorityRepository;
 import ca.bc.gov.educ.api.institute.repository.v1.InstituteEventRepository;
 import ca.bc.gov.educ.api.institute.struct.v1.Event;
+import ca.bc.gov.educ.api.institute.struct.v1.MoveSchoolData;
 import ca.bc.gov.educ.api.institute.struct.v1.School;
 import ca.bc.gov.educ.api.institute.util.JsonUtil;
 import ca.bc.gov.educ.api.institute.util.RequestUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -27,18 +39,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-
-import static ca.bc.gov.educ.api.institute.constants.v1.EventStatus.MESSAGE_PUBLISHED;
-import static lombok.AccessLevel.PRIVATE;
 
 /**
  * The type Event handler service.
@@ -212,6 +212,22 @@ public class EventHandlerService {
     } catch (EntityNotFoundException ex) {
       event.setEventOutcome(EventOutcome.SCHOOL_NOT_FOUND);
     }
+
+    InstituteEvent schoolEvent = createInstituteEventRecord(event);
+    getInstituteEventRepository().save(schoolEvent);
+    return Pair.of(createResponseEvent(schoolEvent), choreographyEvent);
+  }
+
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
+  public Pair<byte[], InstituteEvent> handleMoveSchoolEvent(Event event) throws JsonProcessingException {
+    InstituteEvent choreographyEvent = null;
+    log.trace(EVENT_PAYLOAD, event);
+    MoveSchoolData moveSchoolData = JsonUtil.getJsonObjectFromString(MoveSchoolData.class, event.getEventPayload());
+    RequestUtil.setAuditColumnsForCreate(moveSchoolData.getToSchool());
+    Pair<MoveSchoolData, InstituteEvent> schoolPair = getSchoolService().moveSchool(moveSchoolData);
+    choreographyEvent = schoolPair.getRight();
+    event.setEventOutcome(EventOutcome.SCHOOL_MOVED);
+    event.setEventPayload(JsonUtil.getJsonStringFromObject(schoolPair.getLeft()));
 
     InstituteEvent schoolEvent = createInstituteEventRecord(event);
     getInstituteEventRepository().save(schoolEvent);

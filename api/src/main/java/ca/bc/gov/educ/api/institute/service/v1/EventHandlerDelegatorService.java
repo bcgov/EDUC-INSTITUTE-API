@@ -1,5 +1,7 @@
 package ca.bc.gov.educ.api.institute.service.v1;
 
+import static ca.bc.gov.educ.api.institute.service.v1.EventHandlerService.PAYLOAD_LOG;
+
 import ca.bc.gov.educ.api.institute.messaging.MessagePublisher;
 import ca.bc.gov.educ.api.institute.messaging.jetstream.Publisher;
 import ca.bc.gov.educ.api.institute.model.v1.InstituteEvent;
@@ -9,8 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import static ca.bc.gov.educ.api.institute.service.v1.EventHandlerService.PAYLOAD_LOG;
 
 /**
  * The type Event handler service.
@@ -86,6 +86,14 @@ public class EventHandlerDelegatorService {
           log.info(RESPONDING_BACK_TO_NATS_ON_CHANNEL, message.getReplyTo() != null ? message.getReplyTo() : event.getReplyTo());
           publishToNATS(event, message, isSynchronous, updatePair.getLeft());
           publishToJetStream(updatePair.getRight());
+          break;
+        case MOVE_SCHOOL:
+          log.info("Received MOVE_SCHOOL event :: {}", event.getSagaId());
+          log.trace(PAYLOAD_LOG, event.getEventPayload());
+          Pair<byte[], InstituteEvent> movePair = eventHandlerService.handleMoveSchoolEvent(event);
+          log.info(RESPONDING_BACK_TO_NATS_ON_CHANNEL, message.getReplyTo() != null ? message.getReplyTo() : event.getReplyTo());
+          publishToNATS(event, message, isSynchronous, movePair.getLeft());
+          publishToJetStream(movePair.getRight());
           break;
         default:
           log.info("silently ignoring other events :: {}", event);

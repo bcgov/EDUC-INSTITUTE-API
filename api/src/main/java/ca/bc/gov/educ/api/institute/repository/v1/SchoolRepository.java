@@ -46,4 +46,6 @@ public interface SchoolRepository extends JpaRepository<SchoolEntity, UUID>, Jpa
   Integer findFirstAvailableSchoolNumber(String districtNumber, UUID authorityId, Integer lowerRange, Integer upperRange);
 
   List<SchoolEntity> findBySchoolNumberAndDistrictID(String schoolNumber, UUID districtID);
+
+  Boolean existsBySchoolNumberAndDistrictID(String schoolNumber, UUID districtID);
 }
