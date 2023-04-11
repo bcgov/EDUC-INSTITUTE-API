@@ -22,6 +22,7 @@ import ca.bc.gov.educ.api.institute.mapper.v1.SchoolMapper;
 import ca.bc.gov.educ.api.institute.model.v1.DistrictTombstoneEntity;
 import ca.bc.gov.educ.api.institute.model.v1.IndependentAuthorityEntity;
 import ca.bc.gov.educ.api.institute.model.v1.InstituteEvent;
+import ca.bc.gov.educ.api.institute.model.v1.SchoolAddressEntity;
 import ca.bc.gov.educ.api.institute.model.v1.SchoolEntity;
 import ca.bc.gov.educ.api.institute.repository.v1.DistrictTombstoneRepository;
 import ca.bc.gov.educ.api.institute.repository.v1.IndependentAuthorityRepository;
@@ -48,9 +49,11 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import lombok.extern.slf4j.Slf4j;
@@ -287,8 +290,15 @@ public class EventHandlerServiceTest {
     SchoolEntity fromSchoolEntity = this.createNewSchoolData("99000", "PUBLIC", "DISTONLINE");
     LocalDateTime moveDate = LocalDateTime.now().plusDays(1).truncatedTo(ChronoUnit.MILLIS);
 
+    Set<SchoolAddressEntity> schoolAddressSet = new HashSet<>();
+    SchoolAddressEntity fromSchoolAddressEntity = SchoolAddressEntity.builder()
+        .addressTypeCode("MAILING").addressLine1("123 This Street").city("Victoria")
+        .provinceCode("BC").countryCode("CA").postal("V1V2V3").schoolEntity(fromSchoolEntity).build();
+    schoolAddressSet.add(fromSchoolAddressEntity);
+
     toSchoolEntity.setDistrictEntity(dist);
     fromSchoolEntity.setDistrictEntity(dist);
+    fromSchoolEntity.setAddresses(schoolAddressSet);
     schoolRepository.save(fromSchoolEntity);
 
     School toSchool = new School();
@@ -318,8 +328,10 @@ public class EventHandlerServiceTest {
     //2 schools = 1 that was created + 1 that was closed for the move.
     assertThat(schoolRepository.findAll()).hasSize(2);
 
-    //confirm previous school has closed
+    //confirm previous school has closed and address information saved
     assertThat(schoolRepository.findById(fromSchoolEntity.getSchoolId()).get().getClosedDate()).isEqualTo(moveDate);
+    assertThat(schoolRepository.findById(fromSchoolEntity.getSchoolId()).get().getAddresses().stream().toList().get(0).getCity()).isEqualTo(fromSchoolAddressEntity.getCity());
+
   }
 
   @Test

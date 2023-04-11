@@ -226,7 +226,6 @@ public class EventHandlerService {
 
     if (instituteEventOptional.isEmpty()) {
       log.info(NO_RECORD_SAGA_ID_EVENT_TYPE);
-      log.trace(EVENT_PAYLOAD, event);
       MoveSchoolData moveSchoolData = JsonUtil.getJsonObjectFromString(MoveSchoolData.class, event.getEventPayload());
       RequestUtil.setAuditColumnsForCreate(moveSchoolData.getToSchool());
       Pair<MoveSchoolData, InstituteEvent> schoolPair = getSchoolService().moveSchool(moveSchoolData);
@@ -236,10 +235,10 @@ public class EventHandlerService {
       schoolEvent = createInstituteEventRecord(event);
     } else {
       log.info(RECORD_FOUND_FOR_SAGA_ID_EVENT_TYPE);
-      log.trace(EVENT_PAYLOAD, event);
       schoolEvent = instituteEventOptional.get();
       schoolEvent.setUpdateDate(LocalDateTime.now());
     }
+    log.trace(EVENT_PAYLOAD, event);
 
     getInstituteEventRepository().save(schoolEvent);
     return Pair.of(createResponseEvent(schoolEvent), choreographyEvent);
