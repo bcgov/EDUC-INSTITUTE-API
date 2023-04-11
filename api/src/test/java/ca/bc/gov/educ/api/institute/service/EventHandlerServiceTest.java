@@ -332,6 +332,9 @@ public class EventHandlerServiceTest {
     assertThat(schoolRepository.findById(fromSchoolEntity.getSchoolId()).get().getClosedDate()).isEqualTo(moveDate);
     assertThat(schoolRepository.findById(fromSchoolEntity.getSchoolId()).get().getAddresses().stream().toList().get(0).getCity()).isEqualTo(fromSchoolAddressEntity.getCity());
 
+    //confirm that running the same event twice will not create a new school.
+    eventHandlerServiceUnderTest.handleMoveSchoolEvent(event).getLeft();
+    assertThat(schoolRepository.findAll()).hasSize(2);
   }
 
   @Test
