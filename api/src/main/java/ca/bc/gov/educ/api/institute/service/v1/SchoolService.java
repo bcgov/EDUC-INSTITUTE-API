@@ -191,15 +191,19 @@ public class SchoolService {
       setGradesAndNeighborhoodLearning(currentSchoolEntity, school);
       setAddresses(currentSchoolEntity, school);
 
-      TransformUtil.uppercaseFields(currentSchoolEntity); // convert the input to upper case.
-      var savedSchool = schoolRepository.save(currentSchoolEntity);
-      schoolHistoryService.createSchoolHistory(savedSchool, savedSchool.getUpdateUser());
-
-      return savedSchool;
+      return saveSchoolWithHistory(currentSchoolEntity);
     } else {
       throw new EntityNotFoundException(SchoolEntity.class, SCHOOL_ID_ATTR,
           String.valueOf(school.getSchoolId()));
     }
+  }
+
+  private SchoolEntity saveSchoolWithHistory(SchoolEntity currentSchoolEntity) {
+    TransformUtil.uppercaseFields(currentSchoolEntity); // convert the input to upper case.
+    SchoolEntity savedSchool = schoolRepository.save(currentSchoolEntity);
+    schoolHistoryService.createSchoolHistory(savedSchool, savedSchool.getUpdateUser());
+
+    return savedSchool;
   }
 
   private void setAddresses(SchoolEntity currentSchoolEntity, SchoolEntity school){
@@ -389,8 +393,8 @@ public class SchoolService {
     fromSchoolEntity.setUpdateUser(moveSchoolData.getToSchool().getCreateUser());
     fromSchoolEntity.setUpdateDate(LocalDateTime.now());
 
-    updateSchoolHelper(fromSchoolEntity);
-    log.info("Close date set to {} for schoolId :: {}", moveSchoolData.getMoveDate(), fromSchoolEntity.getSchoolId());
+    SchoolEntity savedSchool = saveSchoolWithHistory(fromSchoolEntity);
+    log.info("Close date set to {} for schoolId :: {}", savedSchool.getClosedDate(), fromSchoolEntity.getSchoolId());
 
     moveSchoolData.setToSchool(SchoolMapper.mapper.toStructure(movedSchool));
 
