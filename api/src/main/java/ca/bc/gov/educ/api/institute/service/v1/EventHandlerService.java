@@ -220,16 +220,26 @@ public class EventHandlerService {
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public Pair<byte[], InstituteEvent> handleMoveSchoolEvent(Event event) throws JsonProcessingException {
+    Optional<InstituteEvent>instituteEventOptional=getInstituteEventRepository().findBySagaIdAndEventType(event.getSagaId(),event.getEventType().toString());
+    InstituteEvent schoolEvent;
     InstituteEvent choreographyEvent = null;
-    log.trace(EVENT_PAYLOAD, event);
-    MoveSchoolData moveSchoolData = JsonUtil.getJsonObjectFromString(MoveSchoolData.class, event.getEventPayload());
-    RequestUtil.setAuditColumnsForCreate(moveSchoolData.getToSchool());
-    Pair<MoveSchoolData, InstituteEvent> schoolPair = getSchoolService().moveSchool(moveSchoolData);
-    choreographyEvent = schoolPair.getRight();
-    event.setEventOutcome(EventOutcome.SCHOOL_MOVED);
-    event.setEventPayload(JsonUtil.getJsonStringFromObject(schoolPair.getLeft()));
 
-    InstituteEvent schoolEvent = createInstituteEventRecord(event);
+    if (instituteEventOptional.isEmpty()) {
+      log.info(NO_RECORD_SAGA_ID_EVENT_TYPE);
+      MoveSchoolData moveSchoolData = JsonUtil.getJsonObjectFromString(MoveSchoolData.class, event.getEventPayload());
+      RequestUtil.setAuditColumnsForCreate(moveSchoolData.getToSchool());
+      Pair<MoveSchoolData, InstituteEvent> schoolPair = getSchoolService().moveSchool(moveSchoolData);
+      choreographyEvent = schoolPair.getRight();
+      event.setEventOutcome(EventOutcome.SCHOOL_MOVED);
+      event.setEventPayload(JsonUtil.getJsonStringFromObject(schoolPair.getLeft()));
+      schoolEvent = createInstituteEventRecord(event);
+    } else {
+      log.info(RECORD_FOUND_FOR_SAGA_ID_EVENT_TYPE);
+      schoolEvent = instituteEventOptional.get();
+      schoolEvent.setUpdateDate(LocalDateTime.now());
+    }
+    log.trace(EVENT_PAYLOAD, event);
+
     getInstituteEventRepository().save(schoolEvent);
     return Pair.of(createResponseEvent(schoolEvent), choreographyEvent);
   }
