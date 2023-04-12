@@ -68,8 +68,6 @@ public class SchoolService {
   private static final String FROM_SCHOOL_ID_ATTR = "fromSchoolId";
   @Getter(AccessLevel.PRIVATE)
   private final SchoolRepository schoolRepository;
-
-  @Getter(AccessLevel.PRIVATE)
   private final SchoolMoveHistoryRepository schoolMoveHistoryRepository;
   private final InstituteEventRepository instituteEventRepository;
 
