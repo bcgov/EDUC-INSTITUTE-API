@@ -419,8 +419,6 @@ public class EventHandlerServiceTest {
 
   private MoveSchoolData createMoveSchoolData(School toSchool, UUID fromSchoolId, LocalDateTime moveDate) {
     MoveSchoolData moveSchoolData = MoveSchoolData.builder().toSchool(toSchool).fromSchoolId(fromSchoolId.toString()).moveDate(moveDate.toString()).build();
-    moveSchoolData.setCreateUser("MOVE_TEST");
-    moveSchoolData.setUpdateUser("MOVE_TEST");
 
     return moveSchoolData;
   }

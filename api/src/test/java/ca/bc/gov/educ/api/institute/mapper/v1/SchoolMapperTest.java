@@ -12,12 +12,12 @@ import java.util.Set;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
-public class SchoolMapperTest {
+class SchoolMapperTest {
 
   private static final SchoolMapper schoolMapper = SchoolMapper.mapper;
 
   @Test
-  public void testToSchool_GivenSchoolMoveHistoryToAndFromLists_ShouldReturnSchoolMoveListSortedInDescendingOrder() {
+  void testToSchool_GivenSchoolMoveHistoryToAndFromLists_ShouldReturnSchoolMoveListSortedInDescendingOrder() {
     final SchoolEntity schoolEntity = new SchoolEntity();
 
     final SchoolMoveHistoryEntity schoolMoveToHistory1 = SchoolMoveHistoryEntity.builder()
