@@ -346,6 +346,31 @@ public class SchoolControllerTest {
         .andDo(print())
         .andExpect(status().isNotFound());
   }
+
+  @Test
+  void testUpdateSchool_GivenInvalidPayload_ShouldReturnNotFound() throws Exception {
+    UUID badSchoolId = UUID.randomUUID();
+    final var school = this.createSchoolData();
+    final DistrictTombstoneEntity dist = this.districtTombstoneRepository.save(this.createDistrictData());
+    var schoolEntity = this.createSchoolData();
+    schoolEntity.setDistrictEntity(dist);
+    final SchoolEntity entity = this.schoolRepository.save(schoolEntity);
+    entity.setDisplayName("newdist");
+    entity.setCreateDate(null);
+    entity.setUpdateDate(null);
+
+    var schoolStruct = SchoolMapper.mapper.toStructure(entity);
+    schoolStruct.setSchoolId(badSchoolId.toString());
+    schoolStruct.setDistrictId(dist.getDistrictId().toString());
+
+    this.mockMvc.perform(put(URL.BASE_URL_SCHOOL + "/" + badSchoolId)
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+            .content(asJsonString(schoolStruct))
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SCHOOL"))))
+        .andDo(print())
+        .andExpect(status().isNotFound());
+  }
   @Test
   void testUpdateSchoolWithAddress_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
     final var school = this.createSchoolData();
@@ -722,6 +747,39 @@ public class SchoolControllerTest {
       .andExpect(MockMvcResultMatchers.jsonPath("$.firstName").value(contact.getFirstName()));
   }
 
+  @Test
+  void testUpdateSchoolContact_GivenInvalidSchoolIdURL_ShouldReturnNotFound() throws Exception {
+    final var school = this.createSchoolData();
+    var schoolEntity = this.schoolRepository.save(school);
+    SchoolContactEntity contactEntity = createContactData(schoolEntity);
+    var contact = this.schoolContactRepository.save(contactEntity);
+    contact.setFirstName("pete");
+
+    this.mockMvc.perform(put(URL.BASE_URL_SCHOOL + "/" + UUID.randomUUID() + "/contact/" + contact.getSchoolContactId())
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+            .content(asJsonString(contact))
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SCHOOL_CONTACT"))))
+        .andDo(print())
+        .andExpect(status().isNotFound());
+  }
+
+  @Test
+  void testUpdateSchoolContact_GivenInvalidContactIdURL_ShouldReturnNotFound() throws Exception {
+    final var school = this.createSchoolData();
+    var schoolEntity = this.schoolRepository.save(school);
+    SchoolContactEntity contactEntity = createContactData(schoolEntity);
+    var contact = this.schoolContactRepository.save(contactEntity);
+    contact.setFirstName("pete");
+
+    this.mockMvc.perform(put(URL.BASE_URL_SCHOOL + "/" + schoolEntity.getSchoolId() + "/contact/" + UUID.randomUUID())
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+            .content(asJsonString(contact))
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SCHOOL_CONTACT"))))
+        .andDo(print())
+        .andExpect(status().isNotFound());
+  }
   @ParameterizedTest
   @CsvSource(value = {"SCOPE_READ_SCHOOL_CONTACT:contact", "SCOPE_READ_SCHOOL_ADDRESS:address", "SCOPE_READ_SCHOOL_NOTE:note"}, delimiter = ':')
   void testRetrieveDistrictInstitute_GivenInvalidID_ShouldReturnStatusNotFound(String scope, String path) throws Exception {
