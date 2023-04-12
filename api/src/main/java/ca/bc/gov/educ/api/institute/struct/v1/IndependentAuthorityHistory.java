@@ -4,12 +4,12 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
 import java.io.Serializable;
 import java.util.List;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * The type Student.
@@ -31,10 +31,12 @@ public class IndependentAuthorityHistory extends BaseRequest implements Serializ
   @NotNull(message = "authorityNumber can not be null.")
   private String authorityNumber;
 
-  @Size(max = 10)
+  @Size(max = 10, min = 10)
+  @Pattern(regexp = "\\d{10}", message = "Invalid phone number format")
   private String faxNumber;
 
-  @Size(max = 10)
+  @Size(max = 10, min = 10)
+  @Pattern(regexp = "\\d{10}", message = "Invalid phone number format")
   private String phoneNumber;
 
   @Size(max = 255)

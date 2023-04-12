@@ -3,11 +3,11 @@ package ca.bc.gov.educ.api.institute.struct.v1;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import java.io.Serializable;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-
-import java.io.Serializable;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -26,7 +26,8 @@ public class DistrictContact extends BaseRequest implements Serializable {
   @NotNull(message = "districtContactTypeCode cannot be null")
   private String districtContactTypeCode;
 
-  @Size(max = 10)
+  @Size(max = 10, min = 10)
+  @Pattern(regexp = "\\d{10}", message = "Invalid phone number format")
   private String phoneNumber;
 
   private String jobTitle;
@@ -34,7 +35,8 @@ public class DistrictContact extends BaseRequest implements Serializable {
   @Size(max = 10)
   private String phoneExtension;
 
-  @Size(max = 10)
+  @Size(max = 10, min = 10)
+  @Pattern(regexp = "\\d{10}", message = "Invalid phone number format")
   private String alternatePhoneNumber;
 
   @Size(max = 10)
