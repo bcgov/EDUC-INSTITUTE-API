@@ -11,11 +11,13 @@ import ca.bc.gov.educ.api.institute.struct.v1.NeighbourhoodLearningSchoolHistory
 import ca.bc.gov.educ.api.institute.struct.v1.School;
 import ca.bc.gov.educ.api.institute.struct.v1.SchoolGradeSchoolHistory;
 import ca.bc.gov.educ.api.institute.struct.v1.SchoolHistory;
+import org.mapstruct.DecoratedWith;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
+@DecoratedWith(SchoolDecorator.class)
 @Mapper(uses = {UUIDMapper.class, LocalDateTimeMapper.class, StringMapper.class, SchoolContactMapper.class, SchoolGradeMapper.class, NeighborhoodLearningMapper.class, NoteMapper.class, SchoolAddressMapper.class})
 @SuppressWarnings("squid:S1214")
 public interface SchoolMapper {
@@ -28,6 +30,7 @@ public interface SchoolMapper {
 
   @Mapping(target = "districtId", source = "districtEntity.districtId")
   @Mapping(target = "mincode", expression = "java(entity.getDistrictEntity() != null && entity.getSchoolNumber() != null ? entity.getDistrictEntity().getDistrictNumber() + entity.getSchoolNumber() : null)")
+  @Mapping(target = "schoolMoveHistory", ignore = true)
   School toStructure(SchoolEntity entity);
 
   @InheritInverseConfiguration
@@ -43,4 +46,5 @@ public interface SchoolMapper {
   NeighbourhoodLearningSchoolHistory toStructure(NeighbourhoodLearningSchoolHistoryEntity model);
   @InheritInverseConfiguration
   NeighbourhoodLearningSchoolHistoryEntity toModel(NeighbourhoodLearningSchoolHistory structure);
+
 }
