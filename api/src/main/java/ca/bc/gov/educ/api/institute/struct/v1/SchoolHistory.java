@@ -32,12 +32,12 @@ public class SchoolHistory extends BaseRequest implements Serializable {
   @NotNull(message = "schoolNumber can not be null.")
   private String schoolNumber;
 
-  @Size(max = 10, min = 10)
-  @Pattern(regexp = "\\d{10}", message = "Invalid phone number format")
+  @Size(max = 10)
+  @Pattern(regexp = "^$|\\d{10}", message = "Invalid phone number format")
   private String faxNumber;
 
-  @Size(max = 10, min = 10)
-  @Pattern(regexp = "\\d{10}", message = "Invalid phone number format")
+  @Size(max = 10)
+  @Pattern(regexp = "^$|\\d{10}", message = "Invalid phone number format")
   private String phoneNumber;
 
   @Size(max = 255)

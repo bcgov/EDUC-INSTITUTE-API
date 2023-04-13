@@ -307,6 +307,7 @@ public class SchoolControllerTest {
     var schoolEntity = this.createSchoolData();
     schoolEntity.setDistrictEntity(dist);
     final SchoolEntity entity = this.schoolRepository.save(schoolEntity);
+    entity.setPhoneNumber("");
     entity.setDisplayName("newdist");
     entity.setCreateDate(null);
     entity.setUpdateDate(null);
