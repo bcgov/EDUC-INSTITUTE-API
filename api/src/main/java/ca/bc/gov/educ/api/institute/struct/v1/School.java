@@ -4,12 +4,12 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
 import java.io.Serializable;
 import java.util.List;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -31,10 +31,12 @@ public class School extends BaseRequest implements Serializable {
   @Size(max = 5)
   private String schoolNumber;
 
-  @Size(max = 10)
+  @Size(max = 10, min = 10)
+  @Pattern(regexp = "\\d{10}", message = "Invalid phone number format")
   private String faxNumber;
 
-  @Size(max = 10)
+  @Size(max = 10, min = 10)
+  @Pattern(regexp = "\\d{10}", message = "Invalid phone number format")
   private String phoneNumber;
 
   @Size(max = 255)
@@ -82,5 +84,8 @@ public class School extends BaseRequest implements Serializable {
 
   @Valid
   private List<NeighborhoodLearning> neighborhoodLearning;
+
+  @Valid
+  private List<SchoolMove> schoolMove;
 
 }

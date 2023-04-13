@@ -1,15 +1,29 @@
 package ca.bc.gov.educ.api.institute.model.v1;
 
 import ca.bc.gov.educ.api.institute.util.UpperCase;
-import jakarta.persistence.*;
+import jakarta.persistence.Basic;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.PastOrPresent;
-import lombok.*;
-import org.hibernate.annotations.GenericGenerator;
-
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+import org.hibernate.annotations.GenericGenerator;
 
 @Data
 @NoArgsConstructor
@@ -165,6 +179,26 @@ public class SchoolEntity {
   )
   private Set<NeighborhoodLearningEntity> neighborhoodLearning;
 
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
+  @OneToMany(
+      mappedBy = "fromSchoolId",
+      fetch = FetchType.EAGER,
+      cascade = CascadeType.ALL,
+      targetEntity = SchoolMoveEntity.class
+  )
+  private Set<SchoolMoveEntity> schoolMoveTo;
+
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
+  @OneToMany(
+      mappedBy = "toSchoolId",
+      fetch = FetchType.EAGER,
+      cascade = CascadeType.ALL,
+      targetEntity = SchoolMoveEntity.class
+  )
+  private Set<SchoolMoveEntity> schoolMoveFrom;
+
   public Set<NeighborhoodLearningEntity> getNeighborhoodLearning() {
     if (this.neighborhoodLearning == null) {
       this.neighborhoodLearning = new HashSet<>();
@@ -184,5 +218,19 @@ public class SchoolEntity {
       this.addresses = new HashSet<>();
     }
     return this.addresses;
+  }
+
+  public Set<SchoolMoveEntity> getSchoolMoveFrom() {
+    if (this.schoolMoveFrom == null) {
+      this.schoolMoveFrom = new HashSet<>();
+    }
+    return this.schoolMoveFrom;
+  }
+
+  public Set<SchoolMoveEntity> getSchoolMoveTo() {
+    if (this.schoolMoveTo == null) {
+      this.schoolMoveTo = new HashSet<>();
+    }
+    return this.schoolMoveTo;
   }
 }

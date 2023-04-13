@@ -1,20 +1,78 @@
 package ca.bc.gov.educ.api.institute.controller.v1;
 
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.core.IsNull.notNullValue;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.oidcLogin;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import ca.bc.gov.educ.api.institute.InstituteApiResourceApplication;
 import ca.bc.gov.educ.api.institute.constants.v1.URL;
-import ca.bc.gov.educ.api.institute.exception.ConflictFoundException;
 import ca.bc.gov.educ.api.institute.filter.FilterOperation;
 import ca.bc.gov.educ.api.institute.mapper.v1.CodeTableMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.SchoolMapper;
-import ca.bc.gov.educ.api.institute.model.v1.*;
-import ca.bc.gov.educ.api.institute.repository.v1.*;
+import ca.bc.gov.educ.api.institute.model.v1.AddressTypeCodeEntity;
+import ca.bc.gov.educ.api.institute.model.v1.CountryCodeEntity;
+import ca.bc.gov.educ.api.institute.model.v1.DistrictTombstoneEntity;
+import ca.bc.gov.educ.api.institute.model.v1.FacilityTypeCodeEntity;
+import ca.bc.gov.educ.api.institute.model.v1.NeighborhoodLearningEntity;
+import ca.bc.gov.educ.api.institute.model.v1.NeighborhoodLearningTypeCodeEntity;
+import ca.bc.gov.educ.api.institute.model.v1.NoteEntity;
+import ca.bc.gov.educ.api.institute.model.v1.ProvinceCodeEntity;
+import ca.bc.gov.educ.api.institute.model.v1.SchoolAddressEntity;
+import ca.bc.gov.educ.api.institute.model.v1.SchoolCategoryCodeEntity;
+import ca.bc.gov.educ.api.institute.model.v1.SchoolContactEntity;
+import ca.bc.gov.educ.api.institute.model.v1.SchoolContactTypeCodeEntity;
+import ca.bc.gov.educ.api.institute.model.v1.SchoolEntity;
+import ca.bc.gov.educ.api.institute.model.v1.SchoolGradeCodeEntity;
+import ca.bc.gov.educ.api.institute.model.v1.SchoolGradeEntity;
+import ca.bc.gov.educ.api.institute.model.v1.SchoolHistoryEntity;
+import ca.bc.gov.educ.api.institute.model.v1.SchoolOrganizationCodeEntity;
+import ca.bc.gov.educ.api.institute.model.v1.SchoolReportingRequirementCodeEntity;
+import ca.bc.gov.educ.api.institute.repository.v1.AddressTypeCodeRepository;
+import ca.bc.gov.educ.api.institute.repository.v1.CountryCodeRepository;
+import ca.bc.gov.educ.api.institute.repository.v1.DistrictTombstoneRepository;
+import ca.bc.gov.educ.api.institute.repository.v1.FacilityTypeCodeRepository;
+import ca.bc.gov.educ.api.institute.repository.v1.NeighborhoodLearningTypeCodeRepository;
+import ca.bc.gov.educ.api.institute.repository.v1.NoteRepository;
+import ca.bc.gov.educ.api.institute.repository.v1.ProvinceCodeRepository;
+import ca.bc.gov.educ.api.institute.repository.v1.SchoolAddressRepository;
+import ca.bc.gov.educ.api.institute.repository.v1.SchoolCategoryCodeRepository;
+import ca.bc.gov.educ.api.institute.repository.v1.SchoolContactRepository;
+import ca.bc.gov.educ.api.institute.repository.v1.SchoolContactTypeCodeRepository;
+import ca.bc.gov.educ.api.institute.repository.v1.SchoolGradeCodeRepository;
+import ca.bc.gov.educ.api.institute.repository.v1.SchoolHistoryRepository;
+import ca.bc.gov.educ.api.institute.repository.v1.SchoolOrganizationCodeRepository;
+import ca.bc.gov.educ.api.institute.repository.v1.SchoolReportingRequirementCodeRepository;
+import ca.bc.gov.educ.api.institute.repository.v1.SchoolRepository;
 import ca.bc.gov.educ.api.institute.service.v1.CodeTableService;
 import ca.bc.gov.educ.api.institute.service.v1.SchoolNumberGenerationService;
-import ca.bc.gov.educ.api.institute.struct.v1.*;
+import ca.bc.gov.educ.api.institute.struct.v1.Condition;
+import ca.bc.gov.educ.api.institute.struct.v1.NeighborhoodLearning;
+import ca.bc.gov.educ.api.institute.struct.v1.School;
+import ca.bc.gov.educ.api.institute.struct.v1.SchoolAddress;
+import ca.bc.gov.educ.api.institute.struct.v1.SchoolGrade;
+import ca.bc.gov.educ.api.institute.struct.v1.Search;
+import ca.bc.gov.educ.api.institute.struct.v1.SearchCriteria;
+import ca.bc.gov.educ.api.institute.struct.v1.ValueType;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.UUID;
 import lombok.val;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -33,23 +91,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.UUID;
-
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.core.IsNull.notNullValue;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.oidcLogin;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(classes = { InstituteApiResourceApplication.class })
 @ActiveProfiles("test")
@@ -284,6 +325,53 @@ public class SchoolControllerTest {
   }
 
   @Test
+  void testUpdateSchool_GivenInvalidURLSchoolId_ShouldReturnNotFound() throws Exception {
+    final var school = this.createSchoolData();
+    final DistrictTombstoneEntity dist = this.districtTombstoneRepository.save(this.createDistrictData());
+    var schoolEntity = this.createSchoolData();
+    schoolEntity.setDistrictEntity(dist);
+    final SchoolEntity entity = this.schoolRepository.save(schoolEntity);
+    entity.setDisplayName("newdist");
+    entity.setCreateDate(null);
+    entity.setUpdateDate(null);
+
+    var schoolStruct = SchoolMapper.mapper.toStructure(entity);
+    schoolStruct.setDistrictId(dist.getDistrictId().toString());
+
+    this.mockMvc.perform(put(URL.BASE_URL_SCHOOL + "/" + UUID.randomUUID())
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+            .content(asJsonString(schoolStruct))
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SCHOOL"))))
+        .andDo(print())
+        .andExpect(status().isNotFound());
+  }
+
+  @Test
+  void testUpdateSchool_GivenInvalidPayload_ShouldReturnNotFound() throws Exception {
+    UUID badSchoolId = UUID.randomUUID();
+    final var school = this.createSchoolData();
+    final DistrictTombstoneEntity dist = this.districtTombstoneRepository.save(this.createDistrictData());
+    var schoolEntity = this.createSchoolData();
+    schoolEntity.setDistrictEntity(dist);
+    final SchoolEntity entity = this.schoolRepository.save(schoolEntity);
+    entity.setDisplayName("newdist");
+    entity.setCreateDate(null);
+    entity.setUpdateDate(null);
+
+    var schoolStruct = SchoolMapper.mapper.toStructure(entity);
+    schoolStruct.setSchoolId(badSchoolId.toString());
+    schoolStruct.setDistrictId(dist.getDistrictId().toString());
+
+    this.mockMvc.perform(put(URL.BASE_URL_SCHOOL + "/" + badSchoolId)
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+            .content(asJsonString(schoolStruct))
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SCHOOL"))))
+        .andDo(print())
+        .andExpect(status().isNotFound());
+  }
+  @Test
   void testUpdateSchoolWithAddress_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
     final var school = this.createSchoolData();
     final DistrictTombstoneEntity dist = this.districtTombstoneRepository.save(this.createDistrictData());
@@ -495,6 +583,8 @@ public class SchoolControllerTest {
   void testCreateSchool_GivenInvalidPayload_ShouldReturnStatusBadRequest() throws Exception {
     final var school = this.createSchoolData();
     school.setSchoolCategoryCode("ABCD");
+    school.setPhoneNumber("123");
+    school.setFaxNumber("noletterss");
     school.setCreateDate(null);
     school.setUpdateDate(null);
     this.mockMvc.perform(post(URL.BASE_URL_SCHOOL)
@@ -505,7 +595,6 @@ public class SchoolControllerTest {
       .andDo(print())
       .andExpect(status().isBadRequest());
   }
-
   @Test
   void testCreateSchoolContact_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
     final SchoolEntity schoolEntity = this.schoolRepository.save(this.createSchoolData());
@@ -595,6 +684,20 @@ public class SchoolControllerTest {
   }
 
   @Test
+  void testCreateSchoolContact_GivenInvalidSchoolIdURL_ShouldReturnNotFound() throws Exception {
+    final SchoolEntity schoolEntity = this.schoolRepository.save(this.createSchoolData());
+    SchoolContactEntity contactEntity = createContactData(schoolEntity);
+
+    this.mockMvc.perform(post(URL.BASE_URL_SCHOOL + "/" + UUID.randomUUID() + "/contact")
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+            .content(asJsonString(contactEntity))
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SCHOOL_CONTACT"))))
+        .andDo(print())
+        .andExpect(status().isNotFound());
+  }
+
+  @Test
   void testDeleteSchoolContact_GivenValidID_ShouldReturnStatusOK() throws Exception {
     final var school = this.createSchoolData();
     var schoolEntity = this.schoolRepository.save(school);
@@ -644,6 +747,39 @@ public class SchoolControllerTest {
       .andExpect(MockMvcResultMatchers.jsonPath("$.firstName").value(contact.getFirstName()));
   }
 
+  @Test
+  void testUpdateSchoolContact_GivenInvalidSchoolIdURL_ShouldReturnNotFound() throws Exception {
+    final var school = this.createSchoolData();
+    var schoolEntity = this.schoolRepository.save(school);
+    SchoolContactEntity contactEntity = createContactData(schoolEntity);
+    var contact = this.schoolContactRepository.save(contactEntity);
+    contact.setFirstName("pete");
+
+    this.mockMvc.perform(put(URL.BASE_URL_SCHOOL + "/" + UUID.randomUUID() + "/contact/" + contact.getSchoolContactId())
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+            .content(asJsonString(contact))
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SCHOOL_CONTACT"))))
+        .andDo(print())
+        .andExpect(status().isNotFound());
+  }
+
+  @Test
+  void testUpdateSchoolContact_GivenInvalidContactIdURL_ShouldReturnNotFound() throws Exception {
+    final var school = this.createSchoolData();
+    var schoolEntity = this.schoolRepository.save(school);
+    SchoolContactEntity contactEntity = createContactData(schoolEntity);
+    var contact = this.schoolContactRepository.save(contactEntity);
+    contact.setFirstName("pete");
+
+    this.mockMvc.perform(put(URL.BASE_URL_SCHOOL + "/" + schoolEntity.getSchoolId() + "/contact/" + UUID.randomUUID())
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+            .content(asJsonString(contact))
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SCHOOL_CONTACT"))))
+        .andDo(print())
+        .andExpect(status().isNotFound());
+  }
   @ParameterizedTest
   @CsvSource(value = {"SCOPE_READ_SCHOOL_CONTACT:contact", "SCOPE_READ_SCHOOL_ADDRESS:address", "SCOPE_READ_SCHOOL_NOTE:note"}, delimiter = ':')
   void testRetrieveDistrictInstitute_GivenInvalidID_ShouldReturnStatusNotFound(String scope, String path) throws Exception {
@@ -669,6 +805,20 @@ public class SchoolControllerTest {
       .andDo(print())
       .andExpect(status().isCreated())
       .andExpect(MockMvcResultMatchers.jsonPath("$.content").value(noteEntity.getContent()));
+  }
+
+  @Test
+  void testCreateSchoolNote_GivenInvalidSchoolIdURL_ShouldReturnNotFound() throws Exception {
+    final SchoolEntity schoolEntity = this.schoolRepository.save(this.createSchoolData());
+    NoteEntity noteEntity = createNoteData(schoolEntity);
+
+    this.mockMvc.perform(post(URL.BASE_URL_SCHOOL + "/" + UUID.randomUUID() + "/note")
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
+            .content(asJsonString(noteEntity))
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SCHOOL_NOTE"))))
+        .andDo(print())
+        .andExpect(status().isNotFound());
   }
 
   @Test

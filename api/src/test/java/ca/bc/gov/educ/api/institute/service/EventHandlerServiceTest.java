@@ -27,6 +27,7 @@ import ca.bc.gov.educ.api.institute.model.v1.SchoolEntity;
 import ca.bc.gov.educ.api.institute.repository.v1.DistrictTombstoneRepository;
 import ca.bc.gov.educ.api.institute.repository.v1.IndependentAuthorityRepository;
 import ca.bc.gov.educ.api.institute.repository.v1.InstituteEventRepository;
+import ca.bc.gov.educ.api.institute.repository.v1.SchoolMoveRepository;
 import ca.bc.gov.educ.api.institute.repository.v1.SchoolRepository;
 import ca.bc.gov.educ.api.institute.service.v1.EventHandlerService;
 import ca.bc.gov.educ.api.institute.struct.v1.Event;
@@ -84,6 +85,9 @@ public class EventHandlerServiceTest {
   DistrictTombstoneRepository districtTombstoneRepository;
   @Autowired
   private SchoolRepository schoolRepository;
+  @Autowired
+  private SchoolMoveRepository schoolMoveRepository;
+
   public static final String SEARCH_CRITERIA_LIST = "searchCriteriaList";
   public static final String PAGE_SIZE = "pageSize";
   @Autowired
@@ -101,6 +105,7 @@ public class EventHandlerServiceTest {
     independentAuthorityRepository.deleteAll();
     instituteEventRepository.deleteAll();
     schoolRepository.deleteAll();
+    schoolMoveRepository.deleteAll();
   }
 
   @Test
@@ -284,7 +289,7 @@ public class EventHandlerServiceTest {
   }
 
   @Test
-  public void testHandleEvent_givenEventTypeMOVE_SCHOOL__DoesExistAndSynchronousNatsMessage_shouldRespondWithData() throws IOException, ExecutionException, InterruptedException {
+  public void testHandleEvent_givenEventTypeMOVE_SCHOOL__DoesExistAndSynchronousNatsMessage_shouldRespondWithDataAndCreateMoveHistory() throws IOException, ExecutionException, InterruptedException {
     final DistrictTombstoneEntity dist = this.districtTombstoneRepository.save(this.createDistrictData());
     SchoolEntity toSchoolEntity = this.createNewSchoolData("99000", "PUBLIC", "DISTONLINE");
     SchoolEntity fromSchoolEntity = this.createNewSchoolData("99000", "PUBLIC", "DISTONLINE");
@@ -328,13 +333,19 @@ public class EventHandlerServiceTest {
     //2 schools = 1 that was created + 1 that was closed for the move.
     assertThat(schoolRepository.findAll()).hasSize(2);
 
-    //confirm previous school has closed and address information saved
-    assertThat(schoolRepository.findById(fromSchoolEntity.getSchoolId()).get().getClosedDate()).isEqualTo(moveDate);
-    assertThat(schoolRepository.findById(fromSchoolEntity.getSchoolId()).get().getAddresses().stream().toList().get(0).getCity()).isEqualTo(fromSchoolAddressEntity.getCity());
-
     //confirm that running the same event twice will not create a new school.
     eventHandlerServiceUnderTest.handleMoveSchoolEvent(event).getLeft();
     assertThat(schoolRepository.findAll()).hasSize(2);
+
+    SchoolEntity fromSchoolEntityComplete = schoolRepository.findById(fromSchoolEntity.getSchoolId()).orElseThrow();
+    SchoolEntity toSchoolEntityComplete = schoolRepository.findById(UUID.fromString(moveSchoolEventData.getToSchool().getSchoolId())).orElseThrow();
+
+    //confirm previous school has closed and address information saved
+    assertThat(fromSchoolEntityComplete.getClosedDate()).isEqualTo(moveDate);
+    assertThat(fromSchoolEntityComplete.getAddresses().stream().toList().get(0).getCity()).isEqualTo(fromSchoolAddressEntity.getCity());
+
+    assertThat(fromSchoolEntityComplete.getSchoolMoveTo().stream().toList().get(0).getToSchoolId()).isEqualTo(toSchoolEntityComplete.getSchoolId());
+    assertThat(toSchoolEntityComplete.getSchoolMoveFrom().stream().toList().get(0).getFromSchoolId()).isEqualTo(fromSchoolEntityComplete.getSchoolId());
   }
 
   @Test
@@ -408,8 +419,6 @@ public class EventHandlerServiceTest {
 
   private MoveSchoolData createMoveSchoolData(School toSchool, UUID fromSchoolId, LocalDateTime moveDate) {
     MoveSchoolData moveSchoolData = MoveSchoolData.builder().toSchool(toSchool).fromSchoolId(fromSchoolId.toString()).moveDate(moveDate.toString()).build();
-    moveSchoolData.setCreateUser("MOVE_TEST");
-    moveSchoolData.setUpdateUser("MOVE_TEST");
 
     return moveSchoolData;
   }

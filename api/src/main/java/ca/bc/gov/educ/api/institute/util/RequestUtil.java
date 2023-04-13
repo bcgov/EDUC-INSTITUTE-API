@@ -3,6 +3,7 @@ package ca.bc.gov.educ.api.institute.util;
 import ca.bc.gov.educ.api.institute.model.v1.BaseAddressEntity;
 import ca.bc.gov.educ.api.institute.model.v1.NeighborhoodLearningEntity;
 import ca.bc.gov.educ.api.institute.model.v1.SchoolGradeEntity;
+import ca.bc.gov.educ.api.institute.model.v1.SchoolMoveEntity;
 import ca.bc.gov.educ.api.institute.properties.ApplicationProperties;
 import ca.bc.gov.educ.api.institute.struct.v1.BaseRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -97,6 +98,23 @@ public class RequestUtil {
       neighborhoodLearningEntity.setUpdateUser(ApplicationProperties.INSTITUTE_API);
     }
     neighborhoodLearningEntity.setUpdateDate(LocalDateTime.now());
+  }
+
+  public static void setAuditColumnsForSchoolMove(@NotNull SchoolMoveEntity schoolMoveEntity) {
+    if (schoolMoveEntity.getCreateDate() == null) {
+      if (StringUtils.isBlank(schoolMoveEntity.getCreateUser())) {
+        schoolMoveEntity.setCreateUser(ApplicationProperties.INSTITUTE_API);
+      }
+      schoolMoveEntity.setCreateDate(LocalDateTime.now());
+    }
+    setAuditColumnsForSchoolMoveUpdate(schoolMoveEntity);
+  }
+
+  public static void setAuditColumnsForSchoolMoveUpdate(@NotNull SchoolMoveEntity schoolMoveEntity) {
+    if (StringUtils.isBlank(schoolMoveEntity.getUpdateUser())) {
+      schoolMoveEntity.setUpdateUser(ApplicationProperties.INSTITUTE_API);
+    }
+    schoolMoveEntity.setUpdateDate(LocalDateTime.now());
   }
 
   /**

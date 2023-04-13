@@ -3,11 +3,11 @@ package ca.bc.gov.educ.api.institute.struct.v1;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import java.io.Serializable;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-
-import java.io.Serializable;
 
 /**
  * The type Student.
@@ -29,13 +29,15 @@ public class AuthorityContact extends BaseRequest implements Serializable {
   @NotNull(message = "authorityContactTypeCode cannot be null")
   private String authorityContactTypeCode;
 
-  @Size(max = 10)
+  @Size(max = 10, min = 10)
+  @Pattern(regexp = "\\d{10}", message = "Invalid phone number format")
   private String phoneNumber;
 
   @Size(max = 10)
   private String phoneExtension;
 
-  @Size(max = 10)
+  @Size(max = 10, min = 10)
+  @Pattern(regexp = "\\d{10}", message = "Invalid phone number format")
   private String alternatePhoneNumber;
 
   @Size(max = 10)
