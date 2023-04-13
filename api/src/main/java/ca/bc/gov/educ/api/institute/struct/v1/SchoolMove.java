@@ -9,13 +9,13 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class SchoolMoveHistory extends BaseRequest implements Serializable {
+public class SchoolMove extends BaseRequest implements Serializable {
   /**
    * The constant serialVersionUID.
    */
   private static final long serialVersionUID = 1L;
 
-  private String schoolMoveHistoryId;
+  private String schoolMoveId;
 
   @NotNull(message = "toSchoolId cannot be null.")
   private String toSchoolId;

@@ -1,7 +1,7 @@
 package ca.bc.gov.educ.api.institute.mapper.v1;
 
 import ca.bc.gov.educ.api.institute.model.v1.SchoolEntity;
-import ca.bc.gov.educ.api.institute.model.v1.SchoolMoveHistoryEntity;
+import ca.bc.gov.educ.api.institute.model.v1.SchoolMoveEntity;
 import ca.bc.gov.educ.api.institute.struct.v1.School;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -15,7 +15,7 @@ public abstract class SchoolDecorator implements SchoolMapper {
 
   private final SchoolMapper delegate;
 
-  private static final SchoolMoveHistoryMapper schoolMoveHistoryMapper = SchoolMoveHistoryMapper.mapper;
+  private static final SchoolMoveMapper schoolMoveMapper = SchoolMoveMapper.mapper;
 
   protected SchoolDecorator(final SchoolMapper delegate) {
     this.delegate = delegate;
@@ -25,20 +25,20 @@ public abstract class SchoolDecorator implements SchoolMapper {
   public School toStructure(SchoolEntity schoolEntity) {
     School school = this.delegate.toStructure(schoolEntity);
 
-    Set<SchoolMoveHistoryEntity> schoolMoveToHistoryEntity = schoolEntity.getSchoolMoveToHistory();
-    Set<SchoolMoveHistoryEntity> schoolMoveFromHistoryEntity = schoolEntity.getSchoolMoveFromHistory();
+    Set<SchoolMoveEntity> schoolMoveToEntity = schoolEntity.getSchoolMoveTo();
+    Set<SchoolMoveEntity> schoolMoveFromEntity = schoolEntity.getSchoolMoveFrom();
 
-    Set<SchoolMoveHistoryEntity> mergedSchoolMoveHistoryEntity = new HashSet<>(schoolMoveToHistoryEntity);
-    mergedSchoolMoveHistoryEntity.addAll(schoolMoveFromHistoryEntity);
+    Set<SchoolMoveEntity> mergedSchoolMoveEntity = new HashSet<>(schoolMoveToEntity);
+    mergedSchoolMoveEntity.addAll(schoolMoveFromEntity);
 
-    school.setSchoolMoveHistory(new ArrayList<>());
+    school.setSchoolMove(new ArrayList<>());
 
-    if (!mergedSchoolMoveHistoryEntity.isEmpty()) {
-      for (val schoolMoveHistoryEntity : mergedSchoolMoveHistoryEntity) {
-        school.getSchoolMoveHistory().add(schoolMoveHistoryMapper.toStructure(schoolMoveHistoryEntity));
+    if (!mergedSchoolMoveEntity.isEmpty()) {
+      for (val schoolMoveEntity : mergedSchoolMoveEntity) {
+        school.getSchoolMove().add(schoolMoveMapper.toStructure(schoolMoveEntity));
       }
 
-      Collections.sort(school.getSchoolMoveHistory(), (schoolHistory1, schoolHistory2) -> {
+      Collections.sort(school.getSchoolMove(), (schoolHistory1, schoolHistory2) -> {
         LocalDateTime dt1 = LocalDateTime.parse(schoolHistory1.getMoveDate(),
             DateTimeFormatter.ISO_LOCAL_DATE_TIME);
         LocalDateTime dt2 = LocalDateTime.parse(schoolHistory2.getMoveDate(),

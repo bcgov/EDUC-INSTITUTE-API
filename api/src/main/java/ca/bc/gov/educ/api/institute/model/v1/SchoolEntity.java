@@ -185,9 +185,9 @@ public class SchoolEntity {
       mappedBy = "fromSchoolId",
       fetch = FetchType.EAGER,
       cascade = CascadeType.ALL,
-      targetEntity = SchoolMoveHistoryEntity.class
+      targetEntity = SchoolMoveEntity.class
   )
-  private Set<SchoolMoveHistoryEntity> schoolMoveToHistory;
+  private Set<SchoolMoveEntity> schoolMoveTo;
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
@@ -195,9 +195,9 @@ public class SchoolEntity {
       mappedBy = "toSchoolId",
       fetch = FetchType.EAGER,
       cascade = CascadeType.ALL,
-      targetEntity = SchoolMoveHistoryEntity.class
+      targetEntity = SchoolMoveEntity.class
   )
-  private Set<SchoolMoveHistoryEntity> schoolMoveFromHistory;
+  private Set<SchoolMoveEntity> schoolMoveFrom;
 
   public Set<NeighborhoodLearningEntity> getNeighborhoodLearning() {
     if (this.neighborhoodLearning == null) {
@@ -220,17 +220,17 @@ public class SchoolEntity {
     return this.addresses;
   }
 
-  public Set<SchoolMoveHistoryEntity> getSchoolMoveFromHistory() {
-    if (this.schoolMoveFromHistory == null) {
-      this.schoolMoveFromHistory = new HashSet<>();
+  public Set<SchoolMoveEntity> getSchoolMoveFrom() {
+    if (this.schoolMoveFrom == null) {
+      this.schoolMoveFrom = new HashSet<>();
     }
-    return this.schoolMoveFromHistory;
+    return this.schoolMoveFrom;
   }
 
-  public Set<SchoolMoveHistoryEntity> getSchoolMoveToHistory() {
-    if (this.schoolMoveToHistory == null) {
-      this.schoolMoveToHistory = new HashSet<>();
+  public Set<SchoolMoveEntity> getSchoolMoveTo() {
+    if (this.schoolMoveTo == null) {
+      this.schoolMoveTo = new HashSet<>();
     }
-    return this.schoolMoveToHistory;
+    return this.schoolMoveTo;
   }
 }

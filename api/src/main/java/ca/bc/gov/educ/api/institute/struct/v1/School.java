@@ -86,6 +86,6 @@ public class School extends BaseRequest implements Serializable {
   private List<NeighborhoodLearning> neighborhoodLearning;
 
   @Valid
-  private List<SchoolMoveHistory> schoolMoveHistory;
+  private List<SchoolMove> schoolMove;
 
 }

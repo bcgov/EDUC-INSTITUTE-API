@@ -30,7 +30,7 @@ public interface SchoolMapper {
 
   @Mapping(target = "districtId", source = "districtEntity.districtId")
   @Mapping(target = "mincode", expression = "java(entity.getDistrictEntity() != null && entity.getSchoolNumber() != null ? entity.getDistrictEntity().getDistrictNumber() + entity.getSchoolNumber() : null)")
-  @Mapping(target = "schoolMoveHistory", ignore = true)
+  @Mapping(target = "schoolMove", ignore = true)
   School toStructure(SchoolEntity entity);
 
   @InheritInverseConfiguration

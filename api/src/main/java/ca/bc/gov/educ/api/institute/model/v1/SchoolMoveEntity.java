@@ -24,15 +24,15 @@ import org.hibernate.annotations.GenericGenerator;
 @SuperBuilder
 @Entity
 @DynamicUpdate
-@Table(name = "SCHOOL_MOVE_HISTORY")
-public class SchoolMoveHistoryEntity {
+@Table(name = "SCHOOL_MOVE")
+public class SchoolMoveEntity {
   @Id
   @GeneratedValue(generator = "UUID")
   @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator", parameters = {
     @org.hibernate.annotations.Parameter(name = "uuid_gen_strategy_class", value = "org.hibernate.id.uuid.CustomVersionOneStrategy")})
-  @Column(name = "school_move_history_id", unique = true, updatable = false, columnDefinition = "BINARY(16)")
+  @Column(name = "school_move_id", unique = true, updatable = false, columnDefinition = "BINARY(16)")
   @ComparableField
-  private UUID schoolMoveHistoryId;
+  private UUID schoolMoveId;
 
   @Basic
   @JoinColumn(name = "to_school_id", referencedColumnName = "school_id")

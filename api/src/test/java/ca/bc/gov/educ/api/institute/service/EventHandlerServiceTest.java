@@ -27,7 +27,7 @@ import ca.bc.gov.educ.api.institute.model.v1.SchoolEntity;
 import ca.bc.gov.educ.api.institute.repository.v1.DistrictTombstoneRepository;
 import ca.bc.gov.educ.api.institute.repository.v1.IndependentAuthorityRepository;
 import ca.bc.gov.educ.api.institute.repository.v1.InstituteEventRepository;
-import ca.bc.gov.educ.api.institute.repository.v1.SchoolMoveHistoryRepository;
+import ca.bc.gov.educ.api.institute.repository.v1.SchoolMoveRepository;
 import ca.bc.gov.educ.api.institute.repository.v1.SchoolRepository;
 import ca.bc.gov.educ.api.institute.service.v1.EventHandlerService;
 import ca.bc.gov.educ.api.institute.struct.v1.Event;
@@ -86,7 +86,7 @@ public class EventHandlerServiceTest {
   @Autowired
   private SchoolRepository schoolRepository;
   @Autowired
-  private SchoolMoveHistoryRepository schoolMoveHistoryRepository;
+  private SchoolMoveRepository schoolMoveRepository;
 
   public static final String SEARCH_CRITERIA_LIST = "searchCriteriaList";
   public static final String PAGE_SIZE = "pageSize";
@@ -105,7 +105,7 @@ public class EventHandlerServiceTest {
     independentAuthorityRepository.deleteAll();
     instituteEventRepository.deleteAll();
     schoolRepository.deleteAll();
-    schoolMoveHistoryRepository.deleteAll();
+    schoolMoveRepository.deleteAll();
   }
 
   @Test
@@ -344,8 +344,8 @@ public class EventHandlerServiceTest {
     assertThat(fromSchoolEntityComplete.getClosedDate()).isEqualTo(moveDate);
     assertThat(fromSchoolEntityComplete.getAddresses().stream().toList().get(0).getCity()).isEqualTo(fromSchoolAddressEntity.getCity());
 
-    assertThat(fromSchoolEntityComplete.getSchoolMoveToHistory().stream().toList().get(0).getToSchoolId()).isEqualTo(toSchoolEntityComplete.getSchoolId());
-    assertThat(toSchoolEntityComplete.getSchoolMoveFromHistory().stream().toList().get(0).getFromSchoolId()).isEqualTo(fromSchoolEntityComplete.getSchoolId());
+    assertThat(fromSchoolEntityComplete.getSchoolMoveTo().stream().toList().get(0).getToSchoolId()).isEqualTo(toSchoolEntityComplete.getSchoolId());
+    assertThat(toSchoolEntityComplete.getSchoolMoveFrom().stream().toList().get(0).getFromSchoolId()).isEqualTo(fromSchoolEntityComplete.getSchoolId());
   }
 
   @Test

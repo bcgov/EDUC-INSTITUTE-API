@@ -17,14 +17,14 @@ import ca.bc.gov.educ.api.institute.model.v1.InstituteEvent;
 import ca.bc.gov.educ.api.institute.model.v1.NoteEntity;
 import ca.bc.gov.educ.api.institute.model.v1.SchoolContactEntity;
 import ca.bc.gov.educ.api.institute.model.v1.SchoolEntity;
-import ca.bc.gov.educ.api.institute.model.v1.SchoolMoveHistoryEntity;
+import ca.bc.gov.educ.api.institute.model.v1.SchoolMoveEntity;
 import ca.bc.gov.educ.api.institute.model.v1.SchoolTombstoneEntity;
 import ca.bc.gov.educ.api.institute.repository.v1.DistrictRepository;
 import ca.bc.gov.educ.api.institute.repository.v1.DistrictTombstoneRepository;
 import ca.bc.gov.educ.api.institute.repository.v1.InstituteEventRepository;
 import ca.bc.gov.educ.api.institute.repository.v1.NoteRepository;
 import ca.bc.gov.educ.api.institute.repository.v1.SchoolContactRepository;
-import ca.bc.gov.educ.api.institute.repository.v1.SchoolMoveHistoryRepository;
+import ca.bc.gov.educ.api.institute.repository.v1.SchoolMoveRepository;
 import ca.bc.gov.educ.api.institute.repository.v1.SchoolRepository;
 import ca.bc.gov.educ.api.institute.repository.v1.SchoolTombstoneRepository;
 import ca.bc.gov.educ.api.institute.struct.v1.MoveSchoolData;
@@ -68,7 +68,7 @@ public class SchoolService {
   private static final String FROM_SCHOOL_ID_ATTR = "fromSchoolId";
   @Getter(AccessLevel.PRIVATE)
   private final SchoolRepository schoolRepository;
-  private final SchoolMoveHistoryRepository schoolMoveHistoryRepository;
+  private final SchoolMoveRepository schoolMoveRepository;
   private final InstituteEventRepository instituteEventRepository;
 
   private final SchoolTombstoneRepository schoolTombstoneRepository;
@@ -87,7 +87,7 @@ public class SchoolService {
   @Autowired
   public SchoolService(SchoolRepository schoolRepository,
       SchoolTombstoneRepository schoolTombstoneRepository,
-      SchoolMoveHistoryRepository schoolMoveHistoryRepository,
+      SchoolMoveRepository schoolMoveRepository,
       DistrictTombstoneRepository districtTombstoneRepository,
       SchoolHistoryService schoolHistoryService, SchoolContactRepository schoolContactRepository,
       NoteRepository noteRepository, DistrictRepository districtRepository,
@@ -95,7 +95,7 @@ public class SchoolService {
       SchoolNumberGenerationService schoolNumberGenerationService) {
     this.schoolRepository = schoolRepository;
     this.schoolTombstoneRepository = schoolTombstoneRepository;
-    this.schoolMoveHistoryRepository = schoolMoveHistoryRepository;
+    this.schoolMoveRepository = schoolMoveRepository;
     this.districtTombstoneRepository = districtTombstoneRepository;
     this.schoolHistoryService = schoolHistoryService;
     this.schoolContactRepository = schoolContactRepository;
@@ -448,7 +448,7 @@ public class SchoolService {
     log.info("Close date set to {} for schoolId :: {}", savedSchool.getClosedDate(),
         fromSchoolEntity.getSchoolId());
 
-    SchoolMoveHistoryEntity schoolMoveHistoryEntity = SchoolMoveHistoryEntity.builder()
+    SchoolMoveEntity schoolMoveEntity = SchoolMoveEntity.builder()
         .toSchoolId(movedSchool.getSchoolId())
         .fromSchoolId(savedSchool.getSchoolId())
         .moveDate(LocalDateTime.parse(moveSchoolData.getMoveDate()))
@@ -456,9 +456,9 @@ public class SchoolService {
         .updateUser(moveSchoolData.getCreateUser())
         .build();
 
-    RequestUtil.setAuditColumnsForSchoolMoveHistory(schoolMoveHistoryEntity);
+    RequestUtil.setAuditColumnsForSchoolMove(schoolMoveEntity);
 
-    schoolMoveHistoryRepository.save(schoolMoveHistoryEntity);
+    schoolMoveRepository.save(schoolMoveEntity);
 
     moveSchoolData.setToSchool(SchoolMapper.mapper.toStructure(movedSchool));
 
