@@ -29,8 +29,8 @@ public class SchoolContact extends BaseRequest implements Serializable {
   @NotNull(message = "schoolContactTypeCode cannot be null")
   private String schoolContactTypeCode;
 
-  @Size(max = 10, min = 10)
-  @Pattern(regexp = "\\d{10}", message = "Invalid phone number format")
+  @Size(max = 10)
+  @Pattern(regexp = "^$|\\d{10}", message = "Invalid phone number format")
   private String phoneNumber;
 
   private String jobTitle;
@@ -38,8 +38,8 @@ public class SchoolContact extends BaseRequest implements Serializable {
   @Size(max = 10)
   private String phoneExtension;
 
-  @Size(max = 10, min = 10)
-  @Pattern(regexp = "\\d{10}", message = "Invalid phone number format")
+  @Size(max = 10)
+  @Pattern(regexp = "^$|\\d{10}", message = "Invalid phone number format")
   private String alternatePhoneNumber;
 
   @Size(max = 10)

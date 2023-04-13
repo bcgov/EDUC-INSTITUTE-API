@@ -31,12 +31,12 @@ public class School extends BaseRequest implements Serializable {
   @Size(max = 5)
   private String schoolNumber;
 
-  @Size(max = 10, min = 10)
-  @Pattern(regexp = "\\d{10}", message = "Invalid phone number format")
+  @Size(max = 10)
+  @Pattern(regexp = "^$|\\d{10}", message = "Invalid phone number format")
   private String faxNumber;
 
-  @Size(max = 10, min = 10)
-  @Pattern(regexp = "\\d{10}", message = "Invalid phone number format")
+  @Size(max = 10)
+  @Pattern(regexp = "^$|\\d{10}", message = "Invalid phone number format")
   private String phoneNumber;
 
   @Size(max = 255)

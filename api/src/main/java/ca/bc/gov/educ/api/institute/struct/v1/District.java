@@ -29,12 +29,12 @@ public class District extends BaseRequest implements Serializable {
   @NotNull(message = "districtNumber can not be null.")
   private String districtNumber;
 
-  @Size(max = 10, min = 10)
-  @Pattern(regexp = "\\d{10}", message = "Invalid phone number format")
+  @Size(max = 10)
+  @Pattern(regexp = "^$|\\d{10}", message = "Invalid phone number format")
   private String faxNumber;
 
-  @Size(max = 10, min = 10)
-  @Pattern(regexp = "\\d{10}", message = "Invalid phone number format")
+  @Size(max = 10)
+  @Pattern(regexp = "^$|\\d{10}", message = "Invalid phone number format")
   private String phoneNumber;
 
   @Size(max = 255)
