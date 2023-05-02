@@ -3,7 +3,7 @@
  * the migration.  This insures that NONE is no longer applied to all
  * schools that have an organization code of 'Special Reporting'.
  *
- * @see: ./V1.0.36__INSTITUTE_API.sql L76
+ * @see: ./V1.0.36x__INSTITUTE_API.sql L76
  * @see: ./V1.0.38__INSTITUTE_API.sql L8
  *
  * TODO: Consolidate these migrations at next database wipe.
