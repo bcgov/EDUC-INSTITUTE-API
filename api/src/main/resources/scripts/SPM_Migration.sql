@@ -477,7 +477,7 @@ WHERE TRIM(schl_mast.NLC_INTEGRATED_SERVICES_FLAG ) = 'Y';
 CREATE TABLE SCHOOL_ADDRESS
 as
 SELECT
-    LOWER(REGEXP_REPLACE(dbms_crypto.randombytes(16), '(.{8})(.{4})(.{4})(.{4})(.{12})', '\1-\2-\3-\4-\5')) as ADDRESS_ID,
+    LOWER(REGEXP_REPLACE(dbms_crypto.randombytes(16), '(.{8})(.{4})(.{4})(.{4})(.{12})', '\1-\2-\3-\4-\5')) as SCHOOL_ADDRESS_ID,
     (SELECT schl.SCHOOL_ID from SCHOOL schl WHERE schl_mast.SCHLNO = schl.SCHOOL_NUMBER AND schl_mast.DISTNO = (SELECT dist.DISTRICT_NUMBER from DISTRICT dist WHERE schl.DISTRICT_ID = dist.DISTRICT_ID)) as SCHOOL_ID,
     TRIM(UPPER(schl_mast.SC_ADDRESS_LINE_1)) as ADDRESS_LINE_1,
     TRIM(UPPER(schl_mast.SC_ADDRESS_LINE_2)) as ADDRESS_LINE_2,
@@ -494,7 +494,7 @@ FROM SCHOOL_MASTER schl_mast
 WHERE TRIM(schl_mast.SC_ADDRESS_LINE_1) != ' '
 UNION
 SELECT
-    LOWER(REGEXP_REPLACE(dbms_crypto.randombytes(16), '(.{8})(.{4})(.{4})(.{4})(.{12})', '\1-\2-\3-\4-\5')) as ADDRESS_ID,
+    LOWER(REGEXP_REPLACE(dbms_crypto.randombytes(16), '(.{8})(.{4})(.{4})(.{4})(.{12})', '\1-\2-\3-\4-\5')) as SCHOOL_ADDRESS_ID,
     (SELECT schl.SCHOOL_ID from SCHOOL schl WHERE schl_mast.SCHLNO = schl.SCHOOL_NUMBER AND schl_mast.DISTNO = (SELECT dist.DISTRICT_NUMBER from DISTRICT dist WHERE schl.DISTRICT_ID = dist.DISTRICT_ID)) as SCHOOL_ID,
     TRIM(UPPER(schl_mast.PHYS_ADDRESS_LINE_1)) as ADDRESS_LINE_1,
     TRIM(UPPER(schl_mast.PHYS_ADDRESS_LINE_2)) as ADDRESS_LINE_2,
@@ -513,7 +513,7 @@ WHERE TRIM(schl_mast.PHYS_ADDRESS_LINE_1) != ' ' AND schl_mast.SCHOOL_CATEGORY_C
 CREATE TABLE DISTRICT_ADDRESS
 as
 SELECT
-    LOWER(REGEXP_REPLACE(dbms_crypto.randombytes(16), '(.{8})(.{4})(.{4})(.{4})(.{12})', '\1-\2-\3-\4-\5')) as ADDRESS_ID,
+    LOWER(REGEXP_REPLACE(dbms_crypto.randombytes(16), '(.{8})(.{4})(.{4})(.{4})(.{12})', '\1-\2-\3-\4-\5')) as DISTRICT_ADDRESS_ID,
     (SELECT dist.DISTRICT_ID from DISTRICT dist WHERE dist_mast.DISTNO = dist.DISTRICT_NUMBER) as DISTRICT_ID,
     TRIM(UPPER(dist_mast.MAIL_ADDRESS_LINE_1)) as ADDRESS_LINE_1,
     TRIM(UPPER(dist_mast.MAIL_ADDRESS_LINE_2)) as ADDRESS_LINE_2,
@@ -530,7 +530,7 @@ FROM DISTRICT_MASTER dist_mast
 WHERE TRIM(dist_mast.MAIL_ADDRESS_LINE_1) != ' '
 UNION
 SELECT
-    LOWER(REGEXP_REPLACE(dbms_crypto.randombytes(16), '(.{8})(.{4})(.{4})(.{4})(.{12})', '\1-\2-\3-\4-\5')) as ADDRESS_ID,
+    LOWER(REGEXP_REPLACE(dbms_crypto.randombytes(16), '(.{8})(.{4})(.{4})(.{4})(.{12})', '\1-\2-\3-\4-\5')) as DISTRICT_ADDRESS_ID,
     (SELECT dist.DISTRICT_ID from DISTRICT dist WHERE dist_mast.DISTNO = dist.DISTRICT_NUMBER) as DISTRICT_ID,
     TRIM(UPPER(dist_mast.PHYS_ADDRESS_LINE_1)) as ADDRESS_LINE_1,
     TRIM(UPPER(dist_mast.PHYS_ADDRESS_LINE_2)) as ADDRESS_LINE_2,
@@ -549,7 +549,7 @@ WHERE TRIM(dist_mast.PHYS_ADDRESS_LINE_1) != ' ';
 CREATE TABLE AUTHORITY_ADDRESS
 as
 SELECT
-    LOWER(REGEXP_REPLACE(dbms_crypto.randombytes(16), '(.{8})(.{4})(.{4})(.{4})(.{12})', '\1-\2-\3-\4-\5')) as ADDRESS_ID,
+    LOWER(REGEXP_REPLACE(dbms_crypto.randombytes(16), '(.{8})(.{4})(.{4})(.{4})(.{12})', '\1-\2-\3-\4-\5')) as AUTHORITY_ADDRESS_ID,
     (SELECT auth.INDEPENDENT_AUTHORITY_ID from INDEPENDENT_AUTHORITY auth WHERE auth_mast.AUTH_NUMBER = auth.AUTHORITY_NUMBER) as INDEPENDENT_AUTHORITY_ID,
     TRIM(UPPER(auth_mast.ADDRESS_LINE_1)) as ADDRESS_LINE_1,
     TRIM(UPPER(auth_mast.ADDRESS_LINE_2)) as ADDRESS_LINE_2,
