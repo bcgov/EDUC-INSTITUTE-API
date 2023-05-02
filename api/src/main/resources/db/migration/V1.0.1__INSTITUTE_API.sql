@@ -79,6 +79,24 @@ VALUES ('OFFSHORE', 'Offshore', 'Offshore Region', '08', 10,
         to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
         to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'));
 
+INSERT INTO DISTRICT_REGION_CODE (DISTRICT_REGION_CODE, LABEL, DESCRIPTION, LEGACY_CODE,
+                                  DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
+                                  CREATE_DATE, UPDATE_USER, UPDATE_DATE)
+VALUES ('PSI', 'Post Secondary', 'Post Secondary Institution Region', null, 10,
+        CURRENT_TIMESTAMP,
+        to_date('2099-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
+        CURRENT_TIMESTAMP, 'IDIR/MVILLENE',
+        CURRENT_TIMESTAMP);
+
+INSERT INTO DISTRICT_REGION_CODE (DISTRICT_REGION_CODE, LABEL, DESCRIPTION, LEGACY_CODE,
+                                  DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
+                                  CREATE_DATE, UPDATE_USER, UPDATE_DATE)
+VALUES ('YUKON', 'Yukon', 'Yukon Region', null, 10,
+        CURRENT_TIMESTAMP,
+        to_date('2099-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
+        CURRENT_TIMESTAMP, 'IDIR/MVILLENE',
+        CURRENT_TIMESTAMP);
+
 INSERT INTO DISTRICT_STATUS_CODE (DISTRICT_STATUS_CODE, LABEL, DESCRIPTION,
                                   DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
                                   CREATE_DATE, UPDATE_USER, UPDATE_DATE)
@@ -118,7 +136,7 @@ VALUES ('INDEPEND', 'Independent', 'Independent School', '02', 10,
 INSERT INTO SCHOOL_CATEGORY_CODE (SCHOOL_CATEGORY_CODE, LABEL, DESCRIPTION, LEGACY_CODE,
                                   DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
                                   CREATE_DATE, UPDATE_USER, UPDATE_DATE)
-VALUES ('FED_BAND', 'Federally Operated Band', 'Federally Operated Band School', '03', 10,
+VALUES ('FED_BAND', 'Non-Independent First Nations', 'Non-Independent First Nations School', '03', 10,
         to_date('2020-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS'),
         to_date('2099-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
         to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
@@ -187,6 +205,15 @@ VALUES ('EAR_LEARN', 'Early Learning', 'Early learning school', '10', 10,
         to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
         to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'));
 
+INSERT INTO SCHOOL_CATEGORY_CODE (SCHOOL_CATEGORY_CODE, LABEL, DESCRIPTION, LEGACY_CODE,
+                                  DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
+                                  CREATE_DATE, UPDATE_USER, UPDATE_DATE)
+VALUES ('INDP_FNS', 'Independent First Nations', 'Independent First Nations School', null, 10,
+        to_date('2020-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS'),
+        to_date('2099-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
+        to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
+        to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'));
+
 INSERT INTO FACILITY_TYPE_CODE (FACILITY_TYPE_CODE, LABEL, DESCRIPTION, LEGACY_CODE,
                                   DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
                                   CREATE_DATE, UPDATE_USER, UPDATE_DATE)
@@ -210,7 +237,7 @@ INSERT INTO FACILITY_TYPE_CODE (FACILITY_TYPE_CODE, LABEL, DESCRIPTION, LEGACY_C
                                 CREATE_DATE, UPDATE_USER, UPDATE_DATE)
 VALUES ('DIST_CONT', 'Distributed Learning', 'Distributed Learning school', '02', 10,
         to_date('2020-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS'),
-        to_date('2099-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
+        to_date('2022-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
         to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
         to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'));
 
@@ -235,7 +262,7 @@ VALUES ('PROVINCIAL', 'Provincial', 'Provincial school', '04', 10,
 INSERT INTO FACILITY_TYPE_CODE (FACILITY_TYPE_CODE, LABEL, DESCRIPTION, LEGACY_CODE,
                                 DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
                                 CREATE_DATE, UPDATE_USER, UPDATE_DATE)
-VALUES ('YOUTH', 'Youth Custody', 'Youth custody school', '05', 10,
+VALUES ('YOUTH', 'Youth Custody/Residential', 'Youth custody or residential attendance school', '05', 10,
         to_date('2020-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS'),
         to_date('2099-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
         to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
@@ -262,7 +289,7 @@ VALUES ('LONG_PRP', 'Long term PRP', 'Long term PRP school', '07', 10,
 INSERT INTO FACILITY_TYPE_CODE (FACILITY_TYPE_CODE, LABEL, DESCRIPTION, LEGACY_CODE,
                                 DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
                                 CREATE_DATE, UPDATE_USER, UPDATE_DATE)
-VALUES ('DIST_LEARN', 'Distributed Learning Programs', 'Distributed learning programs school', '08', 10,
+VALUES ('DIST_LEARN', 'Provincial Online Learning', 'Provincial online learning school', '08', 10,
         to_date('2020-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS'),
         to_date('2099-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
         to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
@@ -273,14 +300,14 @@ INSERT INTO FACILITY_TYPE_CODE (FACILITY_TYPE_CODE, LABEL, DESCRIPTION, LEGACY_C
                                 CREATE_DATE, UPDATE_USER, UPDATE_DATE)
 VALUES ('ELEC_DELIV', 'Electronic Delivery', 'Electronic delivery programs school', '09', 10,
         to_date('2020-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS'),
-        to_date('2099-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
+        to_date('2022-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
         to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
         to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'));
 
 INSERT INTO FACILITY_TYPE_CODE (FACILITY_TYPE_CODE, LABEL, DESCRIPTION, LEGACY_CODE,
                                 DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
                                 CREATE_DATE, UPDATE_USER, UPDATE_DATE)
-VALUES ('STRONG_CEN', 'Strong Start Center', 'Strong start center', '10', 10,
+VALUES ('STRONG_CEN', 'StrongStart Center', 'StrongStart center', '10', 10,
         to_date('2020-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS'),
         to_date('2099-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
         to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
@@ -289,7 +316,7 @@ VALUES ('STRONG_CEN', 'Strong Start Center', 'Strong start center', '10', 10,
 INSERT INTO FACILITY_TYPE_CODE (FACILITY_TYPE_CODE, LABEL, DESCRIPTION, LEGACY_CODE,
                                 DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
                                 CREATE_DATE, UPDATE_USER, UPDATE_DATE)
-VALUES ('STRONG_OUT', 'Strong Start Outreach', 'Strong start outreach', '11', 10,
+VALUES ('STRONG_OUT', 'StrongStart Outreach', 'StrongStart outreach', '11', 10,
         to_date('2020-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS'),
         to_date('2099-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
         to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
@@ -303,6 +330,40 @@ VALUES ('SUMMER', 'Summer', 'Summer school', '12', 10,
         to_date('2099-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
         to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
         to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'));
+
+INSERT INTO FACILITY_TYPE_CODE (FACILITY_TYPE_CODE, LABEL, DESCRIPTION, LEGACY_CODE,
+                                DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
+                                CREATE_DATE, UPDATE_USER, UPDATE_DATE)
+VALUES ('DISTONLINE', 'District Online Learning', 'District online learning school', null, 10,
+        to_date('2020-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS'),
+        to_date('2099-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
+        to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
+        to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'));
+
+INSERT INTO FACILITY_TYPE_CODE (FACILITY_TYPE_CODE, LABEL, DESCRIPTION, LEGACY_CODE,
+                                DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
+                                CREATE_DATE, UPDATE_USER, UPDATE_DATE)
+VALUES ('JUSTB4PRO', 'JustB4 Program', 'JustB4 program', null, 10,
+        to_date('2020-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS'),
+        to_date('2099-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
+        to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
+        to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'));
+
+INSERT INTO FACILITY_TYPE_CODE (FACILITY_TYPE_CODE, LABEL, DESCRIPTION, LEGACY_CODE,
+                                DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
+                                CREATE_DATE, UPDATE_USER, UPDATE_DATE)
+VALUES ('POST_SEC', 'Post Secondary', 'Post Secondary School', null, 10,
+        to_date('2020-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS'),
+        to_date('2099-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/SRATH',
+        to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/SRATH',
+        to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'));
+
+UPDATE FACILITY_TYPE_CODE
+SET
+    EXPIRY_DATE = TO_DATE('2022-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS'),
+    UPDATE_USER = 'IDIR/AVSODHI',
+    UPDATE_DATE = CURRENT_TIMESTAMP
+WHERE FACILITY_TYPE_CODE IN ('DIST_CONT', 'ELEC_DELIV');
 
 INSERT INTO SCHOOL_ORGANIZATION_CODE (SCHOOL_ORGANIZATION_CODE, LABEL, DESCRIPTION, LEGACY_CODE,
                                 DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
@@ -413,8 +474,8 @@ VALUES ('1701', '1701', '1701 Contact', '17', 10,
         to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'));
 
 INSERT INTO DISTRICT_CONTACT_TYPE_CODE (DISTRICT_CONTACT_TYPE_CODE, LABEL, DESCRIPTION, LEGACY_CODE,
-                               DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
-                               CREATE_DATE, UPDATE_USER, UPDATE_DATE)
+                                        DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
+                                        CREATE_DATE, UPDATE_USER, UPDATE_DATE)
 VALUES ('INDIGENOUS', 'Indigenous', 'Indigenous Contact', 'AB', 10,
         to_date('2020-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS'),
         to_date('2099-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
@@ -422,8 +483,8 @@ VALUES ('INDIGENOUS', 'Indigenous', 'Indigenous Contact', 'AB', 10,
         to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'));
 
 INSERT INTO DISTRICT_CONTACT_TYPE_CODE (DISTRICT_CONTACT_TYPE_CODE, LABEL, DESCRIPTION, LEGACY_CODE,
-                               DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
-                               CREATE_DATE, UPDATE_USER, UPDATE_DATE)
+                                        DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
+                                        CREATE_DATE, UPDATE_USER, UPDATE_DATE)
 VALUES ('ADMN_ASSIS', 'Executive/Admin Assistant', 'Executive/Administrative Assistant', 'AE', 10,
         to_date('2020-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS'),
         to_date('2099-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
@@ -431,8 +492,8 @@ VALUES ('ADMN_ASSIS', 'Executive/Admin Assistant', 'Executive/Administrative Ass
         to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'));
 
 INSERT INTO DISTRICT_CONTACT_TYPE_CODE (DISTRICT_CONTACT_TYPE_CODE, LABEL, DESCRIPTION, LEGACY_CODE,
-                               DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
-                               CREATE_DATE, UPDATE_USER, UPDATE_DATE)
+                                        DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
+                                        CREATE_DATE, UPDATE_USER, UPDATE_DATE)
 VALUES ('CUSTORDER', 'Continuing Custody Order', 'Continuing Custody Order Contact', 'CC', 10,
         to_date('2020-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS'),
         to_date('2099-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
@@ -440,8 +501,8 @@ VALUES ('CUSTORDER', 'Continuing Custody Order', 'Continuing Custody Order Conta
         to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'));
 
 INSERT INTO DISTRICT_CONTACT_TYPE_CODE (DISTRICT_CONTACT_TYPE_CODE, LABEL, DESCRIPTION, LEGACY_CODE,
-                               DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
-                               CREATE_DATE, UPDATE_USER, UPDATE_DATE)
+                                        DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
+                                        CREATE_DATE, UPDATE_USER, UPDATE_DATE)
 VALUES ('CHAIR', 'Chairperson', 'Chairperson', 'CH', 10,
         to_date('2020-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS'),
         to_date('2099-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
@@ -449,8 +510,8 @@ VALUES ('CHAIR', 'Chairperson', 'Chairperson', 'CH', 10,
         to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'));
 
 INSERT INTO DISTRICT_CONTACT_TYPE_CODE (DISTRICT_CONTACT_TYPE_CODE, LABEL, DESCRIPTION, LEGACY_CODE,
-                               DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
-                               CREATE_DATE, UPDATE_USER, UPDATE_DATE)
+                                        DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
+                                        CREATE_DATE, UPDATE_USER, UPDATE_DATE)
 VALUES ('DIST_LEARN', 'Distributed Learning', 'Distributed Learning Contact', 'DL', 10,
         to_date('2020-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS'),
         to_date('2099-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
@@ -458,8 +519,8 @@ VALUES ('DIST_LEARN', 'Distributed Learning', 'Distributed Learning Contact', 'D
         to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'));
 
 INSERT INTO DISTRICT_CONTACT_TYPE_CODE (DISTRICT_CONTACT_TYPE_CODE, LABEL, DESCRIPTION, LEGACY_CODE,
-                               DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
-                               CREATE_DATE, UPDATE_USER, UPDATE_DATE)
+                                        DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
+                                        CREATE_DATE, UPDATE_USER, UPDATE_DATE)
 VALUES ('EARL_LEARN', 'Early Learning', 'Early Learning Contact', 'EE', 10,
         to_date('2020-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS'),
         to_date('2099-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
@@ -467,8 +528,8 @@ VALUES ('EARL_LEARN', 'Early Learning', 'Early Learning Contact', 'EE', 10,
         to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'));
 
 INSERT INTO DISTRICT_CONTACT_TYPE_CODE (DISTRICT_CONTACT_TYPE_CODE, LABEL, DESCRIPTION, LEGACY_CODE,
-                               DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
-                               CREATE_DATE, UPDATE_USER, UPDATE_DATE)
+                                        DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
+                                        CREATE_DATE, UPDATE_USER, UPDATE_DATE)
 VALUES ('FACILITIES', 'Facilities', 'Facilities Contact', 'FC', 10,
         to_date('2020-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS'),
         to_date('2099-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
@@ -476,8 +537,8 @@ VALUES ('FACILITIES', 'Facilities', 'Facilities Contact', 'FC', 10,
         to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'));
 
 INSERT INTO DISTRICT_CONTACT_TYPE_CODE (DISTRICT_CONTACT_TYPE_CODE, LABEL, DESCRIPTION, LEGACY_CODE,
-                               DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
-                               CREATE_DATE, UPDATE_USER, UPDATE_DATE)
+                                        DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
+                                        CREATE_DATE, UPDATE_USER, UPDATE_DATE)
 VALUES ('FINANCIAL', 'Financial', 'Financial Contact', 'FN', 10,
         to_date('2020-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS'),
         to_date('2099-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
@@ -485,8 +546,8 @@ VALUES ('FINANCIAL', 'Financial', 'Financial Contact', 'FN', 10,
         to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'));
 
 INSERT INTO DISTRICT_CONTACT_TYPE_CODE (DISTRICT_CONTACT_TYPE_CODE, LABEL, DESCRIPTION, LEGACY_CODE,
-                               DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
-                               CREATE_DATE, UPDATE_USER, UPDATE_DATE)
+                                        DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
+                                        CREATE_DATE, UPDATE_USER, UPDATE_DATE)
 VALUES ('FRENCH', 'French', 'French Contact', 'FR', 10,
         to_date('2020-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS'),
         to_date('2099-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
@@ -494,8 +555,8 @@ VALUES ('FRENCH', 'French', 'French Contact', 'FR', 10,
         to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'));
 
 INSERT INTO DISTRICT_CONTACT_TYPE_CODE (DISTRICT_CONTACT_TYPE_CODE, LABEL, DESCRIPTION, LEGACY_CODE,
-                               DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
-                               CREATE_DATE, UPDATE_USER, UPDATE_DATE)
+                                        DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
+                                        CREATE_DATE, UPDATE_USER, UPDATE_DATE)
 VALUES ('INTERNAT', 'International Education', 'International Education Contact', 'IE', 10,
         to_date('2020-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS'),
         to_date('2099-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
@@ -503,8 +564,8 @@ VALUES ('INTERNAT', 'International Education', 'International Education Contact'
         to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'));
 
 INSERT INTO DISTRICT_CONTACT_TYPE_CODE (DISTRICT_CONTACT_TYPE_CODE, LABEL, DESCRIPTION, LEGACY_CODE,
-                               DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
-                               CREATE_DATE, UPDATE_USER, UPDATE_DATE)
+                                        DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
+                                        CREATE_DATE, UPDATE_USER, UPDATE_DATE)
 VALUES ('LITERACY', 'Literacy', 'Literacy Contact', 'LT', 10,
         to_date('2020-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS'),
         to_date('2099-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
@@ -512,8 +573,8 @@ VALUES ('LITERACY', 'Literacy', 'Literacy Contact', 'LT', 10,
         to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'));
 
 INSERT INTO DISTRICT_CONTACT_TYPE_CODE (DISTRICT_CONTACT_TYPE_CODE, LABEL, DESCRIPTION, LEGACY_CODE,
-                               DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
-                               CREATE_DATE, UPDATE_USER, UPDATE_DATE)
+                                        DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
+                                        CREATE_DATE, UPDATE_USER, UPDATE_DATE)
 VALUES ('MYED', 'MyED BC', 'MyED BC Contact', 'ME', 10,
         to_date('2020-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS'),
         to_date('2099-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
@@ -521,8 +582,8 @@ VALUES ('MYED', 'MyED BC', 'MyED BC Contact', 'ME', 10,
         to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'));
 
 INSERT INTO DISTRICT_CONTACT_TYPE_CODE (DISTRICT_CONTACT_TYPE_CODE, LABEL, DESCRIPTION, LEGACY_CODE,
-                               DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
-                               CREATE_DATE, UPDATE_USER, UPDATE_DATE)
+                                        DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
+                                        CREATE_DATE, UPDATE_USER, UPDATE_DATE)
 VALUES ('PLANNING', 'Planning Officer', 'Planning Officer', 'PO', 10,
         to_date('2020-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS'),
         to_date('2099-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
@@ -530,8 +591,8 @@ VALUES ('PLANNING', 'Planning Officer', 'Planning Officer', 'PO', 10,
         to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'));
 
 INSERT INTO DISTRICT_CONTACT_TYPE_CODE (DISTRICT_CONTACT_TYPE_CODE, LABEL, DESCRIPTION, LEGACY_CODE,
-                               DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
-                               CREATE_DATE, UPDATE_USER, UPDATE_DATE)
+                                        DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
+                                        CREATE_DATE, UPDATE_USER, UPDATE_DATE)
 VALUES ('INCLUSIVE', 'Inclusive Education', 'Inclusive Education Contact', 'SN', 10,
         to_date('2020-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS'),
         to_date('2099-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
@@ -539,8 +600,8 @@ VALUES ('INCLUSIVE', 'Inclusive Education', 'Inclusive Education Contact', 'SN',
         to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'));
 
 INSERT INTO DISTRICT_CONTACT_TYPE_CODE (DISTRICT_CONTACT_TYPE_CODE, LABEL, DESCRIPTION, LEGACY_CODE,
-                               DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
-                               CREATE_DATE, UPDATE_USER, UPDATE_DATE)
+                                        DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
+                                        CREATE_DATE, UPDATE_USER, UPDATE_DATE)
 VALUES ('SUPER', 'Superintendent', 'Superintendent', 'SP', 10,
         to_date('2020-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS'),
         to_date('2099-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
@@ -548,8 +609,8 @@ VALUES ('SUPER', 'Superintendent', 'Superintendent', 'SP', 10,
         to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'));
 
 INSERT INTO DISTRICT_CONTACT_TYPE_CODE (DISTRICT_CONTACT_TYPE_CODE, LABEL, DESCRIPTION, LEGACY_CODE,
-                               DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
-                               CREATE_DATE, UPDATE_USER, UPDATE_DATE)
+                                        DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
+                                        CREATE_DATE, UPDATE_USER, UPDATE_DATE)
 VALUES ('SECRETARY', 'Secretary-Treasurer', 'Secretary-Treasurer', 'ST', 10,
         to_date('2020-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS'),
         to_date('2099-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
@@ -557,9 +618,18 @@ VALUES ('SECRETARY', 'Secretary-Treasurer', 'Secretary-Treasurer', 'ST', 10,
         to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'));
 
 INSERT INTO DISTRICT_CONTACT_TYPE_CODE (DISTRICT_CONTACT_TYPE_CODE, LABEL, DESCRIPTION, LEGACY_CODE,
-                               DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
-                               CREATE_DATE, UPDATE_USER, UPDATE_DATE)
+                                        DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
+                                        CREATE_DATE, UPDATE_USER, UPDATE_DATE)
 VALUES ('TRANSPORT', 'Transportation', 'Transportation Contact', 'TR', 10,
+        to_date('2020-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS'),
+        to_date('2099-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
+        to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
+        to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'));
+
+INSERT INTO DISTRICT_CONTACT_TYPE_CODE (DISTRICT_CONTACT_TYPE_CODE, LABEL, DESCRIPTION, LEGACY_CODE,
+                                        DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
+                                        CREATE_DATE, UPDATE_USER, UPDATE_DATE)
+VALUES ('EAR_CHILD', 'Early Learning Child Care', 'Early Learning Child Care', null, 10,
         to_date('2020-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS'),
         to_date('2099-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
         to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
@@ -821,7 +891,7 @@ VALUES ('12', 'GRADE12', 'Grade 12', 'Twelfth grade', 10,
 INSERT INTO SCHOOL_GRADE_CODE (LEGACY_CODE, SCHOOL_GRADE_CODE, LABEL, DESCRIPTION,
                                DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
                                CREATE_DATE, UPDATE_USER, UPDATE_DATE)
-VALUES ('KH', 'KINDHALF', 'Kindergarden Half', 'Kindergarden half', 10,
+VALUES ('KH', 'KINDHALF', 'Kindergarten Half', 'Kindergarten half', 10,
         to_date('2020-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS'),
         to_date('2099-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
         to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
@@ -830,7 +900,7 @@ VALUES ('KH', 'KINDHALF', 'Kindergarden Half', 'Kindergarden half', 10,
 INSERT INTO SCHOOL_GRADE_CODE (LEGACY_CODE, SCHOOL_GRADE_CODE, LABEL, DESCRIPTION,
                                DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
                                CREATE_DATE, UPDATE_USER, UPDATE_DATE)
-VALUES ('KF', 'KINDFULL', 'Kindergarden Full', 'Kindergarden full', 10,
+VALUES ('KF', 'KINDFULL', 'Kindergarten Full', 'Kindergarten full', 10,
         to_date('2020-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS'),
         to_date('2099-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
         to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
@@ -849,24 +919,6 @@ INSERT INTO SCHOOL_GRADE_CODE (LEGACY_CODE, SCHOOL_GRADE_CODE, LABEL, DESCRIPTIO
                                DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
                                CREATE_DATE, UPDATE_USER, UPDATE_DATE)
 VALUES ('SU', 'SECUNGR', 'Secondary Ungraded', 'Secondary ungraded', 10,
-        to_date('2020-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS'),
-        to_date('2099-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
-        to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
-        to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'));
-
-INSERT INTO SCHOOL_GRADE_CODE (LEGACY_CODE, SCHOOL_GRADE_CODE, LABEL, DESCRIPTION,
-                               DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
-                               CREATE_DATE, UPDATE_USER, UPDATE_DATE)
-VALUES ('HS', 'HOMESCHL', 'Homeschool', 'Homeschool', 10,
-        to_date('2020-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS'),
-        to_date('2099-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
-        to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
-        to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'));
-
-INSERT INTO SCHOOL_GRADE_CODE (LEGACY_CODE, SCHOOL_GRADE_CODE, LABEL, DESCRIPTION,
-                               DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
-                               CREATE_DATE, UPDATE_USER, UPDATE_DATE)
-VALUES ('GA', 'GRADADULT', 'Graduated Adult', 'Graduated Adult', 10,
         to_date('2020-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS'),
         to_date('2099-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
         to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
@@ -934,3 +986,55 @@ VALUES ('INTEGRSERV', 'Integrated Services', 'Integrated services', 10,
         to_date('2099-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
         to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
         to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'));
+
+INSERT INTO SCHOOL_REPORTING_REQUIREMENT_CODE
+(SCHOOL_REPORTING_REQUIREMENT_CODE, LABEL, DESCRIPTION, DISPLAY_ORDER,
+ EFFECTIVE_DATE,
+ EXPIRY_DATE,
+ CREATE_USER, CREATE_DATE,
+ UPDATE_USER, UPDATE_DATE)
+VALUES
+    ('REGULAR', 'Regular', 'The school submits a standard 1701 file', 1,
+     to_date ('2020-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS'),
+     to_date ('2099-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS'),
+     'TRERICHA', to_date ('2023-03-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'),
+     'TRERICHA', to_date ('2023-03-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'));
+
+INSERT INTO SCHOOL_REPORTING_REQUIREMENT_CODE
+(SCHOOL_REPORTING_REQUIREMENT_CODE, LABEL, DESCRIPTION, DISPLAY_ORDER,
+ EFFECTIVE_DATE,
+ EXPIRY_DATE,
+ CREATE_USER, CREATE_DATE,
+ UPDATE_USER, UPDATE_DATE)
+VALUES
+    ('CSF', 'Conseil Scolaire Francophone', 'The school must be in a CSF district', 1,
+     to_date ('2020-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS'),
+     to_date ('2099-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS'),
+     'TRERICHA', to_date ('2023-03-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'),
+     'TRERICHA', to_date ('2023-03-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'));
+
+INSERT INTO SCHOOL_REPORTING_REQUIREMENT_CODE
+(SCHOOL_REPORTING_REQUIREMENT_CODE, LABEL, DESCRIPTION, DISPLAY_ORDER,
+ EFFECTIVE_DATE,
+ EXPIRY_DATE,
+ CREATE_USER, CREATE_DATE,
+ UPDATE_USER, UPDATE_DATE)
+VALUES
+    ('RT', 'Reciprocal Tuition', 'The school submits an RT during a 1701 collection', 1,
+     to_date ('2020-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS'),
+     to_date ('2099-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS'),
+     'TRERICHA', to_date ('2023-03-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'),
+     'TRERICHA', to_date ('2023-03-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'));
+
+INSERT INTO SCHOOL_REPORTING_REQUIREMENT_CODE
+(SCHOOL_REPORTING_REQUIREMENT_CODE, LABEL, DESCRIPTION, DISPLAY_ORDER,
+ EFFECTIVE_DATE,
+ EXPIRY_DATE,
+ CREATE_USER, CREATE_DATE,
+ UPDATE_USER, UPDATE_DATE)
+VALUES
+    ('NONE', 'None', 'The school does not submit a 1701 file', 1,
+     to_date ('2020-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS'),
+     to_date ('2099-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS'),
+     'TRERICHA', to_date ('2023-03-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'),
+     'TRERICHA', to_date ('2023-03-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'));
