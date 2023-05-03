@@ -18,7 +18,7 @@ import java.util.UUID;
 @SuperBuilder
 @Entity
 @DynamicUpdate
-@Table(name = "INDEPENDENT_AUTHORITY_ADDRESS")
+@Table(name = "AUTHORITY_ADDRESS")
 @EqualsAndHashCode(callSuper = true)
 public class AuthorityAddressEntity extends BaseAddressEntity {
   @Id

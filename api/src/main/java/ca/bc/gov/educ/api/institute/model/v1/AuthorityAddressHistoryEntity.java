@@ -17,7 +17,7 @@ import java.util.UUID;
 @SuperBuilder
 @Entity
 @EqualsAndHashCode(callSuper = true)
-@Table(name = "INDEPENDENT_AUTHORITY_ADDRESS_HISTORY")
+@Table(name = "AUTHORITY_ADDRESS_HISTORY")
 public class AuthorityAddressHistoryEntity extends BaseAddressEntity {
   @Id
   @GeneratedValue(generator = "UUID")
