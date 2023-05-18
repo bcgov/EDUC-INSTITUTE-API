@@ -62,6 +62,10 @@ public class SchoolHistoryEntity {
   private String displayName;
 
   @Basic
+  @Column(name = "display_name_no_spec_chars")
+  private String displayNameNoSpecialChars;
+
+  @Basic
   @Column(name = "school_organization_code")
   @UpperCase
   private String schoolOrganizationCode;
