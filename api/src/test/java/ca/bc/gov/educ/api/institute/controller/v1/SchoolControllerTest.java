@@ -248,6 +248,21 @@ public class SchoolControllerTest {
         .value(entity.getSchoolId().toString()));
   }
 
+    @Test
+  void testRetrieveSchoolWithDisplayNameNoSpecChars_GivenValidID_ShouldReturnStatusOK() throws Exception {
+    final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_SCHOOL";
+    final var mockAuthority = oidcLogin().authorities(grantedAuthority);
+    final DistrictTombstoneEntity dist = this.districtTombstoneRepository.save(this.createDistrictData());
+    var schoolEntity = this.createSchoolData();
+    schoolEntity.setDistrictEntity(dist);
+    schoolEntity.setDisplayNameNoSpecialChars("NOSPECCHAR");
+    final SchoolEntity entity = this.schoolRepository.save(schoolEntity);
+
+    this.mockMvc.perform(get(URL.BASE_URL_SCHOOL + "/" + entity.getSchoolId()).with(mockAuthority))
+      .andDo(print()).andExpect(status().isOk()).andExpect(MockMvcResultMatchers.jsonPath("$.displayNameNoSpecialChars")
+        .value(entity.getDisplayNameNoSpecialChars()));
+  }
+
   @Test
   void testRetrieveSchool_GivenInvalidID_ShouldReturnStatusNotFound() throws Exception {
     final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_SCHOOL";
@@ -323,6 +338,32 @@ public class SchoolControllerTest {
       .andDo(print())
       .andExpect(status().isOk())
       .andExpect(MockMvcResultMatchers.jsonPath("$.displayName").value(entity.getDisplayName()));
+  }
+
+  @Test
+  void testUpdateSchool_GivenValidPayloadWithNoSpecCharDisplayName_ShouldReturnStatusCreated() throws Exception {
+    final var school = this.createSchoolData();
+    final DistrictTombstoneEntity dist = this.districtTombstoneRepository.save(this.createDistrictData());
+    var schoolEntity = this.createSchoolData();
+    schoolEntity.setDistrictEntity(dist);
+    final SchoolEntity entity = this.schoolRepository.save(schoolEntity);
+    entity.setPhoneNumber("");
+    entity.setDisplayName("newdist");
+    entity.setDisplayNameNoSpecialChars("nochars");
+    entity.setCreateDate(null);
+    entity.setUpdateDate(null);
+
+    var schoolStruct = SchoolMapper.mapper.toStructure(entity);
+    schoolStruct.setDistrictId(dist.getDistrictId().toString());
+
+    this.mockMvc.perform(put(URL.BASE_URL_SCHOOL + "/" + entity.getSchoolId())
+        .contentType(MediaType.APPLICATION_JSON)
+        .accept(MediaType.APPLICATION_JSON)
+        .content(asJsonString(schoolStruct))
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SCHOOL"))))
+      .andDo(print())
+      .andExpect(status().isOk())
+      .andExpect(MockMvcResultMatchers.jsonPath("$.displayNameNoSpecialChars").value(entity.getDisplayNameNoSpecialChars()));
   }
 
   @Test
@@ -529,6 +570,7 @@ public class SchoolControllerTest {
     final DistrictTombstoneEntity dist = this.districtTombstoneRepository.save(this.createDistrictData());
 
     var schoolEntity = this.createNewSchoolData(null, "PUBLIC", "DISTONLINE");
+    schoolEntity.setDisplayNameNoSpecialChars("NOSPECCHAR");
     SchoolMapper map = SchoolMapper.mapper;
 
     School mappedSchool = map.toStructure(schoolEntity);
@@ -549,7 +591,8 @@ public class SchoolControllerTest {
       .andDo(print())
       .andExpect(status().isCreated())
       .andExpect(MockMvcResultMatchers.jsonPath("$.schoolNumber").exists())
-      .andExpect(MockMvcResultMatchers.jsonPath("$.displayName").value(mappedSchool.getDisplayName()));
+      .andExpect(MockMvcResultMatchers.jsonPath("$.displayName").value(mappedSchool.getDisplayName()))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.displayNameNoSpecialChars").value(mappedSchool.getDisplayNameNoSpecialChars()));
   }
 
   @Test
@@ -944,6 +987,7 @@ public class SchoolControllerTest {
     school.setDistrictId(dist.getDistrictId().toString());
     school.setUpdateDate(null);
     school.setCreateDate(null);
+    school.setDisplayNameNoSpecialChars("NOSPECCHAR");
 
     String updatedSchool = asJsonString(school);
     this.mockMvc.perform(put(URL.BASE_URL_SCHOOL + "/" + entity.getSchoolId())
@@ -959,6 +1003,7 @@ public class SchoolControllerTest {
         .with(mockAuthority))
       .andDo(print()).andExpect(status().isOk())
       .andExpect(jsonPath("$.[0].schoolId").value(entity.getSchoolId().toString()))
+      .andExpect(jsonPath("$.[0].displayNameNoSpecialChars").value(school.getDisplayNameNoSpecialChars()))
       .andExpect(jsonPath("$.[0].schoolGrades.[0]", is(notNullValue())))
       .andExpect(jsonPath("$.[0].neighbourhoodLearnings.[0]", is(notNullValue())));
 
