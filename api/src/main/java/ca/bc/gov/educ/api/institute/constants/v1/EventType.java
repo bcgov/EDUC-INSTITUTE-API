@@ -20,5 +20,7 @@ public enum EventType {
 
   GET_PAGINATED_SCHOOLS,
 
+  GET_PAGINATED_AUTHORITIES,
+
   MOVE_SCHOOL
 }

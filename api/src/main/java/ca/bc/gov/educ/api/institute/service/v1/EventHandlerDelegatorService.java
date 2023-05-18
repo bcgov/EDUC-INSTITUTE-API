@@ -71,6 +71,16 @@ public class EventHandlerDelegatorService {
               publishToNATS(event, message, isSynchronous, resBytes);
             });
           break;
+        case GET_PAGINATED_AUTHORITIES:
+          log.info("Received GET_PAGINATED_AUTHORITIES event :: {}", event.getSagaId());
+          log.trace(PAYLOAD_LOG, event.getEventPayload());
+          eventHandlerService
+            .handleGetPaginatedAuthorities(event)
+            .thenAcceptAsync(resBytes -> {
+              log.info(RESPONDING_BACK_TO_NATS_ON_CHANNEL, message.getReplyTo() != null ? message.getReplyTo() : event.getReplyTo());
+              publishToNATS(event, message, isSynchronous, resBytes);
+            });
+          break;
         case CREATE_SCHOOL:
           log.info("Received CREATE_SCHOOL event :: {}", event.getSagaId());
           log.trace(PAYLOAD_LOG, event.getEventPayload());

@@ -8,6 +8,7 @@ import ca.bc.gov.educ.api.institute.constants.v1.EventType;
 import ca.bc.gov.educ.api.institute.exception.EntityNotFoundException;
 import ca.bc.gov.educ.api.institute.mapper.v1.IndependentAuthorityMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.SchoolMapper;
+import ca.bc.gov.educ.api.institute.model.v1.IndependentAuthorityEntity;
 import ca.bc.gov.educ.api.institute.model.v1.InstituteEvent;
 import ca.bc.gov.educ.api.institute.model.v1.SchoolEntity;
 import ca.bc.gov.educ.api.institute.repository.v1.IndependentAuthorityRepository;
@@ -84,18 +85,23 @@ public class EventHandlerService {
 
   private final SchoolSearchService schoolSearchService;
 
+  private final AuthoritySearchService authoritySearchService;
+
   private static final SchoolMapper schoolMapper = SchoolMapper.mapper;
+
+  private static final IndependentAuthorityMapper authorityMapper = IndependentAuthorityMapper.mapper;
 
   private final ObjectMapper obMapper = new ObjectMapper();
 
   private static final IndependentAuthorityMapper independentAuthorityMapper = IndependentAuthorityMapper.mapper;
 
   @Autowired
-  public EventHandlerService(IndependentAuthorityRepository independentAuthorityRepository, InstituteEventRepository instituteEventRepository, SchoolService schoolService, SchoolSearchService schoolSearchService){
+  public EventHandlerService(IndependentAuthorityRepository independentAuthorityRepository, InstituteEventRepository instituteEventRepository, SchoolService schoolService, SchoolSearchService schoolSearchService, AuthoritySearchService authoritySearchService){
     this.independentAuthorityRepository = independentAuthorityRepository;
     this.instituteEventRepository = instituteEventRepository;
     this.schoolService = schoolService;
     this.schoolSearchService = schoolSearchService;
+    this.authoritySearchService = authoritySearchService;
   }
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -170,6 +176,53 @@ public class EventHandlerService {
         return new byte[0];
       });
 
+  }
+
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
+  public CompletableFuture<byte[]> handleGetPaginatedAuthorities(Event event) {
+    String sortCriteriaJson = null;
+    String searchCriteriaListJson = null;
+    var pageNumber = 0;
+    var pageSize = 100000;
+    var params = event.getEventPayload().split("&");
+    for (String param : params) {
+      if (param != null) {
+        var keyValPair = param.split("=");
+        if (SEARCH_CRITERIA_LIST.equalsIgnoreCase(keyValPair[0])) {
+          searchCriteriaListJson = URLDecoder.decode(keyValPair[1], StandardCharsets.UTF_8);
+        } else if (PAGE_SIZE.equalsIgnoreCase(keyValPair[0])) {
+          pageSize = Integer.parseInt(keyValPair[1]);
+        } else if (PAGE_NUMBER.equalsIgnoreCase(keyValPair[0])) {
+          pageNumber = Integer.parseInt(keyValPair[1]);
+        } else if (SORT_CRITERIA.equalsIgnoreCase(keyValPair[0])) {
+          sortCriteriaJson = keyValPair[1];
+        }
+      }
+    }
+
+    final List<Sort.Order> sorts = new ArrayList<>();
+    Specification<IndependentAuthorityEntity> authoritySpecs = authoritySearchService.setSpecificationAndSortCriteria(sortCriteriaJson, searchCriteriaListJson, obMapper, sorts);
+    log.trace("Running query for paginated authorities: {}", authoritySpecs);
+    return authoritySearchService
+      .findAll(authoritySpecs, pageNumber, pageSize, sorts)
+      .thenApplyAsync(authorityEntities -> {
+        log.trace("Performing paginated authority mapping: {}", authoritySpecs);
+        var authorityMap = authorityEntities.map(authorityMapper::toStructure);
+        log.trace("Mapping complete");
+        return authorityMap;
+      })
+      .thenApplyAsync(authorityEntities -> {
+        try {
+          log.trace("Found {} authorities for {}", authorityEntities.getContent().size(), event.getSagaId());
+          val resBytes = obMapper.writeValueAsBytes(authorityEntities.getContent());
+          log.trace("Response prepared for {}, response length {}", event.getSagaId(), resBytes.length);
+          return resBytes;
+        } catch (JsonProcessingException e) {
+          log.error("Error during get paginated authorities :: {} {}", event, e);
+        }
+        log.trace("Found no authorities for paginated query with saga {}", event.getSagaId());
+        return new byte[0];
+      });
   }
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)
