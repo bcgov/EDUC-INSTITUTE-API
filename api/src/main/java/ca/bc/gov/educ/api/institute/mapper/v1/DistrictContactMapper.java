@@ -18,5 +18,6 @@ public interface DistrictContactMapper {
 
   DistrictContactEntity toModel(DistrictContact structure);
 
+  @Mapping(target = "districtId", source = "districtEntity.districtId")
   DistrictContact toStructure(DistrictContactEntity entity);
 }

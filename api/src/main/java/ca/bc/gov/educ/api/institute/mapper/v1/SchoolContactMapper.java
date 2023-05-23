@@ -17,5 +17,6 @@ public interface SchoolContactMapper {
 
   SchoolContactEntity toModel(SchoolContact structure);
 
+  @Mapping(target = "schoolId", source = "schoolEntity.schoolId")
   SchoolContact toStructure(SchoolContactEntity entity);
 }
