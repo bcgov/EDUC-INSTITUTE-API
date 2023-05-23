@@ -17,5 +17,6 @@ public interface AuthorityContactMapper {
 
   AuthorityContactEntity toModel(AuthorityContact structure);
 
+  @Mapping(target = "independentAuthorityId", source = "independentAuthorityEntity.independentAuthorityId")
   AuthorityContact toStructure(AuthorityContactEntity entity);
 }
