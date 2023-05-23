@@ -297,6 +297,25 @@ public class DistrictControllerTest {
   }
 
   @Test
+  void testCreateDistrictWithAddress_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
+    var district = this.createDistrictData();
+    var addressEntity = this.createDistrictAddressData();
+    addressEntity.setCreateDate(null);
+    addressEntity.setUpdateDate(null);
+    district.getAddresses().add(addressEntity);
+    district.setCreateDate(null);
+    district.setUpdateDate(null);
+    this.mockMvc.perform(post(URL.BASE_URL_DISTRICT)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .content(asJsonString(district))
+                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_DISTRICT"))))
+            .andDo(print())
+            .andExpect(status().isCreated())
+            .andExpect(MockMvcResultMatchers.jsonPath("$.displayName").value(district.getDisplayName()));
+  }
+
+  @Test
   void testCreateDistrict_GivenInvalidPayload_ShouldReturnStatusBadRequest() throws Exception {
     final var district = this.createDistrictData();
     district.setDistrictRegionCode("ABCD");
