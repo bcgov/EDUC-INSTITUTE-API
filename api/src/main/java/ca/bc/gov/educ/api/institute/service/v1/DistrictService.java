@@ -81,6 +81,13 @@ public class DistrictService {
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public Pair<DistrictEntity, InstituteEvent> createDistrict(District district) throws JsonProcessingException {
     var districtEntity = DistrictMapper.mapper.toModel(district);
+
+    districtEntity.getAddresses().stream().forEach(address -> {
+      RequestUtil.setAuditColumnsForAddress(address);
+      TransformUtil.uppercaseFields(address);
+      address.setDistrictEntity(districtEntity);
+    });
+
     TransformUtil.uppercaseFields(districtEntity);
     districtRepository.save(districtEntity);
     districtHistoryService.createDistrictHistory(districtEntity, district.getCreateUser());
