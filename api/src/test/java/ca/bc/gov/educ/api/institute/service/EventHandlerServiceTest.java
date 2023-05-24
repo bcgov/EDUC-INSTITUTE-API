@@ -6,11 +6,7 @@ import static ca.bc.gov.educ.api.institute.constants.v1.EventOutcome.SCHOOL_CREA
 import static ca.bc.gov.educ.api.institute.constants.v1.EventOutcome.SCHOOL_MOVED;
 import static ca.bc.gov.educ.api.institute.constants.v1.EventOutcome.SCHOOL_UPDATED;
 import static ca.bc.gov.educ.api.institute.constants.v1.EventStatus.MESSAGE_PUBLISHED;
-import static ca.bc.gov.educ.api.institute.constants.v1.EventType.CREATE_SCHOOL;
-import static ca.bc.gov.educ.api.institute.constants.v1.EventType.GET_AUTHORITY;
-import static ca.bc.gov.educ.api.institute.constants.v1.EventType.GET_PAGINATED_SCHOOLS;
-import static ca.bc.gov.educ.api.institute.constants.v1.EventType.MOVE_SCHOOL;
-import static ca.bc.gov.educ.api.institute.constants.v1.EventType.UPDATE_SCHOOL;
+import static ca.bc.gov.educ.api.institute.constants.v1.EventType.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import ca.bc.gov.educ.api.institute.constants.v1.Topics;
@@ -30,15 +26,7 @@ import ca.bc.gov.educ.api.institute.repository.v1.InstituteEventRepository;
 import ca.bc.gov.educ.api.institute.repository.v1.SchoolMoveRepository;
 import ca.bc.gov.educ.api.institute.repository.v1.SchoolRepository;
 import ca.bc.gov.educ.api.institute.service.v1.EventHandlerService;
-import ca.bc.gov.educ.api.institute.struct.v1.Event;
-import ca.bc.gov.educ.api.institute.struct.v1.MoveSchoolData;
-import ca.bc.gov.educ.api.institute.struct.v1.NeighborhoodLearning;
-import ca.bc.gov.educ.api.institute.struct.v1.School;
-import ca.bc.gov.educ.api.institute.struct.v1.SchoolAddress;
-import ca.bc.gov.educ.api.institute.struct.v1.SchoolGrade;
-import ca.bc.gov.educ.api.institute.struct.v1.Search;
-import ca.bc.gov.educ.api.institute.struct.v1.SearchCriteria;
-import ca.bc.gov.educ.api.institute.struct.v1.ValueType;
+import ca.bc.gov.educ.api.institute.struct.v1.*;
 import ca.bc.gov.educ.api.institute.util.JsonUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -173,6 +161,29 @@ public class EventHandlerServiceTest {
     final Event event = Event.builder().eventType(GET_PAGINATED_SCHOOLS).sagaId(sagaId).eventPayload(SEARCH_CRITERIA_LIST.concat("=").concat(URLEncoder.encode(criteriaJSON, StandardCharsets.UTF_8)).concat("&").concat(PAGE_SIZE).concat("=").concat("100000").concat("&pageNumber=0")).build();
     var response = eventHandlerServiceUnderTest.handleGetPaginatedSchools(event).get();
     List<School> payload = new ObjectMapper().readValue(response, new TypeReference<>() {
+    });
+    assertThat(payload).hasSize(1);
+  }
+
+    @Test
+  public void testHandleEvent_givenEventTypeGET_PAGINATED_AUTHORITIES_BY_CRITERIA__DoesExistAndSynchronousNatsMessage_shouldRespondWithData() throws IOException, ExecutionException, InterruptedException {
+    var independentAuthorityEntity = this.createIndependentAuthorityData();
+    independentAuthorityRepository.save(independentAuthorityEntity);
+
+    SearchCriteria criteriaSchoolNumber = SearchCriteria.builder().key("authorityNumber").operation(FilterOperation.EQUAL).value(independentAuthorityEntity.getAuthorityNumber().toString()).valueType(ValueType.INTEGER).build();
+    List<SearchCriteria> criteriaList = new LinkedList<>();
+    criteriaList.add(criteriaSchoolNumber);
+
+    List<Search> searches = new LinkedList<>();
+    searches.add(Search.builder().searchCriteriaList(criteriaList).build());
+
+    ObjectMapper objectMapper = new ObjectMapper();
+    String criteriaJSON = objectMapper.writeValueAsString(searches);
+
+    var sagaId = UUID.randomUUID();
+    final Event event = Event.builder().eventType(GET_PAGINATED_AUTHORITIES).sagaId(sagaId).eventPayload(SEARCH_CRITERIA_LIST.concat("=").concat(URLEncoder.encode(criteriaJSON, StandardCharsets.UTF_8)).concat("&").concat(PAGE_SIZE).concat("=").concat("100000").concat("&pageNumber=0")).build();
+    var response = eventHandlerServiceUnderTest.handleGetPaginatedAuthorities(event).get();
+    List<IndependentAuthority> payload = new ObjectMapper().readValue(response, new TypeReference<>() {
     });
     assertThat(payload).hasSize(1);
   }
