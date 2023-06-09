@@ -389,7 +389,7 @@ public class EventHandlerServiceTest {
   }
 
   private IndependentAuthorityEntity createIndependentAuthorityData() {
-    return IndependentAuthorityEntity.builder().authorityNumber(003).displayName("IndependentAuthority Name").openedDate(LocalDateTime.now().minusDays(1))
+    return IndependentAuthorityEntity.builder().authorityNumber(003).displayName("IndependentAuthority Name").email("fake@email.com").openedDate(LocalDateTime.now().minusDays(1))
       .authorityTypeCode("INDEPEND").createDate(LocalDateTime.now()).updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
   }
 

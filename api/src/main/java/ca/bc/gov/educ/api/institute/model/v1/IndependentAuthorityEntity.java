@@ -2,6 +2,7 @@ package ca.bc.gov.educ.api.institute.model.v1;
 
 import ca.bc.gov.educ.api.institute.util.UpperCase;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
@@ -35,6 +36,7 @@ public class IndependentAuthorityEntity {
   private String phoneNumber;
   @Basic
   @Column(name = "email")
+  @NotNull(message = "email cannot be null")
   private String email;
   @Basic
   @Column(name = "display_name")
