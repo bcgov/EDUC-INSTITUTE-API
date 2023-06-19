@@ -15,7 +15,13 @@ public interface NoteMapper {
 
   NoteMapper mapper = Mappers.getMapper(NoteMapper.class);
 
+  @Mapping(target = "schoolID", source = "structure.schoolId")
+  @Mapping(target = "districtID", source = "structure.districtId")
+  @Mapping(target = "independentAuthorityID", source = "structure.independentAuthorityId")
   NoteEntity toModel(Note structure);
 
+  @Mapping(target = "schoolId", source = "entity.schoolID")
+  @Mapping(target = "districtId", source = "entity.districtID")
+  @Mapping(target = "independentAuthorityId", source = "entity.independentAuthorityID")
   Note toStructure(NoteEntity entity);
 }
