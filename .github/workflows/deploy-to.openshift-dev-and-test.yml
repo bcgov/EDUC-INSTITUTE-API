@@ -37,12 +37,17 @@ env:
   TAG: "latest"
   MIN_REPLICAS_DEV: "1"
   MAX_REPLICAS_DEV: "1"
+  MIN_CPU_DEV: "5m"
+  MAX_CPU_DEV: "150m"
+  MIN_MEM_DEV: "400Mi"
+  MAX_MEM_DEV: "800Mi"
+
   MIN_REPLICAS_TEST: "2"
   MAX_REPLICAS_TEST: "2"
-  MIN_CPU: "75m"
-  MAX_CPU: "150m"
-  MIN_MEM: "400Mi"
-  MAX_MEM: "800Mi"
+  MIN_CPU_TEST: "5m"
+  MAX_CPU_TEST: "150m"
+  MIN_MEM_TEST: "400Mi"
+  MAX_MEM_TEST: "800Mi"
 
 on:
   # https://docs.github.com/en/actions/reference/events-that-trigger-workflows
@@ -163,7 +168,7 @@ jobs:
         oc tag ${{ steps.push-image.outputs.registry-path }} ${{ env.REPO_NAME }}-${{ env.BRANCH }}:${{ env.TAG }}
                
         # Process and apply deployment template
-        oc process -f tools/openshift/api.dc.yaml -p APP_NAME=${{ env.APP_NAME }} -p REPO_NAME=${{ env.REPO_NAME }} -p BRANCH=${{ env.BRANCH }} -p NAMESPACE=${{ env.OPENSHIFT_NAMESPACE_DEV }} -p TAG=${{ env.TAG }} -p MIN_REPLICAS=${{ env.MIN_REPLICAS_DEV }} -p MAX_REPLICAS=${{ env.MAX_REPLICAS_DEV }} -p MIN_CPU=${{ env.MIN_CPU }} -p MAX_CPU=${{ env.MAX_CPU }} -p MIN_MEM=${{ env.MIN_MEM }} -p MAX_MEM=${{ env.MAX_MEM }} \
+        oc process -f tools/openshift/api.dc.yaml -p APP_NAME=${{ env.APP_NAME }} -p REPO_NAME=${{ env.REPO_NAME }} -p BRANCH=${{ env.BRANCH }} -p NAMESPACE=${{ env.OPENSHIFT_NAMESPACE_DEV }} -p TAG=${{ env.TAG }} -p MIN_REPLICAS=${{ env.MIN_REPLICAS_DEV }} -p MAX_REPLICAS=${{ env.MAX_REPLICAS_DEV }} -p MIN_CPU=${{ env.MIN_CPU_DEV }} -p MAX_CPU=${{ env.MAX_CPU_DEV }} -p MIN_MEM=${{ env.MIN_MEM_DEV }} -p MAX_MEM=${{ env.MAX_MEM_DEV }} \
         | oc apply -f -
         
         curl -s https://raw.githubusercontent.com/bcgov/${{ env.REPO_NAME }}/master/tools/config/update-configmap.sh | bash /dev/stdin dev ${{ env.APP_NAME }} ${{ env.NAMESPACE }} ${{ env.COMMON_NAMESPACE }} ${{ env.DB_JDBC_CONNECT_STRING }} ${{ env.DB_PWD }} ${{ env.DB_USER }} ${{ env.SPLUNK_TOKEN }}
@@ -250,7 +255,7 @@ jobs:
          oc tag ${{ env.NAMESPACE }}-dev/${{ env.REPO_NAME }}-${{ env.BRANCH }}:${{ env.TAG }} ${{ env.NAMESPACE }}-test/${{ env.REPO_NAME }}-${{ env.BRANCH }}:${{ env.TAG }}
 
          # Process and apply deployment template
-         oc process -f tools/openshift/api.dc.yaml -p APP_NAME=${{ env.APP_NAME }} -p REPO_NAME=${{ env.REPO_NAME }} -p BRANCH=${{ env.BRANCH }} -p NAMESPACE=${{ env.OPENSHIFT_NAMESPACE_TEST }} -p TAG=${{ env.TAG }} -p MIN_REPLICAS=${{ env.MIN_REPLICAS_TEST }} -p MAX_REPLICAS=${{ env.MAX_REPLICAS_TEST }} -p MIN_CPU=${{ env.MIN_CPU }} -p MAX_CPU=${{ env.MAX_CPU }} -p MIN_MEM=${{ env.MIN_MEM }} -p MAX_MEM=${{ env.MAX_MEM }} \
+         oc process -f tools/openshift/api.dc.yaml -p APP_NAME=${{ env.APP_NAME }} -p REPO_NAME=${{ env.REPO_NAME }} -p BRANCH=${{ env.BRANCH }} -p NAMESPACE=${{ env.OPENSHIFT_NAMESPACE_TEST }} -p TAG=${{ env.TAG }} -p MIN_REPLICAS=${{ env.MIN_REPLICAS_TEST }} -p MAX_REPLICAS=${{ env.MAX_REPLICAS_TEST }} -p MIN_CPU=${{ env.MIN_CPU_TEST }} -p MAX_CPU=${{ env.MAX_CPU_TEST }} -p MIN_MEM=${{ env.MIN_MEM_TEST }} -p MAX_MEM=${{ env.MAX_MEM_TEST }} \
          | oc apply -f -
 
          curl -s https://raw.githubusercontent.com/bcgov/${{ env.REPO_NAME }}/master/tools/config/update-configmap.sh | bash /dev/stdin test ${{ env.APP_NAME }} ${{ env.NAMESPACE }} ${{ env.COMMON_NAMESPACE }} ${{ env.DB_JDBC_CONNECT_STRING }} ${{ env.DB_PWD }} ${{ env.DB_USER }} ${{ env.SPLUNK_TOKEN }}
