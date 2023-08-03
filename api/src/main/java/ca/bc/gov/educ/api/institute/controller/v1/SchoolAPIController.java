@@ -230,12 +230,7 @@ public class SchoolAPIController implements SchoolAPIEndpoint {
   }
 
   @Override
-  public CompletableFuture<Page<School>> findAll(
-    Integer pageNumber,
-    Integer pageSize,
-    String sortCriteriaJson,
-    String searchCriteriaListJson
-  ) {
+  public CompletableFuture<Page<School>> findAll(Integer pageNumber, Integer pageSize, String sortCriteriaJson, String searchCriteriaListJson) {
     final List<Sort.Order> sorts = new ArrayList<>();
     Specification<SchoolEntity> studentSpecs = schoolSearchService
       .setSpecificationAndSortCriteria(
@@ -250,12 +245,7 @@ public class SchoolAPIController implements SchoolAPIEndpoint {
   }
 
   @Override
-  public CompletableFuture<Page<SchoolHistory>> schoolHistoryFindAll(
-    Integer pageNumber,
-    Integer pageSize,
-    String sortCriteriaJson,
-    String searchCriteriaListJson
-  ) {
+  public CompletableFuture<Page<SchoolHistory>> schoolHistoryFindAll(Integer pageNumber, Integer pageSize, String sortCriteriaJson, String searchCriteriaListJson) {
     final List<Sort.Order> sorts = new ArrayList<>();
     Specification<SchoolHistoryEntity> schoolHistorySpecs = schoolHistorySearchService
       .setSpecificationAndSortCriteria(

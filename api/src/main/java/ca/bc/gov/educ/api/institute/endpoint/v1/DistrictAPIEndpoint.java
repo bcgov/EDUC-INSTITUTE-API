@@ -10,7 +10,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 import static org.springframework.http.HttpStatus.CREATED;
 
@@ -68,6 +71,29 @@ public interface DistrictAPIEndpoint {
   @Tag(name = "District Entity", description = "Endpoints for district entity.")
   @Schema(name = "District", implementation = District.class)
   List<District> getAllDistricts();
+
+  @GetMapping("/paginated")
+  @Async
+  @PreAuthorize("hasAuthority('SCOPE_READ_DISTRICT')")
+  @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR.")})
+  @Transactional(readOnly = true)
+  @Tag(name = "District Entity", description = "Endpoints for district note entity.")
+  CompletableFuture<Page<District>> findAll(@RequestParam(name = "pageNumber", defaultValue = "0") Integer pageNumber,
+                                          @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
+                                          @RequestParam(name = "sort", defaultValue = "") String sortCriteriaJson,
+                                          @RequestParam(name = "searchCriteriaList", required = false) String searchCriteriaListJson);
+
+  @GetMapping("/contact/paginated")
+  @Async
+  @PreAuthorize("hasAuthority('SCOPE_READ_DISTRICT_CONTACT')")
+  @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR.")})
+  @Transactional(readOnly = true)
+  @Tag(name = "District Contact Entity", description = "Endpoints for district contact entity.")
+  @Schema(name = "DistrictContact", implementation = DistrictContact.class)
+  CompletableFuture<Page<DistrictContact>> findAllContacts(@RequestParam(name = "pageNumber", defaultValue = "0") Integer pageNumber,
+                                          @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
+                                          @RequestParam(name = "sort", defaultValue = "") String sortCriteriaJson,
+                                          @RequestParam(name = "searchCriteriaList", required = false) String searchCriteriaListJson);
 
   @GetMapping("/{districtId}/contact/{contactId}")
   @PreAuthorize("hasAuthority('SCOPE_READ_DISTRICT_CONTACT')")

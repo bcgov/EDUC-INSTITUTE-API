@@ -9,12 +9,17 @@ import ca.bc.gov.educ.api.institute.mapper.v1.DistrictMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.DistrictTombstoneMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.NoteMapper;
 import ca.bc.gov.educ.api.institute.messaging.jetstream.Publisher;
+import ca.bc.gov.educ.api.institute.model.v1.DistrictContactEntity;
+import ca.bc.gov.educ.api.institute.model.v1.DistrictEntity;
+import ca.bc.gov.educ.api.institute.service.v1.DistrictContactSearchService;
 import ca.bc.gov.educ.api.institute.service.v1.DistrictHistoryService;
+import ca.bc.gov.educ.api.institute.service.v1.DistrictSearchService;
 import ca.bc.gov.educ.api.institute.service.v1.DistrictService;
 import ca.bc.gov.educ.api.institute.struct.v1.District;
 import ca.bc.gov.educ.api.institute.struct.v1.DistrictContact;
 import ca.bc.gov.educ.api.institute.struct.v1.DistrictHistory;
 import ca.bc.gov.educ.api.institute.struct.v1.Note;
+import ca.bc.gov.educ.api.institute.util.JsonUtil;
 import ca.bc.gov.educ.api.institute.util.RequestUtil;
 import ca.bc.gov.educ.api.institute.validator.DistrictContactPayloadValidator;
 import ca.bc.gov.educ.api.institute.validator.DistrictPayloadValidator;
@@ -25,14 +30,19 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -52,6 +62,8 @@ public class DistrictAPIController implements DistrictAPIEndpoint {
 
   private static final NoteMapper noteMapper = NoteMapper.mapper;
   private final DistrictService districtService;
+  private final DistrictSearchService districtSearchService;
+  private final DistrictContactSearchService districtContactSearchService;
   private final DistrictHistoryService districtHistoryService;
 
   private final DistrictPayloadValidator districtPayloadValidator;
@@ -61,9 +73,11 @@ public class DistrictAPIController implements DistrictAPIEndpoint {
   private final NotePayloadValidator notePayloadValidator;
 
   @Autowired
-  public DistrictAPIController(Publisher publisher, final DistrictService districtService, final DistrictHistoryService districtHistoryService, final DistrictPayloadValidator districtPayloadValidator, DistrictContactPayloadValidator districtContactPayloadValidator, NotePayloadValidator notePayloadValidator) {
+  public DistrictAPIController(Publisher publisher, final DistrictService districtService, DistrictSearchService districtSearchService, DistrictContactSearchService districtContactSearchService, final DistrictHistoryService districtHistoryService, final DistrictPayloadValidator districtPayloadValidator, DistrictContactPayloadValidator districtContactPayloadValidator, NotePayloadValidator notePayloadValidator) {
     this.publisher = publisher;
     this.districtService = districtService;
+    this.districtSearchService = districtSearchService;
+    this.districtContactSearchService = districtContactSearchService;
     this.districtHistoryService = districtHistoryService;
     this.districtPayloadValidator = districtPayloadValidator;
     this.districtContactPayloadValidator = districtContactPayloadValidator;
@@ -83,7 +97,7 @@ public class DistrictAPIController implements DistrictAPIEndpoint {
 
   @Override
   public List<DistrictHistory> getDistrictHistory(UUID districtId) {
-    return this.districtHistoryService.getAllDistrictHistoryList(districtId).stream().map(mapper::toStructure).collect(Collectors.toList());
+    return this.districtHistoryService.getAllDistrictHistoryList(districtId).stream().map(mapper::toStructure).toList();
   }
 
   @Override
@@ -122,7 +136,21 @@ public class DistrictAPIController implements DistrictAPIEndpoint {
 
   @Override
   public List<District> getAllDistricts() {
-    return this.districtService.getAllDistrictsList().stream().map(districtTombstoneMapper::toStructure).collect(Collectors.toList());
+    return this.districtService.getAllDistrictsList().stream().map(districtTombstoneMapper::toStructure).toList();
+  }
+
+  @Override
+  public CompletableFuture<Page<District>> findAll(Integer pageNumber, Integer pageSize, String sortCriteriaJson, String searchCriteriaListJson) {
+    final List<Sort.Order> sorts = new ArrayList<>();
+    Specification<DistrictEntity> districtSpecs = districtSearchService.setSpecificationAndSortCriteria(sortCriteriaJson, searchCriteriaListJson, JsonUtil.mapper, sorts);
+    return this.districtSearchService.findAll(districtSpecs, pageNumber, pageSize, sorts).thenApplyAsync(districtEntities -> districtEntities.map(mapper::toStructure));
+  }
+
+  @Override
+  public CompletableFuture<Page<DistrictContact>> findAllContacts(Integer pageNumber, Integer pageSize, String sortCriteriaJson, String searchCriteriaListJson) {
+    final List<Sort.Order> sorts = new ArrayList<>();
+    Specification<DistrictContactEntity> districtSpecs = districtContactSearchService.setSpecificationAndSortCriteria(sortCriteriaJson, searchCriteriaListJson, JsonUtil.mapper, sorts);
+    return this.districtContactSearchService.findAll(districtSpecs, pageNumber, pageSize, sorts).thenApplyAsync(districtEntities -> districtEntities.map(districtContactMapper::toStructure));
   }
 
   @Override
