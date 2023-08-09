@@ -22,7 +22,7 @@ SELECT
     sysdate as CREATE_DATE,
     'SPM_MIGRATION' as UPDATE_USER,
     sysdate as UPDATE_DATE
-FROM SCHOOL_FUNDING_MASTER fund_mast
+FROM SCHOOL_FUNDING_MASTER fund_mast, SCHOOL schl_table
 WHERE fund_mast.FUNDING_GROUP_SUBCODE = '01'
 AND fund_mast.SCHLNO = schl_table.SCHOOL_NUMBER AND fund_mast.DISTNO = (SELECT dist.DISTRICT_NUMBER from DISTRICT dist WHERE schl_table.DISTRICT_ID = dist.DISTRICT_ID);
 
