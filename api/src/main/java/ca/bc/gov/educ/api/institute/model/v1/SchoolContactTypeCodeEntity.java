@@ -51,4 +51,8 @@ public class SchoolContactTypeCodeEntity {
   private LocalDateTime updateDate;
   @Column(name = "publicly_avail")
   private boolean publiclyAvailable;
+  @Column(name = "ind_only")
+  private boolean indOnly;
+  @Column(name = "offshore_only")
+  private boolean offshoreOnly;
 }

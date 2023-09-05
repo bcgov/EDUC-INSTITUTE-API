@@ -31,4 +31,8 @@ public class AuthorityContactTypeCode implements Serializable {
   private String expiryDate;
 
   private boolean publiclyAvailable;
+
+  private boolean indOnly;
+
+  private boolean offshoreOnly;
 }
