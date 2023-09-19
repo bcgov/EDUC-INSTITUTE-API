@@ -1,6 +1,7 @@
 package ca.bc.gov.educ.api.institute.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
@@ -9,7 +10,7 @@ import java.io.IOException;
  * The type Json util.
  */
 public class JsonUtil {
-  public static final ObjectMapper mapper = new ObjectMapper();
+  public static final ObjectMapper mapper = createMapper();
 
   private JsonUtil() {
   }
@@ -60,5 +61,11 @@ public class JsonUtil {
    */
   public static <T> T getObjectFromJsonBytes(Class<T> clazz, byte[] payload) throws IOException {
     return mapper.readValue(payload, clazz);
+  }
+
+  public static ObjectMapper createMapper() {
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.registerModule(new Jdk8Module());
+    return mapper;
   }
 }

@@ -13,6 +13,7 @@ import ca.bc.gov.educ.api.institute.model.v1.InstituteEvent;
 import ca.bc.gov.educ.api.institute.model.v1.SchoolEntity;
 import ca.bc.gov.educ.api.institute.repository.v1.IndependentAuthorityRepository;
 import ca.bc.gov.educ.api.institute.repository.v1.InstituteEventRepository;
+import ca.bc.gov.educ.api.institute.struct.v1.CreateSchoolSagaData;
 import ca.bc.gov.educ.api.institute.struct.v1.Event;
 import ca.bc.gov.educ.api.institute.struct.v1.MoveSchoolData;
 import ca.bc.gov.educ.api.institute.struct.v1.School;
@@ -239,6 +240,37 @@ public class EventHandlerService {
       choreographyEvent = schoolPair.getRight();
       event.setEventOutcome(EventOutcome.SCHOOL_CREATED);
       event.setEventPayload(JsonUtil.getJsonStringFromObject(schoolMapper.toStructure(schoolPair.getLeft())));
+      schoolEvent = createInstituteEventRecord(event);
+    } else {
+      log.info(RECORD_FOUND_FOR_SAGA_ID_EVENT_TYPE);
+      log.trace(EVENT_PAYLOAD, event);
+      schoolEvent = instituteEventOptional.get();
+      schoolEvent.setUpdateDate(LocalDateTime.now());
+    }
+
+    getInstituteEventRepository().save(schoolEvent);
+    return Pair.of(createResponseEvent(schoolEvent), choreographyEvent);
+  }
+
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
+  public Pair<byte[], InstituteEvent> handleCreateSchoolWithAdminEvent(Event event) throws JsonProcessingException {
+    Optional<InstituteEvent> instituteEventOptional = getInstituteEventRepository()
+      .findBySagaIdAndEventType(event.getSagaId(), event.getEventType().toString());
+    InstituteEvent schoolEvent;
+    InstituteEvent choreographyEvent = null;
+    if (instituteEventOptional.isEmpty()) {
+      log.info(NO_RECORD_SAGA_ID_EVENT_TYPE);
+      log.trace(EVENT_PAYLOAD, event);
+      CreateSchoolSagaData sagaData = JsonUtil
+        .getJsonObjectFromString(CreateSchoolSagaData.class, event.getEventPayload());
+      School school = sagaData.getSchool();
+      RequestUtil.setAuditColumnsForCreate(school);
+      Pair<SchoolEntity, InstituteEvent> schoolPair = getSchoolService().createSchool(school);
+      choreographyEvent = schoolPair.getRight();
+      School createdSchool = schoolMapper.toStructure(schoolPair.getLeft());
+      sagaData.setSchool(createdSchool);
+      event.setEventOutcome(EventOutcome.SCHOOL_CREATED);
+      event.setEventPayload(JsonUtil.getJsonStringFromObject(sagaData));
       schoolEvent = createInstituteEventRecord(event);
     } else {
       log.info(RECORD_FOUND_FOR_SAGA_ID_EVENT_TYPE);

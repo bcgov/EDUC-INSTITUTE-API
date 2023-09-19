@@ -89,6 +89,14 @@ public class EventHandlerDelegatorService {
           publishToNATS(event, message, isSynchronous, pair.getLeft());
           publishToJetStream(pair.getRight());
           break;
+        case CREATE_SCHOOL_WITH_ADMIN:
+          log.info("Received CREATE_SCHOOL_WITH_ADMIN event :: {}", event.getSagaId());
+          log.trace(PAYLOAD_LOG, event.getEventPayload());
+          Pair<byte[], InstituteEvent> pairWithAdmin = eventHandlerService.handleCreateSchoolWithAdminEvent(event);
+          log.info(RESPONDING_BACK_TO_NATS_ON_CHANNEL, message.getReplyTo() != null ? message.getReplyTo() : event.getReplyTo());
+          publishToNATS(event, message, isSynchronous, pairWithAdmin.getLeft());
+          publishToJetStream(pairWithAdmin.getRight());
+          break;
         case UPDATE_SCHOOL:
           log.info("Received UPDATE_SCHOOL event :: {}", event.getSagaId());
           log.trace(PAYLOAD_LOG, event.getEventPayload());
