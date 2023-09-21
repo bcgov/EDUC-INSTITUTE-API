@@ -5,6 +5,7 @@ import static ca.bc.gov.educ.api.institute.constants.v1.EventOutcome.AUTHORITY_N
 import static ca.bc.gov.educ.api.institute.constants.v1.EventOutcome.SCHOOL_CREATED;
 import static ca.bc.gov.educ.api.institute.constants.v1.EventOutcome.SCHOOL_MOVED;
 import static ca.bc.gov.educ.api.institute.constants.v1.EventOutcome.SCHOOL_UPDATED;
+import static ca.bc.gov.educ.api.institute.constants.v1.EventOutcome.CREATED_SCHOOL_HAS_ADMIN_USER;
 import static ca.bc.gov.educ.api.institute.constants.v1.EventStatus.MESSAGE_PUBLISHED;
 import static ca.bc.gov.educ.api.institute.constants.v1.EventType.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -32,6 +33,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -163,7 +165,7 @@ public class EventHandlerServiceTest {
     assertThat(payload).hasSize(1);
   }
 
-    @Test
+  @Test
   public void testHandleEvent_givenEventTypeGET_PAGINATED_AUTHORITIES_BY_CRITERIA__DoesExistAndSynchronousNatsMessage_shouldRespondWithData() throws IOException, ExecutionException, InterruptedException {
     var independentAuthorityEntity = this.createIndependentAuthorityData();
     independentAuthorityRepository.save(independentAuthorityEntity);
@@ -271,6 +273,77 @@ public class EventHandlerServiceTest {
     var sagaId = UUID.randomUUID();
     final Event event = Event.builder().eventType(CREATE_SCHOOL).sagaId(sagaId).eventPayload(objectMapper.writeValueAsString(mappedSchool)).build();
     eventHandlerServiceUnderTest.handleCreateSchoolEvent(event);
+  }
+
+  @Test
+  public void testHandleEvent_givenEventTypeCREATE_SCHOOL_WITH_ADMIN_USER__DoesExistAndSynchronousNatsMessage_shouldRespondWithHasAdmin()
+  throws IOException, ExecutionException, InterruptedException {
+    final DistrictTombstoneEntity dist = this.districtTombstoneRepository.save(this.createDistrictData());
+
+    var sagaData = this.createNewSchoolSagaData(true);
+    School school = sagaData.getSchool();
+
+    school.setDistrictId(dist.getDistrictId().toString());
+    school.setCreateDate(null);
+    school.setUpdateDate(null);
+    school.setSchoolNumber(null);
+    school.setGrades(List.of(createSchoolGrade()));
+    school.setNeighborhoodLearning(List.of(createNeighborhoodLearning()));
+    school.setAddresses(List.of(createSchoolAddress()));
+
+    ObjectMapper objectMapper = new ObjectMapper();
+    objectMapper.registerModule(new JavaTimeModule()).configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+    objectMapper.registerModule(new Jdk8Module());
+
+    UUID sagaId = UUID.randomUUID();
+    final Event event = Event.builder()
+      .eventType(CREATE_SCHOOL_WITH_ADMIN)
+      .sagaId(sagaId)
+      .eventPayload(objectMapper.writeValueAsString(sagaData))
+      .build();
+
+    eventHandlerServiceUnderTest.handleCreateSchoolWithAdminEvent(event).getLeft();
+    Optional<InstituteEvent> schoolCreatedEvent = instituteEventRepository
+      .findBySagaIdAndEventType(sagaId, CREATE_SCHOOL_WITH_ADMIN.toString());
+
+    assertThat(schoolCreatedEvent).isPresent();
+    assertThat(schoolCreatedEvent.get().getEventStatus()).isEqualTo(MESSAGE_PUBLISHED.toString());
+    assertThat(schoolCreatedEvent.get().getEventOutcome()).isEqualTo(CREATED_SCHOOL_HAS_ADMIN_USER.toString());
+  }
+
+  public void testHandleEvent_givenEventTypeCREATE_SCHOOL_WITH_EMPTY_ADMIN_USER__DoesExistAndSynchronousNatsMessage_shouldRespondWithSchoolCreated()
+  throws IOException, ExecutionException, InterruptedException {
+    final DistrictTombstoneEntity dist = this.districtTombstoneRepository.save(this.createDistrictData());
+
+    var sagaData = this.createNewSchoolSagaData(false);
+    School school = sagaData.getSchool();
+
+    school.setDistrictId(dist.getDistrictId().toString());
+    school.setCreateDate(null);
+    school.setUpdateDate(null);
+    school.setSchoolNumber(null);
+    school.setGrades(List.of(createSchoolGrade()));
+    school.setNeighborhoodLearning(List.of(createNeighborhoodLearning()));
+    school.setAddresses(List.of(createSchoolAddress()));
+
+    ObjectMapper objectMapper = new ObjectMapper();
+    objectMapper.registerModule(new JavaTimeModule()).configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+    objectMapper.registerModule(new Jdk8Module());
+
+    UUID sagaId = UUID.randomUUID();
+    final Event event = Event.builder()
+      .eventType(CREATE_SCHOOL_WITH_ADMIN)
+      .sagaId(sagaId)
+      .eventPayload(objectMapper.writeValueAsString(sagaData))
+      .build();
+
+    eventHandlerServiceUnderTest.handleCreateSchoolWithAdminEvent(event).getLeft();
+    Optional<InstituteEvent> schoolCreatedEvent = instituteEventRepository
+      .findBySagaIdAndEventType(sagaId, CREATE_SCHOOL_WITH_ADMIN.toString());
+
+    assertThat(schoolCreatedEvent).isPresent();
+    assertThat(schoolCreatedEvent.get().getEventStatus()).isEqualTo(MESSAGE_PUBLISHED.toString());
+    assertThat(schoolCreatedEvent.get().getEventOutcome()).isEqualTo(SCHOOL_CREATED.toString());
   }
 
   @Test
@@ -396,6 +469,30 @@ public class EventHandlerServiceTest {
       .schoolOrganizationCode("TWO_SEM").facilityTypeCode(facilityTypeCode).website("abc@sd99.edu").createDate(LocalDateTime.now().withNano(0))
       .updateDate(LocalDateTime.now().withNano(0)).createUser("TEST").updateUser("TEST").build();
   }
+
+  /**
+   * Create mock saga data for an EDX CreateSchoolSagaData struct, which may or may not contain an initial EDX user.
+   * @param includeEdxUser Incude a present EdxUser inside the initialEdxUser optional.
+   */
+  private CreateSchoolSagaData createNewSchoolSagaData(Boolean includeEdxUser) {
+    CreateSchoolSagaData sagaData = new CreateSchoolSagaData();
+    SchoolEntity school = this.createNewSchoolData(null, "PUBLIC", "DISTONLINE");
+    sagaData.setSchool(SchoolMapper.mapper.toStructure(school));
+
+    if (includeEdxUser) {
+      EdxUser mockUser = new EdxUser();
+      mockUser.setEmail("test@test.ca");
+      mockUser.setFirstName("TestFirst");
+      mockUser.setLastName("TestLast");
+      mockUser.setDigitalIdentityID(UUID.randomUUID().toString());
+      sagaData.setInitialEdxUser(Optional.of(mockUser));
+    } else {
+      sagaData.setInitialEdxUser(Optional.empty());
+    }
+
+    return sagaData;
+  }
+
   private DistrictTombstoneEntity createDistrictData() {
     return DistrictTombstoneEntity.builder().districtNumber("003").displayName("District Name").districtStatusCode("OPEN").districtRegionCode("KOOTENAYS")
             .website("abc@sd99.edu").createDate(LocalDateTime.now()).updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
