@@ -261,15 +261,23 @@ public class EventHandlerService {
     if (instituteEventOptional.isEmpty()) {
       log.info(NO_RECORD_SAGA_ID_EVENT_TYPE);
       log.trace(EVENT_PAYLOAD, event);
+
       CreateSchoolSagaData sagaData = JsonUtil
         .getJsonObjectFromString(CreateSchoolSagaData.class, event.getEventPayload());
       School school = sagaData.getSchool();
       RequestUtil.setAuditColumnsForCreate(school);
+
       Pair<SchoolEntity, InstituteEvent> schoolPair = getSchoolService().createSchool(school);
       choreographyEvent = schoolPair.getRight();
       School createdSchool = schoolMapper.toStructure(schoolPair.getLeft());
       sagaData.setSchool(createdSchool);
-      event.setEventOutcome(EventOutcome.SCHOOL_CREATED);
+
+      if (sagaData.getInitialEdxUser().isPresent()) {
+        event.setEventOutcome(EventOutcome.CREATED_SCHOOL_HAS_ADMIN_USER);
+      } else {
+        event.setEventOutcome(EventOutcome.SCHOOL_CREATED);
+      }
+
       event.setEventPayload(JsonUtil.getJsonStringFromObject(sagaData));
       schoolEvent = createInstituteEventRecord(event);
     } else {
