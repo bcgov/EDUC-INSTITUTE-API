@@ -9,6 +9,9 @@ import static ca.bc.gov.educ.api.institute.constants.v1.EventOutcome.CREATED_SCH
 import static ca.bc.gov.educ.api.institute.constants.v1.EventStatus.MESSAGE_PUBLISHED;
 import static ca.bc.gov.educ.api.institute.constants.v1.EventType.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
 import ca.bc.gov.educ.api.institute.constants.v1.Topics;
 import ca.bc.gov.educ.api.institute.exception.ConflictFoundException;
@@ -56,6 +59,8 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import ca.bc.gov.educ.api.institute.constants.v1.EventType;
+import ca.bc.gov.educ.api.institute.constants.v1.EventOutcome;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
@@ -64,25 +69,32 @@ import org.springframework.test.context.junit4.SpringRunner;
 public class EventHandlerServiceTest {
 
   public static final String INSTITUTE_API_TOPIC = Topics.INSTITUTE_API_TOPIC.toString();
+
   @Autowired
   private IndependentAuthorityRepository independentAuthorityRepository;
+
   @Autowired
   private InstituteEventRepository instituteEventRepository;
 
   @Autowired
   DistrictTombstoneRepository districtTombstoneRepository;
+
   @Autowired
   private SchoolRepository schoolRepository;
+
   @Autowired
   private SchoolMoveRepository schoolMoveRepository;
 
   public static final String SEARCH_CRITERIA_LIST = "searchCriteriaList";
   public static final String PAGE_SIZE = "pageSize";
+
   @Autowired
   private EventHandlerService eventHandlerServiceUnderTest;
+
   private static final IndependentAuthorityMapper independentAuthorityMapper = IndependentAuthorityMapper.mapper;
-  private static final SchoolMapper schoolMapper = SchoolMapper.mapper;
+
   private final boolean isSynchronous = false;
+
   @Before
   public void setUp() {
     MockitoAnnotations.openMocks(this);
@@ -245,6 +257,24 @@ public class EventHandlerServiceTest {
     assertThat(schoolCreatedEvent).isPresent();
     assertThat(schoolCreatedEvent.get().getEventStatus()).isEqualTo(MESSAGE_PUBLISHED.toString());
     assertThat(schoolCreatedEvent.get().getEventOutcome()).isEqualTo(SCHOOL_CREATED.toString());
+  }
+
+  @Test
+  public void testHandleEvent_givenEventTypeCREATE_SCHOOL__whereSagaAlreadyExists_shouldRetrieveSaga()
+  throws JsonProcessingException {
+    Event event = mock(Event.class);
+    Event createMockEvent = this.createExistingChoreographyEvent(CREATE_SCHOOL, SCHOOL_CREATED);
+    this.eventHandlerServiceUnderTest.handleCreateSchoolEvent(createMockEvent);
+    verify(event, never()).setEventOutcome(SCHOOL_CREATED);
+  }
+
+  @Test
+  public void testHandleEvent_givenEventTypeCREATE_SCHOOL_WITH_ADMIN_USER__whereSagaAlreadyExists_shouldRetrieveSaga()
+  throws JsonProcessingException {
+    Event event = mock(Event.class);
+    Event createMockEvent = this.createExistingChoreographyEvent(CREATE_SCHOOL_WITH_ADMIN, SCHOOL_CREATED);
+    this.eventHandlerServiceUnderTest.handleCreateSchoolEvent(createMockEvent);
+    verify(event, never()).setEventOutcome(SCHOOL_CREATED);
   }
 
   @Test(expected = ConflictFoundException.class)
@@ -497,6 +527,7 @@ public class EventHandlerServiceTest {
     return DistrictTombstoneEntity.builder().districtNumber("003").displayName("District Name").districtStatusCode("OPEN").districtRegionCode("KOOTENAYS")
             .website("abc@sd99.edu").createDate(LocalDateTime.now()).updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
   }
+
   private SchoolGrade createSchoolGrade() {
     SchoolGrade schoolGrade = new SchoolGrade();
     schoolGrade.setSchoolGradeCode("01");
@@ -504,6 +535,7 @@ public class EventHandlerServiceTest {
     schoolGrade.setUpdateUser("TEST");
     return schoolGrade;
   }
+
   private NeighborhoodLearning createNeighborhoodLearning() {
     NeighborhoodLearning neighborhoodLearning = new NeighborhoodLearning();
     neighborhoodLearning.setNeighborhoodLearningTypeCode("COMM_USE");
@@ -511,6 +543,7 @@ public class EventHandlerServiceTest {
     neighborhoodLearning.setUpdateUser("TEST");
     return neighborhoodLearning;
   }
+
   private SchoolAddress createSchoolAddress() {
     SchoolAddress schoolAddress = new SchoolAddress();
     schoolAddress.setAddressTypeCode("MAILING");
@@ -521,6 +554,26 @@ public class EventHandlerServiceTest {
     schoolAddress.setPostal("v1B9H2");
 
     return schoolAddress;
+  }
+
+  private Event createExistingChoreographyEvent(EventType eventType, EventOutcome eventOutcome) {
+    Event event = new Event();
+    InstituteEvent instituteEvent = new InstituteEvent();
+    UUID eventId = UUID.randomUUID();
+
+    event.setSagaId(eventId);
+    event.setEventType(eventType);
+    event.setEventOutcome(eventOutcome);
+
+    instituteEvent.setSagaId(eventId);
+    instituteEvent.setEventType(eventType.toString());
+    instituteEvent.setEventOutcome(eventOutcome.toString());
+    instituteEvent.setEventPayload("");
+    instituteEvent.setEventStatus(MESSAGE_PUBLISHED.toString());
+
+    instituteEventRepository.save(instituteEvent);
+
+    return event;
   }
 
   private MoveSchoolData createMoveSchoolData(School toSchool, UUID fromSchoolId, LocalDateTime moveDate) {
