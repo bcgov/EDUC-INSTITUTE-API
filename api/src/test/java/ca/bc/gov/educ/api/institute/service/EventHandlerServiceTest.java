@@ -50,6 +50,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
+import java.util.logging.Logger;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -119,8 +121,6 @@ public class EventHandlerServiceTest {
     assertThat(responseEvent.getEventOutcome()).isEqualTo(AUTHORITY_NOT_FOUND);
   }
 
-
-
   @Test
   public void testHandleEvent_givenEventTypeGET_AUTHORITY__whenStudentExist_shouldHaveEventOutcomeAUTHORITY_FOUND() throws IOException {
     IndependentAuthorityEntity entity = independentAuthorityRepository.save(createIndependentAuthorityData());
@@ -132,7 +132,6 @@ public class EventHandlerServiceTest {
     assertThat(responseEvent).isNotNull();
     assertThat(responseEvent.getEventOutcome()).isEqualTo(AUTHORITY_FOUND);
   }
-
 
   @Test
   public void testHandleEvent_givenEventTypeGET_AUTHORITY__whenStudentExistAndSynchronousNatsMessage_shouldRespondWithAuthorityData() throws JsonProcessingException {
@@ -271,10 +270,9 @@ public class EventHandlerServiceTest {
   @Test
   public void testHandleEvent_givenEventTypeCREATE_SCHOOL_WITH_ADMIN_USER__whereSagaAlreadyExists_shouldRetrieveSaga()
   throws JsonProcessingException {
-    Event event = mock(Event.class);
-    Event createMockEvent = this.createExistingChoreographyEvent(CREATE_SCHOOL_WITH_ADMIN, SCHOOL_CREATED);
-    this.eventHandlerServiceUnderTest.handleCreateSchoolEvent(createMockEvent);
-    verify(event, never()).setEventOutcome(SCHOOL_CREATED);
+    Logger logger = mock(Logger.class);
+    this.createExistingChoreographyEvent(CREATE_SCHOOL_WITH_ADMIN, SCHOOL_CREATED);
+    verify(logger, never()).info(EventHandlerService.RECORD_FOUND_FOR_SAGA_ID_EVENT_TYPE);
   }
 
   @Test(expected = ConflictFoundException.class)
@@ -306,7 +304,7 @@ public class EventHandlerServiceTest {
   }
 
   @Test
-  public void testHandleEvent_givenEventTypeCREATE_SCHOOL_WITH_ADMIN_USER__DoesExistAndSynchronousNatsMessage_shouldRespondWithHasAdmin()
+  public void testHandleEvent_givenEventTypeCREATE_SCHOOL_WITH_ADMIN_USER__EventHasAdminUser_shouldRespondWithHasAdmin()
   throws IOException, ExecutionException, InterruptedException {
     final DistrictTombstoneEntity dist = this.districtTombstoneRepository.save(this.createDistrictData());
 
@@ -337,15 +335,18 @@ public class EventHandlerServiceTest {
       .findBySagaIdAndEventType(sagaId, CREATE_SCHOOL_WITH_ADMIN.toString());
 
     assertThat(schoolCreatedEvent).isPresent();
+    String eventPayload = schoolCreatedEvent.get().getEventPayload();
+    CreateSchoolSagaData newSagaData = objectMapper.readValue(eventPayload, CreateSchoolSagaData.class);
+    assertThat(newSagaData.getInitialEdxUser()).isPresent();
     assertThat(schoolCreatedEvent.get().getEventStatus()).isEqualTo(MESSAGE_PUBLISHED.toString());
     assertThat(schoolCreatedEvent.get().getEventOutcome()).isEqualTo(CREATED_SCHOOL_HAS_ADMIN_USER.toString());
   }
 
-  public void testHandleEvent_givenEventTypeCREATE_SCHOOL_WITH_EMPTY_ADMIN_USER__DoesExistAndSynchronousNatsMessage_shouldRespondWithSchoolCreated()
+  public void testHandleEvent_givenEventTypeCREATE_SCHOOL_WITH_EMPTY_ADMIN_USER__EventHasNoAdminUser_shouldRespondWithSchoolCreated()
   throws IOException, ExecutionException, InterruptedException {
     final DistrictTombstoneEntity dist = this.districtTombstoneRepository.save(this.createDistrictData());
 
-    var sagaData = this.createNewSchoolSagaData(false);
+    CreateSchoolSagaData sagaData = this.createNewSchoolSagaData(false);
     School school = sagaData.getSchool();
 
     school.setDistrictId(dist.getDistrictId().toString());
@@ -372,6 +373,9 @@ public class EventHandlerServiceTest {
       .findBySagaIdAndEventType(sagaId, CREATE_SCHOOL_WITH_ADMIN.toString());
 
     assertThat(schoolCreatedEvent).isPresent();
+    String eventPayload = schoolCreatedEvent.get().getEventPayload();
+    CreateSchoolSagaData newSagaData = objectMapper.readValue(eventPayload, CreateSchoolSagaData.class);
+    assertThat(newSagaData.getInitialEdxUser()).isEmpty();
     assertThat(schoolCreatedEvent.get().getEventStatus()).isEqualTo(MESSAGE_PUBLISHED.toString());
     assertThat(schoolCreatedEvent.get().getEventOutcome()).isEqualTo(SCHOOL_CREATED.toString());
   }
