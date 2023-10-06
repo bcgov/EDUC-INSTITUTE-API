@@ -369,29 +369,7 @@ SELECT
     'SPM_MIGRATION' as UPDATE_USER,
     sysdate as UPDATE_DATE
 FROM SCHOOL_MASTER schl_mast
-WHERE TRIM(schl_mast.GRADE_12_IND ) = 'Y'
-UNION
-SELECT
-    LOWER(REGEXP_REPLACE(dbms_crypto.randombytes(16), '(.{8})(.{4})(.{4})(.{4})(.{12})', '\1-\2-\3-\4-\5')) as SCHOOL_GRADE_ID,
-    (SELECT schl.SCHOOL_ID from SCHOOL schl WHERE schl_mast.SCHLNO = schl.SCHOOL_NUMBER AND schl_mast.DISTNO = (SELECT dist.DISTRICT_NUMBER from DISTRICT dist WHERE schl.DISTRICT_ID = dist.DISTRICT_ID)) as SCHOOL_ID,
-    'ELEMUNGR' as SCHOOL_GRADE_CODE,
-    'SPM_MIGRATION' as CREATE_USER,
-    sysdate as CREATE_DATE,
-    'SPM_MIGRATION' as UPDATE_USER,
-    sysdate as UPDATE_DATE
-FROM SCHOOL_MASTER schl_mast
-WHERE TRIM(schl_mast.GRADE_EU_IND ) = 'Y'
-UNION
-SELECT
-    LOWER(REGEXP_REPLACE(dbms_crypto.randombytes(16), '(.{8})(.{4})(.{4})(.{4})(.{12})', '\1-\2-\3-\4-\5')) as SCHOOL_GRADE_ID,
-    (SELECT schl.SCHOOL_ID from SCHOOL schl WHERE schl_mast.SCHLNO = schl.SCHOOL_NUMBER AND schl_mast.DISTNO = (SELECT dist.DISTRICT_NUMBER from DISTRICT dist WHERE schl.DISTRICT_ID = dist.DISTRICT_ID)) as SCHOOL_ID,
-    'SECUNGR' as SCHOOL_GRADE_CODE,
-    'SPM_MIGRATION' as CREATE_USER,
-    sysdate as CREATE_DATE,
-    'SPM_MIGRATION' as UPDATE_USER,
-    sysdate as UPDATE_DATE
-FROM SCHOOL_MASTER schl_mast
-WHERE TRIM(schl_mast.GRADE_SU_IND ) = 'Y';
+WHERE TRIM(schl_mast.GRADE_12_IND ) = 'Y';
 
 CREATE TABLE NEIGHBORHOOD_LEARNING
 as
