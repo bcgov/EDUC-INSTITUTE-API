@@ -635,6 +635,15 @@ VALUES ('EAR_CHILD', 'Early Learning Child Care', 'Early Learning Child Care', n
         to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
         to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'));
 
+INSERT INTO DISTRICT_CONTACT_TYPE_CODE (DISTRICT_CONTACT_TYPE_CODE, LABEL, DESCRIPTION, LEGACY_CODE,
+                                        DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
+                                        CREATE_DATE, UPDATE_USER, UPDATE_DATE, PUBLICLY_AVAIL)
+VALUES ('OL_LEARN', 'Online Learning Contact', 'Online Learning Contact', 'OL', 17,
+        to_date('2023-06-30 00:00:00', 'YYYY-MM-DD HH24:MI:SS'),
+        to_date('2099-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/JOHCOX',
+        CURRENT_TIMESTAMP, 'IDIR/JOHCOX',
+        CURRENT_TIMESTAMP, TRUE);
+
 INSERT INTO ADDRESS_TYPE_CODE (ADDRESS_TYPE_CODE, LABEL, DESCRIPTION,
                                DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
                                CREATE_DATE, UPDATE_USER, UPDATE_DATE)
