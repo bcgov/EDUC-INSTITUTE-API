@@ -210,7 +210,11 @@ public class EventHandlerServiceTest {
     objectMapper.registerModule(new JavaTimeModule()).configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 
     var sagaId = UUID.randomUUID();
-    final Event event = Event.builder().eventType(CREATE_SCHOOL).sagaId(sagaId).eventPayload(objectMapper.writeValueAsString(mappedSchool)).build();
+    final Event event = Event.builder()
+      .eventType(CREATE_SCHOOL)
+      .eventOutcome(SCHOOL_CREATED)
+      .sagaId(sagaId)
+      .eventPayload(objectMapper.writeValueAsString(mappedSchool)).build();
     eventHandlerServiceUnderTest.handleCreateSchoolEvent(event).getLeft();
     var schoolCreatedEvent = instituteEventRepository.findBySagaIdAndEventType(sagaId, CREATE_SCHOOL.toString());
     assertThat(schoolCreatedEvent).isPresent();
@@ -239,7 +243,11 @@ public class EventHandlerServiceTest {
     objectMapper.registerModule(new JavaTimeModule()).configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 
     var sagaId = UUID.randomUUID();
-    final Event event = Event.builder().eventType(CREATE_SCHOOL).sagaId(sagaId).eventPayload(objectMapper.writeValueAsString(mappedSchool)).build();
+    final Event event = Event.builder()
+      .eventType(CREATE_SCHOOL)
+      .eventOutcome(SCHOOL_CREATED)
+      .sagaId(sagaId)
+      .eventPayload(objectMapper.writeValueAsString(mappedSchool)).build();
     eventHandlerServiceUnderTest.handleCreateSchoolEvent(event).getLeft();
     var schoolCreatedEvent = instituteEventRepository.findBySagaIdAndEventType(sagaId, CREATE_SCHOOL.toString());
     assertThat(schoolCreatedEvent).isPresent();

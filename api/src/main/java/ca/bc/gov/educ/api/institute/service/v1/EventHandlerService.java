@@ -237,7 +237,7 @@ public class EventHandlerService {
       RequestUtil.setAuditColumnsForCreate(school);
       Pair<SchoolEntity, InstituteEvent> schoolPair = getSchoolService().createSchool(school);
       choreographyEvent = schoolPair.getRight();
-      event.setEventOutcome(EventOutcome.SCHOOL_CREATED);
+      event.setEventOutcome(event.getEventOutcome());
       event.setEventPayload(JsonUtil.getJsonStringFromObject(schoolMapper.toStructure(schoolPair.getLeft())));
       schoolEvent = createInstituteEventRecord(event);
     } else {
