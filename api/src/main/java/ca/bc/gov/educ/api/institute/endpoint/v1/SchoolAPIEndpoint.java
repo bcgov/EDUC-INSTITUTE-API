@@ -147,4 +147,16 @@ public interface SchoolAPIEndpoint {
       @RequestParam(name = "sort", defaultValue = "") String sortCriteriaJson,
       @RequestParam(name = "searchCriteriaList", required = false) String searchCriteriaListJson);
 
+  @GetMapping("/contact/paginated")
+  @Async
+  @PreAuthorize("hasAuthority('SCOPE_READ_SCHOOL_CONTACT')")
+  @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR.")})
+  @Transactional(readOnly = true)
+  @Tag(name = "School Contact Entity", description = "Endpoints for school contact entity.")
+  @Schema(name = "SchoolContact", implementation = SchoolContact.class)
+  CompletableFuture<Page<SchoolContact>> findAllContacts(@RequestParam(name = "pageNumber", defaultValue = "0") Integer pageNumber,
+                                                           @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
+                                                           @RequestParam(name = "sort", defaultValue = "") String sortCriteriaJson,
+                                                           @RequestParam(name = "searchCriteriaList", required = false) String searchCriteriaListJson);
+
 }
