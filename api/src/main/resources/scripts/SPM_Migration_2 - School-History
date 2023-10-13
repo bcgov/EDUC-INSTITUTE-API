@@ -354,8 +354,8 @@ SELECT
     CASE WHEN trim(create_username) IS NULL then 'SPM_MIGRATION' ELSE trim(create_username) END as create_user,
     create_date                                                                     create_date,
     CASE WHEN trim(edit_username) IS NULL then 'SPM_MIGRATION' ELSE trim(edit_username) END as update_user,
-    nvl(to_date(nxt_min_report_date, 'YYYY-MM-DD'), sysdate) - INTERVAL '60' SECOND update_date,
-    trim(school_name)                                                                     display_name_no_spec_chars
+    update_date,
+    NULL                                                                     display_name_no_spec_chars
 FROM
     edx.conv_edx_school_history hist
 WHERE TRIM(hist.SCHOOL_NAME) IS NOT NULL;
