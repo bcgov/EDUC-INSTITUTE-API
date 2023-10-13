@@ -1,0 +1,452 @@
+alter session set NLS_TIMESTAMP_FORMAT = 'YYYY-MM-DD';
+alter SESSION set NLS_DATE_FORMAT = 'YYYY-MM-DD';
+
+CREATE TABLE CONV_EDX_SCHOOL_MINCODE_TRANSLATION
+as
+    (SELECT
+         dst.DISTRICT_ID as DISTRICT_ID,
+         dst.DISTRICT_NUMBER as DISTRICT_NUMBER,
+         sch.SCHOOL_ID as SCHOOL_ID,
+         sch.SCHOOL_NUMBER as SCHOOL_NUMBER,
+         ia.INDEPENDENT_AUTHORITY_ID as INDEPENDENT_AUTHORITY_ID,
+         ia.AUTHORITY_NUMBER as AUTHORITY_NUMBER
+     FROM SCHOOL sch
+              LEFT OUTER JOIN district              dst ON sch.district_id = dst.district_id
+              LEFT OUTER JOIN independent_authority ia ON sch.independent_authority_id = ia.independent_authority_id)
+
+-- staging base school history records
+CREATE TABLE EDX.CONV_EDX_SCHOOL_HISTORY AS
+SELECT
+    REGEXP_REPLACE(LOWER(sys_guid()), '(.{8})(.{4})(.{4})(.{4})(.{12})', '\1-\2-\3-\4-\5') as school_history_id,
+    esmt.school_id,
+    esmt.district_id,
+    esmt.independent_authority_id,
+    hist_rec.distno,
+    hist_rec.schlno,
+    hist_rec.min_report_date,
+    TO_DATE(hist_rec.min_report_date, 'YYYY-MM-DD') update_date,
+    TO_DATE(hist_rec.min_report_date, 'YYYY-MM-DD') create_date,
+    hist_rec.max_report_date,
+    hist_rec.min_edit_date,
+    hist_rec.max_edit_date,
+    hist_rec.seq_rank,
+    hist_rec_next.min_report_date nxt_min_report_date,
+    hist_rec_next.max_report_date nxt_max_report_date,
+    hist_rec_next.min_edit_date nxt_min_edit_date,
+    hist_rec_next.max_edit_date nxt_max_edit_date,
+    (TO_DATE(hist_rec_next.min_report_date, 'YYYYMMDD') - TO_DATE(hist_rec.max_report_date, 'YYYYMMDD')) AS rep_days_diff,
+    hist_rec.school_name,
+    hist_rec.sc_phone_number,
+    REPLACE(hist_rec.sc_fax_number,'0000000000', NULL) fax_number,
+    hist_rec.sc_e_mail_id,
+    hist_rec.facility_type_code,
+    hist_rec.school_type_code,
+    hist_rec.school_organization_code,
+    hist_rec.school_category_code,
+    hist_rec.sc_address_type_code,
+    hist_rec.sc_address_line_1,
+    hist_rec.sc_address_line_2,
+    hist_rec.sc_city,
+    hist_rec.sc_province_code,
+    hist_rec.sc_country_code,
+    hist_rec.sc_postal_code,
+    hist_rec.grade_01_ind,
+    hist_rec.grade_04_ind,
+    hist_rec.grade_05_ind,
+    hist_rec.grade_06_ind,
+    hist_rec.grade_07_ind,
+    hist_rec.grade_08_ind,
+    hist_rec.grade_09_ind,
+    hist_rec.grade_10_ind,
+    hist_rec.grade_11_ind,
+    hist_rec.grade_12_ind,
+    hist_rec.grade_kh_ind,
+    hist_rec.grade_kf_ind,
+    hist_rec.grade_02_ind,
+    hist_rec.grade_03_ind,
+    hist_rec.grade_eu_ind,
+    hist_rec.grade_su_ind,
+    hist_rec.grade_hs_ind,
+    hist_rec.grade_ga_ind,
+    hist_rec.auth_number,
+    hist_rec.phys_address_type_code,
+    hist_rec.phys_address_line_1,
+    hist_rec.phys_address_line_2,
+    hist_rec.phys_city,
+    hist_rec.phys_province_code,
+    hist_rec.phys_country_code,
+    hist_rec.phys_postal_code,
+    hist_rec.date_opened,
+    hist_rec.date_closed,
+    hist_rec.school_reporting_requirement_code,
+    sc_base.edit_username,
+    sc_base.create_username
+FROM
+    (
+
+        SELECT
+            RANK() OVER(
+                PARTITION BY distno, schlno
+                ORDER BY MIN(report_date) ASC) seq_rank,
+                distno,
+            schlno,
+            (distno || schlno) AS MINCODE,
+            MIN(report_date) min_report_date,
+            MAX(report_date) max_report_date,
+            school_name,
+            facility_type_code,
+            school_type_code,
+            school_organization_code,
+            school_category_code,
+            'MAILING' sc_address_type_code,
+            sc_address_line_1,
+            sc_address_line_2,
+            sc_city,
+            sc_province_code,
+            sc_country_code,
+            sc_postal_code,
+            sc_phone_number,
+            sc_fax_number,
+            sc_e_mail_id,
+            grade_01_ind,
+            grade_04_ind,
+            grade_05_ind,
+            grade_06_ind,
+            grade_07_ind,
+            grade_08_ind,
+            grade_09_ind,
+            grade_10_ind,
+            grade_11_ind,
+            grade_12_ind,
+            grade_kh_ind,
+            grade_kf_ind,
+            grade_02_ind,
+            grade_03_ind,
+            grade_eu_ind,
+            grade_su_ind,
+            grade_hs_ind,
+            grade_ga_ind,
+            auth_number,
+            MIN(edit_date) min_edit_date,
+            MAX(edit_date) max_edit_date,
+            'PHYSICAL' phys_address_type_code,
+            phys_address_line_1,
+            phys_address_line_2,
+            phys_city,
+            phys_province_code,
+            phys_country_code,
+            phys_postal_code,
+            date_opened,
+            date_closed,
+            'UNKNOWN' school_reporting_requirement_code
+        FROM
+            edx.school_census
+        WHERE
+                1 = 1
+        GROUP BY
+            distno,
+            schlno,
+            (distno || schlno),
+            -- as MINCODE,
+            school_name,
+            facility_type_code,
+            school_type_code,
+            school_organization_code,
+            school_category_code,
+            'MAILING' ,
+            --sc_address_type_code,
+            sc_address_line_1,
+            sc_address_line_2,
+            sc_city,
+            sc_province_code,
+            sc_country_code,
+            sc_postal_code,
+            sc_phone_number,
+            sc_fax_number,
+            sc_e_mail_id,
+            grade_01_ind,
+            grade_04_ind,
+            grade_05_ind,
+            grade_06_ind,
+            grade_07_ind,
+            grade_08_ind,
+            grade_09_ind,
+            grade_10_ind,
+            grade_11_ind,
+            grade_12_ind,
+            grade_kh_ind,
+            grade_kf_ind,
+            grade_02_ind,
+            grade_03_ind,
+            grade_eu_ind,
+            grade_su_ind,
+            grade_hs_ind,
+            grade_ga_ind,
+            auth_number,
+            phys_address_line_1,
+            phys_address_line_2,
+            phys_city,
+            phys_province_code,
+            phys_country_code,
+            phys_postal_code,
+            date_opened,
+            date_closed
+    ) hist_rec
+        LEFT OUTER JOIN
+    (
+        SELECT
+            RANK() OVER(
+                PARTITION BY distno, schlno
+                ORDER BY MIN(report_date) ASC) seq_rank,
+                distno,
+            schlno,
+            (distno || schlno) AS MINCODE,
+            MIN(report_date) min_report_date,
+            MAX(report_date) max_report_date,
+            school_name,
+            facility_type_code,
+            school_type_code,
+            school_organization_code,
+            school_category_code,
+            'MAILING' sc_address_type_code,
+            sc_address_line_1,
+            sc_address_line_2,
+            sc_city,
+            sc_province_code,
+            sc_country_code,
+            sc_postal_code,
+            sc_phone_number,
+            sc_fax_number,
+            sc_e_mail_id,
+            grade_01_ind,
+            grade_04_ind,
+            grade_05_ind,
+            grade_06_ind,
+            grade_07_ind,
+            grade_08_ind,
+            grade_09_ind,
+            grade_10_ind,
+            grade_11_ind,
+            grade_12_ind,
+            grade_kh_ind,
+            grade_kf_ind,
+            grade_02_ind,
+            grade_03_ind,
+            grade_eu_ind,
+            grade_su_ind,
+            grade_hs_ind,
+            grade_ga_ind,
+            auth_number,
+            MIN(edit_date) min_edit_date,
+            MAX(edit_date) max_edit_date,
+            'PHYSICAL' phys_address_type_code,
+            phys_address_line_1,
+            phys_address_line_2,
+            phys_city,
+            phys_province_code,
+            phys_country_code,
+            phys_postal_code,
+            date_opened,
+            date_closed,
+            'UNKNOWN' school_reporting_requirement_code
+        FROM
+            edx.school_census
+        WHERE
+                1 = 1
+        GROUP BY
+            distno,
+            schlno,
+            (distno || schlno),
+            -- as MINCODE,
+            school_name,
+            facility_type_code,
+            school_type_code,
+            school_organization_code,
+            school_category_code,
+            'MAILING' ,
+            --sc_address_type_code,
+            sc_address_line_1,
+            sc_address_line_2,
+            sc_city,
+            sc_province_code,
+            sc_country_code,
+            sc_postal_code,
+            sc_phone_number,
+            sc_fax_number,
+            sc_e_mail_id,
+            grade_01_ind,
+            grade_04_ind,
+            grade_05_ind,
+            grade_06_ind,
+            grade_07_ind,
+            grade_08_ind,
+            grade_09_ind,
+            grade_10_ind,
+            grade_11_ind,
+            grade_12_ind,
+            grade_kh_ind,
+            grade_kf_ind,
+            grade_02_ind,
+            grade_03_ind,
+            grade_eu_ind,
+            grade_su_ind,
+            grade_hs_ind,
+            grade_ga_ind,
+            auth_number,
+            phys_address_line_1,
+            phys_address_line_2,
+            phys_city,
+            phys_province_code,
+            phys_country_code,
+            phys_postal_code,
+            date_opened,
+            date_closed
+    ) hist_rec_next ON
+                    hist_rec.distno || '-' || hist_rec.schlno = hist_rec_next.distno || '-' || hist_rec_next.schlno
+            AND hist_rec.seq_rank + 1 = hist_rec_next.seq_rank
+        INNER JOIN school_census sc_base ON
+                trim(hist_rec.distno) = trim(sc_base.distno)
+            AND trim(hist_rec.schlno) = trim(sc_base.schlno)
+            AND hist_rec.min_report_date = sc_base.report_date
+        LEFT OUTER JOIN conv_edx_school_mincode_translation esmt ON
+                trim(hist_rec.distno) = trim(esmt.district_number)
+            AND trim(hist_rec.schlno) = trim(esmt.school_number)
+WHERE
+        1 = 1
+ORDER BY
+    3 ASC,
+    1,
+    2;
+
+
+UPDATE conv_edx_school_history
+SET SCHOOL_ORGANIZATION_CODE = '010'
+WHERE SCHOOL_ORGANIZATION_CODE = ' '
+   OR SCHOOL_ORGANIZATION_CODE IS null;
+
+
+UPDATE conv_edx_school_history
+SET FACILITY_TYPE_CODE = '00'
+WHERE FACILITY_TYPE_CODE = ' '
+   OR FACILITY_TYPE_CODE IS null;
+
+
+-- school_history conversion
+
+CREATE OR REPLACE VIEW EDX.CONV_EDX_SCHOOL_HISTORY_VW AS
+SELECT
+    school_history_id,
+    school_id,
+    district_id,
+    independent_authority_id,
+    trim(schlno)                                                                          school_number,
+    trim(fax_number) fax_number,
+    trim(sc_phone_number)                                                                 phone_number,
+    trim(sc_e_mail_id)                                                                    email,
+    NULL                                                                            website,
+    trim(school_name)                                                                     display_name,
+    (SELECT schl_org.SCHOOL_ORGANIZATION_CODE from SCHOOL_ORGANIZATION_CODE schl_org where TRIM(hist.SCHOOL_ORGANIZATION_CODE) = schl_org.LEGACY_CODE) as school_organization_code,
+    (SELECT schl_cat.SCHOOL_CATEGORY_CODE from SCHOOL_CATEGORY_CODE schl_cat where TRIM(hist.SCHOOL_CATEGORY_CODE) = schl_cat.LEGACY_CODE) AS school_category_code,
+    (SELECT fac_type.FACILITY_TYPE_CODE from FACILITY_TYPE_CODE fac_type where TRIM(hist.FACILITY_TYPE_CODE) = fac_type.LEGACY_CODE) AS facility_type_code,
+    'NONE' school_reporting_requirement_code,
+    date_opened                                                                     opened_date,
+    CASE WHEN hist.date_closed = TO_DATE('9999-12-31','YYYY-MM-DD') then (CAST(NULL as DATE)) ELSE hist.date_closed END as closed_date,
+    CASE WHEN trim(create_username) IS NULL then 'SPM_MIGRATION' ELSE trim(create_username) END as create_user,
+    create_date                                                                     create_date,
+    CASE WHEN trim(edit_username) IS NULL then 'SPM_MIGRATION' ELSE trim(edit_username) END as update_user,
+    nvl(to_date(nxt_min_report_date, 'YYYY-MM-DD'), sysdate) - INTERVAL '60' SECOND update_date,
+    trim(school_name)                                                                     display_name_no_spec_chars
+FROM
+    edx.conv_edx_school_history hist
+WHERE TRIM(hist.SCHOOL_NAME) IS NOT NULL;
+
+
+-- MAILING school_address_history conversion
+CREATE OR REPLACE VIEW EDX.CONV_EDX_SCHOOL_ADDRESS_HIST_VW AS
+SELECT
+    REGEXP_REPLACE(LOWER(sys_guid()), '(.{8})(.{4})(.{4})(.{4})(.{12})', '\1-\2-\3-\4-\5')             school_address_history_id,
+    school_history_id school_history_id,
+    school_id                 school_id,
+    update_date,
+    create_date            create_date,
+    sc_address_type_code   address_type_code,
+    TRIM(sc_address_line_1)      address_line_1,
+    TRIM(sc_address_line_2)      address_line_2,
+    TRIM(sc_city)                city,
+    CASE
+        WHEN sc_province_code = '10' THEN
+            'BC'
+        WHEN sc_province_code = '01' THEN
+            'BC'
+        WHEN sc_province_code = '02' THEN
+            'BC'
+        WHEN sc_province_code = '11' THEN
+            'YT'
+        WHEN sc_province_code = '09' THEN
+            'AB'
+        ELSE
+            TRIM(sc_province_code)
+        END                    province_code,
+    CASE
+        WHEN TRIM(sc_country_code) = '001' THEN
+            'CA'
+        ELSE
+            NULL
+        END                    country_code,
+    TRIM(sc_postal_code)         postal,
+    NVL(TRIM(edit_username), 'SPM_MIGRATION')          update_user,
+    NVL(TRIM(create_username), 'SPM_MIGRATION')        create_user
+FROM
+    edx.conv_edx_school_history
+WHERE
+    trim(SC_ADDRESS_LINE_1) IS NOT NULL
+  AND trim(SC_CITY) IS NOT NULL
+  AND trim(SC_PROVINCE_CODE) IS NOT NULL
+  AND trim(SC_COUNTRY_CODE) IS NOT NULL
+  AND trim(SC_POSTAL_CODE) IS NOT NULL
+ORDER BY create_date;
+
+-- PHYSICAL school_address_history conversion
+CREATE OR REPLACE VIEW EDX.CONV_EDX_SCHOOL_ADDRESS_HIST_PHYS_VW AS
+SELECT
+    REGEXP_REPLACE(LOWER(sys_guid()), '(.{8})(.{4})(.{4})(.{4})(.{12})', '\1-\2-\3-\4-\5')             school_address_history_id,
+    school_history_id school_history_id,
+    school_id                 school_id,
+    update_date,
+    create_date            create_date,
+    phys_address_type_code   address_type_code,
+    TRIM(phys_address_line_1)      address_line_1,
+    TRIM(phys_address_line_2)      address_line_2,
+    TRIM(phys_city)                city,
+    CASE
+        WHEN phys_province_code = '10' THEN
+            'BC'
+        WHEN phys_province_code = '01' THEN
+            'BC'
+        WHEN phys_province_code = '02' THEN
+            'BC'
+        WHEN phys_province_code = '11' THEN
+            'YT'
+        WHEN phys_province_code = '09' THEN
+            'AB'
+        ELSE
+            TRIM(phys_province_code)
+        END                    province_code,
+    CASE
+        WHEN TRIM(phys_country_code) = '001' THEN
+            'CA'
+        ELSE
+            NULL
+        END                    country_code,
+    TRIM(phys_postal_code)         postal,
+    NVL(TRIM(edit_username), 'SPM_MIGRATION')          update_user,
+    NVL(TRIM(create_username), 'SPM_MIGRATION')        create_user
+FROM
+    edx.conv_edx_school_history
+WHERE
+    trim(phys_ADDRESS_LINE_1) IS NOT NULL
+  AND trim(phys_CITY) IS NOT NULL
+  AND trim(phys_PROVINCE_CODE) IS NOT NULL
+  AND trim(phys_COUNTRY_CODE) IS NOT NULL
+  AND trim(phys_POSTAL_CODE) IS NOT NULL
+ORDER BY create_date;
