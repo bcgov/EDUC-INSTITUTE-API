@@ -7,6 +7,7 @@ import static ca.bc.gov.educ.api.institute.constants.v1.EventType.CREATE_SCHOOL;
 import static ca.bc.gov.educ.api.institute.constants.v1.EventType.MOVE_SCHOOL;
 import static ca.bc.gov.educ.api.institute.constants.v1.EventType.UPDATE_SCHOOL;
 
+import ca.bc.gov.educ.api.institute.constants.v1.EventOutcome;
 import ca.bc.gov.educ.api.institute.exception.ConflictFoundException;
 import ca.bc.gov.educ.api.institute.exception.EntityNotFoundException;
 import ca.bc.gov.educ.api.institute.mapper.v1.NoteMapper;
@@ -112,20 +113,21 @@ public class SchoolService {
     return schoolRepository.findById(schoolId);
   }
 
-  @Transactional(propagation = Propagation.REQUIRES_NEW)
-  public Pair<SchoolEntity, InstituteEvent> createSchool(School school)
-      throws JsonProcessingException {
+  @Transactional
+  public InstituteEvent createSchoolInstituteEvent(SchoolEntity schoolEntity, EventOutcome eventOutcome)
+  throws JsonProcessingException {
 
-    SchoolEntity schoolEntity = createSchoolHelper(school);
     final InstituteEvent instituteEvent = EventUtil.createInstituteEvent(
-        schoolEntity.getUpdateUser(), schoolEntity.getUpdateUser(),
-        JsonUtil.getJsonStringFromObject(SchoolMapper.mapper.toStructure(schoolEntity)),
-        CREATE_SCHOOL, SCHOOL_CREATED);
-    instituteEventRepository.save(instituteEvent);
-    return Pair.of(schoolEntity, instituteEvent);
+      schoolEntity.getUpdateUser(), schoolEntity.getUpdateUser(),
+      JsonUtil.getJsonStringFromObject(SchoolMapper.mapper.toStructure(schoolEntity)),
+      CREATE_SCHOOL, eventOutcome
+    );
+
+    return instituteEventRepository.save(instituteEvent);
   }
 
-  private SchoolEntity createSchoolHelper(School school) {
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
+  public SchoolEntity createSchool(School school) {
     var schoolEntity = SchoolMapper.mapper.toModel(school);
     Optional<DistrictTombstoneEntity> district = districtTombstoneRepository.findById(
         UUID.fromString(school.getDistrictId()));
@@ -431,7 +433,7 @@ public class SchoolService {
       moveSchoolData.getToSchool().setSchoolNumber(null);
     }
 
-    SchoolEntity movedSchool = createSchoolHelper(moveSchoolData.getToSchool());
+    SchoolEntity movedSchool = createSchool(moveSchoolData.getToSchool());
     log.info("School created for move schoolId :: {}", movedSchool.getSchoolId());
 
     val schoolEntityOptional = schoolRepository.findById(

@@ -235,9 +235,9 @@ public class EventHandlerService {
       log.trace(EVENT_PAYLOAD, event);
       School school = JsonUtil.getJsonObjectFromString(School.class, event.getEventPayload());
       RequestUtil.setAuditColumnsForCreate(school);
-      Pair<SchoolEntity, InstituteEvent> schoolPair = getSchoolService().createSchool(school);
-      choreographyEvent = schoolPair.getRight();
-      event.setEventPayload(JsonUtil.getJsonStringFromObject(schoolMapper.toStructure(schoolPair.getLeft())));
+      SchoolEntity schoolEntity = getSchoolService().createSchool(school);
+      choreographyEvent = getSchoolService().createSchoolInstituteEvent(schoolEntity, event.getEventOutcome());
+      event.setEventPayload(JsonUtil.getJsonStringFromObject(schoolMapper.toStructure(schoolEntity)));
       schoolEvent = createInstituteEventRecord(event);
     } else {
       log.info(RECORD_FOUND_FOR_SAGA_ID_EVENT_TYPE);
