@@ -4,6 +4,7 @@ import ca.bc.gov.educ.api.institute.mapper.LocalDateTimeMapper;
 import ca.bc.gov.educ.api.institute.mapper.StringMapper;
 import ca.bc.gov.educ.api.institute.mapper.UUIDMapper;
 import ca.bc.gov.educ.api.institute.model.v1.SchoolContactEntity;
+import ca.bc.gov.educ.api.institute.model.v1.SchoolContactTombstoneEntity;
 import ca.bc.gov.educ.api.institute.struct.v1.SchoolContact;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -19,4 +20,7 @@ public interface SchoolContactMapper {
 
   @Mapping(target = "schoolId", source = "schoolEntity.schoolId")
   SchoolContact toStructure(SchoolContactEntity entity);
+
+  @Mapping(target = "schoolId", source = "schoolID")
+  SchoolContact toStructure(SchoolContactTombstoneEntity entity);
 }

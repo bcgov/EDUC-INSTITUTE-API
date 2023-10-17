@@ -9,7 +9,7 @@ import ca.bc.gov.educ.api.institute.mapper.v1.DistrictMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.DistrictTombstoneMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.NoteMapper;
 import ca.bc.gov.educ.api.institute.messaging.jetstream.Publisher;
-import ca.bc.gov.educ.api.institute.model.v1.DistrictContactEntity;
+import ca.bc.gov.educ.api.institute.model.v1.DistrictContactTombstoneEntity;
 import ca.bc.gov.educ.api.institute.model.v1.DistrictEntity;
 import ca.bc.gov.educ.api.institute.service.v1.DistrictContactSearchService;
 import ca.bc.gov.educ.api.institute.service.v1.DistrictHistoryService;
@@ -44,7 +44,6 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
@@ -149,7 +148,7 @@ public class DistrictAPIController implements DistrictAPIEndpoint {
   @Override
   public CompletableFuture<Page<DistrictContact>> findAllContacts(Integer pageNumber, Integer pageSize, String sortCriteriaJson, String searchCriteriaListJson) {
     final List<Sort.Order> sorts = new ArrayList<>();
-    Specification<DistrictContactEntity> districtSpecs = districtContactSearchService.setSpecificationAndSortCriteria(sortCriteriaJson, searchCriteriaListJson, JsonUtil.mapper, sorts);
+    Specification<DistrictContactTombstoneEntity> districtSpecs = districtContactSearchService.setSpecificationAndSortCriteria(sortCriteriaJson, searchCriteriaListJson, JsonUtil.mapper, sorts);
     return this.districtContactSearchService.findAll(districtSpecs, pageNumber, pageSize, sorts).thenApplyAsync(districtEntities -> districtEntities.map(districtContactMapper::toStructure));
   }
 
