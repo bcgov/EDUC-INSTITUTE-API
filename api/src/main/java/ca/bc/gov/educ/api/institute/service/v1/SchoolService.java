@@ -126,7 +126,7 @@ public class SchoolService {
     return instituteEventRepository.save(instituteEvent);
   }
 
-  @Transactional(propagation = Propagation.REQUIRES_NEW)
+  @Transactional
   public SchoolEntity createSchool(School school) {
     var schoolEntity = SchoolMapper.mapper.toModel(school);
     Optional<DistrictTombstoneEntity> district = districtTombstoneRepository.findById(
