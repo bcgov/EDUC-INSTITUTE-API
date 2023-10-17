@@ -9,7 +9,7 @@ import ca.bc.gov.educ.api.institute.mapper.v1.SchoolContactMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.SchoolMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.SchoolTombstoneMapper;
 import ca.bc.gov.educ.api.institute.messaging.jetstream.Publisher;
-import ca.bc.gov.educ.api.institute.model.v1.SchoolContactEntity;
+import ca.bc.gov.educ.api.institute.model.v1.SchoolContactTombstoneEntity;
 import ca.bc.gov.educ.api.institute.model.v1.SchoolEntity;
 import ca.bc.gov.educ.api.institute.model.v1.SchoolHistoryEntity;
 import ca.bc.gov.educ.api.institute.service.v1.*;
@@ -197,7 +197,7 @@ public class SchoolAPIController implements SchoolAPIEndpoint {
   @Override
   public CompletableFuture<Page<SchoolContact>> findAllContacts(Integer pageNumber, Integer pageSize, String sortCriteriaJson, String searchCriteriaListJson) {
     final List<Sort.Order> sorts = new ArrayList<>();
-    Specification<SchoolContactEntity> schoolSpecs = schoolContactSearchService.setSpecificationAndSortCriteria(sortCriteriaJson, searchCriteriaListJson, JsonUtil.mapper, sorts);
+    Specification<SchoolContactTombstoneEntity> schoolSpecs = schoolContactSearchService.setSpecificationAndSortCriteria(sortCriteriaJson, searchCriteriaListJson, JsonUtil.mapper, sorts);
     return this.schoolContactSearchService.findAll(schoolSpecs, pageNumber, pageSize, sorts).thenApplyAsync(schoolEntities -> schoolEntities.map(schoolContactMapper::toStructure));
   }
 
