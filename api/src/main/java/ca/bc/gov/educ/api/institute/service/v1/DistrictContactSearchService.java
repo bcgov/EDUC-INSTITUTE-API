@@ -4,9 +4,9 @@ import ca.bc.gov.educ.api.institute.exception.InvalidParameterException;
 import ca.bc.gov.educ.api.institute.exception.SchoolAPIRuntimeException;
 import ca.bc.gov.educ.api.institute.filter.DistrictContactFilterSpecs;
 import ca.bc.gov.educ.api.institute.filter.FilterOperation;
-import ca.bc.gov.educ.api.institute.model.v1.DistrictContactEntity;
+import ca.bc.gov.educ.api.institute.model.v1.DistrictContactTombstoneEntity;
 import ca.bc.gov.educ.api.institute.model.v1.SchoolEntity;
-import ca.bc.gov.educ.api.institute.repository.v1.DistrictContactRepository;
+import ca.bc.gov.educ.api.institute.repository.v1.DistrictContactTombstoneRepository;
 import ca.bc.gov.educ.api.institute.struct.v1.Condition;
 import ca.bc.gov.educ.api.institute.struct.v1.Search;
 import ca.bc.gov.educ.api.institute.struct.v1.SearchCriteria;
@@ -43,15 +43,15 @@ import java.util.concurrent.Executor;
 public class DistrictContactSearchService {
   private final DistrictContactFilterSpecs districtContactFilterSpecs;
 
-  private final DistrictContactRepository districtContactRepository;
+  private final DistrictContactTombstoneRepository districtContactTombstoneRepository;
 
   private final Executor paginatedQueryExecutor = new EnhancedQueueExecutor.Builder()
     .setThreadFactory(new ThreadFactoryBuilder().setNameFormat("async-pagination-query-executor-%d").build())
     .setCorePoolSize(2).setMaximumPoolSize(10).setKeepAliveTime(Duration.ofSeconds(60)).build();
 
-  public DistrictContactSearchService(DistrictContactFilterSpecs districtContactFilterSpecs, DistrictContactRepository districtContactRepository) {
+  public DistrictContactSearchService(DistrictContactFilterSpecs districtContactFilterSpecs, DistrictContactTombstoneRepository districtContactTombstoneRepository) {
     this.districtContactFilterSpecs = districtContactFilterSpecs;
-    this.districtContactRepository = districtContactRepository;
+    this.districtContactTombstoneRepository = districtContactTombstoneRepository;
   }
 
   /**
@@ -62,7 +62,7 @@ public class DistrictContactSearchService {
    * @param search       the search
    * @return the specifications
    */
-  public Specification<DistrictContactEntity> getSpecifications(Specification<DistrictContactEntity> districtSpecs, int i, Search search) {
+  public Specification<DistrictContactTombstoneEntity> getSpecifications(Specification<DistrictContactTombstoneEntity> districtSpecs, int i, Search search) {
     if (i == 0) {
       districtSpecs = getDistrictContactEntitySpecification(search.getSearchCriteriaList());
     } else {
@@ -75,8 +75,8 @@ public class DistrictContactSearchService {
     return districtSpecs;
   }
 
-  private Specification<DistrictContactEntity> getDistrictContactEntitySpecification(List<SearchCriteria> criteriaList) {
-    Specification<DistrictContactEntity> districtSpecs = null;
+  private Specification<DistrictContactTombstoneEntity> getDistrictContactEntitySpecification(List<SearchCriteria> criteriaList) {
+    Specification<DistrictContactTombstoneEntity> districtSpecs = null;
     if (!criteriaList.isEmpty()) {
       int i = 0;
       for (SearchCriteria criteria : criteriaList) {
@@ -85,7 +85,7 @@ public class DistrictContactSearchService {
           if(StringUtils.isNotBlank(criteria.getValue()) && TransformUtil.isUppercaseField(SchoolEntity.class, criteria.getKey())) {
             criteriaValue = criteriaValue.toUpperCase();
           }
-          Specification<DistrictContactEntity> typeSpecification = getTypeSpecification(criteria.getKey(), criteria.getOperation(), criteriaValue, criteria.getValueType());
+          Specification<DistrictContactTombstoneEntity> typeSpecification = getTypeSpecification(criteria.getKey(), criteria.getOperation(), criteriaValue, criteria.getValueType());
           districtSpecs = getSpecificationPerGroup(districtSpecs, i, criteria, typeSpecification);
           i++;
         } else {
@@ -105,7 +105,7 @@ public class DistrictContactSearchService {
    * @param typeSpecification          the type specification
    * @return the specification per group
    */
-  private Specification<DistrictContactEntity> getSpecificationPerGroup(Specification<DistrictContactEntity> districtContactEntitySpecification, int i, SearchCriteria criteria, Specification<DistrictContactEntity> typeSpecification) {
+  private Specification<DistrictContactTombstoneEntity> getSpecificationPerGroup(Specification<DistrictContactTombstoneEntity> districtContactEntitySpecification, int i, SearchCriteria criteria, Specification<DistrictContactTombstoneEntity> typeSpecification) {
     if (i == 0) {
       districtContactEntitySpecification = Specification.where(typeSpecification);
     } else {
@@ -118,8 +118,8 @@ public class DistrictContactSearchService {
     return districtContactEntitySpecification;
   }
 
-  private Specification<DistrictContactEntity> getTypeSpecification(String key, FilterOperation filterOperation, String value, ValueType valueType) {
-    Specification<DistrictContactEntity> schoolEntitySpecification = null;
+  private Specification<DistrictContactTombstoneEntity> getTypeSpecification(String key, FilterOperation filterOperation, String value, ValueType valueType) {
+    Specification<DistrictContactTombstoneEntity> schoolEntitySpecification = null;
     switch (valueType) {
       case STRING:
         schoolEntitySpecification = districtContactFilterSpecs.getStringTypeSpecification(key, value, filterOperation);
@@ -146,13 +146,13 @@ public class DistrictContactSearchService {
   }
 
   @Transactional(propagation = Propagation.SUPPORTS)
-  public CompletableFuture<Page<DistrictContactEntity>> findAll(Specification<DistrictContactEntity> districtSpecs, final Integer pageNumber, final Integer pageSize, final List<Sort.Order> sorts) {
+  public CompletableFuture<Page<DistrictContactTombstoneEntity>> findAll(Specification<DistrictContactTombstoneEntity> districtSpecs, final Integer pageNumber, final Integer pageSize, final List<Sort.Order> sorts) {
     log.trace("In find all query: {}", districtSpecs);
     return CompletableFuture.supplyAsync(() -> {
       Pageable paging = PageRequest.of(pageNumber, pageSize, Sort.by(sorts));
       try {
         log.trace("Running paginated query: {}", districtSpecs);
-        var results = this.districtContactRepository.findAll(districtSpecs, paging);
+        var results = this.districtContactTombstoneRepository.findAll(districtSpecs, paging);
         log.trace("Paginated query returned with results: {}", results);
         return results;
       } catch (final Throwable ex) {
@@ -172,8 +172,8 @@ public class DistrictContactSearchService {
    * @param sorts                  the sorts
    * @return the specification and sort criteria
    */
-  public Specification<DistrictContactEntity> setSpecificationAndSortCriteria(String sortCriteriaJson, String searchCriteriaListJson, ObjectMapper objectMapper, List<Sort.Order> sorts) {
-    Specification<DistrictContactEntity> districtSpecs = null;
+  public Specification<DistrictContactTombstoneEntity> setSpecificationAndSortCriteria(String sortCriteriaJson, String searchCriteriaListJson, ObjectMapper objectMapper, List<Sort.Order> sorts) {
+    Specification<DistrictContactTombstoneEntity> districtSpecs = null;
     try {
       RequestUtil.getSortCriteria(sortCriteriaJson, objectMapper, sorts);
       if (StringUtils.isNotBlank(searchCriteriaListJson)) {

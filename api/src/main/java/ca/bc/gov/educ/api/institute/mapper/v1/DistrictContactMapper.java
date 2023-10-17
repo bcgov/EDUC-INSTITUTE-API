@@ -4,6 +4,7 @@ import ca.bc.gov.educ.api.institute.mapper.LocalDateTimeMapper;
 import ca.bc.gov.educ.api.institute.mapper.StringMapper;
 import ca.bc.gov.educ.api.institute.mapper.UUIDMapper;
 import ca.bc.gov.educ.api.institute.model.v1.DistrictContactEntity;
+import ca.bc.gov.educ.api.institute.model.v1.DistrictContactTombstoneEntity;
 import ca.bc.gov.educ.api.institute.struct.v1.DistrictContact;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -20,4 +21,7 @@ public interface DistrictContactMapper {
 
   @Mapping(target = "districtId", source = "districtEntity.districtId")
   DistrictContact toStructure(DistrictContactEntity entity);
+
+  @Mapping(target = "districtId", source = "districtID")
+  DistrictContact toStructure(DistrictContactTombstoneEntity entity);
 }
