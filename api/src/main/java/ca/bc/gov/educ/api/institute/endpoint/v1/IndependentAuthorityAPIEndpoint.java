@@ -107,6 +107,13 @@ public interface IndependentAuthorityAPIEndpoint {
   @Schema(name = "Note", implementation = Note.class)
   Note getIndependentAuthorityNote(@PathVariable UUID independentAuthorityId, @PathVariable UUID noteId);
 
+  @GetMapping("/{independentAuthorityId}/note")
+  @PreAuthorize("hasAuthority('SCOPE_READ_INDEPENDENT_AUTHORITY_NOTE')")
+  @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
+  @Tag(name = "Independent Authority Note Entity", description = "Endpoints for authority note entity.")
+  @Schema(name = "Note", implementation = Note.class)
+  List<Note> getIndependentAuthorityNotes(@PathVariable UUID independentAuthorityId);
+
   @PostMapping("/{independentAuthorityId}/note")
   @PreAuthorize("hasAuthority('SCOPE_WRITE_INDEPENDENT_AUTHORITY_NOTE')")
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})

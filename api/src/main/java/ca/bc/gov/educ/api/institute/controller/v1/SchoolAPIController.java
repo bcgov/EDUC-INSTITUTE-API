@@ -188,6 +188,11 @@ public class SchoolAPIController implements SchoolAPIEndpoint {
   }
 
   @Override
+  public List<Note> getSchoolNotes(UUID schoolId) {
+    return this.schoolService.getSchoolNotes(schoolId).stream().map(noteMapper::toStructure).toList();
+  }
+
+  @Override
   public Note createSchoolNote(UUID schoolId, Note note) {
     validatePayload(() -> this.notePayloadValidator.validateCreatePayload(note));
     RequestUtil.setAuditColumnsForCreate(note);

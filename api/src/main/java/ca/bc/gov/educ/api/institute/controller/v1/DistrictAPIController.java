@@ -44,6 +44,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
@@ -192,6 +193,11 @@ public class DistrictAPIController implements DistrictAPIEndpoint {
     } else {
       throw new EntityNotFoundException();
     }
+  }
+
+  @Override
+  public List<Note> getDistrictNotes(UUID districtId) {
+    return this.districtService.getDistrictNotes(districtId).stream().map(noteMapper::toStructure).toList();
   }
 
   @Override

@@ -524,6 +524,19 @@ public class DistrictControllerTest {
   }
 
   @Test
+  void testRetrieveDistrictNotes_GivenValidID_ShouldReturnStatusOK() throws Exception {
+    final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_DISTRICT_NOTE";
+    final var mockAuthority = oidcLogin().authorities(grantedAuthority);
+    final var district = this.createDistrictData();
+    var districtEntity = this.districtRepository.save(district);
+    NoteEntity noteEntity = createNoteData(districtEntity);
+    var note = this.noteRepository.save(noteEntity);
+    this.mockMvc.perform(get(URL.BASE_URL_DISTRICT + "/" + districtEntity.getDistrictId() + "/note")
+            .with(mockAuthority)).andDo(print()).andExpect(status().isOk()).andExpect(MockMvcResultMatchers.jsonPath("$.[0].noteId")
+                    .value(note.getNoteId().toString()));
+  }
+
+  @Test
   void testUpdateDistrictNote_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
     final var district = this.createDistrictData();
     var districtEntity = this.districtRepository.save(district);

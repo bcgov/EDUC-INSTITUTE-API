@@ -220,6 +220,16 @@ public class DistrictService {
     }
   }
 
+  public List<NoteEntity> getDistrictNotes(UUID districtID) {
+    Optional<DistrictEntity> curDistrictEntityOptional = districtRepository.findById(districtID);
+
+    if (curDistrictEntityOptional.isPresent()) {
+      return noteRepository.findByDistrictID(districtID);
+    } else {
+      throw new EntityNotFoundException(DistrictEntity.class, DISTRICT_ID_ATTR, String.valueOf(districtID));
+    }
+  }
+
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public NoteEntity createDistrictNote(Note note, UUID districtId) {
     var noteEntity = NoteMapper.mapper.toModel(note);
