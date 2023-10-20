@@ -29,7 +29,7 @@ public class SchoolContactTombstoneEntity {
   private UUID schoolContactId;
   @Basic
   @Column(name = "school_id", unique = true, updatable = false, columnDefinition = "BINARY(16)")
-  String schoolID;
+  UUID schoolID;
   @Basic
   @Column(name = "first_name")
   private String firstName;
