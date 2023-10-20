@@ -1,29 +1,15 @@
 package ca.bc.gov.educ.api.institute.model.v1;
 
 import ca.bc.gov.educ.api.institute.util.UpperCase;
-import jakarta.persistence.Basic;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.PastOrPresent;
+import lombok.*;
+import org.hibernate.annotations.GenericGenerator;
+
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
-import org.hibernate.annotations.GenericGenerator;
 
 @Data
 @NoArgsConstructor
@@ -129,11 +115,6 @@ public class SchoolEntity {
   @EqualsAndHashCode.Exclude
   @OneToMany(mappedBy = "schoolEntity", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = SchoolAddressEntity.class)
   private Set<SchoolAddressEntity> addresses;
-
-  @ToString.Exclude
-  @EqualsAndHashCode.Exclude
-  @OneToMany(mappedBy = "schoolID", fetch = FetchType.EAGER, cascade = CascadeType.DETACH, targetEntity = NoteEntity.class)
-  private Set<NoteEntity> notes;
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude

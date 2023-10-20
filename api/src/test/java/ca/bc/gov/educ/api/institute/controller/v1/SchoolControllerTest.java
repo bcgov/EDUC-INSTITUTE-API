@@ -856,6 +856,19 @@ public class SchoolControllerTest {
   }
 
   @Test
+  void testRetrieveSchoolNotes_GivenValidID_ShouldReturnStatusOK() throws Exception {
+    final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_SCHOOL_NOTE";
+    final var mockAuthority = oidcLogin().authorities(grantedAuthority);
+    final var school = this.createSchoolData();
+    var schoolEntity = this.schoolRepository.save(school);
+    NoteEntity noteEntity = createNoteData(schoolEntity);
+    var note = this.noteRepository.save(noteEntity);
+    this.mockMvc.perform(get(URL.BASE_URL_SCHOOL + "/" + schoolEntity.getSchoolId() + "/note").with(mockAuthority))
+            .andDo(print()).andExpect(status().isOk()).andExpect(MockMvcResultMatchers.jsonPath("$.[0].noteId")
+                    .value(note.getNoteId().toString()));
+  }
+
+  @Test
   void testUpdateSchoolNote_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
     final var school = this.createSchoolData();
     var schoolEntity = this.schoolRepository.save(school);

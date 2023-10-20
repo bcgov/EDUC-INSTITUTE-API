@@ -104,6 +104,13 @@ public interface SchoolAPIEndpoint {
   @Schema(name = "Note", implementation = Note.class)
   Note getSchoolNote(@PathVariable UUID schoolId, @PathVariable UUID noteId);
 
+  @GetMapping("/{schoolId}/note")
+  @PreAuthorize("hasAuthority('SCOPE_READ_SCHOOL_NOTE')")
+  @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
+  @Tag(name = "School Note Entity", description = "Endpoints for school note entity.")
+  @Schema(name = "Note", implementation = Note.class)
+  List<Note> getSchoolNotes(@PathVariable UUID schoolId);
+
   @PostMapping("/{schoolId}/note")
   @PreAuthorize("hasAuthority('SCOPE_WRITE_SCHOOL_NOTE')")
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})

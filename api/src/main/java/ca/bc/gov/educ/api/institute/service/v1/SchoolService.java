@@ -1,32 +1,12 @@
 package ca.bc.gov.educ.api.institute.service.v1;
 
-import static ca.bc.gov.educ.api.institute.constants.v1.EventOutcome.SCHOOL_CREATED;
-import static ca.bc.gov.educ.api.institute.constants.v1.EventOutcome.SCHOOL_MOVED;
-import static ca.bc.gov.educ.api.institute.constants.v1.EventOutcome.SCHOOL_UPDATED;
-import static ca.bc.gov.educ.api.institute.constants.v1.EventType.CREATE_SCHOOL;
-import static ca.bc.gov.educ.api.institute.constants.v1.EventType.MOVE_SCHOOL;
-import static ca.bc.gov.educ.api.institute.constants.v1.EventType.UPDATE_SCHOOL;
-
 import ca.bc.gov.educ.api.institute.exception.ConflictFoundException;
 import ca.bc.gov.educ.api.institute.exception.EntityNotFoundException;
 import ca.bc.gov.educ.api.institute.mapper.v1.NoteMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.SchoolContactMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.SchoolMapper;
-import ca.bc.gov.educ.api.institute.model.v1.DistrictTombstoneEntity;
-import ca.bc.gov.educ.api.institute.model.v1.InstituteEvent;
-import ca.bc.gov.educ.api.institute.model.v1.NoteEntity;
-import ca.bc.gov.educ.api.institute.model.v1.SchoolContactEntity;
-import ca.bc.gov.educ.api.institute.model.v1.SchoolEntity;
-import ca.bc.gov.educ.api.institute.model.v1.SchoolMoveEntity;
-import ca.bc.gov.educ.api.institute.model.v1.SchoolTombstoneEntity;
-import ca.bc.gov.educ.api.institute.repository.v1.DistrictRepository;
-import ca.bc.gov.educ.api.institute.repository.v1.DistrictTombstoneRepository;
-import ca.bc.gov.educ.api.institute.repository.v1.InstituteEventRepository;
-import ca.bc.gov.educ.api.institute.repository.v1.NoteRepository;
-import ca.bc.gov.educ.api.institute.repository.v1.SchoolContactRepository;
-import ca.bc.gov.educ.api.institute.repository.v1.SchoolMoveRepository;
-import ca.bc.gov.educ.api.institute.repository.v1.SchoolRepository;
-import ca.bc.gov.educ.api.institute.repository.v1.SchoolTombstoneRepository;
+import ca.bc.gov.educ.api.institute.model.v1.*;
+import ca.bc.gov.educ.api.institute.repository.v1.*;
 import ca.bc.gov.educ.api.institute.struct.v1.MoveSchoolData;
 import ca.bc.gov.educ.api.institute.struct.v1.Note;
 import ca.bc.gov.educ.api.institute.struct.v1.School;
@@ -36,10 +16,6 @@ import ca.bc.gov.educ.api.institute.util.JsonUtil;
 import ca.bc.gov.educ.api.institute.util.RequestUtil;
 import ca.bc.gov.educ.api.institute.util.TransformUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -50,6 +26,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+import static ca.bc.gov.educ.api.institute.constants.v1.EventOutcome.*;
+import static ca.bc.gov.educ.api.institute.constants.v1.EventType.*;
 
 @Service
 @Slf4j
@@ -348,8 +332,17 @@ public class SchoolService {
       final SchoolEntity currentSchoolEntity = curSchoolEntityOptional.get();
       return noteRepository.findByNoteIdAndSchoolID(noteId, currentSchoolEntity.getSchoolId());
     } else {
-      throw new EntityNotFoundException(SchoolEntity.class, SCHOOL_ID_ATTR,
-          String.valueOf(schoolId));
+      throw new EntityNotFoundException(SchoolEntity.class, SCHOOL_ID_ATTR, String.valueOf(schoolId));
+    }
+  }
+
+  public List<NoteEntity> getSchoolNotes(UUID schoolId) {
+    Optional<SchoolEntity> curSchoolEntityOptional = schoolRepository.findById(schoolId);
+
+    if (curSchoolEntityOptional.isPresent()) {
+      return noteRepository.findBySchoolID(schoolId);
+    } else {
+      throw new EntityNotFoundException(SchoolEntity.class, SCHOOL_ID_ATTR, String.valueOf(schoolId));
     }
   }
 

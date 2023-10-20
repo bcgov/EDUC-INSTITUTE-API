@@ -130,6 +130,13 @@ public interface DistrictAPIEndpoint {
   @Schema(name = "Note", implementation = Note.class)
   Note getDistrictNote(@PathVariable UUID districtId, @PathVariable UUID noteId);
 
+  @GetMapping("/{districtId}/note")
+  @PreAuthorize("hasAuthority('SCOPE_READ_DISTRICT_NOTE')")
+  @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
+  @Tag(name = "District Note Entity", description = "Endpoints for district note entity.")
+  @Schema(name = "Note", implementation = Note.class)
+  List<Note> getDistrictNotes(@PathVariable UUID districtId);
+
   @PostMapping("/{districtId}/note")
   @PreAuthorize("hasAuthority('SCOPE_WRITE_DISTRICT_NOTE')")
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})

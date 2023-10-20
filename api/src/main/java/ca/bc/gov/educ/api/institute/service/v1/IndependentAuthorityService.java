@@ -224,6 +224,16 @@ public class IndependentAuthorityService {
     }
   }
 
+  public List<NoteEntity> getIndependentAuthorityNotes(UUID independentAuthorityId) {
+    Optional<IndependentAuthorityEntity> curIndependentAuthorityEntityOptional = independentAuthorityRepository.findById(independentAuthorityId);
+
+    if (curIndependentAuthorityEntityOptional.isPresent()) {
+      return noteRepository.findByIndependentAuthorityID(independentAuthorityId);
+    } else {
+      throw new EntityNotFoundException(IndependentAuthorityEntity.class, INDEPENDENT_AUTHORITY_ID_ATTR, String.valueOf(independentAuthorityId));
+    }
+  }
+
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public NoteEntity createIndependentAuthorityNote(Note note, UUID independentAuthorityId) {
     var noteEntity = NoteMapper.mapper.toModel(note);

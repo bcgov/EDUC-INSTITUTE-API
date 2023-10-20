@@ -1,43 +1,12 @@
 package ca.bc.gov.educ.api.institute.controller.v1;
 
-import static org.hamcrest.Matchers.hasSize;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.oidcLogin;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import ca.bc.gov.educ.api.institute.InstituteApiResourceApplication;
 import ca.bc.gov.educ.api.institute.constants.v1.URL;
 import ca.bc.gov.educ.api.institute.filter.FilterOperation;
 import ca.bc.gov.educ.api.institute.mapper.v1.CodeTableMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.IndependentAuthorityMapper;
-import ca.bc.gov.educ.api.institute.model.v1.AddressTypeCodeEntity;
-import ca.bc.gov.educ.api.institute.model.v1.AuthorityAddressEntity;
-import ca.bc.gov.educ.api.institute.model.v1.AuthorityContactEntity;
-import ca.bc.gov.educ.api.institute.model.v1.AuthorityContactTypeCodeEntity;
-import ca.bc.gov.educ.api.institute.model.v1.AuthorityTypeCodeEntity;
-import ca.bc.gov.educ.api.institute.model.v1.CountryCodeEntity;
-import ca.bc.gov.educ.api.institute.model.v1.IndependentAuthorityEntity;
-import ca.bc.gov.educ.api.institute.model.v1.IndependentAuthorityHistoryEntity;
-import ca.bc.gov.educ.api.institute.model.v1.NoteEntity;
-import ca.bc.gov.educ.api.institute.model.v1.ProvinceCodeEntity;
-import ca.bc.gov.educ.api.institute.repository.v1.AddressTypeCodeRepository;
-import ca.bc.gov.educ.api.institute.repository.v1.AuthorityContactRepository;
-import ca.bc.gov.educ.api.institute.repository.v1.AuthorityContactTypeCodeRepository;
-import ca.bc.gov.educ.api.institute.repository.v1.AuthorityTypeCodeRepository;
-import ca.bc.gov.educ.api.institute.repository.v1.CountryCodeRepository;
-import ca.bc.gov.educ.api.institute.repository.v1.IndependentAuthorityHistoryRepository;
-import ca.bc.gov.educ.api.institute.repository.v1.IndependentAuthorityRepository;
-import ca.bc.gov.educ.api.institute.repository.v1.NoteRepository;
-import ca.bc.gov.educ.api.institute.repository.v1.ProvinceCodeRepository;
-import ca.bc.gov.educ.api.institute.repository.v1.SchoolAddressRepository;
+import ca.bc.gov.educ.api.institute.model.v1.*;
+import ca.bc.gov.educ.api.institute.repository.v1.*;
 import ca.bc.gov.educ.api.institute.service.v1.CodeTableService;
 import ca.bc.gov.educ.api.institute.struct.v1.Condition;
 import ca.bc.gov.educ.api.institute.struct.v1.Search;
@@ -46,11 +15,6 @@ import ca.bc.gov.educ.api.institute.struct.v1.ValueType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.UUID;
 import lombok.val;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -68,6 +32,21 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.UUID;
+
+import static org.hamcrest.Matchers.hasSize;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.oidcLogin;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(classes = { InstituteApiResourceApplication.class })
 @ActiveProfiles("test")
@@ -623,6 +602,19 @@ public class IndependentAuthorityControllerTest {
     this.mockMvc.perform(get(URL.BASE_URL_AUTHORITY + "/" + independentAuthorityEntity.getIndependentAuthorityId() + "/note/" + note.getNoteId()).with(mockAuthority))
       .andDo(print()).andExpect(status().isOk()).andExpect(MockMvcResultMatchers.jsonPath("$.noteId")
         .value(note.getNoteId().toString()));
+  }
+
+  @Test
+  void testRetrieveIndependentAuthorityNotes_GivenValidID_ShouldReturnStatusOK() throws Exception {
+    final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_INDEPENDENT_AUTHORITY_NOTE";
+    final var mockAuthority = oidcLogin().authorities(grantedAuthority);
+    final var independentAuthority = this.createIndependentAuthorityData();
+    var independentAuthorityEntity = this.independentAuthorityRepository.save(independentAuthority);
+    NoteEntity noteEntity = createNoteData(independentAuthorityEntity);
+    var note = this.noteRepository.save(noteEntity);
+    this.mockMvc.perform(get(URL.BASE_URL_AUTHORITY + "/" + independentAuthorityEntity.getIndependentAuthorityId() + "/note").with(mockAuthority))
+            .andDo(print()).andExpect(status().isOk()).andExpect(MockMvcResultMatchers.jsonPath("$.[0].noteId")
+                    .value(note.getNoteId().toString()));
   }
 
   @Test

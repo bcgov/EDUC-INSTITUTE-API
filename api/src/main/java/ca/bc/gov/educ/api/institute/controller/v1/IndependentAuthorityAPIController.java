@@ -179,6 +179,11 @@ public class IndependentAuthorityAPIController implements IndependentAuthorityAP
   }
 
   @Override
+  public List<Note> getIndependentAuthorityNotes(UUID independentAuthorityId) {
+    return this.independentAuthorityService.getIndependentAuthorityNotes(independentAuthorityId).stream().map(noteMapper::toStructure).toList();
+  }
+
+  @Override
   public Note createIndependentAuthorityNote(UUID independentAuthorityId, Note note) {
     validatePayload(() -> this.notePayloadValidator.validateCreatePayload(note));
     RequestUtil.setAuditColumnsForCreate(note);

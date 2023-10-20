@@ -4,6 +4,7 @@ import ca.bc.gov.educ.api.institute.model.v1.NoteEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -14,6 +15,12 @@ public interface NoteRepository extends JpaRepository<NoteEntity, UUID> {
   void deleteByNoteIdAndDistrictID(UUID noteId, UUID districtID);
 
   Optional<NoteEntity> findByNoteIdAndSchoolID(UUID noteId, UUID schoolID);
+
+  List<NoteEntity> findBySchoolID(UUID schoolID);
+
+  List<NoteEntity> findByDistrictID(UUID districtID);
+
+  List<NoteEntity> findByIndependentAuthorityID(UUID independentAuthorityID);
 
   void deleteByNoteIdAndSchoolID(UUID noteId, UUID schoolID);
 
