@@ -62,7 +62,7 @@ public class SchoolNumberGenerationService {
         });
 
         map.put(FacilityCategoryLookup.ENTRY3, (districtNumber, authorityId) -> {
-            String schoolNumber = getLastSchoolNumberWithPattern(districtNumber, "96%");
+            String schoolNumber = getLastSchoolNumberWithIndependentPattern();
             if(isNullEmptyOrBlank(schoolNumber)) {
                 return Constants.NINETYSIX + Constants.DEFAULTNUMBER;
             } else if(Integer.parseInt(schoolNumber) == getUpperBoundNumber(Constants.NINETYSIX)) {
@@ -145,6 +145,10 @@ public class SchoolNumberGenerationService {
     private String getLastSchoolNumberWithPattern(String districtNumber, String pattern) {
         return schoolRepository.findLastSchoolNumberWithPattern(districtNumber, pattern);
     }
+    private String getLastSchoolNumberWithIndependentPattern() {
+        return schoolRepository.findFirstAvailableSchoolNumberForIndependent();
+    }
+
     private Integer getFirstAvailableSchoolNumber(String districtNumber, UUID authorityId, Integer lowerRange, Integer upperRange) {
         return schoolRepository.findFirstAvailableSchoolNumber(districtNumber, authorityId, lowerRange, upperRange);
     }
