@@ -62,23 +62,19 @@ public class SchoolNumberGenerationService {
         });
 
         map.put(FacilityCategoryLookup.ENTRY3, (districtNumber, authorityId) -> {
-            String schoolNumber = getLastSchoolNumberWithIndependentPattern();
+            String schoolNumber = getFirstAvailableIndependentSchoolNumber();
             if(isNullEmptyOrBlank(schoolNumber)) {
-                return Constants.NINETYSIX + Constants.DEFAULTNUMBER;
-            } else if(Integer.parseInt(schoolNumber) == getUpperBoundNumber(Constants.NINETYSIX)) {
-                return getSchoolNumberWithinRange(districtNumber, null, getLowerBoundNumber(Constants.NINETYSIX), getUpperBoundNumber(Constants.NINETYSIX)).toString();
+                throw new PreConditionFailedException("Unable to generate school number. No more independent school numbers available. Please contact your System Administrator");
             }
-            return Integer.toString(Integer.parseInt(schoolNumber) + 1);
+            return schoolNumber;
         });
 
         map.put(FacilityCategoryLookup.ENTRY4, (districtNumber, authorityId) -> {
-            String schoolNumber = getLastSchoolNumberWithPattern(districtNumber, Constants.NINETYSEVEN + "%");
+            String schoolNumber = getFirstAvailableIndependentFirstNationsSchoolNumber();
             if(isNullEmptyOrBlank(schoolNumber)) {
-                return Constants.NINETYSEVEN + Constants.DEFAULTNUMBER;
-            } else if(Integer.parseInt(schoolNumber) == getUpperBoundNumber(Constants.NINETYSEVEN)) {
-                return getSchoolNumberWithinRange(districtNumber, null, getLowerBoundNumber(Constants.NINETYSEVEN), getUpperBoundNumber(Constants.NINETYSEVEN)).toString();
+                throw new PreConditionFailedException("Unable to generate school number. No more independent First Nations school numbers available. Please contact your System Administrator");
             }
-            return Integer.toString(Integer.parseInt(schoolNumber) + 1);
+            return schoolNumber;
         });
 
         map.put(FacilityCategoryLookup.ENTRY5, (districtNumber, authorityId) -> {
@@ -145,8 +141,13 @@ public class SchoolNumberGenerationService {
     private String getLastSchoolNumberWithPattern(String districtNumber, String pattern) {
         return schoolRepository.findLastSchoolNumberWithPattern(districtNumber, pattern);
     }
-    private String getLastSchoolNumberWithIndependentPattern() {
+
+    private String getFirstAvailableIndependentSchoolNumber() {
         return schoolRepository.findFirstAvailableSchoolNumberForIndependent();
+    }
+
+    private String getFirstAvailableIndependentFirstNationsSchoolNumber() {
+        return schoolRepository.findFirstAvailableSchoolNumberForIndependentFirstNations();
     }
 
     private Integer getFirstAvailableSchoolNumber(String districtNumber, UUID authorityId, Integer lowerRange, Integer upperRange) {

@@ -25,12 +25,22 @@ public interface SchoolRepository extends JpaRepository<SchoolEntity, UUID>, Jpa
   @Transactional
   @Query(value = """
           SELECT MIN(S.ID) AS MISSING_NUM
-          FROM generate_series(96010, 96999) S(ID)
+          FROM generate_series(96000, 96999) S(ID)
           WHERE NOT EXISTS
           (SELECT 1 FROM SCHOOL SCH
           WHERE CAST(SCH.SCHOOL_NUMBER as INTEGER) = S.ID)"""
           , nativeQuery = true)
   String findFirstAvailableSchoolNumberForIndependent();
+
+  @Transactional
+  @Query(value = """
+          SELECT MIN(S.ID) AS MISSING_NUM
+          FROM generate_series(97000, 97999) S(ID)
+          WHERE NOT EXISTS
+          (SELECT 1 FROM SCHOOL SCH
+          WHERE CAST(SCH.SCHOOL_NUMBER as INTEGER) = S.ID)"""
+          , nativeQuery = true)
+  String findFirstAvailableSchoolNumberForIndependentFirstNations();
 
   @Transactional
   @Query(value = """
