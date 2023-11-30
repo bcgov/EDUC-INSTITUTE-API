@@ -554,34 +554,6 @@ public class SchoolControllerTest {
   }
 
   @Test
-  void testCreateSchoolWithSchoolNumberConflict_GivenValidPayload_ShouldReturnStatusCONFLICT() throws Exception {
-    final DistrictTombstoneEntity dist = this.districtTombstoneRepository.save(this.createDistrictData());
-    var existingSchoolEntity = this.createNewSchoolData("99000", "PUBLIC", "DISTONLINE");
-    existingSchoolEntity.setDistrictEntity(dist);
-    schoolRepository.save(existingSchoolEntity);
-
-    var schoolEntity = this.createNewSchoolData("99000", "PUBLIC", "DISTONLINE");
-    SchoolMapper map = SchoolMapper.mapper;
-
-    School mappedSchool = map.toStructure(schoolEntity);
-
-    mappedSchool.setDistrictId(dist.getDistrictId().toString());
-    mappedSchool.setCreateDate(null);
-    mappedSchool.setUpdateDate(null);
-    mappedSchool.setGrades(List.of(createSchoolGrade()));
-    mappedSchool.setNeighborhoodLearning(List.of(createNeighborhoodLearning()));
-    mappedSchool.setAddresses(List.of(createSchoolAddress()));
-
-    this.mockMvc.perform(post(URL.BASE_URL_SCHOOL)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .accept(MediaType.APPLICATION_JSON)
-                    .content(asJsonString(mappedSchool))
-                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SCHOOL"))))
-            .andDo(print())
-            .andExpect(status().isConflict());
-  }
-
-  @Test
   void testCreateSchool_GivenInvalidPayload_ShouldReturnStatusBadRequest() throws Exception {
     final var school = this.createSchoolData();
     school.setSchoolCategoryCode("ABCD");

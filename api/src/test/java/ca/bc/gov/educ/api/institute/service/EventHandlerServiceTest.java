@@ -218,6 +218,36 @@ public class EventHandlerServiceTest {
     assertThat(schoolCreatedEvent.get().getEventOutcome()).isEqualTo(SCHOOL_CREATED.toString());
   }
 
+  @Test(expected = EntityNotFoundException.class)
+  public void testHandleEvent_givenEventTypeCREATE_SCHOOL_WithNoDistrict__DoesExistAndSynchronousNatsMessage_shouldRespondWithData() throws IOException, ExecutionException, InterruptedException {
+    final DistrictTombstoneEntity dist = this.districtTombstoneRepository.save(this.createDistrictData());
+
+    var schoolEntity = this.createNewSchoolData(null, "PUBLIC", "DISTONLINE");
+
+    SchoolMapper map = SchoolMapper.mapper;
+
+    School mappedSchool = map.toStructure(schoolEntity);
+
+    mappedSchool.setDistrictId(UUID.randomUUID().toString());
+    mappedSchool.setCreateDate(null);
+    mappedSchool.setUpdateDate(null);
+    mappedSchool.setSchoolNumber(null);
+    mappedSchool.setGrades(List.of(createSchoolGrade()));
+    mappedSchool.setNeighborhoodLearning(List.of(createNeighborhoodLearning()));
+    mappedSchool.setAddresses(List.of(createSchoolAddress()));
+
+    ObjectMapper objectMapper = new ObjectMapper();
+    objectMapper.registerModule(new JavaTimeModule()).configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+
+    var sagaId = UUID.randomUUID();
+    final Event event = Event.builder().eventType(CREATE_SCHOOL).sagaId(sagaId).eventPayload(objectMapper.writeValueAsString(mappedSchool)).build();
+    eventHandlerServiceUnderTest.handleCreateSchoolEvent(event).getLeft();
+    var schoolCreatedEvent = instituteEventRepository.findBySagaIdAndEventType(sagaId, CREATE_SCHOOL.toString());
+    assertThat(schoolCreatedEvent).isPresent();
+    assertThat(schoolCreatedEvent.get().getEventStatus()).isEqualTo(MESSAGE_PUBLISHED.toString());
+    assertThat(schoolCreatedEvent.get().getEventOutcome()).isEqualTo(SCHOOL_CREATED.toString());
+  }
+
   @Test
   public void testHandleEvent_givenEventTypeCREATE_SCHOOL_WITH_EXISTING_SCHOOL_NUMBER__DoesExistAndSynchronousNatsMessage_shouldRespondWithData() throws IOException, ExecutionException, InterruptedException {
     final DistrictTombstoneEntity dist = this.districtTombstoneRepository.save(this.createDistrictData());
@@ -246,35 +276,6 @@ public class EventHandlerServiceTest {
     assertThat(schoolCreatedEvent.get().getEventStatus()).isEqualTo(MESSAGE_PUBLISHED.toString());
     assertThat(schoolCreatedEvent.get().getEventOutcome()).isEqualTo(SCHOOL_CREATED.toString());
   }
-
-  @Test(expected = ConflictFoundException.class)
-  public void testHandleEvent_givenEventTypeCREATE_SCHOOL_WITH_CONFLICTING_SCHOOL_NUMBER__DoesExistAndSynchronousNatsMessage_shouldThrowError() throws IOException, ExecutionException, InterruptedException {
-    final DistrictTombstoneEntity dist = this.districtTombstoneRepository.save(this.createDistrictData());
-    var existingSchoolEntity = this.createNewSchoolData("99000", "PUBLIC", "DISTONLINE");
-    existingSchoolEntity.setDistrictEntity(dist);
-    schoolRepository.save(existingSchoolEntity);
-
-    var schoolEntity = this.createNewSchoolData("99000", "PUBLIC", "DISTONLINE");
-
-    SchoolMapper map = SchoolMapper.mapper;
-
-    School mappedSchool = map.toStructure(schoolEntity);
-
-    mappedSchool.setDistrictId(dist.getDistrictId().toString());
-    mappedSchool.setCreateDate(null);
-    mappedSchool.setUpdateDate(null);
-    mappedSchool.setGrades(List.of(createSchoolGrade()));
-    mappedSchool.setNeighborhoodLearning(List.of(createNeighborhoodLearning()));
-    mappedSchool.setAddresses(List.of(createSchoolAddress()));
-
-    ObjectMapper objectMapper = new ObjectMapper();
-    objectMapper.registerModule(new JavaTimeModule()).configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-
-    var sagaId = UUID.randomUUID();
-    final Event event = Event.builder().eventType(CREATE_SCHOOL).sagaId(sagaId).eventPayload(objectMapper.writeValueAsString(mappedSchool)).build();
-    eventHandlerServiceUnderTest.handleCreateSchoolEvent(event);
-  }
-
   @Test
   public void testHandleEvent_givenEventTypeUPDATE_SCHOOL__DoesExistAndSynchronousNatsMessage_shouldRespondWithData() throws IOException, ExecutionException, InterruptedException {
     final DistrictTombstoneEntity dist = this.districtTombstoneRepository.save(this.createDistrictData());
@@ -318,6 +319,9 @@ public class EventHandlerServiceTest {
     schoolRepository.save(fromSchoolEntity);
 
     School toSchool = new School();
+    toSchool.setGrades(List.of(createSchoolGrade()));
+    toSchool.setNeighborhoodLearning(List.of(createNeighborhoodLearning()));
+    toSchool.setAddresses(List.of(createSchoolAddress()));
     SchoolMapper map = SchoolMapper.mapper;
 
     BeanUtils.copyProperties(map.toStructure(toSchoolEntity), toSchool);
@@ -340,6 +344,347 @@ public class EventHandlerServiceTest {
     MoveSchoolData moveSchoolEventData = JsonUtil.getJsonObjectFromString(MoveSchoolData.class, event.getEventPayload());
     assertThat(moveSchoolEventData.getToSchool().getSchoolId()).isNotNull();
     assertThat(moveSchoolEventData.getToSchool().getSchoolNumber()).isNotEqualTo("99000"); //new school number since school number already exists in district
+
+    //2 schools = 1 that was created + 1 that was closed for the move.
+    assertThat(schoolRepository.findAll()).hasSize(2);
+
+    //confirm that running the same event twice will not create a new school.
+    eventHandlerServiceUnderTest.handleMoveSchoolEvent(event).getLeft();
+    assertThat(schoolRepository.findAll()).hasSize(2);
+
+    SchoolEntity fromSchoolEntityComplete = schoolRepository.findById(fromSchoolEntity.getSchoolId()).orElseThrow();
+    SchoolEntity toSchoolEntityComplete = schoolRepository.findById(UUID.fromString(moveSchoolEventData.getToSchool().getSchoolId())).orElseThrow();
+
+    //confirm previous school has closed and address information saved
+    assertThat(fromSchoolEntityComplete.getClosedDate()).isEqualTo(moveDate);
+    assertThat(fromSchoolEntityComplete.getAddresses().stream().toList().get(0).getCity()).isEqualTo(fromSchoolAddressEntity.getCity());
+
+    assertThat(fromSchoolEntityComplete.getSchoolMoveTo().stream().toList().get(0).getToSchoolId()).isEqualTo(toSchoolEntityComplete.getSchoolId());
+    assertThat(toSchoolEntityComplete.getSchoolMoveFrom().stream().toList().get(0).getFromSchoolId()).isEqualTo(fromSchoolEntityComplete.getSchoolId());
+  }
+
+  @Test(expected = EntityNotFoundException.class)
+  public void testHandleEvent_givenEventTypeMOVE_SCHOOL_DistrictNotFound__DoesExistAndSynchronousNatsMessage_shouldRespondWithDataAndCreateMoveHistory() throws IOException, ExecutionException, InterruptedException {
+    final DistrictTombstoneEntity dist = this.districtTombstoneRepository.save(this.createDistrictData());
+    SchoolEntity toSchoolEntity = this.createNewSchoolData("99000", "PUBLIC", "DISTONLINE");
+    SchoolEntity fromSchoolEntity = this.createNewSchoolData("99000", "PUBLIC", "DISTONLINE");
+    LocalDateTime moveDate = LocalDateTime.now().plusDays(1).truncatedTo(ChronoUnit.MILLIS);
+
+    Set<SchoolAddressEntity> schoolAddressSet = new HashSet<>();
+    SchoolAddressEntity fromSchoolAddressEntity = SchoolAddressEntity.builder()
+            .addressTypeCode("MAILING").addressLine1("123 This Street").city("Victoria")
+            .provinceCode("BC").countryCode("CA").postal("V1V2V3").schoolEntity(fromSchoolEntity).build();
+    schoolAddressSet.add(fromSchoolAddressEntity);
+
+    fromSchoolEntity.setDistrictEntity(dist);
+    fromSchoolEntity.setAddresses(schoolAddressSet);
+    schoolRepository.save(fromSchoolEntity);
+
+    School toSchool = new School();
+    toSchool.setGrades(List.of(createSchoolGrade()));
+    toSchool.setNeighborhoodLearning(List.of(createNeighborhoodLearning()));
+    toSchool.setAddresses(List.of(createSchoolAddress()));
+    SchoolMapper map = SchoolMapper.mapper;
+
+    BeanUtils.copyProperties(map.toStructure(toSchoolEntity), toSchool);
+    toSchool.setDistrictId(UUID.randomUUID().toString());
+
+    ObjectMapper objectMapper = new ObjectMapper();
+    objectMapper.registerModule(new JavaTimeModule()).configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+
+    MoveSchoolData moveSchoolData = createMoveSchoolData(toSchool, fromSchoolEntity.getSchoolId(), moveDate);
+
+    UUID sagaId = UUID.randomUUID();
+    final Event event = Event.builder().eventType(MOVE_SCHOOL).sagaId(sagaId).eventPayload(objectMapper.writeValueAsString(moveSchoolData)).build();
+
+    eventHandlerServiceUnderTest.handleMoveSchoolEvent(event).getLeft();
+  }
+
+  @Test
+  public void testHandleEvent_givenEventTypeMOVE_SCHOOL_whereSchoolNumberInNewDistrictIsAvailable__DoesExistAndSynchronousNatsMessage_shouldRespondWithDataAndCreateMoveHistory() throws IOException, ExecutionException, InterruptedException {
+    final DistrictTombstoneEntity dist = this.districtTombstoneRepository.save(this.createDistrictData());
+    SchoolEntity toSchoolEntity = this.createNewSchoolData("99000", "PUBLIC", "DISTONLINE");
+    SchoolEntity fromSchoolEntity = this.createNewSchoolData("99100", "PUBLIC", "DISTONLINE");
+    LocalDateTime moveDate = LocalDateTime.now().plusDays(1).truncatedTo(ChronoUnit.MILLIS);
+
+    Set<SchoolAddressEntity> schoolAddressSet = new HashSet<>();
+    SchoolAddressEntity fromSchoolAddressEntity = SchoolAddressEntity.builder()
+            .addressTypeCode("MAILING").addressLine1("123 This Street").city("Victoria")
+            .provinceCode("BC").countryCode("CA").postal("V1V2V3").schoolEntity(fromSchoolEntity).build();
+    schoolAddressSet.add(fromSchoolAddressEntity);
+
+    toSchoolEntity.setDistrictEntity(dist);
+    fromSchoolEntity.setDistrictEntity(dist);
+    fromSchoolEntity.setAddresses(schoolAddressSet);
+    schoolRepository.save(fromSchoolEntity);
+
+    School toSchool = new School();
+    SchoolMapper map = SchoolMapper.mapper;
+
+    BeanUtils.copyProperties(map.toStructure(toSchoolEntity), toSchool);
+
+    ObjectMapper objectMapper = new ObjectMapper();
+    objectMapper.registerModule(new JavaTimeModule()).configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+
+    MoveSchoolData moveSchoolData = createMoveSchoolData(toSchool, fromSchoolEntity.getSchoolId(), moveDate);
+
+    UUID sagaId = UUID.randomUUID();
+    final Event event = Event.builder().eventType(MOVE_SCHOOL).sagaId(sagaId).eventPayload(objectMapper.writeValueAsString(moveSchoolData)).build();
+
+    eventHandlerServiceUnderTest.handleMoveSchoolEvent(event).getLeft();
+    Optional<InstituteEvent> schoolUpdatedEvent = instituteEventRepository.findBySagaIdAndEventType(sagaId, MOVE_SCHOOL.toString());
+    assertThat(schoolUpdatedEvent).isPresent();
+    assertThat(schoolUpdatedEvent.get().getEventStatus()).isEqualTo(MESSAGE_PUBLISHED.toString());
+    assertThat(schoolUpdatedEvent.get().getEventOutcome()).isEqualTo(SCHOOL_MOVED.toString());
+
+    //check that data in event payload is updated
+    MoveSchoolData moveSchoolEventData = JsonUtil.getJsonObjectFromString(MoveSchoolData.class, event.getEventPayload());
+    assertThat(moveSchoolEventData.getToSchool().getSchoolId()).isNotNull();
+    assertThat(moveSchoolEventData.getToSchool().getSchoolNumber()).isEqualTo("99000"); //new school number since school number already exists in district
+
+    //2 schools = 1 that was created + 1 that was closed for the move.
+    assertThat(schoolRepository.findAll()).hasSize(2);
+
+    //confirm that running the same event twice will not create a new school.
+    eventHandlerServiceUnderTest.handleMoveSchoolEvent(event).getLeft();
+    assertThat(schoolRepository.findAll()).hasSize(2);
+
+    SchoolEntity fromSchoolEntityComplete = schoolRepository.findById(fromSchoolEntity.getSchoolId()).orElseThrow();
+    SchoolEntity toSchoolEntityComplete = schoolRepository.findById(UUID.fromString(moveSchoolEventData.getToSchool().getSchoolId())).orElseThrow();
+
+    //confirm previous school has closed and address information saved
+    assertThat(fromSchoolEntityComplete.getClosedDate()).isEqualTo(moveDate);
+    assertThat(fromSchoolEntityComplete.getAddresses().stream().toList().get(0).getCity()).isEqualTo(fromSchoolAddressEntity.getCity());
+
+    assertThat(fromSchoolEntityComplete.getSchoolMoveTo().stream().toList().get(0).getToSchoolId()).isEqualTo(toSchoolEntityComplete.getSchoolId());
+    assertThat(toSchoolEntityComplete.getSchoolMoveFrom().stream().toList().get(0).getFromSchoolId()).isEqualTo(fromSchoolEntityComplete.getSchoolId());
+  }
+
+  @Test
+  public void testHandleEvent_givenEventTypeMOVE_SCHOOL_withNewSchoolCategory__DoesExistAndSynchronousNatsMessage_shouldRespondWithDataAndCreateMoveHistory() throws IOException, ExecutionException, InterruptedException {
+    final DistrictTombstoneEntity dist = this.districtTombstoneRepository.save(this.createDistrictData());
+    SchoolEntity toSchoolEntity = this.createNewSchoolData("99000", "EAR_LEARN", "STRONG_CEN");
+    SchoolEntity fromSchoolEntity = this.createNewSchoolData("99100", "PUBLIC", "DISTONLINE");
+    LocalDateTime moveDate = LocalDateTime.now().plusDays(1).truncatedTo(ChronoUnit.MILLIS);
+
+    Set<SchoolAddressEntity> schoolAddressSet = new HashSet<>();
+    SchoolAddressEntity fromSchoolAddressEntity = SchoolAddressEntity.builder()
+            .addressTypeCode("MAILING").addressLine1("123 This Street").city("Victoria")
+            .provinceCode("BC").countryCode("CA").postal("V1V2V3").schoolEntity(fromSchoolEntity).build();
+    schoolAddressSet.add(fromSchoolAddressEntity);
+
+    toSchoolEntity.setDistrictEntity(dist);
+    fromSchoolEntity.setDistrictEntity(dist);
+    fromSchoolEntity.setAddresses(schoolAddressSet);
+    schoolRepository.save(fromSchoolEntity);
+
+    School toSchool = new School();
+    SchoolMapper map = SchoolMapper.mapper;
+
+    BeanUtils.copyProperties(map.toStructure(toSchoolEntity), toSchool);
+
+    ObjectMapper objectMapper = new ObjectMapper();
+    objectMapper.registerModule(new JavaTimeModule()).configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+
+    MoveSchoolData moveSchoolData = createMoveSchoolData(toSchool, fromSchoolEntity.getSchoolId(), moveDate);
+
+    UUID sagaId = UUID.randomUUID();
+    final Event event = Event.builder().eventType(MOVE_SCHOOL).sagaId(sagaId).eventPayload(objectMapper.writeValueAsString(moveSchoolData)).build();
+
+    eventHandlerServiceUnderTest.handleMoveSchoolEvent(event).getLeft();
+    Optional<InstituteEvent> schoolUpdatedEvent = instituteEventRepository.findBySagaIdAndEventType(sagaId, MOVE_SCHOOL.toString());
+    assertThat(schoolUpdatedEvent).isPresent();
+    assertThat(schoolUpdatedEvent.get().getEventStatus()).isEqualTo(MESSAGE_PUBLISHED.toString());
+    assertThat(schoolUpdatedEvent.get().getEventOutcome()).isEqualTo(SCHOOL_MOVED.toString());
+
+    //check that data in event payload is updated
+    MoveSchoolData moveSchoolEventData = JsonUtil.getJsonObjectFromString(MoveSchoolData.class, event.getEventPayload());
+    assertThat(moveSchoolEventData.getToSchool().getSchoolId()).isNotNull();
+    assertThat(moveSchoolEventData.getToSchool().getSchoolNumber()).isNotEqualTo("99000"); //new school number since school number already exists in district
+    assertThat(moveSchoolEventData.getToSchool().getSchoolNumber()).startsWith("25");
+
+    //2 schools = 1 that was created + 1 that was closed for the move.
+    assertThat(schoolRepository.findAll()).hasSize(2);
+
+    //confirm that running the same event twice will not create a new school.
+    eventHandlerServiceUnderTest.handleMoveSchoolEvent(event).getLeft();
+    assertThat(schoolRepository.findAll()).hasSize(2);
+
+    SchoolEntity fromSchoolEntityComplete = schoolRepository.findById(fromSchoolEntity.getSchoolId()).orElseThrow();
+    SchoolEntity toSchoolEntityComplete = schoolRepository.findById(UUID.fromString(moveSchoolEventData.getToSchool().getSchoolId())).orElseThrow();
+
+    //confirm previous school has closed and address information saved
+    assertThat(fromSchoolEntityComplete.getClosedDate()).isEqualTo(moveDate);
+    assertThat(fromSchoolEntityComplete.getAddresses().stream().toList().get(0).getCity()).isEqualTo(fromSchoolAddressEntity.getCity());
+
+    assertThat(fromSchoolEntityComplete.getSchoolMoveTo().stream().toList().get(0).getToSchoolId()).isEqualTo(toSchoolEntityComplete.getSchoolId());
+    assertThat(toSchoolEntityComplete.getSchoolMoveFrom().stream().toList().get(0).getFromSchoolId()).isEqualTo(fromSchoolEntityComplete.getSchoolId());
+  }
+
+  @Test
+  public void testHandleEvent_givenEventTypeMOVE_SCHOOL_withIndependentSchoolCategory__DoesExistAndSynchronousNatsMessage_shouldRespondWithDataAndCreateMoveHistory() throws IOException, ExecutionException, InterruptedException {
+    final DistrictTombstoneEntity dist = this.districtTombstoneRepository.save(this.createDistrictData());
+    SchoolEntity toSchoolEntity = this.createNewSchoolData("96100", "INDEPEND", "STANDARD");
+    SchoolEntity fromSchoolEntity = this.createNewSchoolData("96100", "INDEPEND", "STANDARD");
+    LocalDateTime moveDate = LocalDateTime.now().plusDays(1).truncatedTo(ChronoUnit.MILLIS);
+
+    Set<SchoolAddressEntity> schoolAddressSet = new HashSet<>();
+    SchoolAddressEntity fromSchoolAddressEntity = SchoolAddressEntity.builder()
+            .addressTypeCode("MAILING").addressLine1("123 This Street").city("Victoria")
+            .provinceCode("BC").countryCode("CA").postal("V1V2V3").schoolEntity(fromSchoolEntity).build();
+    schoolAddressSet.add(fromSchoolAddressEntity);
+
+    toSchoolEntity.setDistrictEntity(dist);
+    fromSchoolEntity.setDistrictEntity(dist);
+    fromSchoolEntity.setAddresses(schoolAddressSet);
+    schoolRepository.save(fromSchoolEntity);
+
+    School toSchool = new School();
+    SchoolMapper map = SchoolMapper.mapper;
+
+    BeanUtils.copyProperties(map.toStructure(toSchoolEntity), toSchool);
+
+    ObjectMapper objectMapper = new ObjectMapper();
+    objectMapper.registerModule(new JavaTimeModule()).configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+
+    MoveSchoolData moveSchoolData = createMoveSchoolData(toSchool, fromSchoolEntity.getSchoolId(), moveDate);
+
+    UUID sagaId = UUID.randomUUID();
+    final Event event = Event.builder().eventType(MOVE_SCHOOL).sagaId(sagaId).eventPayload(objectMapper.writeValueAsString(moveSchoolData)).build();
+
+    eventHandlerServiceUnderTest.handleMoveSchoolEvent(event).getLeft();
+    Optional<InstituteEvent> schoolUpdatedEvent = instituteEventRepository.findBySagaIdAndEventType(sagaId, MOVE_SCHOOL.toString());
+    assertThat(schoolUpdatedEvent).isPresent();
+    assertThat(schoolUpdatedEvent.get().getEventStatus()).isEqualTo(MESSAGE_PUBLISHED.toString());
+    assertThat(schoolUpdatedEvent.get().getEventOutcome()).isEqualTo(SCHOOL_MOVED.toString());
+
+    //check that data in event payload is updated
+    MoveSchoolData moveSchoolEventData = JsonUtil.getJsonObjectFromString(MoveSchoolData.class, event.getEventPayload());
+    assertThat(moveSchoolEventData.getToSchool().getSchoolId()).isNotNull();
+    assertThat(moveSchoolEventData.getToSchool().getSchoolNumber()).isNotEqualTo("96100"); //new school number since school number already exists in district
+    assertThat(moveSchoolEventData.getToSchool().getSchoolNumber()).startsWith("96");
+
+    //2 schools = 1 that was created + 1 that was closed for the move.
+    assertThat(schoolRepository.findAll()).hasSize(2);
+
+    //confirm that running the same event twice will not create a new school.
+    eventHandlerServiceUnderTest.handleMoveSchoolEvent(event).getLeft();
+    assertThat(schoolRepository.findAll()).hasSize(2);
+
+    SchoolEntity fromSchoolEntityComplete = schoolRepository.findById(fromSchoolEntity.getSchoolId()).orElseThrow();
+    SchoolEntity toSchoolEntityComplete = schoolRepository.findById(UUID.fromString(moveSchoolEventData.getToSchool().getSchoolId())).orElseThrow();
+
+    //confirm previous school has closed and address information saved
+    assertThat(fromSchoolEntityComplete.getClosedDate()).isEqualTo(moveDate);
+    assertThat(fromSchoolEntityComplete.getAddresses().stream().toList().get(0).getCity()).isEqualTo(fromSchoolAddressEntity.getCity());
+
+    assertThat(fromSchoolEntityComplete.getSchoolMoveTo().stream().toList().get(0).getToSchoolId()).isEqualTo(toSchoolEntityComplete.getSchoolId());
+    assertThat(toSchoolEntityComplete.getSchoolMoveFrom().stream().toList().get(0).getFromSchoolId()).isEqualTo(fromSchoolEntityComplete.getSchoolId());
+  }
+
+  @Test
+  public void testHandleEvent_givenEventTypeMOVE_SCHOOL_withNonIndependentSchoolCategory__DoesExistAndSynchronousNatsMessage_shouldRespondWithDataAndCreateMoveHistory() throws IOException, ExecutionException, InterruptedException {
+    final DistrictTombstoneEntity dist = this.districtTombstoneRepository.save(this.createDistrictData());
+    SchoolEntity toSchoolEntity = this.createNewSchoolData("97100", "FED_BAND", "STANDARD");
+    SchoolEntity fromSchoolEntity = this.createNewSchoolData("97100", "FED_BAND", "STANDARD");
+    LocalDateTime moveDate = LocalDateTime.now().plusDays(1).truncatedTo(ChronoUnit.MILLIS);
+
+    Set<SchoolAddressEntity> schoolAddressSet = new HashSet<>();
+    SchoolAddressEntity fromSchoolAddressEntity = SchoolAddressEntity.builder()
+            .addressTypeCode("MAILING").addressLine1("123 This Street").city("Victoria")
+            .provinceCode("BC").countryCode("CA").postal("V1V2V3").schoolEntity(fromSchoolEntity).build();
+    schoolAddressSet.add(fromSchoolAddressEntity);
+
+    toSchoolEntity.setDistrictEntity(dist);
+    fromSchoolEntity.setDistrictEntity(dist);
+    fromSchoolEntity.setAddresses(schoolAddressSet);
+    schoolRepository.save(fromSchoolEntity);
+
+    School toSchool = new School();
+    SchoolMapper map = SchoolMapper.mapper;
+
+    BeanUtils.copyProperties(map.toStructure(toSchoolEntity), toSchool);
+
+    ObjectMapper objectMapper = new ObjectMapper();
+    objectMapper.registerModule(new JavaTimeModule()).configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+
+    MoveSchoolData moveSchoolData = createMoveSchoolData(toSchool, fromSchoolEntity.getSchoolId(), moveDate);
+
+    UUID sagaId = UUID.randomUUID();
+    final Event event = Event.builder().eventType(MOVE_SCHOOL).sagaId(sagaId).eventPayload(objectMapper.writeValueAsString(moveSchoolData)).build();
+
+    eventHandlerServiceUnderTest.handleMoveSchoolEvent(event).getLeft();
+    Optional<InstituteEvent> schoolUpdatedEvent = instituteEventRepository.findBySagaIdAndEventType(sagaId, MOVE_SCHOOL.toString());
+    assertThat(schoolUpdatedEvent).isPresent();
+    assertThat(schoolUpdatedEvent.get().getEventStatus()).isEqualTo(MESSAGE_PUBLISHED.toString());
+    assertThat(schoolUpdatedEvent.get().getEventOutcome()).isEqualTo(SCHOOL_MOVED.toString());
+
+    //check that data in event payload is updated
+    MoveSchoolData moveSchoolEventData = JsonUtil.getJsonObjectFromString(MoveSchoolData.class, event.getEventPayload());
+    assertThat(moveSchoolEventData.getToSchool().getSchoolId()).isNotNull();
+    assertThat(moveSchoolEventData.getToSchool().getSchoolNumber()).isEqualTo("97000"); //new school number since school number already exists in district
+    assertThat(moveSchoolEventData.getToSchool().getSchoolNumber()).startsWith("97");
+
+    //2 schools = 1 that was created + 1 that was closed for the move.
+    assertThat(schoolRepository.findAll()).hasSize(2);
+
+    //confirm that running the same event twice will not create a new school.
+    eventHandlerServiceUnderTest.handleMoveSchoolEvent(event).getLeft();
+    assertThat(schoolRepository.findAll()).hasSize(2);
+
+    SchoolEntity fromSchoolEntityComplete = schoolRepository.findById(fromSchoolEntity.getSchoolId()).orElseThrow();
+    SchoolEntity toSchoolEntityComplete = schoolRepository.findById(UUID.fromString(moveSchoolEventData.getToSchool().getSchoolId())).orElseThrow();
+
+    //confirm previous school has closed and address information saved
+    assertThat(fromSchoolEntityComplete.getClosedDate()).isEqualTo(moveDate);
+    assertThat(fromSchoolEntityComplete.getAddresses().stream().toList().get(0).getCity()).isEqualTo(fromSchoolAddressEntity.getCity());
+
+    assertThat(fromSchoolEntityComplete.getSchoolMoveTo().stream().toList().get(0).getToSchoolId()).isEqualTo(toSchoolEntityComplete.getSchoolId());
+    assertThat(toSchoolEntityComplete.getSchoolMoveFrom().stream().toList().get(0).getFromSchoolId()).isEqualTo(fromSchoolEntityComplete.getSchoolId());
+  }
+
+  @Test
+  public void testHandleEvent_givenEventTypeMOVE_SCHOOL_withIndependentSchoolCategoryChange__DoesExistAndSynchronousNatsMessage_shouldRespondWithDataAndCreateMoveHistory() throws IOException, ExecutionException, InterruptedException {
+    final DistrictTombstoneEntity dist = this.districtTombstoneRepository.save(this.createDistrictData());
+    SchoolEntity toSchoolEntity = this.createNewSchoolData("97100", "FED_BAND", "STANDARD");
+    SchoolEntity fromSchoolEntity = this.createNewSchoolData("96100", "OFFSHORE", "STANDARD");
+    LocalDateTime moveDate = LocalDateTime.now().plusDays(1).truncatedTo(ChronoUnit.MILLIS);
+
+    Set<SchoolAddressEntity> schoolAddressSet = new HashSet<>();
+    SchoolAddressEntity fromSchoolAddressEntity = SchoolAddressEntity.builder()
+            .addressTypeCode("MAILING").addressLine1("123 This Street").city("Victoria")
+            .provinceCode("BC").countryCode("CA").postal("V1V2V3").schoolEntity(fromSchoolEntity).build();
+    schoolAddressSet.add(fromSchoolAddressEntity);
+
+    toSchoolEntity.setDistrictEntity(dist);
+    fromSchoolEntity.setDistrictEntity(dist);
+    fromSchoolEntity.setAddresses(schoolAddressSet);
+    schoolRepository.save(fromSchoolEntity);
+
+    School toSchool = new School();
+    SchoolMapper map = SchoolMapper.mapper;
+
+    BeanUtils.copyProperties(map.toStructure(toSchoolEntity), toSchool);
+
+    ObjectMapper objectMapper = new ObjectMapper();
+    objectMapper.registerModule(new JavaTimeModule()).configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+
+    MoveSchoolData moveSchoolData = createMoveSchoolData(toSchool, fromSchoolEntity.getSchoolId(), moveDate);
+
+    UUID sagaId = UUID.randomUUID();
+    final Event event = Event.builder().eventType(MOVE_SCHOOL).sagaId(sagaId).eventPayload(objectMapper.writeValueAsString(moveSchoolData)).build();
+
+    eventHandlerServiceUnderTest.handleMoveSchoolEvent(event).getLeft();
+    Optional<InstituteEvent> schoolUpdatedEvent = instituteEventRepository.findBySagaIdAndEventType(sagaId, MOVE_SCHOOL.toString());
+    assertThat(schoolUpdatedEvent).isPresent();
+    assertThat(schoolUpdatedEvent.get().getEventStatus()).isEqualTo(MESSAGE_PUBLISHED.toString());
+    assertThat(schoolUpdatedEvent.get().getEventOutcome()).isEqualTo(SCHOOL_MOVED.toString());
+
+    //check that data in event payload is updated
+    MoveSchoolData moveSchoolEventData = JsonUtil.getJsonObjectFromString(MoveSchoolData.class, event.getEventPayload());
+    assertThat(moveSchoolEventData.getToSchool().getSchoolId()).isNotNull();
+    assertThat(moveSchoolEventData.getToSchool().getSchoolNumber()).isEqualTo("97000"); //new school number since school number already exists in district
+    assertThat(moveSchoolEventData.getToSchool().getSchoolNumber()).startsWith("97");
 
     //2 schools = 1 that was created + 1 that was closed for the move.
     assertThat(schoolRepository.findAll()).hasSize(2);
@@ -402,6 +747,7 @@ public class EventHandlerServiceTest {
     return DistrictTombstoneEntity.builder().districtNumber("003").displayName("District Name").districtStatusCode("OPEN").districtRegionCode("KOOTENAYS")
             .website("abc@sd99.edu").createDate(LocalDateTime.now()).updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
   }
+
   private SchoolGrade createSchoolGrade() {
     SchoolGrade schoolGrade = new SchoolGrade();
     schoolGrade.setSchoolGradeCode("01");
