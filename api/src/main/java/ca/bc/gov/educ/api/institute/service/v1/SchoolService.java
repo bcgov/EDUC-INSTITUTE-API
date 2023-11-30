@@ -120,6 +120,8 @@ public class SchoolService {
       schoolEntity.setSchoolNumber(schoolNumberGenerationService.generateSchoolNumber(district.get().getDistrictNumber(),
               school.getFacilityTypeCode(), school.getSchoolCategoryCode(),
               school.getIndependentAuthorityId()));
+    } else {
+      throw new EntityNotFoundException(DistrictTombstoneEntity.class, school.getDistrictId());
     }
 
     schoolEntity.getAddresses().stream().forEach(address -> {
@@ -445,16 +447,11 @@ public class SchoolService {
             UUID.fromString(school.getDistrictId()));
     if (district.isPresent()) {
       schoolEntity.setDistrictEntity(district.get());
-    }
 
-    if (district.isPresent()) {
       List<SchoolEntity> schools = schoolRepository.findBySchoolNumberAndDistrictID(
               school.getSchoolNumber(), UUID.fromString(school.getDistrictId()));
 
-      if(school.getSchoolCategoryCode().equals(existingSchool.getSchoolCategoryCode()) &&
-              !school.getSchoolCategoryCode().equals(Constants.INDEPENDENT) && !school.getSchoolCategoryCode().equals(Constants.NONINDEPENDENT)
-              && !school.getSchoolCategoryCode().equals(Constants.INDEPENDENTFNS) && !school.getSchoolCategoryCode().equals(Constants.OFFSHORE)
-              && schools.isEmpty()) {
+      if(school.getSchoolCategoryCode().equals(existingSchool.getSchoolCategoryCode()) && schools.isEmpty()) {
         schoolEntity.setSchoolNumber(school.getSchoolNumber());
       } else {
         schoolEntity.setSchoolNumber(
@@ -462,7 +459,10 @@ public class SchoolService {
                         school.getFacilityTypeCode(), school.getSchoolCategoryCode(),
                         school.getIndependentAuthorityId()));
       }
+    } else {
+      throw new EntityNotFoundException(DistrictTombstoneEntity.class, school.getDistrictId());
     }
+
     schoolEntity.getAddresses().stream().forEach(address -> {
       RequestUtil.setAuditColumnsForAddress(address);
       TransformUtil.uppercaseFields(address);
