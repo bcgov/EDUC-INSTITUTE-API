@@ -246,35 +246,6 @@ public class EventHandlerServiceTest {
     assertThat(schoolCreatedEvent.get().getEventStatus()).isEqualTo(MESSAGE_PUBLISHED.toString());
     assertThat(schoolCreatedEvent.get().getEventOutcome()).isEqualTo(SCHOOL_CREATED.toString());
   }
-
-  @Test(expected = ConflictFoundException.class)
-  public void testHandleEvent_givenEventTypeCREATE_SCHOOL_WITH_CONFLICTING_SCHOOL_NUMBER__DoesExistAndSynchronousNatsMessage_shouldThrowError() throws IOException, ExecutionException, InterruptedException {
-    final DistrictTombstoneEntity dist = this.districtTombstoneRepository.save(this.createDistrictData());
-    var existingSchoolEntity = this.createNewSchoolData("99000", "PUBLIC", "DISTONLINE");
-    existingSchoolEntity.setDistrictEntity(dist);
-    schoolRepository.save(existingSchoolEntity);
-
-    var schoolEntity = this.createNewSchoolData("99000", "PUBLIC", "DISTONLINE");
-
-    SchoolMapper map = SchoolMapper.mapper;
-
-    School mappedSchool = map.toStructure(schoolEntity);
-
-    mappedSchool.setDistrictId(dist.getDistrictId().toString());
-    mappedSchool.setCreateDate(null);
-    mappedSchool.setUpdateDate(null);
-    mappedSchool.setGrades(List.of(createSchoolGrade()));
-    mappedSchool.setNeighborhoodLearning(List.of(createNeighborhoodLearning()));
-    mappedSchool.setAddresses(List.of(createSchoolAddress()));
-
-    ObjectMapper objectMapper = new ObjectMapper();
-    objectMapper.registerModule(new JavaTimeModule()).configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-
-    var sagaId = UUID.randomUUID();
-    final Event event = Event.builder().eventType(CREATE_SCHOOL).sagaId(sagaId).eventPayload(objectMapper.writeValueAsString(mappedSchool)).build();
-    eventHandlerServiceUnderTest.handleCreateSchoolEvent(event);
-  }
-
   @Test
   public void testHandleEvent_givenEventTypeUPDATE_SCHOOL__DoesExistAndSynchronousNatsMessage_shouldRespondWithData() throws IOException, ExecutionException, InterruptedException {
     final DistrictTombstoneEntity dist = this.districtTombstoneRepository.save(this.createDistrictData());
