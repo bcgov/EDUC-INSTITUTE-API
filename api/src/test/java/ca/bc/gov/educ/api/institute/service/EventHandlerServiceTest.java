@@ -289,6 +289,9 @@ public class EventHandlerServiceTest {
     schoolRepository.save(fromSchoolEntity);
 
     School toSchool = new School();
+    toSchool.setGrades(List.of(createSchoolGrade()));
+    toSchool.setNeighborhoodLearning(List.of(createNeighborhoodLearning()));
+    toSchool.setAddresses(List.of(createSchoolAddress()));
     SchoolMapper map = SchoolMapper.mapper;
 
     BeanUtils.copyProperties(map.toStructure(toSchoolEntity), toSchool);
