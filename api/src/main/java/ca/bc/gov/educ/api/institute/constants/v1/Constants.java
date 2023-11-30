@@ -17,5 +17,7 @@ public final class Constants {
     public static final String UPPERBOUND = "999";
     public static final String DEFAULTNUMBER = "000";
     public static final String INDEPENDENT="INDEPEND";
+    public static final String OFFSHORE="OFFSHORE";
     public static final String NONINDEPENDENT="FED_BAND";
+    public static final String INDEPENDENTFNS="INDP_FNS";
 }

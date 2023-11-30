@@ -452,7 +452,9 @@ public class SchoolService {
               school.getSchoolNumber(), UUID.fromString(school.getDistrictId()));
 
       if(school.getSchoolCategoryCode().equals(existingSchool.getSchoolCategoryCode()) &&
-              !school.getSchoolCategoryCode().equals(Constants.INDEPENDENT) && !school.getSchoolCategoryCode().equals(Constants.NONINDEPENDENT) && schools.isEmpty()) {
+              !school.getSchoolCategoryCode().equals(Constants.INDEPENDENT) && !school.getSchoolCategoryCode().equals(Constants.NONINDEPENDENT)
+              && !school.getSchoolCategoryCode().equals(Constants.INDEPENDENTFNS) && !school.getSchoolCategoryCode().equals(Constants.OFFSHORE)
+              && schools.isEmpty()) {
         schoolEntity.setSchoolNumber(school.getSchoolNumber());
       } else {
         schoolEntity.setSchoolNumber(
