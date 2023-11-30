@@ -121,7 +121,7 @@ public class SchoolService {
               school.getFacilityTypeCode(), school.getSchoolCategoryCode(),
               school.getIndependentAuthorityId()));
     } else {
-      throw new EntityNotFoundException(DistrictTombstoneEntity.class, school.getDistrictId());
+      throw new EntityNotFoundException(DistrictTombstoneEntity.class, school.getDistrictId(), school.getSchoolId());
     }
 
     schoolEntity.getAddresses().stream().forEach(address -> {
@@ -460,7 +460,7 @@ public class SchoolService {
                         school.getIndependentAuthorityId()));
       }
     } else {
-      throw new EntityNotFoundException(DistrictTombstoneEntity.class, school.getDistrictId());
+      throw new EntityNotFoundException(DistrictTombstoneEntity.class, school.getDistrictId(), school.getSchoolId());
     }
 
     schoolEntity.getAddresses().stream().forEach(address -> {
