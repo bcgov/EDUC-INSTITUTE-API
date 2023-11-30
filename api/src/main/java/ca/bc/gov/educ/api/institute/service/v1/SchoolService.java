@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.institute.service.v1;
 
+import ca.bc.gov.educ.api.institute.constants.v1.Constants;
 import ca.bc.gov.educ.api.institute.exception.ConflictFoundException;
 import ca.bc.gov.educ.api.institute.exception.EntityNotFoundException;
 import ca.bc.gov.educ.api.institute.mapper.v1.NoteMapper;
@@ -115,24 +116,12 @@ public class SchoolService {
         UUID.fromString(school.getDistrictId()));
     if (district.isPresent()) {
       schoolEntity.setDistrictEntity(district.get());
+
+      schoolEntity.setSchoolNumber(schoolNumberGenerationService.generateSchoolNumber(district.get().getDistrictNumber(),
+              school.getFacilityTypeCode(), school.getSchoolCategoryCode(),
+              school.getIndependentAuthorityId()));
     }
 
-    if (district.isPresent()) {
-      if (school.getSchoolNumber() != null) {
-        List<SchoolEntity> schools = schoolRepository.findBySchoolNumberAndDistrictID(
-            school.getSchoolNumber(), UUID.fromString(school.getDistrictId()));
-        if (!schools.isEmpty()) {
-          throw new ConflictFoundException("School Number already exists for this district.");
-        }
-        schoolEntity.setSchoolNumber(school.getSchoolNumber());
-      } else {
-        schoolEntity.setSchoolNumber(
-            schoolNumberGenerationService.generateSchoolNumber(district.get().getDistrictNumber(),
-                school.getFacilityTypeCode(), school.getSchoolCategoryCode(),
-                school.getIndependentAuthorityId()));
-      }
-
-    }
     schoolEntity.getAddresses().stream().forEach(address -> {
       RequestUtil.setAuditColumnsForAddress(address);
       TransformUtil.uppercaseFields(address);
@@ -413,25 +402,14 @@ public class SchoolService {
   public Pair<MoveSchoolData, InstituteEvent> moveSchool(MoveSchoolData moveSchoolData)
       throws JsonProcessingException {
 
-    Boolean schoolNumberExistsInDistrict = schoolRepository.existsBySchoolNumberAndDistrictID(
-        moveSchoolData.getToSchool().getSchoolNumber(),
-        UUID.fromString(moveSchoolData.getToSchool().getDistrictId()));
-
-    if (Boolean.TRUE.equals(schoolNumberExistsInDistrict)) {
-      log.info("School number {} exists in district {} setting school number to null",
-          moveSchoolData.getToSchool().getSchoolNumber(),
-          moveSchoolData.getToSchool().getDistrictId());
-      moveSchoolData.getToSchool().setSchoolNumber(null);
-    }
-
-    SchoolEntity movedSchool = createSchoolHelper(moveSchoolData.getToSchool());
-    log.info("School created for move schoolId :: {}", movedSchool.getSchoolId());
-
     val schoolEntityOptional = schoolRepository.findById(
-        UUID.fromString(moveSchoolData.getFromSchoolId()));
+            UUID.fromString(moveSchoolData.getFromSchoolId()));
     SchoolEntity fromSchoolEntity = schoolEntityOptional.orElseThrow(
-        () -> new EntityNotFoundException(SchoolEntity.class, FROM_SCHOOL_ID_ATTR,
-            moveSchoolData.getFromSchoolId()));
+            () -> new EntityNotFoundException(SchoolEntity.class, FROM_SCHOOL_ID_ATTR,
+                    moveSchoolData.getFromSchoolId()));
+
+    SchoolEntity movedSchool = moveSchoolHelper(moveSchoolData.getToSchool(), SchoolMapper.mapper.toStructure(fromSchoolEntity));
+    log.info("School created for move schoolId :: {}", movedSchool.getSchoolId());
 
     fromSchoolEntity.setClosedDate(LocalDateTime.parse(moveSchoolData.getMoveDate()));
     fromSchoolEntity.setUpdateUser(moveSchoolData.getToSchool().getCreateUser());
@@ -459,5 +437,52 @@ public class SchoolService {
         movedSchool.getUpdateUser(), movedSchool.getUpdateUser(),
         JsonUtil.getJsonStringFromObject(moveSchoolData), MOVE_SCHOOL, SCHOOL_MOVED);
     return Pair.of(moveSchoolData, instituteEvent);
+  }
+
+  private SchoolEntity moveSchoolHelper(School school, School existingSchool) {
+    var schoolEntity = SchoolMapper.mapper.toModel(school);
+    Optional<DistrictTombstoneEntity> district = districtTombstoneRepository.findById(
+            UUID.fromString(school.getDistrictId()));
+    if (district.isPresent()) {
+      schoolEntity.setDistrictEntity(district.get());
+    }
+
+    if (district.isPresent()) {
+      List<SchoolEntity> schools = schoolRepository.findBySchoolNumberAndDistrictID(
+              school.getSchoolNumber(), UUID.fromString(school.getDistrictId()));
+
+      if(school.getSchoolCategoryCode().equals(existingSchool.getSchoolCategoryCode()) &&
+              (school.getSchoolCategoryCode().equals(Constants.INDEPENDENT) || school.getSchoolCategoryCode().equals(Constants.NONINDEPENDENT)) && schools.isEmpty()) {
+        schoolEntity.setSchoolNumber(school.getSchoolNumber());
+      } else {
+        schoolEntity.setSchoolNumber(
+                schoolNumberGenerationService.generateSchoolNumber(district.get().getDistrictNumber(),
+                        school.getFacilityTypeCode(), school.getSchoolCategoryCode(),
+                        school.getIndependentAuthorityId()));
+      }
+    }
+    schoolEntity.getAddresses().stream().forEach(address -> {
+      RequestUtil.setAuditColumnsForAddress(address);
+      TransformUtil.uppercaseFields(address);
+      address.setSchoolEntity(schoolEntity);
+    });
+
+    schoolEntity.getGrades().stream().forEach(grade -> {
+      RequestUtil.setAuditColumnsForGrades(grade);
+      TransformUtil.uppercaseFields(grade);
+      grade.setSchoolEntity(schoolEntity);
+    });
+
+    schoolEntity.getNeighborhoodLearning().stream().forEach(neighborhoodLearning -> {
+      RequestUtil.setAuditColumnsForNeighborhoodLearning(neighborhoodLearning);
+      TransformUtil.uppercaseFields(neighborhoodLearning);
+      neighborhoodLearning.setSchoolEntity(schoolEntity);
+    });
+
+    TransformUtil.uppercaseFields(schoolEntity);
+    schoolRepository.save(schoolEntity);
+    schoolHistoryService.createSchoolHistory(schoolEntity, school.getCreateUser());
+
+    return schoolEntity;
   }
 }

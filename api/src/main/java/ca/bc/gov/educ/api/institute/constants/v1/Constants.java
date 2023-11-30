@@ -16,4 +16,6 @@ public final class Constants {
     public static final String TWENTYFIVE = "25";
     public static final String UPPERBOUND = "999";
     public static final String DEFAULTNUMBER = "000";
+    public static final String INDEPENDENT="INDEPEND";
+    public static final String NONINDEPENDENT="FED_BAND";
 }
