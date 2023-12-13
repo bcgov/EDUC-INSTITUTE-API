@@ -451,7 +451,8 @@ public class SchoolService {
       List<SchoolEntity> schools = schoolRepository.findBySchoolNumberAndDistrictID(
               school.getSchoolNumber(), UUID.fromString(school.getDistrictId()));
 
-      if(school.getSchoolCategoryCode().equals(existingSchool.getSchoolCategoryCode()) && schools.isEmpty()) {
+      if(school.getSchoolCategoryCode().equals(existingSchool.getSchoolCategoryCode())
+              && school.getFacilityTypeCode().equals(existingSchool.getFacilityTypeCode()) && schools.isEmpty()) {
         schoolEntity.setSchoolNumber(school.getSchoolNumber());
       } else {
         schoolEntity.setSchoolNumber(
