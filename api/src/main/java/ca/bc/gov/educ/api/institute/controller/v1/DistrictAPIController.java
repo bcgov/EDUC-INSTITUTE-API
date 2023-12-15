@@ -111,6 +111,7 @@ public class DistrictAPIController implements DistrictAPIEndpoint {
 
   @Override
   public District updateDistrict(UUID id, District district) throws JsonProcessingException {
+    log.info("Incoming district update user: " + district.getUpdateUser());
     validatePayload(() -> this.districtPayloadValidator.validateUpdatePayload(district));
     RequestUtil.setAuditColumnsForUpdate(district);
     var pair = districtService.updateDistrict(district, id);
