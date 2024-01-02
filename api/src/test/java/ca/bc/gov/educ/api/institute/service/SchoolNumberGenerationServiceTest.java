@@ -1,15 +1,16 @@
 package ca.bc.gov.educ.api.institute.service;
 
-import ca.bc.gov.educ.api.institute.InstituteApiResourceApplication;
 import ca.bc.gov.educ.api.institute.exception.InvalidParameterException;
 import ca.bc.gov.educ.api.institute.exception.PreConditionFailedException;
 import ca.bc.gov.educ.api.institute.model.v1.DistrictTombstoneEntity;
 import ca.bc.gov.educ.api.institute.model.v1.FacilityTypeCodeEntity;
 import ca.bc.gov.educ.api.institute.model.v1.SchoolCategoryCodeEntity;
 import ca.bc.gov.educ.api.institute.model.v1.SchoolEntity;
-import ca.bc.gov.educ.api.institute.repository.v1.*;
+import ca.bc.gov.educ.api.institute.repository.v1.DistrictTombstoneRepository;
+import ca.bc.gov.educ.api.institute.repository.v1.FacilityTypeCodeRepository;
+import ca.bc.gov.educ.api.institute.repository.v1.SchoolCategoryCodeRepository;
+import ca.bc.gov.educ.api.institute.repository.v1.SchoolRepository;
 import ca.bc.gov.educ.api.institute.service.v1.SchoolNumberGenerationService;
-
 import lombok.extern.slf4j.Slf4j;
 import org.junit.After;
 import org.junit.Before;
@@ -109,11 +110,11 @@ public class SchoolNumberGenerationServiceTest {
     @Test
     public void testCreateSchool_givenSchoolCodeINDEPEND_givenFacilityCodeALT_PROGS_shouldCreateValidSchoolNumber() {
         SchoolCategoryCodeEntity schoolCategoryCodeEntity = schoolCategoryCodeRepository.save(createSchoolCategoryCodeData("INDEPEND"));
-        FacilityTypeCodeEntity facilityTypeCodeEntity = facilityTypeCodeRepository.save(createFacilityTypeCodeData("ALT_PROGS"));
+        FacilityTypeCodeEntity facilityTypeCodeEntity = facilityTypeCodeRepository.save(createFacilityTypeCodeData("DIST_LEARN"));
         String schoolNumber = schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
         assertThat(schoolNumber)
                 .isNotEmpty()
-                .isEqualTo("99000");
+                .isEqualTo("96000");
     }
 
     @Test
@@ -368,7 +369,7 @@ public class SchoolNumberGenerationServiceTest {
         var schoolEntity = this.createSchoolDataWithSchoolNumber("99999","POST_SEC", "POST_SEC");
         schoolEntity.setDistrictEntity(dist);
         this.schoolRepository.save(schoolEntity);
-        String schoolNumber = schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
+        schoolNumberGenerationService.generateSchoolNumber("003", facilityTypeCodeEntity.getFacilityTypeCode(), schoolCategoryCodeEntity.getSchoolCategoryCode(), null);
     }
     @Test
     public void testCreateSchool_givenSchoolCodePOST_SEC_givenFacilityCodePOST_shouldGetNextSchoolNumber() {
