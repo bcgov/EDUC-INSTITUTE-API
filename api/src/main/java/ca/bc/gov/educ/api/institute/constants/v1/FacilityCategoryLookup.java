@@ -4,17 +4,18 @@ import java.util.Arrays;
 
 public enum FacilityCategoryLookup {
 
-    ENTRY1(new String[] {"DIST_LEARN", "DISTONLINE", "ALT_PROGS"}, new String[]{Constants.PUBLIC, Constants.YUKON, "INDEPEND"}),
-    ENTRY2(new String[] {Constants.STANDARD}, new String[]{Constants.PUBLIC, Constants.YUKON}),
-    ENTRY3(new String[] {Constants.STANDARD}, new String[]{"OFFSHORE", "INDEPEND"}),
-    ENTRY4(new String[] {Constants.STANDARD}, new String[]{"INDP_FNS", "FED_BAND"}),
-    ENTRY5(new String[] {"CONT_ED"}, new String[]{Constants.PUBLIC}),
-    ENTRY6(new String[] {"STRONG_CEN", "STRONG_OUT", "JUSTB4PRO"}, new String[]{"EAR_LEARN"}),
-    ENTRY7(new String[] {"SHORT_PRP", "LONG_PRP" }, new String[]{Constants.PUBLIC}),
-    ENTRY8(new String[] {"SUMMER"}, new String[]{Constants.PUBLIC, Constants.YUKON}),
-    ENTRY9(new String[] {"YOUTH"}, new String[]{Constants.PUBLIC}),
-    ENTRY10(new String[] {"POST_SEC"}, new String[]{"POST_SEC"})
-    ;
+    ENTRY1(new String[] {FacilityTypeCodes.DIST_LEARN.getCode(), FacilityTypeCodes.DISTONLINE.getCode(), FacilityTypeCodes.ALT_PROGS.getCode()},
+            new String[]{SchoolCategoryCodes.PUBLIC.getCode(), SchoolCategoryCodes.YUKON.getCode()}),
+    ENTRY2(new String[] {FacilityTypeCodes.STANDARD.getCode()}, new String[]{SchoolCategoryCodes.PUBLIC.getCode(), SchoolCategoryCodes.YUKON.getCode()}),
+    ENTRY3(new String[] {FacilityTypeCodes.DIST_LEARN.getCode(), FacilityTypeCodes.STANDARD.getCode()}, new String[]{SchoolCategoryCodes.OFFSHORE.getCode(), SchoolCategoryCodes.INDEPEND.getCode()}),
+    ENTRY4(new String[] {FacilityTypeCodes.STANDARD.getCode()}, new String[]{SchoolCategoryCodes.INDP_FNS.getCode(), SchoolCategoryCodes.FED_BAND.getCode()}),
+    ENTRY5(new String[] {FacilityTypeCodes.CONT_ED.getCode()}, new String[]{SchoolCategoryCodes.PUBLIC.getCode()}),
+    ENTRY6(new String[] {FacilityTypeCodes.STRONG_CEN.getCode(), FacilityTypeCodes.STRONG_OUT.getCode(), FacilityTypeCodes.JUSTB4PRO.getCode()},
+            new String[]{SchoolCategoryCodes.EAR_LEARN.getCode()}),
+    ENTRY7(new String[] {FacilityTypeCodes.SHORT_PRP.getCode(), FacilityTypeCodes.LONG_PRP.getCode() }, new String[]{SchoolCategoryCodes.PUBLIC.getCode()}),
+    ENTRY8(new String[] {FacilityTypeCodes.SUMMER.getCode()}, new String[]{SchoolCategoryCodes.PUBLIC.getCode(), SchoolCategoryCodes.YUKON.getCode()}),
+    ENTRY9(new String[] {FacilityTypeCodes.YOUTH.getCode()}, new String[]{SchoolCategoryCodes.PUBLIC.getCode()}),
+    ENTRY10(new String[] {FacilityTypeCodes.POST_SEC.getCode()}, new String[]{SchoolCategoryCodes.POST_SEC.getCode()});
 
     private final String[] facilityCodes;
     private final String[] mappedCategories;
