@@ -1,10 +1,7 @@
 package ca.bc.gov.educ.api.institute.endpoint.v1;
 
 import ca.bc.gov.educ.api.institute.constants.v1.URL;
-import ca.bc.gov.educ.api.institute.struct.v1.District;
-import ca.bc.gov.educ.api.institute.struct.v1.DistrictContact;
-import ca.bc.gov.educ.api.institute.struct.v1.DistrictHistory;
-import ca.bc.gov.educ.api.institute.struct.v1.Note;
+import ca.bc.gov.educ.api.institute.struct.v1.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -69,7 +66,7 @@ public interface DistrictAPIEndpoint {
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
   @Transactional(readOnly = true)
   @Tag(name = "District Entity", description = "Endpoints for district entity.")
-  @Schema(name = "District", implementation = District.class)
+  @Schema(name = "DistrictTombstone", implementation = DistrictTombstone.class)
   List<District> getAllDistricts();
 
   @GetMapping("/paginated")
