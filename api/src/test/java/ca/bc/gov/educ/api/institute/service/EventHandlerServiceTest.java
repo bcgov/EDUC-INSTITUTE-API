@@ -1,30 +1,12 @@
 package ca.bc.gov.educ.api.institute.service;
 
-import static ca.bc.gov.educ.api.institute.constants.v1.EventOutcome.AUTHORITY_FOUND;
-import static ca.bc.gov.educ.api.institute.constants.v1.EventOutcome.AUTHORITY_NOT_FOUND;
-import static ca.bc.gov.educ.api.institute.constants.v1.EventOutcome.SCHOOL_CREATED;
-import static ca.bc.gov.educ.api.institute.constants.v1.EventOutcome.SCHOOL_MOVED;
-import static ca.bc.gov.educ.api.institute.constants.v1.EventOutcome.SCHOOL_UPDATED;
-import static ca.bc.gov.educ.api.institute.constants.v1.EventStatus.MESSAGE_PUBLISHED;
-import static ca.bc.gov.educ.api.institute.constants.v1.EventType.*;
-import static org.assertj.core.api.Assertions.assertThat;
-
 import ca.bc.gov.educ.api.institute.constants.v1.Topics;
-import ca.bc.gov.educ.api.institute.exception.ConflictFoundException;
 import ca.bc.gov.educ.api.institute.exception.EntityNotFoundException;
 import ca.bc.gov.educ.api.institute.filter.FilterOperation;
 import ca.bc.gov.educ.api.institute.mapper.v1.IndependentAuthorityMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.SchoolMapper;
-import ca.bc.gov.educ.api.institute.model.v1.DistrictTombstoneEntity;
-import ca.bc.gov.educ.api.institute.model.v1.IndependentAuthorityEntity;
-import ca.bc.gov.educ.api.institute.model.v1.InstituteEvent;
-import ca.bc.gov.educ.api.institute.model.v1.SchoolAddressEntity;
-import ca.bc.gov.educ.api.institute.model.v1.SchoolEntity;
-import ca.bc.gov.educ.api.institute.repository.v1.DistrictTombstoneRepository;
-import ca.bc.gov.educ.api.institute.repository.v1.IndependentAuthorityRepository;
-import ca.bc.gov.educ.api.institute.repository.v1.InstituteEventRepository;
-import ca.bc.gov.educ.api.institute.repository.v1.SchoolMoveRepository;
-import ca.bc.gov.educ.api.institute.repository.v1.SchoolRepository;
+import ca.bc.gov.educ.api.institute.model.v1.*;
+import ca.bc.gov.educ.api.institute.repository.v1.*;
 import ca.bc.gov.educ.api.institute.service.v1.EventHandlerService;
 import ca.bc.gov.educ.api.institute.struct.v1.*;
 import ca.bc.gov.educ.api.institute.util.JsonUtil;
@@ -33,18 +15,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import java.io.IOException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.ExecutionException;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.After;
 import org.junit.Before;
@@ -56,6 +26,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
+import java.util.concurrent.ExecutionException;
+
+import static ca.bc.gov.educ.api.institute.constants.v1.EventOutcome.*;
+import static ca.bc.gov.educ.api.institute.constants.v1.EventStatus.MESSAGE_PUBLISHED;
+import static ca.bc.gov.educ.api.institute.constants.v1.EventType.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
 @ActiveProfiles("test")
@@ -81,7 +64,6 @@ public class EventHandlerServiceTest {
   @Autowired
   private EventHandlerService eventHandlerServiceUnderTest;
   private static final IndependentAuthorityMapper independentAuthorityMapper = IndependentAuthorityMapper.mapper;
-  private static final SchoolMapper schoolMapper = SchoolMapper.mapper;
   private final boolean isSynchronous = false;
   @Before
   public void setUp() {
@@ -97,7 +79,7 @@ public class EventHandlerServiceTest {
   }
 
   @Test
-  public void testHandleEvent_givenEventTypeGET_AUTHORITY__whenNoStudentExist_shouldHaveEventOutcomeAUTHORITY_NOT_FOUND() throws JsonProcessingException, IOException {
+  public void testHandleEvent_givenEventTypeGET_AUTHORITY__whenNoStudentExist_shouldHaveEventOutcomeAUTHORITY_NOT_FOUND() throws IOException {
     var sagaId = UUID.randomUUID();
     final Event event = Event.builder().eventType(GET_AUTHORITY).sagaId(sagaId).replyTo(INSTITUTE_API_TOPIC).eventPayload(JsonUtil.getJsonStringFromObject(UUID.randomUUID().toString())).build();
     byte[] response = eventHandlerServiceUnderTest.handleGetAuthorityEvent(event, isSynchronous);
@@ -144,7 +126,7 @@ public class EventHandlerServiceTest {
 
   @Test
   public void testHandleEvent_givenEventTypeGET_PAGINATED_SCHOOLS_BY_CRITERIA__DoesExistAndSynchronousNatsMessage_shouldRespondWithData() throws IOException, ExecutionException, InterruptedException {
-    var schoolEntity = this.createNewSchoolData(null, "PUBLIC", "DISTONLINE");;
+    var schoolEntity = this.createNewSchoolData(null, "PUBLIC", "DISTONLINE");
     schoolRepository.save(schoolEntity);
 
     SearchCriteria criteriaSchoolNumber = SearchCriteria.builder().key("schoolNumber").operation(FilterOperation.EQUAL).value(schoolEntity.getSchoolNumber()).valueType(ValueType.STRING).build();
@@ -189,7 +171,7 @@ public class EventHandlerServiceTest {
   }
 
   @Test
-  public void testHandleEvent_givenEventTypeCREATE_SCHOOL_WITH_NEW_SCHOOL_NUMBER__DoesExistAndSynchronousNatsMessage_shouldRespondWithData() throws IOException, ExecutionException, InterruptedException {
+  public void testHandleEvent_givenEventTypeCREATE_SCHOOL_WITH_NEW_SCHOOL_NUMBER__DoesExistAndSynchronousNatsMessage_shouldRespondWithData() throws IOException {
     final DistrictTombstoneEntity dist = this.districtTombstoneRepository.save(this.createDistrictData());
 
     var schoolEntity = this.createNewSchoolData(null, "PUBLIC", "DISTONLINE");
@@ -219,8 +201,8 @@ public class EventHandlerServiceTest {
   }
 
   @Test(expected = EntityNotFoundException.class)
-  public void testHandleEvent_givenEventTypeCREATE_SCHOOL_WithNoDistrict__DoesExistAndSynchronousNatsMessage_shouldRespondWithData() throws IOException, ExecutionException, InterruptedException {
-    final DistrictTombstoneEntity dist = this.districtTombstoneRepository.save(this.createDistrictData());
+  public void testHandleEvent_givenEventTypeCREATE_SCHOOL_WithNoDistrict__DoesExistAndSynchronousNatsMessage_shouldRespondWithData() throws IOException {
+    this.districtTombstoneRepository.save(this.createDistrictData());
 
     var schoolEntity = this.createNewSchoolData(null, "PUBLIC", "DISTONLINE");
 
@@ -249,7 +231,7 @@ public class EventHandlerServiceTest {
   }
 
   @Test
-  public void testHandleEvent_givenEventTypeCREATE_SCHOOL_WITH_EXISTING_SCHOOL_NUMBER__DoesExistAndSynchronousNatsMessage_shouldRespondWithData() throws IOException, ExecutionException, InterruptedException {
+  public void testHandleEvent_givenEventTypeCREATE_SCHOOL_WITH_EXISTING_SCHOOL_NUMBER__DoesExistAndSynchronousNatsMessage_shouldRespondWithData() throws IOException {
     final DistrictTombstoneEntity dist = this.districtTombstoneRepository.save(this.createDistrictData());
 
     var schoolEntity = this.createNewSchoolData("99000", "PUBLIC", "DISTONLINE");
@@ -277,7 +259,7 @@ public class EventHandlerServiceTest {
     assertThat(schoolCreatedEvent.get().getEventOutcome()).isEqualTo(SCHOOL_CREATED.toString());
   }
   @Test
-  public void testHandleEvent_givenEventTypeUPDATE_SCHOOL__DoesExistAndSynchronousNatsMessage_shouldRespondWithData() throws IOException, ExecutionException, InterruptedException {
+  public void testHandleEvent_givenEventTypeUPDATE_SCHOOL__DoesExistAndSynchronousNatsMessage_shouldRespondWithData() throws IOException {
     final DistrictTombstoneEntity dist = this.districtTombstoneRepository.save(this.createDistrictData());
     var schoolEntity = this.createNewSchoolData("99000", "PUBLIC", "DISTONLINE");
     schoolEntity.setDistrictEntity(dist);
@@ -301,7 +283,7 @@ public class EventHandlerServiceTest {
   }
 
   @Test
-  public void testHandleEvent_givenEventTypeMOVE_SCHOOL__DoesExistAndSynchronousNatsMessage_shouldRespondWithDataAndCreateMoveHistory() throws IOException, ExecutionException, InterruptedException {
+  public void testHandleEvent_givenEventTypeMOVE_SCHOOL__DoesExistAndSynchronousNatsMessage_shouldRespondWithDataAndCreateMoveHistory() throws IOException {
     final DistrictTombstoneEntity dist = this.districtTombstoneRepository.save(this.createDistrictData());
     SchoolEntity toSchoolEntity = this.createNewSchoolData("99000", "PUBLIC", "DISTONLINE");
     SchoolEntity fromSchoolEntity = this.createNewSchoolData("99000", "PUBLIC", "DISTONLINE");
@@ -364,7 +346,7 @@ public class EventHandlerServiceTest {
   }
 
   @Test(expected = EntityNotFoundException.class)
-  public void testHandleEvent_givenEventTypeMOVE_SCHOOL_DistrictNotFound__DoesExistAndSynchronousNatsMessage_shouldRespondWithDataAndCreateMoveHistory() throws IOException, ExecutionException, InterruptedException {
+  public void testHandleEvent_givenEventTypeMOVE_SCHOOL_DistrictNotFound__DoesExistAndSynchronousNatsMessage_shouldRespondWithDataAndCreateMoveHistory() throws IOException {
     final DistrictTombstoneEntity dist = this.districtTombstoneRepository.save(this.createDistrictData());
     SchoolEntity toSchoolEntity = this.createNewSchoolData("99000", "PUBLIC", "DISTONLINE");
     SchoolEntity fromSchoolEntity = this.createNewSchoolData("99000", "PUBLIC", "DISTONLINE");
@@ -401,7 +383,7 @@ public class EventHandlerServiceTest {
   }
 
   @Test
-  public void testHandleEvent_givenEventTypeMOVE_SCHOOL_whereSchoolNumberInNewDistrictIsAvailable__DoesExistAndSynchronousNatsMessage_shouldRespondWithDataAndCreateMoveHistory() throws IOException, ExecutionException, InterruptedException {
+  public void testHandleEvent_givenEventTypeMOVE_SCHOOL_whereSchoolNumberInNewDistrictIsAvailable__DoesExistAndSynchronousNatsMessage_shouldRespondWithDataAndCreateMoveHistory() throws IOException {
     final DistrictTombstoneEntity dist = this.districtTombstoneRepository.save(this.createDistrictData());
     SchoolEntity toSchoolEntity = this.createNewSchoolData("99000", "PUBLIC", "DISTONLINE");
     SchoolEntity fromSchoolEntity = this.createNewSchoolData("99100", "PUBLIC", "DISTONLINE");
@@ -461,7 +443,7 @@ public class EventHandlerServiceTest {
   }
 
   @Test
-  public void testHandleEvent_givenEventTypeMOVE_SCHOOL_withNewSchoolCategory__DoesExistAndSynchronousNatsMessage_shouldRespondWithDataAndCreateMoveHistory() throws IOException, ExecutionException, InterruptedException {
+  public void testHandleEvent_givenEventTypeMOVE_SCHOOL_withNewSchoolCategory__DoesExistAndSynchronousNatsMessage_shouldRespondWithDataAndCreateMoveHistory() throws IOException {
     final DistrictTombstoneEntity dist = this.districtTombstoneRepository.save(this.createDistrictData());
     SchoolEntity toSchoolEntity = this.createNewSchoolData("99000", "EAR_LEARN", "STRONG_CEN");
     SchoolEntity fromSchoolEntity = this.createNewSchoolData("99100", "PUBLIC", "DISTONLINE");
@@ -522,7 +504,7 @@ public class EventHandlerServiceTest {
   }
 
   @Test
-  public void testHandleEvent_givenEventTypeMOVE_SCHOOL_withIndependentSchoolCategory__DoesExistAndSynchronousNatsMessage_shouldRespondWithDataAndCreateMoveHistory() throws IOException, ExecutionException, InterruptedException {
+  public void testHandleEvent_givenEventTypeMOVE_SCHOOL_withIndependentSchoolCategory__DoesExistAndSynchronousNatsMessage_shouldRespondWithDataAndCreateMoveHistory() throws IOException {
     final DistrictTombstoneEntity dist = this.districtTombstoneRepository.save(this.createDistrictData());
     SchoolEntity toSchoolEntity = this.createNewSchoolData("96100", "INDEPEND", "STANDARD");
     SchoolEntity fromSchoolEntity = this.createNewSchoolData("96100", "INDEPEND", "STANDARD");
@@ -583,7 +565,7 @@ public class EventHandlerServiceTest {
   }
 
   @Test
-  public void testHandleEvent_givenEventTypeMOVE_SCHOOL_withNonIndependentSchoolCategory__DoesExistAndSynchronousNatsMessage_shouldRespondWithDataAndCreateMoveHistory() throws IOException, ExecutionException, InterruptedException {
+  public void testHandleEvent_givenEventTypeMOVE_SCHOOL_withNonIndependentSchoolCategory__DoesExistAndSynchronousNatsMessage_shouldRespondWithDataAndCreateMoveHistory() throws IOException {
     final DistrictTombstoneEntity dist = this.districtTombstoneRepository.save(this.createDistrictData());
     SchoolEntity toSchoolEntity = this.createNewSchoolData("97100", "FED_BAND", "STANDARD");
     SchoolEntity fromSchoolEntity = this.createNewSchoolData("97100", "FED_BAND", "STANDARD");
@@ -644,7 +626,7 @@ public class EventHandlerServiceTest {
   }
 
   @Test
-  public void testHandleEvent_givenEventTypeMOVE_SCHOOL_withIndependentSchoolCategoryChange__DoesExistAndSynchronousNatsMessage_shouldRespondWithDataAndCreateMoveHistory() throws IOException, ExecutionException, InterruptedException {
+  public void testHandleEvent_givenEventTypeMOVE_SCHOOL_withIndependentSchoolCategoryChange__DoesExistAndSynchronousNatsMessage_shouldRespondWithDataAndCreateMoveHistory() throws IOException {
     final DistrictTombstoneEntity dist = this.districtTombstoneRepository.save(this.createDistrictData());
     SchoolEntity toSchoolEntity = this.createNewSchoolData("97100", "FED_BAND", "STANDARD");
     SchoolEntity fromSchoolEntity = this.createNewSchoolData("96100", "OFFSHORE", "STANDARD");
@@ -705,9 +687,9 @@ public class EventHandlerServiceTest {
   }
 
   @Test
-  public void testHandleEvent_givenEventTypeMOVE_SCHOOL_withIndependentSchoolFacilityChange__DoesExistAndSynchronousNatsMessage_shouldRespondWithDataAndCreateMoveHistory() throws IOException, ExecutionException, InterruptedException {
+  public void testHandleEvent_givenEventTypeMOVE_SCHOOL_withIndependentSchoolFacilityChange__DoesExistAndSynchronousNatsMessage_shouldRespondWithDataAndCreateMoveHistory() throws IOException {
     final DistrictTombstoneEntity dist = this.districtTombstoneRepository.save(this.createDistrictData());
-    SchoolEntity toSchoolEntity = this.createNewSchoolData("97100", "INDEPEND", "DISTONLINE");
+    SchoolEntity toSchoolEntity = this.createNewSchoolData("97100", "INDEPEND", "DIST_LEARN");
     SchoolEntity fromSchoolEntity = this.createNewSchoolData("96100", "INDEPEND", "STANDARD");
     LocalDateTime moveDate = LocalDateTime.now().plusDays(1).truncatedTo(ChronoUnit.MILLIS);
 
@@ -744,8 +726,8 @@ public class EventHandlerServiceTest {
     //check that data in event payload is updated
     MoveSchoolData moveSchoolEventData = JsonUtil.getJsonObjectFromString(MoveSchoolData.class, event.getEventPayload());
     assertThat(moveSchoolEventData.getToSchool().getSchoolId()).isNotNull();
-    assertThat(moveSchoolEventData.getToSchool().getSchoolNumber()).isEqualTo("99000"); //new school number since school number already exists in district
-    assertThat(moveSchoolEventData.getToSchool().getSchoolNumber()).startsWith("99");
+    assertThat(moveSchoolEventData.getToSchool().getSchoolNumber()).isEqualTo("96000"); //new school number since school number already exists in district
+    assertThat(moveSchoolEventData.getToSchool().getSchoolNumber()).startsWith("96");
 
     //2 schools = 1 that was created + 1 that was closed for the move.
     assertThat(schoolRepository.findAll()).hasSize(2);
@@ -766,7 +748,7 @@ public class EventHandlerServiceTest {
   }
 
   @Test
-  public void testHandleEvent_givenEventTypeMOVE_SCHOOL__ToSchoolIdDoesNotExist_shouldThrowEntitynotFoundException() throws IOException, ExecutionException, InterruptedException {
+  public void testHandleEvent_givenEventTypeMOVE_SCHOOL__ToSchoolIdDoesNotExist_shouldThrowEntitynotFoundException() throws IOException {
     final DistrictTombstoneEntity dist = this.districtTombstoneRepository.save(this.createDistrictData());
     SchoolEntity toSchoolEntity = this.createNewSchoolData("99000", "PUBLIC", "DISTONLINE");
     LocalDateTime moveDate = LocalDateTime.now().plusDays(1).truncatedTo(ChronoUnit.MILLIS);
@@ -836,8 +818,6 @@ public class EventHandlerServiceTest {
   }
 
   private MoveSchoolData createMoveSchoolData(School toSchool, UUID fromSchoolId, LocalDateTime moveDate) {
-    MoveSchoolData moveSchoolData = MoveSchoolData.builder().toSchool(toSchool).fromSchoolId(fromSchoolId.toString()).moveDate(moveDate.toString()).build();
-
-    return moveSchoolData;
+    return MoveSchoolData.builder().toSchool(toSchool).fromSchoolId(fromSchoolId.toString()).moveDate(moveDate.toString()).build();
   }
 }
