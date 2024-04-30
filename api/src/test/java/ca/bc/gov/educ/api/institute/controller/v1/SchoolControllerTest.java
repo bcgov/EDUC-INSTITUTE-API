@@ -3,7 +3,6 @@ package ca.bc.gov.educ.api.institute.controller.v1;
 import ca.bc.gov.educ.api.institute.InstituteApiResourceApplication;
 import ca.bc.gov.educ.api.institute.constants.v1.URL;
 import ca.bc.gov.educ.api.institute.filter.FilterOperation;
-import ca.bc.gov.educ.api.institute.mapper.v1.CodeTableMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.SchoolMapper;
 import ca.bc.gov.educ.api.institute.model.v1.*;
 import ca.bc.gov.educ.api.institute.repository.v1.*;
@@ -55,8 +54,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 public class SchoolControllerTest {
   protected final static ObjectMapper objectMapper = new ObjectMapper();
-  private static final CodeTableMapper mapper = CodeTableMapper.mapper;
-  private static final SchoolMapper schoolMapper = SchoolMapper.mapper;
 
   @Autowired
   private MockMvc mockMvc;

@@ -198,7 +198,7 @@ public class CodeTableControllerTest {
   }
 
   private SchoolGradeCodeEntity createSchoolGradeCodeData() {
-    return SchoolGradeCodeEntity.builder().schoolGradeCode("01").description("First Grade")
+    return SchoolGradeCodeEntity.builder().schoolGradeCode("GRADE01").description("First Grade")
       .effectiveDate(LocalDateTime.now()).expiryDate(LocalDateTime.MAX).displayOrder(1).label("First").createDate(LocalDateTime.now())
       .updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
   }
@@ -272,7 +272,7 @@ public class CodeTableControllerTest {
     final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_INSTITUTE_CODES";
     final var mockAuthority = oidcLogin().authorities(grantedAuthority);
     this.mockMvc.perform(get(URL.BASE_URL + URL.GRADE_CODES).with(mockAuthority)).andDo(print()).andExpect(status().isOk())
-      .andExpect(MockMvcResultMatchers.jsonPath("$[0].schoolGradeCode").value("01"));
+      .andExpect(MockMvcResultMatchers.jsonPath("$[0].schoolGradeCode").value("GRADE01"));
   }
 
   @Test

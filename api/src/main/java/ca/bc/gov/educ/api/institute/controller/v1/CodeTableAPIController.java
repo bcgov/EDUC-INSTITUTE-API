@@ -31,6 +31,11 @@ public class CodeTableAPIController implements CodeTableAPIEndpoint {
   }
 
   @Override
+  public List<SchoolFundingGroupCode> getIndependentSchoolFundingGroupCodes() {
+    return getService().getAllSchoolFundingGroupCodes().stream().map(mapper::toStructure).toList();
+  }
+
+  @Override
   public List<ProvinceCode> getProvinceCodes() {
     return getService().getProvinceCodesList().stream().map(mapper::toStructure).collect(Collectors.toList());
   }
