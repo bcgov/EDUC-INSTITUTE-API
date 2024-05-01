@@ -5,7 +5,6 @@ import ca.bc.gov.educ.api.institute.mapper.StringMapper;
 import ca.bc.gov.educ.api.institute.model.v1.*;
 import ca.bc.gov.educ.api.institute.struct.v1.*;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 /**
@@ -92,4 +91,6 @@ public interface CodeTableMapper {
   SchoolReportingRequirementCodeEntity toModel(SchoolReportingRequirementCode structure);
 
   SchoolReportingRequirementCode toStructure(SchoolReportingRequirementCodeEntity entity);
+
+  SchoolFundingGroupCode toStructure(SchoolFundingGroupCodeEntity entity);
 }

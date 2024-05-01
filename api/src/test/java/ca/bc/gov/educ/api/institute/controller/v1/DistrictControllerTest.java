@@ -92,6 +92,9 @@ public class DistrictControllerTest {
   @Autowired
   CountryCodeRepository countryCodeRepository;
 
+  @Autowired
+  SchoolRepository schoolRepository;
+
   @BeforeEach
   public void setUp() {
     MockitoAnnotations.openMocks(this);
@@ -115,6 +118,7 @@ public class DistrictControllerTest {
     this.addressRepository.deleteAll();
     this.districtContactRepository.deleteAll();
     this.noteRepository.deleteAll();
+    this.schoolRepository.deleteAll();
     this.districtRepository.deleteAll();
     this.districtHistoryRepository.deleteAll();
     this.districtRegionCodeRepository.deleteAll();
