@@ -78,6 +78,14 @@ public class SchoolTombstoneEntity {
   @UpperCase
   private String facilityTypeCode;
 
+  @Column(name = "CAN_ISSUE_TRANSCRIPTS")
+  @UpperCase
+  private boolean canIssueTranscripts;
+
+  @Column(name = "CAN_ISSUE_CERTIFICATES")
+  @UpperCase
+  private boolean canIssueCertificates;
+
   @Basic
   @Column(name = "opened_date")
   private LocalDateTime openedDate;

@@ -72,4 +72,8 @@ public class SchoolTombstone extends BaseRequest implements Serializable {
 
   private String closedDate;
 
+  private boolean canIssueTranscripts;
+
+  private boolean canIssueCertificates;
+
 }
