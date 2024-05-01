@@ -537,6 +537,8 @@ public class SchoolControllerTest {
     mappedSchool.setGrades(List.of(createSchoolGrade()));
     mappedSchool.setNeighborhoodLearning(List.of(createNeighborhoodLearning()));
     mappedSchool.setAddresses(List.of(createSchoolAddress()));
+    mappedSchool.setCanIssueCertificates(true);
+    mappedSchool.setCanIssueTranscripts(true);
 
     this.mockMvc.perform(post(URL.BASE_URL_SCHOOL)
         .contentType(MediaType.APPLICATION_JSON)
@@ -547,6 +549,8 @@ public class SchoolControllerTest {
       .andExpect(status().isCreated())
       .andExpect(MockMvcResultMatchers.jsonPath("$.schoolNumber").exists())
       .andExpect(MockMvcResultMatchers.jsonPath("$.displayName").value(mappedSchool.getDisplayName()))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.canIssueCertificates").value(true))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.canIssueTranscripts").value(true))
       .andExpect(MockMvcResultMatchers.jsonPath("$.displayNameNoSpecialChars").value(mappedSchool.getDisplayNameNoSpecialChars()));
   }
 

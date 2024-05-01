@@ -73,6 +73,10 @@ public class School extends BaseRequest implements Serializable {
 
   private String closedDate;
 
+  private boolean canIssueTranscripts;
+
+  private boolean canIssueCertificates;
+
   @Valid
   private List<SchoolContact> contacts;
 

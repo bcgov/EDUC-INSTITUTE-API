@@ -74,6 +74,10 @@ public class SchoolHistory extends BaseRequest implements Serializable {
 
   private String closedDate;
 
+  private boolean canIssueTranscripts;
+
+  private boolean canIssueCertificates;
+
   @Valid
   private List<SchoolGradeSchoolHistory> schoolGrades;
 
