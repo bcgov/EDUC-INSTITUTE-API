@@ -87,11 +87,11 @@ public class SchoolHistoryEntity {
 
   @Column(name = "CAN_ISSUE_TRANSCRIPTS")
   @UpperCase
-  private boolean canIssueTranscripts;
+  private Boolean canIssueTranscripts;
 
   @Column(name = "CAN_ISSUE_CERTIFICATES")
   @UpperCase
-  private boolean canIssueCertificates;
+  private Boolean canIssueCertificates;
 
   @Basic
   @Column(name = "opened_date")
