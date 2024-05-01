@@ -95,6 +95,27 @@ curl -sX POST "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/client-scope
   -d "{\"description\": \"Delete scope for district address\",\"id\": \"DELETE_DISTRICT_ADDRESS\",\"name\": \"DELETE_DISTRICT_ADDRESS\",\"protocol\": \"openid-connect\",\"attributes\" : {\"include.in.token.scope\" : \"true\",\"display.on.consent.screen\" : \"false\"}}"
 
 echo
+echo Writing scope READ_SCHOOL_FUNDING_GROUP
+curl -sX POST "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/client-scopes" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TKN" \
+  -d "{\"description\": \"Read Independent School Funding Group\",\"id\": \"READ_SCHOOL_FUNDING_GROUP\",\"name\": \"READ_SCHOOL_FUNDING_GROUP\",\"protocol\": \"openid-connect\",\"attributes\" : {\"include.in.token.scope\" : \"true\",\"display.on.consent.screen\" : \"false\"}}"
+
+echo
+echo Writing scope WRITE_SCHOOL_FUNDING_GROUP
+curl -sX POST "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/client-scopes" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TKN" \
+  -d "{\"description\": \"Write Independent School Funding Group\",\"id\": \"WRITE_SCHOOL_FUNDING_GROUP\",\"name\": \"WRITE_SCHOOL_FUNDING_GROUP\",\"protocol\": \"openid-connect\",\"attributes\" : {\"include.in.token.scope\" : \"true\",\"display.on.consent.screen\" : \"false\"}}"
+
+echo
+echo Delete scope DELETE_SCHOOL_FUNDING_GROUP
+curl -sX POST "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/client-scopes" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TKN" \
+  -d "{\"description\": \"Delete Independent School Funding Group\",\"id\": \"DELETE_SCHOOL_FUNDING_GROUP\",\"name\": \"DELETE_SCHOOL_FUNDING_GROUP\",\"protocol\": \"openid-connect\",\"attributes\" : {\"include.in.token.scope\" : \"true\",\"display.on.consent.screen\" : \"false\"}}"
+
+echo
 echo Writing scope READ_DISTRICT_NOTE
 curl -sX POST "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/client-scopes" \
   -H "Content-Type: application/json" \
