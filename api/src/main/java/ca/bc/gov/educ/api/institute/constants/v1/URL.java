@@ -26,5 +26,5 @@ public final class URL {
   public static final String BASE_URL_DISTRICT="/api/v1/institute/district";
   public static final String BASE_URL_SCHOOL="/api/v1/institute/school";
   public static final String BASE_URL_AUTHORITY="/api/v1/institute/authority";
-  public static final String BASE_URL_SCHOOL_FUNDING="/api/v1/institute/schoolFundingGroup";
+  public static final String BASE_URL_SCHOOL_FUNDING="/api/v1/institute/school-funding-group";
 }
