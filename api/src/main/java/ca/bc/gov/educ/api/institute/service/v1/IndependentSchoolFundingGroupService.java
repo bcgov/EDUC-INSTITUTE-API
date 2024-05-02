@@ -88,7 +88,7 @@ public class IndependentSchoolFundingGroupService {
 
     var curIndependentSchoolFundingGroupEntity = independentSchoolFundingGroupEntity.get();
     var incomingIndependentSchoolFundingGroupEntity = independentSchoolFundingGroupMapper.toModel(independentSchoolFundingGroup);
-    BeanUtils.copyProperties(incomingIndependentSchoolFundingGroupEntity, curIndependentSchoolFundingGroupEntity, "schoolFundingGroupID, schoolID, createUser, createDate");
+    BeanUtils.copyProperties(incomingIndependentSchoolFundingGroupEntity, curIndependentSchoolFundingGroupEntity, "schoolFundingGroupID", "schoolID", "createUser", "createDate");
     TransformUtil.uppercaseFields(curIndependentSchoolFundingGroupEntity);
 
     var savedEntity = independentSchoolFundingGroupRepository.save(curIndependentSchoolFundingGroupEntity);

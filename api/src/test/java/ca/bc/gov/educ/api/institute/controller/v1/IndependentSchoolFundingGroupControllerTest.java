@@ -162,8 +162,12 @@ class IndependentSchoolFundingGroupControllerTest {
   void testUpdateSchoolFundingGroupByCreateUserWithHistory_ShouldReturnFundingGroup() throws Exception {
     final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_SCHOOL_FUNDING_GROUP";
     final OidcLoginRequestPostProcessor mockAuthority = oidcLogin().authorities(grantedAuthority);
+    final DistrictTombstoneEntity dist = this.districtTombstoneRepository.save(this.createDistrictData());
+    var schoolEntity = this.createSchoolData();
+    schoolEntity.setDistrictEntity(dist);
+    final SchoolEntity entity = this.schoolRepository.save(schoolEntity);
 
-    final var independentSchoolFundingGroupEntity = this.independentSchoolFundingGroupRepository.save(this.createMockIndependentSchoolFundingGroupEntity(UUID.randomUUID()));
+    final var independentSchoolFundingGroupEntity = this.independentSchoolFundingGroupRepository.save(this.createMockIndependentSchoolFundingGroupEntity(schoolEntity.getSchoolId()));
 
     var resultActions = this.mockMvc.perform(
                     get(URL.BASE_URL_SCHOOL_FUNDING + "/search/" + independentSchoolFundingGroupEntity.getSchoolID()).with(mockAuthority))
@@ -174,10 +178,7 @@ class IndependentSchoolFundingGroupControllerTest {
 
     assertThat(summary).hasSize(1);
 
-    final DistrictTombstoneEntity dist = this.districtTombstoneRepository.save(this.createDistrictData());
-    var schoolEntity = this.createSchoolData();
-    schoolEntity.setDistrictEntity(dist);
-    final SchoolEntity entity = this.schoolRepository.save(schoolEntity);
+
 
     independentSchoolFundingGroupEntity.setSchoolGradeCode("GRADE02");
     independentSchoolFundingGroupEntity.setSchoolID(entity.getSchoolId());
