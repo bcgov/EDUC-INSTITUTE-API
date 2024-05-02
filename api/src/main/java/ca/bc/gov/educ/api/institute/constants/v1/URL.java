@@ -8,7 +8,6 @@ public final class URL {
   public static final String REPORTING_REQUIREMENT_CODES = "/reporting-requirement-codes";
   public static final String NEIGHBORHOOD_LEARNING_CODES = "/neighborhood-learning-codes";
   public static final String ADDRESS_TYPE_CODES = "/address-type-codes";
-  public static final String AUTHORITY_GROUP_CODES = "/authority-group-codes";
   public static final String AUTHORITY_TYPE_CODES = "/authority-type-codes";
   public static final String DISTRICT_CONTACT_TYPE_CODES = "/district-contact-type-codes";
   public static final String SCHOOL_CONTACT_TYPE_CODES = "/school-contact-type-codes";
