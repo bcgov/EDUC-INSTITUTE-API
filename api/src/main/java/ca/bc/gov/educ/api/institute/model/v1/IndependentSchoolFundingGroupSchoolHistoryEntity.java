@@ -39,10 +39,6 @@ public class IndependentSchoolFundingGroupSchoolHistoryEntity {
   SchoolHistoryEntity schoolHistoryEntity;
 
   @Basic
-  @Column(name = "SCHOOL_FUNDING_GROUP_ID", columnDefinition = "BINARY(16)")
-  private UUID schoolFundingGroupID;
-
-  @Basic
   @Column(name = "SCHOOL_ID", columnDefinition = "BINARY(16)")
   private UUID schoolID;
 

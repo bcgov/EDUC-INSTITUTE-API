@@ -20,8 +20,6 @@ public class IndependentSchoolFundingGroupHistory extends BaseRequest implements
 
   private String schoolFundingGroupHistoryID;
 
-  private String schoolFundingGroupID;
-
   @NotNull(message = "schoolID cannot be null")
   private String schoolID;
 

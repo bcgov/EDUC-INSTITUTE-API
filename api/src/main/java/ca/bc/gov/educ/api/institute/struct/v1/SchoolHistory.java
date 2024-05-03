@@ -79,6 +79,9 @@ public class SchoolHistory extends BaseRequest implements Serializable {
   private Boolean canIssueCertificates;
 
   @Valid
+  private List<IndependentSchoolFundingGroupHistory> schoolFundingGroups;
+
+  @Valid
   private List<SchoolGradeSchoolHistory> schoolGrades;
 
   @Valid
