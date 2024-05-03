@@ -272,7 +272,7 @@ public class CodeTableControllerTest {
     final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_INSTITUTE_CODES";
     final var mockAuthority = oidcLogin().authorities(grantedAuthority);
     this.mockMvc.perform(get(URL.BASE_URL + URL.GRADE_CODES).with(mockAuthority)).andDo(print()).andExpect(status().isOk())
-      .andExpect(MockMvcResultMatchers.jsonPath("$[0].schoolGradeCode").value("GRADE01"));
+      .andExpect(MockMvcResultMatchers.jsonPath("$[0].schoolGradeCode").value("01"));
   }
 
   @Test

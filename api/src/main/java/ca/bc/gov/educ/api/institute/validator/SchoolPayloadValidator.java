@@ -1,15 +1,15 @@
 package ca.bc.gov.educ.api.institute.validator;
 
-import ca.bc.gov.educ.api.institute.model.v1.DistrictEntity;
-import ca.bc.gov.educ.api.institute.model.v1.FacilityTypeCodeEntity;
-import ca.bc.gov.educ.api.institute.model.v1.SchoolCategoryCodeEntity;
-import ca.bc.gov.educ.api.institute.model.v1.SchoolOrganizationCodeEntity;
+import ca.bc.gov.educ.api.institute.model.v1.*;
 import ca.bc.gov.educ.api.institute.repository.v1.DistrictRepository;
 import ca.bc.gov.educ.api.institute.service.v1.CodeTableService;
 import ca.bc.gov.educ.api.institute.service.v1.SchoolService;
+import ca.bc.gov.educ.api.institute.struct.v1.IndependentSchoolFundingGroup;
 import ca.bc.gov.educ.api.institute.struct.v1.School;
+import ca.bc.gov.educ.api.institute.util.ValidationUtil;
 import lombok.AccessLevel;
 import lombok.Getter;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.FieldError;
@@ -58,6 +58,7 @@ public class SchoolPayloadValidator {
     validateSchoolOrganizationCode(school, apiValidationErrors);
     validateSchoolCategoryCode(school, apiValidationErrors);
     validateFacilityTypeCode(school, apiValidationErrors);
+    validateSchoolFundingCodes(school, apiValidationErrors);
     Optional.ofNullable(school.getAddresses()).orElse(Collections.emptyList()).stream().forEach(address -> addressPayloadValidator.validatePayload(address, apiValidationErrors));
     return apiValidationErrors;
   }
@@ -99,6 +100,22 @@ public class SchoolPayloadValidator {
         apiValidationErrors.add(createFieldError(SCHOOL_CATEGORY_CODE, school.getSchoolCategoryCode(), "School category code provided is not yet effective."));
       } else if (schoolCategoryCodeEntity.get().getExpiryDate() != null && schoolCategoryCodeEntity.get().getExpiryDate().isBefore(LocalDateTime.now())) {
         apiValidationErrors.add(createFieldError(SCHOOL_CATEGORY_CODE, school.getSchoolCategoryCode(), "School category code provided has expired."));
+      }
+    }
+  }
+
+  protected void validateSchoolFundingCodes(School school, List<FieldError> apiValidationErrors) {
+    if(school.getSchoolFundingGroups() != null) {
+      for (IndependentSchoolFundingGroup independentSchoolFundingGroup : school.getSchoolFundingGroups()) {
+        List<SchoolFundingGroupCodeEntity> schoolFundingGroupCodes = codeTableService.getAllSchoolFundingGroupCodes();
+        if (StringUtils.isNotEmpty(independentSchoolFundingGroup.getSchoolFundingGroupCode()) && schoolFundingGroupCodes.stream().noneMatch(fundingGroupCode -> fundingGroupCode.getSchoolFundingGroupCode().equals(independentSchoolFundingGroup.getSchoolFundingGroupCode()))) {
+          apiValidationErrors.add(ValidationUtil.createFieldError("schoolFundingGroupCode", independentSchoolFundingGroup.getSchoolFundingGroupCode(), "Invalid School Funding Group Code."));
+        }
+
+        List<SchoolGradeCodeEntity> schoolGradeCodes = codeTableService.getSchoolGradeCodesList();
+        if (StringUtils.isNotEmpty(independentSchoolFundingGroup.getSchoolGradeCode()) && schoolGradeCodes.stream().noneMatch(gradeCode -> gradeCode.getSchoolGradeCode().equals(independentSchoolFundingGroup.getSchoolGradeCode()))) {
+          apiValidationErrors.add(ValidationUtil.createFieldError("schoolGradeCode", independentSchoolFundingGroup.getSchoolGradeCode(), "Invalid School Grade Code."));
+        }
       }
     }
   }

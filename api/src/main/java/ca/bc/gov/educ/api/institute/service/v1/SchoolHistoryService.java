@@ -12,7 +12,6 @@ import org.springframework.util.CollectionUtils;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 public class SchoolHistoryService {
@@ -38,6 +37,7 @@ public class SchoolHistoryService {
     schoolHistoryEntity.setUpdateUser(updateUser);
     schoolHistoryEntity.setUpdateDate(LocalDateTime.now());
     mapGradeCodeHistory(curSchoolEntity, schoolHistoryEntity);
+    mapFundingGroupHistory(curSchoolEntity, schoolHistoryEntity);
     mapNeighbourhoodLearningHistory(curSchoolEntity, schoolHistoryEntity);
     mapAddressHistory(curSchoolEntity, schoolHistoryEntity);
     schoolHistoryRepository.save(schoolHistoryEntity);
@@ -62,7 +62,7 @@ public class SchoolHistoryService {
             .createUser(schoolHistoryEntity.getCreateUser())
             .updateUser(schoolHistoryEntity.getUpdateUser())
             .build())
-          .collect(Collectors.toList()));
+                .toList());
     }
   }
 
@@ -78,7 +78,7 @@ public class SchoolHistoryService {
             .createUser(schoolHistoryEntity.getCreateUser())
             .updateUser(schoolHistoryEntity.getUpdateUser())
             .build())
-          .collect(Collectors.toList()));
+                .toList());
 
     }
   }
@@ -95,7 +95,26 @@ public class SchoolHistoryService {
             .createUser(schoolHistoryEntity.getCreateUser())
             .updateUser(schoolHistoryEntity.getUpdateUser())
             .build())
-          .collect(Collectors.toList()));
+            .toList());
+
+    }
+
+  }
+
+  private void mapFundingGroupHistory(SchoolEntity curSchoolEntity, SchoolHistoryEntity schoolHistoryEntity) {
+    if (!CollectionUtils.isEmpty(curSchoolEntity.getSchoolFundingGroups())) {
+      schoolHistoryEntity.getSchoolFundingGroups()
+              .addAll(curSchoolEntity.getSchoolFundingGroups().stream()
+                      .map(el -> IndependentSchoolFundingGroupSchoolHistoryEntity.builder()
+                              .schoolHistoryEntity(schoolHistoryEntity)
+                              .schoolFundingGroupCode(el.getSchoolFundingGroupCode())
+                              .schoolGradeCode(el.getSchoolGradeCode())
+                              .createDate(schoolHistoryEntity.getCreateDate())
+                              .updateDate(schoolHistoryEntity.getUpdateDate())
+                              .createUser(schoolHistoryEntity.getCreateUser())
+                              .updateUser(schoolHistoryEntity.getUpdateUser())
+                              .build())
+                      .toList());
 
     }
 

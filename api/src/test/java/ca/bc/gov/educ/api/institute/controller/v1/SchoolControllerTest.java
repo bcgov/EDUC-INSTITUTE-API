@@ -115,19 +115,22 @@ public class SchoolControllerTest {
   @Autowired
   NeighborhoodLearningTypeCodeRepository neighborhoodLearningTypeCodeRepository;
 
+  @Autowired
+  SchoolFundingGroupCodeRepository schoolFundingGroupCodeRepository;
+
   @BeforeEach
   public void before(){
     MockitoAnnotations.openMocks(this);
     this.schoolCategoryCodeRepository.save(this.createSchoolCategoryCodeData());
     this.schoolOrganizationCodeRepository.save(this.createSchoolOrganizationCodeData());
-    this.schoolReportingRequirementCodeRepository
-      .save(this.createSchoolReportingRequirementCodeData());
+    this.schoolReportingRequirementCodeRepository.save(this.createSchoolReportingRequirementCodeData());
     this.facilityTypeCodeRepository.save(this.createFacilityTypeCodeData());
     this.schoolContactTypeCodeRepository.save(this.createContactTypeCodeData());
     this.addressTypeCodeRepository.save(this.createAddressTypeCodeData());
     this.provinceCodeRepository.save(this.createProvinceCodeData());
     this.countryCodeRepository.save(this.createCountryCodeData());
     this.schoolGradeCodeRepository.save(this.createSchoolGradeCodeData());
+    this.schoolFundingGroupCodeRepository.save(this.createSchoolFundingGroupData());
     this.neighborhoodLearningTypeCodeRepository.save(this.createNeighborhoodLearningTypeCodeData());
   }
 
@@ -144,6 +147,7 @@ public class SchoolControllerTest {
     this.schoolGradeCodeRepository.deleteAll();
     this.neighborhoodLearningTypeCodeRepository.deleteAll();
     this.schoolCategoryCodeRepository.deleteAll();
+    this.schoolFundingGroupCodeRepository.deleteAll();
     this.schoolOrganizationCodeRepository.deleteAll();
     this.schoolReportingRequirementCodeRepository.deleteAll();
     this.facilityTypeCodeRepository.deleteAll();
@@ -453,6 +457,88 @@ public class SchoolControllerTest {
       .andDo(print())
       .andExpect(status().isOk())
       .andExpect(MockMvcResultMatchers.jsonPath("$.grades[0].schoolGradeCode").value("01"));
+  }
+
+  @Test
+  void testAddSchoolFundingGroup_GivenValidPayload_ShouldReturnStatusOk() throws Exception {
+    final DistrictTombstoneEntity dist = this.districtTombstoneRepository.save(this.createDistrictData());
+    var schoolEntity = this.createSchoolData();
+    schoolEntity.setDistrictEntity(dist);
+    final SchoolEntity entity = this.schoolRepository.save(schoolEntity);
+    entity.setDisplayName("newdist");
+    entity.setCreateDate(null);
+    entity.setUpdateDate(null);
+    entity.getSchoolFundingGroups().add(createSchoolFundingGroupData(entity));
+
+    SchoolMapper map = SchoolMapper.mapper;
+
+    School mappedSchool = map.toStructure(entity);
+
+    mappedSchool.setCreateDate(null);
+    mappedSchool.setUpdateDate(null);
+
+    this.mockMvc.perform(put(URL.BASE_URL_SCHOOL + "/" + entity.getSchoolId())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .content(asJsonString(mappedSchool))
+                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SCHOOL"))))
+            .andDo(print())
+            .andExpect(status().isOk())
+            .andExpect(MockMvcResultMatchers.jsonPath("$.schoolFundingGroups[0].schoolFundingGroupCode").value("GROUP01"));
+  }
+
+  @Test
+  void testAddSchoolFundingGroupAndRemove_GivenValidPayload_ShouldReturnStatusOk() throws Exception {
+    var gradeCodeData = this.createSchoolGradeCodeData();
+    gradeCodeData.setSchoolGradeCode("GRADE02");
+    this.schoolGradeCodeRepository.save(gradeCodeData);
+    var groupData = this.createSchoolFundingGroupData();
+    groupData.setSchoolFundingGroupCode("GROUP02");
+    this.schoolFundingGroupCodeRepository.save(groupData);
+    final DistrictTombstoneEntity dist = this.districtTombstoneRepository.save(this.createDistrictData());
+    var schoolEntity = this.createSchoolData();
+    schoolEntity.setDistrictEntity(dist);
+    SchoolEntity entity = this.schoolRepository.save(schoolEntity);
+    entity.setDisplayName("newdist");
+    entity.setCreateDate(null);
+    entity.setUpdateDate(null);
+    entity.getSchoolFundingGroups().add(createSchoolFundingGroupData(entity));
+
+    SchoolMapper map = SchoolMapper.mapper;
+
+    School mappedSchool = map.toStructure(entity);
+
+    mappedSchool.setCreateDate(null);
+    mappedSchool.setUpdateDate(null);
+
+    this.mockMvc.perform(put(URL.BASE_URL_SCHOOL + "/" + entity.getSchoolId())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .content(asJsonString(mappedSchool))
+                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SCHOOL"))))
+            .andDo(print())
+            .andExpect(status().isOk())
+            .andExpect(MockMvcResultMatchers.jsonPath("$.schoolFundingGroups[0].schoolFundingGroupCode").value("GROUP01"));
+
+    entity = this.schoolRepository.findById(schoolEntity.getSchoolId()).get();
+    entity.getSchoolFundingGroups().stream().findFirst().get().setCreateDate(null);
+    entity.getSchoolFundingGroups().stream().findFirst().get().setUpdateDate(null);
+    var secondFunding = createSchoolFundingGroupData(entity);
+    secondFunding.setSchoolFundingGroupCode("GROUP02");
+    secondFunding.setSchoolGradeCode("GRADE02");
+    entity.getSchoolFundingGroups().add(secondFunding);
+    School mappedSchool2 = map.toStructure(entity);
+
+    mappedSchool2.setCreateDate(null);
+    mappedSchool2.setUpdateDate(null);
+    this.mockMvc.perform(put(URL.BASE_URL_SCHOOL + "/" + entity.getSchoolId())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .content(asJsonString(mappedSchool2))
+                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SCHOOL"))))
+            .andDo(print())
+            .andExpect(status().isOk())
+            .andExpect(MockMvcResultMatchers.jsonPath("$.schoolFundingGroups", hasSize(2)));
   }
 
   @Test
@@ -1176,6 +1262,10 @@ public class SchoolControllerTest {
     return SchoolGradeEntity.builder().schoolEntity(entity).schoolGradeCode("01").createUser("TEST").updateUser("TEST").build();
   }
 
+  private IndependentSchoolFundingGroupEntity createSchoolFundingGroupData(SchoolEntity entity) {
+    return IndependentSchoolFundingGroupEntity.builder().schoolEntity(entity).schoolGradeCode("01").schoolFundingGroupCode("GROUP01").createUser("TEST").updateUser("TEST").build();
+  }
+
   private SchoolGrade createSchoolGrade(String schoolId) {
     SchoolGrade schoolGrade = new SchoolGrade();
     schoolGrade.setSchoolGradeCode("01");
@@ -1259,6 +1349,12 @@ public class SchoolControllerTest {
     return SchoolGradeCodeEntity.builder().schoolGradeCode("01").description("First Grade")
       .effectiveDate(LocalDateTime.now()).expiryDate(LocalDateTime.MAX).displayOrder(1).label("First").createDate(LocalDateTime.now())
       .updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
+  }
+
+  private SchoolFundingGroupCodeEntity createSchoolFundingGroupData() {
+    return SchoolFundingGroupCodeEntity.builder().schoolFundingGroupCode("GROUP01")
+            .effectiveDate(LocalDateTime.now()).expiryDate(LocalDateTime.MAX).displayOrder(1).label("Group 1").createDate(LocalDateTime.now())
+            .updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
   }
 
   private SchoolAddressEntity createSchoolAddressData() {

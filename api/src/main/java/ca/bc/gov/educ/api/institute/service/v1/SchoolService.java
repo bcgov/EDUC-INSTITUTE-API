@@ -1,7 +1,5 @@
 package ca.bc.gov.educ.api.institute.service.v1;
 
-import ca.bc.gov.educ.api.institute.constants.v1.Constants;
-import ca.bc.gov.educ.api.institute.exception.ConflictFoundException;
 import ca.bc.gov.educ.api.institute.exception.EntityNotFoundException;
 import ca.bc.gov.educ.api.institute.mapper.v1.NoteMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.SchoolContactMapper;
@@ -186,11 +184,12 @@ public class SchoolService {
     if (curSchoolEntityOptional.isPresent()) {
       final SchoolEntity currentSchoolEntity = curSchoolEntityOptional.get();
       BeanUtils.copyProperties(school, currentSchoolEntity, CREATE_DATE, CREATE_USER, "grades",
-          "neighborhoodLearning", "districtEntity",
+          "neighborhoodLearning", "districtEntity", "schoolFundingGroups",
           "addresses"); // update current student entity with incoming payload ignoring the fields.
 
       setGradesAndNeighborhoodLearning(currentSchoolEntity, school);
       setAddresses(currentSchoolEntity, school);
+      setSchoolFundingGroups(currentSchoolEntity, school);
 
       return saveSchoolWithHistory(currentSchoolEntity);
     } else {
@@ -217,8 +216,17 @@ public class SchoolService {
     });
   }
 
-  private void setGradesAndNeighborhoodLearning(SchoolEntity currentSchoolEntity,
-      SchoolEntity school) {
+  private void setSchoolFundingGroups(SchoolEntity currentSchoolEntity, SchoolEntity school) {
+    currentSchoolEntity.getSchoolFundingGroups().clear();
+    school.getSchoolFundingGroups().stream().forEach(group -> {
+      RequestUtil.setAuditColumnsForFundingGroups(group);
+      group.setSchoolEntity(currentSchoolEntity);
+      TransformUtil.uppercaseFields(group);
+      currentSchoolEntity.getSchoolFundingGroups().add(group);
+    });
+  }
+
+  private void setGradesAndNeighborhoodLearning(SchoolEntity currentSchoolEntity, SchoolEntity school) {
     currentSchoolEntity.getGrades().clear();
     school.getGrades().stream().forEach(grade -> {
       RequestUtil.setAuditColumnsForGrades(grade);

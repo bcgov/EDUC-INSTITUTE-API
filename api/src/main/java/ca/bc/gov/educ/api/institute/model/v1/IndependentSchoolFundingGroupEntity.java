@@ -32,9 +32,10 @@ public class IndependentSchoolFundingGroupEntity {
   @Column(name = "SCHOOL_FUNDING_GROUP_ID", unique = true, updatable = false, columnDefinition = "BINARY(16)")
   private UUID schoolFundingGroupID;
 
-  @Basic
-  @Column(name = "SCHOOL_ID", columnDefinition = "BINARY(16)")
-  private UUID schoolID;
+  @ManyToOne(optional = false, targetEntity = SchoolEntity.class)
+  @JoinColumn(name = "school_id", referencedColumnName = "school_id")
+  @JsonIgnoreProperties("schoolFundingGroups")
+  SchoolEntity schoolEntity;
 
   @Column(name = "SCHOOL_GRADE_CODE", nullable = false, length = 10)
   @UpperCase

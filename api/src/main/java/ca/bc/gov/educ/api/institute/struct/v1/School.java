@@ -6,10 +6,11 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import java.io.Serializable;
-import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import java.io.Serializable;
+import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -88,6 +89,9 @@ public class School extends BaseRequest implements Serializable {
 
   @Valid
   private List<SchoolGrade> grades;
+
+  @Valid
+  private List<IndependentSchoolFundingGroup> schoolFundingGroups;
 
   @Valid
   private List<NeighborhoodLearning> neighborhoodLearning;

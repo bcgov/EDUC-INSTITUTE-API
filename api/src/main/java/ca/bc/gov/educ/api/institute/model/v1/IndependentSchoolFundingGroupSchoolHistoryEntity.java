@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
@@ -23,7 +24,7 @@ import java.util.UUID;
 @Builder
 @Table(name = "INDEPENDENT_SCHOOL_FUNDING_GROUP_HISTORY")
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class IndependentSchoolFundingGroupHistoryEntity {
+public class IndependentSchoolFundingGroupSchoolHistoryEntity {
 
   @Id
   @GeneratedValue(generator = "UUID")
@@ -31,6 +32,11 @@ public class IndependentSchoolFundingGroupHistoryEntity {
       @Parameter(name = "uuid_gen_strategy_class", value = "org.hibernate.id.uuid.CustomVersionOneStrategy")})
   @Column(name = "SCHOOL_FUNDING_GROUP_HISTORY_ID", unique = true, updatable = false, columnDefinition = "BINARY(16)")
   private UUID schoolFundingGroupHistoryID;
+
+  @ManyToOne(optional = false, targetEntity = SchoolHistoryEntity.class)
+  @Cascade(org.hibernate.annotations.CascadeType.ALL)
+  @JoinColumn(name = "SCHOOL_HISTORY_ID", referencedColumnName = "SCHOOL_HISTORY_ID")
+  SchoolHistoryEntity schoolHistoryEntity;
 
   @Basic
   @Column(name = "SCHOOL_FUNDING_GROUP_ID", columnDefinition = "BINARY(16)")
