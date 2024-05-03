@@ -7,6 +7,7 @@ import ca.bc.gov.educ.api.institute.model.v1.IndependentSchoolFundingGroupSchool
 import ca.bc.gov.educ.api.institute.struct.v1.IndependentSchoolFundingGroup;
 import ca.bc.gov.educ.api.institute.struct.v1.IndependentSchoolFundingGroupHistory;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 @Mapper(uses = {UUIDMapper.class, LocalDateTimeMapper.class})
@@ -16,7 +17,7 @@ public interface IndependentSchoolFundingGroupMapper {
   IndependentSchoolFundingGroupMapper mapper = Mappers.getMapper(IndependentSchoolFundingGroupMapper.class);
 
   IndependentSchoolFundingGroupEntity toModel(IndependentSchoolFundingGroup structure);
-
+  @Mapping(target = "schoolID", source = "schoolEntity.schoolId")
   IndependentSchoolFundingGroup toStructure(IndependentSchoolFundingGroupEntity entity);
   IndependentSchoolFundingGroupSchoolHistoryEntity toModel(IndependentSchoolFundingGroupHistory structure);
 

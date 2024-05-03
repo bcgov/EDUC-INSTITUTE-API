@@ -20,6 +20,8 @@ public class IndependentSchoolFundingGroup extends BaseRequest implements Serial
 
   private String schoolFundingGroupID;
 
+  private String schoolID;
+
   @NotNull(message = "schoolGradeCode cannot be null")
   private String schoolGradeCode;
 

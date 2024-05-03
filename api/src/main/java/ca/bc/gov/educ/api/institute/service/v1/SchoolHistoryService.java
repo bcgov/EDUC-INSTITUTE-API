@@ -108,6 +108,7 @@ public class SchoolHistoryService {
                       .map(el -> IndependentSchoolFundingGroupSchoolHistoryEntity.builder()
                               .schoolHistoryEntity(schoolHistoryEntity)
                               .schoolFundingGroupCode(el.getSchoolFundingGroupCode())
+                              .schoolID(el.getSchoolEntity().getSchoolId())
                               .schoolGradeCode(el.getSchoolGradeCode())
                               .createDate(schoolHistoryEntity.getCreateDate())
                               .updateDate(schoolHistoryEntity.getUpdateDate())
@@ -115,9 +116,7 @@ public class SchoolHistoryService {
                               .updateUser(schoolHistoryEntity.getUpdateUser())
                               .build())
                       .toList());
-
     }
-
   }
 
   public List<SchoolHistoryEntity> getAllSchoolHistoryList(UUID schoolId) {
