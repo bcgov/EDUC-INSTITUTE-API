@@ -3,7 +3,7 @@ package ca.bc.gov.educ.api.institute.mapper.v1;
 import ca.bc.gov.educ.api.institute.mapper.LocalDateTimeMapper;
 import ca.bc.gov.educ.api.institute.mapper.UUIDMapper;
 import ca.bc.gov.educ.api.institute.model.v1.IndependentSchoolFundingGroupEntity;
-import ca.bc.gov.educ.api.institute.model.v1.IndependentSchoolFundingGroupHistoryEntity;
+import ca.bc.gov.educ.api.institute.model.v1.IndependentSchoolFundingGroupSchoolHistoryEntity;
 import ca.bc.gov.educ.api.institute.struct.v1.IndependentSchoolFundingGroup;
 import ca.bc.gov.educ.api.institute.struct.v1.IndependentSchoolFundingGroupHistory;
 import org.mapstruct.Mapper;
@@ -18,7 +18,7 @@ public interface IndependentSchoolFundingGroupMapper {
   IndependentSchoolFundingGroupEntity toModel(IndependentSchoolFundingGroup structure);
 
   IndependentSchoolFundingGroup toStructure(IndependentSchoolFundingGroupEntity entity);
-  IndependentSchoolFundingGroupHistoryEntity toModel(IndependentSchoolFundingGroupHistory structure);
+  IndependentSchoolFundingGroupSchoolHistoryEntity toModel(IndependentSchoolFundingGroupHistory structure);
 
-  IndependentSchoolFundingGroupHistory toStructure(IndependentSchoolFundingGroupHistoryEntity entity);
+  IndependentSchoolFundingGroupHistory toStructure(IndependentSchoolFundingGroupSchoolHistoryEntity entity);
 }

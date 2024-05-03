@@ -1,9 +1,6 @@
 package ca.bc.gov.educ.api.institute.util;
 
-import ca.bc.gov.educ.api.institute.model.v1.BaseAddressEntity;
-import ca.bc.gov.educ.api.institute.model.v1.NeighborhoodLearningEntity;
-import ca.bc.gov.educ.api.institute.model.v1.SchoolGradeEntity;
-import ca.bc.gov.educ.api.institute.model.v1.SchoolMoveEntity;
+import ca.bc.gov.educ.api.institute.model.v1.*;
 import ca.bc.gov.educ.api.institute.properties.ApplicationProperties;
 import ca.bc.gov.educ.api.institute.struct.v1.BaseRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -64,6 +61,23 @@ public class RequestUtil {
       address.setUpdateUser(ApplicationProperties.INSTITUTE_API);
     }
     address.setUpdateDate(LocalDateTime.now());
+  }
+
+  public static void setAuditColumnsForFundingGroups(@NotNull IndependentSchoolFundingGroupEntity group) {
+    if(group.getCreateDate() == null) {
+      if (StringUtils.isBlank(group.getCreateUser())) {
+        group.setCreateUser(ApplicationProperties.INSTITUTE_API);
+      }
+      group.setCreateDate(LocalDateTime.now());
+    }
+    setAuditColumnsForFundingGroupUpdate(group);
+  }
+
+  private static void setAuditColumnsForFundingGroupUpdate(@NotNull IndependentSchoolFundingGroupEntity group) {
+    if (StringUtils.isBlank(group.getUpdateUser())) {
+      group.setUpdateUser(ApplicationProperties.INSTITUTE_API);
+    }
+    group.setUpdateDate(LocalDateTime.now());
   }
 
   public static void setAuditColumnsForGrades(@NotNull SchoolGradeEntity grade) {

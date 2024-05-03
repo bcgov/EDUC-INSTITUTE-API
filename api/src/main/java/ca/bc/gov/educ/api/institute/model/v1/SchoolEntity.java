@@ -131,6 +131,11 @@ public class SchoolEntity {
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
+  @OneToMany(mappedBy = "schoolEntity", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = IndependentSchoolFundingGroupEntity.class)
+  private Set<IndependentSchoolFundingGroupEntity> schoolFundingGroups;
+
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
   @OneToMany(mappedBy = "schoolEntity", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = NeighborhoodLearningEntity.class)
   private Set<NeighborhoodLearningEntity> neighborhoodLearning;
 
@@ -156,6 +161,13 @@ public class SchoolEntity {
       this.grades = new HashSet<>();
     }
     return this.grades;
+  }
+
+  public Set<IndependentSchoolFundingGroupEntity> getSchoolFundingGroups() {
+    if (this.schoolFundingGroups == null) {
+      this.schoolFundingGroups = new HashSet<>();
+    }
+    return this.schoolFundingGroups;
   }
 
   public Set<SchoolAddressEntity> getAddresses() {
