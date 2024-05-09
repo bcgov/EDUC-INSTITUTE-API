@@ -32,8 +32,8 @@ env:
   TARGET_ENV: "test"
   MIN_REPLICAS: "2"
   MAX_REPLICAS: "3"
-  MIN_CPU: "5m"
-  MAX_CPU: "150m"
+  MIN_CPU: "300m"
+  MAX_CPU: "500m"
   MIN_MEM: "400Mi"
   MAX_MEM: "800Mi"
 

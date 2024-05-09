@@ -36,8 +36,8 @@ env:
   TAG: "latest"
   MIN_REPLICAS_DEV: "1"
   MAX_REPLICAS_DEV: "2"
-  MIN_CPU_DEV: "5m"
-  MAX_CPU_DEV: "150m"
+  MIN_CPU_DEV: "300m"
+  MAX_CPU_DEV: "500m"
   MIN_MEM_DEV: "400Mi"
   MAX_MEM_DEV: "800Mi"
 
