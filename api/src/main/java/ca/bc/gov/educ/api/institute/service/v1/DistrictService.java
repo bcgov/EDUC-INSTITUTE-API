@@ -172,7 +172,7 @@ public class DistrictService {
   }
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)
-  public DistrictContactEntity updateDistrictContact(DistrictContact contact, UUID districtId, UUID contactId) {
+  public Pair<DistrictContactEntity, InstituteEvent> updateDistrictContact(DistrictContact contact, UUID districtId, UUID contactId) throws JsonProcessingException {
     var contactEntity = DistrictContactMapper.mapper.toModel(contact);
     if (contactId == null || !contactId.equals(contactEntity.getDistrictContactId())) {
       throw new EntityNotFoundException(DistrictContactEntity.class, CONTACT_ID_ATTR, String.valueOf(contactId));
@@ -195,7 +195,13 @@ public class DistrictService {
       TransformUtil.uppercaseFields(currentContactEntity); // convert the input to upper case.
       currentContactEntity.setDistrictEntity(curDistrictEntityOptional.get());
       districtContactRepository.save(currentContactEntity);
-      return currentContactEntity;
+      final InstituteEvent instituteEvent = EventUtil.createInstituteEvent(
+              contact.getCreateUser(), contact.getUpdateUser(),
+              JsonUtil.getJsonStringFromObject(DistrictContactMapper.mapper.toStructure(contactEntity)),
+              UPDATE_CONTACT, CONTACT_UPDATED
+      );
+      instituteEventRepository.save(instituteEvent);
+      return Pair.of(contactEntity, instituteEvent);
     } else {
       throw new EntityNotFoundException(DistrictContactEntity.class, CONTACT_ID_ATTR, String.valueOf(contactId));
     }
