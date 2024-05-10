@@ -23,6 +23,7 @@ public enum EventOutcome {
 
   SCHOOL_NOT_FOUND,
 
-  SCHOOL_MOVED
+  SCHOOL_MOVED,
+  CONTACT_CREATED
 
 }

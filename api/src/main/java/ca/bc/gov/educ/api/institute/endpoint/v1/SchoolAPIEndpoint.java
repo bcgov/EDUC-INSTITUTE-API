@@ -82,7 +82,7 @@ public interface SchoolAPIEndpoint {
   @Tag(name = "School Contact Entity", description = "Endpoints for school contact entity.")
   @Schema(name = "SchoolContact", implementation = SchoolContact.class)
   @ResponseStatus(CREATED)
-  SchoolContact createSchoolContact(@PathVariable UUID schoolId, @Validated @RequestBody SchoolContact contact);
+  SchoolContact createSchoolContact(@PathVariable UUID schoolId, @Validated @RequestBody SchoolContact contact) throws JsonProcessingException;
 
   @PutMapping("/{schoolId}/contact/{contactId}")
   @PreAuthorize("hasAuthority('SCOPE_WRITE_SCHOOL_CONTACT')")

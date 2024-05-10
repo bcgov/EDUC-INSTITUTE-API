@@ -157,10 +157,12 @@ public class SchoolAPIController implements SchoolAPIEndpoint {
   }
 
   @Override
-  public SchoolContact createSchoolContact(UUID schoolId, SchoolContact contact) {
+  public SchoolContact createSchoolContact(UUID schoolId, SchoolContact contact) throws JsonProcessingException {
     validatePayload(() -> this.contactPayloadValidator.validateCreatePayload(contact));
     RequestUtil.setAuditColumnsForCreate(contact);
-    return schoolContactMapper.toStructure(schoolService.createSchoolContact(contact, schoolId));
+    var pair = schoolService.createSchoolContact(contact, schoolId);
+    publisher.dispatchChoreographyEvent(pair.getRight());
+    return schoolContactMapper.toStructure(pair.getLeft());
   }
 
   @Override

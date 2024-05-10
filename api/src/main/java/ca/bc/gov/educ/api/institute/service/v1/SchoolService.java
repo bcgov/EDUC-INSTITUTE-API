@@ -6,10 +6,7 @@ import ca.bc.gov.educ.api.institute.mapper.v1.SchoolContactMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.SchoolMapper;
 import ca.bc.gov.educ.api.institute.model.v1.*;
 import ca.bc.gov.educ.api.institute.repository.v1.*;
-import ca.bc.gov.educ.api.institute.struct.v1.MoveSchoolData;
-import ca.bc.gov.educ.api.institute.struct.v1.Note;
-import ca.bc.gov.educ.api.institute.struct.v1.School;
-import ca.bc.gov.educ.api.institute.struct.v1.SchoolContact;
+import ca.bc.gov.educ.api.institute.struct.v1.*;
 import ca.bc.gov.educ.api.institute.util.EventUtil;
 import ca.bc.gov.educ.api.institute.util.JsonUtil;
 import ca.bc.gov.educ.api.institute.util.RequestUtil;
@@ -258,7 +255,7 @@ public class SchoolService {
   }
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)
-  public SchoolContactEntity createSchoolContact(SchoolContact contact, UUID schoolId) {
+  public Pair<SchoolContactEntity, InstituteEvent> createSchoolContact(SchoolContact contact, UUID schoolId) throws JsonProcessingException {
     var contactEntity = SchoolContactMapper.mapper.toModel(contact);
     Optional<SchoolEntity> curSchoolEntityOptional = schoolRepository.findById(schoolId);
 
@@ -266,7 +263,13 @@ public class SchoolService {
       contactEntity.setSchoolEntity(curSchoolEntityOptional.get());
       TransformUtil.uppercaseFields(contactEntity);
       schoolContactRepository.save(contactEntity);
-      return contactEntity;
+      final InstituteEvent instituteEvent = EventUtil.createInstituteEvent(
+              contact.getCreateUser(), contact.getUpdateUser(),
+              JsonUtil.getJsonStringFromObject(SchoolContactMapper.mapper.toStructure(contactEntity)),
+              CREATE_CONTACT, CONTACT_CREATED
+      );
+      instituteEventRepository.save(instituteEvent);
+      return Pair.of(contactEntity, instituteEvent);
     } else {
       throw new EntityNotFoundException(SchoolEntity.class, SCHOOL_ID_ATTR,
           String.valueOf(schoolId));
