@@ -5,6 +5,7 @@ import ca.bc.gov.educ.api.institute.mapper.v1.DistrictContactMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.DistrictMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.NoteMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.SchoolContactMapper;
+import ca.bc.gov.educ.api.institute.messaging.jetstream.Publisher;
 import ca.bc.gov.educ.api.institute.model.v1.*;
 import ca.bc.gov.educ.api.institute.repository.v1.*;
 import ca.bc.gov.educ.api.institute.struct.v1.District;
@@ -17,6 +18,7 @@ import ca.bc.gov.educ.api.institute.util.TransformUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.BeanUtils;
@@ -33,6 +35,7 @@ import static ca.bc.gov.educ.api.institute.constants.v1.EventOutcome.*;
 import static ca.bc.gov.educ.api.institute.constants.v1.EventType.*;
 
 @Service
+@Slf4j
 public class DistrictService {
 
   private static final String DISTRICT_ID_ATTR = "districtId";
@@ -58,15 +61,19 @@ public class DistrictService {
 
   private final InstituteEventRepository instituteEventRepository;
 
+  @Getter(AccessLevel.PRIVATE)
+  private final Publisher publisher;
+
 
   @Autowired
-  public DistrictService(DistrictRepository districtRepository, DistrictTombstoneRepository districtTombstoneRepository, DistrictHistoryService districtHistoryService, NoteRepository noteRepository, DistrictContactRepository districtContactRepository, InstituteEventRepository instituteEventRepository) {
+  public DistrictService(DistrictRepository districtRepository, DistrictTombstoneRepository districtTombstoneRepository, DistrictHistoryService districtHistoryService, DistrictContactRepository districtContactRepository, NoteRepository noteRepository, InstituteEventRepository instituteEventRepository, Publisher publisher) {
     this.districtRepository = districtRepository;
     this.districtTombstoneRepository = districtTombstoneRepository;
     this.districtHistoryService = districtHistoryService;
-    this.noteRepository = noteRepository;
     this.districtContactRepository = districtContactRepository;
+    this.noteRepository = noteRepository;
     this.instituteEventRepository = instituteEventRepository;
+    this.publisher = publisher;
   }
 
   public List<DistrictTombstoneEntity> getAllDistrictsList() {
@@ -210,10 +217,29 @@ public class DistrictService {
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void deleteDistrictContact(UUID districtId, UUID contactId) {
     Optional<DistrictEntity> curDistrictEntityOptional = districtRepository.findById(districtId);
-
     if (curDistrictEntityOptional.isPresent()) {
       final DistrictEntity currentDistrictEntity = curDistrictEntityOptional.get();
-      districtContactRepository.deleteByDistrictContactIdAndDistrictEntity(contactId, currentDistrictEntity);
+      final Optional<DistrictContactEntity> districtContactEntityOptional = currentDistrictEntity.getContacts()
+              .stream()
+              .filter(e -> e.getDistrictContactId().equals(contactId))
+              .findFirst();
+      if (districtContactEntityOptional.isPresent()){
+        districtContactRepository.deleteByDistrictContactIdAndDistrictEntity(contactId, currentDistrictEntity);
+        DistrictContactEntity districtContactEntity = districtContactEntityOptional.get();
+        final InstituteEvent instituteEvent;
+        try {
+          instituteEvent = EventUtil.createInstituteEvent(
+                  districtContactEntity.getCreateUser(), districtContactEntity.getUpdateUser(),
+                  JsonUtil.getJsonStringFromObject(DistrictContactMapper.mapper.toStructure(districtContactEntity)),
+                  DELETE_DISTRICT_CONTACT, DISTRICT_CONTACT_DELETED
+          );
+          instituteEventRepository.save(instituteEvent);
+          publisher.dispatchChoreographyEvent(instituteEvent);
+        } catch (JsonProcessingException e) {
+          log.error(String.format("Exception encountered while attempting to DELETE District Contact id: %s", contactId), e);
+        }
+      }
+
     } else {
       throw new EntityNotFoundException(DistrictEntity.class, DISTRICT_ID_ATTR, String.valueOf(districtId));
     }
