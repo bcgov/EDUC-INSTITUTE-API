@@ -4,6 +4,7 @@ import ca.bc.gov.educ.api.institute.exception.EntityNotFoundException;
 import ca.bc.gov.educ.api.institute.mapper.v1.DistrictContactMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.DistrictMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.NoteMapper;
+import ca.bc.gov.educ.api.institute.mapper.v1.SchoolContactMapper;
 import ca.bc.gov.educ.api.institute.model.v1.*;
 import ca.bc.gov.educ.api.institute.repository.v1.*;
 import ca.bc.gov.educ.api.institute.struct.v1.District;
@@ -28,10 +29,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static ca.bc.gov.educ.api.institute.constants.v1.EventOutcome.DISTRICT_CREATED;
-import static ca.bc.gov.educ.api.institute.constants.v1.EventOutcome.DISTRICT_UPDATED;
-import static ca.bc.gov.educ.api.institute.constants.v1.EventType.CREATE_DISTRICT;
-import static ca.bc.gov.educ.api.institute.constants.v1.EventType.UPDATE_DISTRICT;
+import static ca.bc.gov.educ.api.institute.constants.v1.EventOutcome.*;
+import static ca.bc.gov.educ.api.institute.constants.v1.EventType.*;
 
 @Service
 public class DistrictService {
@@ -152,7 +151,7 @@ public class DistrictService {
   }
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)
-  public DistrictContactEntity createDistrictContact(DistrictContact contact, UUID districtId) {
+  public Pair<DistrictContactEntity, InstituteEvent> createDistrictContact(DistrictContact contact, UUID districtId) throws JsonProcessingException {
     var contactEntity = DistrictContactMapper.mapper.toModel(contact);
     Optional<DistrictEntity> curDistrictEntityOptional = districtRepository.findById(districtId);
 
@@ -160,7 +159,13 @@ public class DistrictService {
       contactEntity.setDistrictEntity(curDistrictEntityOptional.get());
       TransformUtil.uppercaseFields(contactEntity);
       districtContactRepository.save(contactEntity);
-      return contactEntity;
+      final InstituteEvent instituteEvent = EventUtil.createInstituteEvent(
+              contact.getCreateUser(), contact.getUpdateUser(),
+              JsonUtil.getJsonStringFromObject(DistrictContactMapper.mapper.toStructure(contactEntity)),
+              CREATE_CONTACT, CONTACT_CREATED
+      );
+      instituteEventRepository.save(instituteEvent);
+      return Pair.of(contactEntity, instituteEvent);
     } else {
       throw new EntityNotFoundException(DistrictEntity.class, DISTRICT_ID_ATTR, String.valueOf(districtId));
     }

@@ -165,10 +165,12 @@ public class DistrictAPIController implements DistrictAPIEndpoint {
   }
 
   @Override
-  public DistrictContact createDistrictContact(UUID districtId, DistrictContact contact) {
+  public DistrictContact createDistrictContact(UUID districtId, DistrictContact contact) throws JsonProcessingException {
     validatePayload(() -> this.districtContactPayloadValidator.validateCreatePayload(contact));
     RequestUtil.setAuditColumnsForCreate(contact);
-    return districtContactMapper.toStructure(districtService.createDistrictContact(contact, districtId));
+    var pair = districtService.createDistrictContact(contact, districtId);
+    publisher.dispatchChoreographyEvent(pair.getRight());
+    return districtContactMapper.toStructure(pair.getLeft());
   }
 
   @Override

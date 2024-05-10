@@ -105,7 +105,7 @@ public interface DistrictAPIEndpoint {
   @Tag(name = "District Contact Entity", description = "Endpoints for district contact entity.")
   @Schema(name = "DistrictContact", implementation = DistrictContact.class)
   @ResponseStatus(CREATED)
-  DistrictContact createDistrictContact(@PathVariable UUID districtId, @Validated @RequestBody DistrictContact contact);
+  DistrictContact createDistrictContact(@PathVariable UUID districtId, @Validated @RequestBody DistrictContact contact) throws JsonProcessingException;
 
   @PutMapping("/{districtId}/contact/{contactId}")
   @PreAuthorize("hasAuthority('SCOPE_WRITE_DISTRICT_CONTACT')")
