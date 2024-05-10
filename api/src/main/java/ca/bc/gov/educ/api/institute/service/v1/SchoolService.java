@@ -277,8 +277,8 @@ public class SchoolService {
   }
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)
-  public SchoolContactEntity updateSchoolContact(SchoolContact contact, UUID schoolId,
-      UUID contactId) {
+  public Pair<SchoolContactEntity, InstituteEvent> updateSchoolContact(SchoolContact contact, UUID schoolId,
+      UUID contactId) throws JsonProcessingException {
     var contactEntity = SchoolContactMapper.mapper.toModel(contact);
     if (contactId == null || !contactId.equals(contactEntity.getSchoolContactId())) {
       throw new EntityNotFoundException(SchoolContactEntity.class, CONTACT_ID_ATTR,
@@ -306,7 +306,13 @@ public class SchoolService {
       TransformUtil.uppercaseFields(currentContactEntity); // convert the input to upper case.
       currentContactEntity.setSchoolEntity(curSchoolEntityOptional.get());
       schoolContactRepository.save(currentContactEntity);
-      return currentContactEntity;
+      final InstituteEvent instituteEvent = EventUtil.createInstituteEvent(
+              contact.getCreateUser(), contact.getUpdateUser(),
+              JsonUtil.getJsonStringFromObject(SchoolContactMapper.mapper.toStructure(contactEntity)),
+              UPDATE_CONTACT, CONTACT_UPDATED
+      );
+      instituteEventRepository.save(instituteEvent);
+      return Pair.of(contactEntity, instituteEvent);
     } else {
       throw new EntityNotFoundException(SchoolContactEntity.class, CONTACT_ID_ATTR,
           String.valueOf(contactId));

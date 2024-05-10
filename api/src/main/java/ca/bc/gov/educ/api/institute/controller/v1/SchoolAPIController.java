@@ -166,10 +166,12 @@ public class SchoolAPIController implements SchoolAPIEndpoint {
   }
 
   @Override
-  public SchoolContact updateSchoolContact(UUID schoolId, UUID contactId, SchoolContact contact) {
+  public SchoolContact updateSchoolContact(UUID schoolId, UUID contactId, SchoolContact contact) throws JsonProcessingException {
     validatePayload(() -> this.contactPayloadValidator.validateUpdatePayload(contact));
     RequestUtil.setAuditColumnsForUpdate(contact);
-    return schoolContactMapper.toStructure(schoolService.updateSchoolContact(contact, schoolId, contactId));
+    var pair = schoolService.updateSchoolContact(contact, schoolId, contactId);
+    publisher.dispatchChoreographyEvent(pair.getRight());
+    return schoolContactMapper.toStructure(pair.getLeft());
   }
 
   @Override
