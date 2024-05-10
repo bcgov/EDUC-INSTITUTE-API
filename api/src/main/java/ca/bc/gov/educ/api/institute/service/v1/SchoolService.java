@@ -266,7 +266,7 @@ public class SchoolService {
       final InstituteEvent instituteEvent = EventUtil.createInstituteEvent(
               contact.getCreateUser(), contact.getUpdateUser(),
               JsonUtil.getJsonStringFromObject(SchoolContactMapper.mapper.toStructure(contactEntity)),
-              CREATE_CONTACT, CONTACT_CREATED
+              CREATE_SCHOOL_CONTACT, SCHOOL_CONTACT_CREATED
       );
       instituteEventRepository.save(instituteEvent);
       return Pair.of(contactEntity, instituteEvent);
@@ -309,7 +309,7 @@ public class SchoolService {
       final InstituteEvent instituteEvent = EventUtil.createInstituteEvent(
               contact.getCreateUser(), contact.getUpdateUser(),
               JsonUtil.getJsonStringFromObject(SchoolContactMapper.mapper.toStructure(contactEntity)),
-              UPDATE_CONTACT, CONTACT_UPDATED
+              UPDATE_SCHOOL_CONTACT, SCHOOL_CONTACT_UPDATED
       );
       instituteEventRepository.save(instituteEvent);
       return Pair.of(contactEntity, instituteEvent);

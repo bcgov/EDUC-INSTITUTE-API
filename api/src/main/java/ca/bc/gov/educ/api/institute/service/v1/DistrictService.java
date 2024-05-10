@@ -162,7 +162,7 @@ public class DistrictService {
       final InstituteEvent instituteEvent = EventUtil.createInstituteEvent(
               contact.getCreateUser(), contact.getUpdateUser(),
               JsonUtil.getJsonStringFromObject(DistrictContactMapper.mapper.toStructure(contactEntity)),
-              CREATE_CONTACT, CONTACT_CREATED
+              CREATE_DISTRICT_CONTACT, DISTRICT_CONTACT_CREATED
       );
       instituteEventRepository.save(instituteEvent);
       return Pair.of(contactEntity, instituteEvent);
@@ -198,7 +198,7 @@ public class DistrictService {
       final InstituteEvent instituteEvent = EventUtil.createInstituteEvent(
               contact.getCreateUser(), contact.getUpdateUser(),
               JsonUtil.getJsonStringFromObject(DistrictContactMapper.mapper.toStructure(contactEntity)),
-              UPDATE_CONTACT, CONTACT_UPDATED
+              UPDATE_DISTRICT_CONTACT, DISTRICT_CONTACT_UPDATED
       );
       instituteEventRepository.save(instituteEvent);
       return Pair.of(contactEntity, instituteEvent);
