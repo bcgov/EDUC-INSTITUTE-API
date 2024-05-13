@@ -205,9 +205,11 @@ public class DistrictService {
       currentContactEntity.setDistrictEntity(curDistrictEntityOptional.get());
       districtContactRepository.save(currentContactEntity);
       final InstituteEvent instituteEvent = EventUtil.createInstituteEvent(
-              contact.getCreateUser(), contact.getUpdateUser(),
+              contact.getCreateUser(),
+              contact.getUpdateUser(),
               JsonUtil.getJsonStringFromObject(DistrictContactMapper.mapper.toStructure(contactEntity)),
-              UPDATE_DISTRICT_CONTACT, DISTRICT_CONTACT_UPDATED
+              UPDATE_DISTRICT_CONTACT,
+              DISTRICT_CONTACT_UPDATED
       );
       instituteEventRepository.save(instituteEvent);
       return Pair.of(contactEntity, instituteEvent);

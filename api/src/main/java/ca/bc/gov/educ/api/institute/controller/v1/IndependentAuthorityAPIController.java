@@ -157,10 +157,12 @@ public class IndependentAuthorityAPIController implements IndependentAuthorityAP
   }
 
   @Override
-  public AuthorityContact updateIndependentAuthorityContact(UUID independentAuthorityId, UUID contactId, AuthorityContact contact) {
+  public AuthorityContact updateIndependentAuthorityContact(UUID independentAuthorityId, UUID contactId, AuthorityContact contact) throws JsonProcessingException {
     validatePayload(() -> this.authorityContactPayloadValidator.validateUpdatePayload(contact));
     RequestUtil.setAuditColumnsForUpdate(contact);
-    return authorityContactMapper.toStructure(independentAuthorityService.updateIndependentAuthorityContact(contact, independentAuthorityId, contactId));
+    var pair = independentAuthorityService.updateIndependentAuthorityContact(contact, independentAuthorityId, contactId);
+    publisher.dispatchChoreographyEvent(pair.getRight());
+    return authorityContactMapper.toStructure(pair.getLeft());
   }
 
   @Override

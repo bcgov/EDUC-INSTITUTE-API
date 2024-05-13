@@ -20,6 +20,7 @@ import ca.bc.gov.educ.api.institute.util.JsonUtil;
 import ca.bc.gov.educ.api.institute.util.RequestUtil;
 import ca.bc.gov.educ.api.institute.util.TransformUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import io.swagger.v3.core.util.Json;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.val;
@@ -177,7 +178,7 @@ public class IndependentAuthorityService {
   }
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)
-  public AuthorityContactEntity updateIndependentAuthorityContact(AuthorityContact contact, UUID independentAuthorityId, UUID contactId) {
+  public Pair<AuthorityContactEntity, InstituteEvent> updateIndependentAuthorityContact(AuthorityContact contact, UUID independentAuthorityId, UUID contactId) throws JsonProcessingException {
     var contactEntity = AuthorityContactMapper.mapper.toModel(contact);
     if (contactId == null || !contactId.equals(contactEntity.getAuthorityContactId())) {
       throw new EntityNotFoundException(AuthorityContactEntity.class, CONTACT_ID_ATTR, String.valueOf(contactId));
@@ -200,7 +201,14 @@ public class IndependentAuthorityService {
       TransformUtil.uppercaseFields(currentContactEntity); // convert the input to upper case.
       currentContactEntity.setIndependentAuthorityEntity(curIndependentAuthorityEntityOptional.get());
       authorityContactRepository.save(currentContactEntity);
-      return currentContactEntity;
+      final InstituteEvent instituteEvent = EventUtil.createInstituteEvent(
+             contact.getCreateUser(),
+             contact.getUpdateUser(),
+              JsonUtil.getJsonStringFromObject(AuthorityContactMapper.mapper.toStructure(contactEntity)),
+              UPDATE_AUTHORITY_CONTACT,
+              AUTHORITY_CONTACT_UPDATED
+      );
+      return Pair.of(currentContactEntity, instituteEvent);
     } else {
       throw new EntityNotFoundException(AuthorityContactEntity.class, CONTACT_ID_ATTR, String.valueOf(contactId));
     }
