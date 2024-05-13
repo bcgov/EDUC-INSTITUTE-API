@@ -320,17 +320,11 @@ public class SchoolService {
   }
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)
-  public InstituteEvent deleteSchoolContact(UUID schoolId, UUID contactId) throws JsonProcessingException {
-    Optional<SchoolEntity> curSchoolEntityOptional = schoolRepository.findById(schoolId);
-    if (curSchoolEntityOptional.isPresent()) {
-      final SchoolEntity currentSchoolEntity = curSchoolEntityOptional.get();
-      final Optional<SchoolContactEntity> schoolContactEntityOptional = currentSchoolEntity.getContacts()
-                      .stream()
-                      .filter(e -> e.getSchoolContactId().equals(contactId))
-                      .findFirst();
+  public InstituteEvent deleteSchoolContact(UUID contactId) throws JsonProcessingException {
+    Optional<SchoolContactEntity> schoolContactEntityOptional = schoolContactRepository.findById(contactId);
       if(schoolContactEntityOptional.isPresent()){
-        schoolContactRepository.deleteBySchoolContactIdAndSchoolEntity(contactId, currentSchoolEntity);
         SchoolContactEntity schoolContactEntity = schoolContactEntityOptional.get();
+        schoolContactRepository.delete(schoolContactEntity);
         final InstituteEvent instituteEvent = EventUtil.createInstituteEvent(
                 schoolContactEntity.getCreateUser(),
                 schoolContactEntity.getUpdateUser(),
@@ -341,12 +335,9 @@ public class SchoolService {
         instituteEventRepository.save(instituteEvent);
         return instituteEvent;
       }
-
-    } else {
-      throw new EntityNotFoundException(SchoolEntity.class, SCHOOL_ID_ATTR,
-          String.valueOf(schoolId));
+      else {
+      throw new EntityNotFoundException(SchoolContactEntity.class, CONTACT_ID_ATTR, String.valueOf(contactId));
     }
-    return null;
   }
 
   public Optional<NoteEntity> getSchoolNote(UUID schoolId, UUID noteId) {

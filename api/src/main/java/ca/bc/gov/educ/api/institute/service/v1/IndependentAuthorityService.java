@@ -215,18 +215,11 @@ public class IndependentAuthorityService {
   }
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)
-  public InstituteEvent deleteIndependentAuthorityContact(UUID independentAuthorityId, UUID contactId) throws JsonProcessingException {
-    Optional<IndependentAuthorityEntity> curIndependentAuthorityEntityOptional = independentAuthorityRepository.findById(independentAuthorityId);
-
-    if (curIndependentAuthorityEntityOptional.isPresent()) {
-      final IndependentAuthorityEntity currentIndependentAuthorityEntity = curIndependentAuthorityEntityOptional.get();
-      final Optional<AuthorityContactEntity> authorityContactEntityOptional = currentIndependentAuthorityEntity.getContacts()
-                      .stream()
-                      .filter(e -> e.getAuthorityContactId().equals(contactId))
-                      .findFirst();
+  public InstituteEvent deleteIndependentAuthorityContact(UUID contactId) throws JsonProcessingException {
+    Optional<AuthorityContactEntity> authorityContactEntityOptional = authorityContactRepository.findById(contactId);
       if(authorityContactEntityOptional.isPresent()){
-        authorityContactRepository.deleteByAuthorityContactIdAndIndependentAuthorityEntity(contactId, currentIndependentAuthorityEntity);
         AuthorityContactEntity authorityContactEntity = authorityContactEntityOptional.get();
+        authorityContactRepository.delete(authorityContactEntity);
         final InstituteEvent instituteEvent = EventUtil.createInstituteEvent(
           authorityContactEntity.getCreateUser(),
           authorityContactEntity.getUpdateUser(),
@@ -237,11 +230,9 @@ public class IndependentAuthorityService {
         instituteEventRepository.save(instituteEvent);
         return instituteEvent;
       }
-
-    } else {
-      throw new EntityNotFoundException(IndependentAuthorityEntity.class, INDEPENDENT_AUTHORITY_ID_ATTR, String.valueOf(independentAuthorityId));
+      else {
+      throw new EntityNotFoundException(AuthorityContactEntity.class, CONTACT_ID_ATTR, String.valueOf(contactId));
     }
-    return null;
   }
 
   public Optional<NoteEntity> getIndependentAuthorityNote(UUID independentAuthorityId, UUID noteId) {

@@ -184,10 +184,7 @@ public class DistrictAPIController implements DistrictAPIEndpoint {
 
   @Override
   public ResponseEntity<Void> deleteDistrictContact(UUID districtId, UUID contactId) throws JsonProcessingException {
-    InstituteEvent instituteEvent = this.districtService.deleteDistrictContact(districtId, contactId);
-    if(instituteEvent != null){
-      publisher.dispatchChoreographyEvent(instituteEvent);
-    }
+    publisher.dispatchChoreographyEvent(this.districtService.deleteDistrictContact(contactId));
     return ResponseEntity.noContent().build();
   }
 

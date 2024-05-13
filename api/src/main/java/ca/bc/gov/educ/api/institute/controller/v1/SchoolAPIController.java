@@ -177,10 +177,7 @@ public class SchoolAPIController implements SchoolAPIEndpoint {
 
   @Override
   public ResponseEntity<Void> deleteSchoolContact(UUID schoolId, UUID contactId) throws JsonProcessingException {
-    InstituteEvent instituteEvent = this.schoolService.deleteSchoolContact(schoolId, contactId);
-    if(instituteEvent != null){
-      publisher.dispatchChoreographyEvent(instituteEvent);
-    }
+    publisher.dispatchChoreographyEvent(this.schoolService.deleteSchoolContact(contactId));
     return ResponseEntity.noContent().build();
   }
 

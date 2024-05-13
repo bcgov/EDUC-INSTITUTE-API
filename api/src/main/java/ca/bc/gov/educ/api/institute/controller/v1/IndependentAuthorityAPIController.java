@@ -168,10 +168,7 @@ public class IndependentAuthorityAPIController implements IndependentAuthorityAP
 
   @Override
   public ResponseEntity<Void> deleteIndependentAuthorityContact(UUID independentAuthorityId, UUID contactId) throws JsonProcessingException {
-    InstituteEvent instituteEvent = this.independentAuthorityService.deleteIndependentAuthorityContact(independentAuthorityId, contactId);
-    if(instituteEvent != null){
-      publisher.dispatchChoreographyEvent(instituteEvent);
-    }
+    publisher.dispatchChoreographyEvent(this.independentAuthorityService.deleteIndependentAuthorityContact(contactId));
     return ResponseEntity.noContent().build();
   }
 
