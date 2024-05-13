@@ -9,6 +9,7 @@ import ca.bc.gov.educ.api.institute.mapper.v1.SchoolContactMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.SchoolMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.SchoolTombstoneMapper;
 import ca.bc.gov.educ.api.institute.messaging.jetstream.Publisher;
+import ca.bc.gov.educ.api.institute.model.v1.InstituteEvent;
 import ca.bc.gov.educ.api.institute.model.v1.SchoolContactTombstoneEntity;
 import ca.bc.gov.educ.api.institute.model.v1.SchoolEntity;
 import ca.bc.gov.educ.api.institute.model.v1.SchoolHistoryEntity;
@@ -175,8 +176,11 @@ public class SchoolAPIController implements SchoolAPIEndpoint {
   }
 
   @Override
-  public ResponseEntity<Void> deleteSchoolContact(UUID schoolId, UUID contactId) {
-    this.schoolService.deleteSchoolContact(schoolId, contactId);
+  public ResponseEntity<Void> deleteSchoolContact(UUID schoolId, UUID contactId) throws JsonProcessingException {
+    InstituteEvent instituteEvent = this.schoolService.deleteSchoolContact(schoolId, contactId);
+    if(instituteEvent != null){
+      publisher.dispatchChoreographyEvent(instituteEvent);
+    }
     return ResponseEntity.noContent().build();
   }
 

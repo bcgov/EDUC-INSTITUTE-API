@@ -85,7 +85,7 @@ public interface IndependentAuthorityAPIEndpoint {
   @Tag(name = "Independent Authority Contact Entity", description = "Endpoints for independent authority contact entity.")
   @Schema(name = "AuthorityContact", implementation = AuthorityContact.class)
   @ResponseStatus(CREATED)
-  AuthorityContact createIndependentAuthorityContact(@PathVariable UUID independentAuthorityId, @Validated @RequestBody AuthorityContact contact);
+  AuthorityContact createIndependentAuthorityContact(@PathVariable UUID independentAuthorityId, @Validated @RequestBody AuthorityContact contact) throws JsonProcessingException;
 
   @PutMapping("/{independentAuthorityId}/contact/{contactId}")
   @PreAuthorize("hasAuthority('SCOPE_WRITE_INDEPENDENT_AUTHORITY_CONTACT')")

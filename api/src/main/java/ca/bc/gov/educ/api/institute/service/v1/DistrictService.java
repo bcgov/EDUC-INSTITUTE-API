@@ -167,9 +167,11 @@ public class DistrictService {
       TransformUtil.uppercaseFields(contactEntity);
       districtContactRepository.save(contactEntity);
       final InstituteEvent instituteEvent = EventUtil.createInstituteEvent(
-              contact.getCreateUser(), contact.getUpdateUser(),
+              contact.getCreateUser(),
+              contact.getUpdateUser(),
               JsonUtil.getJsonStringFromObject(DistrictContactMapper.mapper.toStructure(contactEntity)),
-              CREATE_DISTRICT_CONTACT, DISTRICT_CONTACT_CREATED
+              CREATE_DISTRICT_CONTACT,
+              DISTRICT_CONTACT_CREATED
       );
       instituteEventRepository.save(instituteEvent);
       return Pair.of(contactEntity, instituteEvent);
@@ -227,9 +229,11 @@ public class DistrictService {
         districtContactRepository.deleteByDistrictContactIdAndDistrictEntity(contactId, currentDistrictEntity);
         DistrictContactEntity districtContactEntity = districtContactEntityOptional.get();
         final InstituteEvent instituteEvent = EventUtil.createInstituteEvent(
-                  districtContactEntity.getCreateUser(), districtContactEntity.getUpdateUser(),
+                  districtContactEntity.getCreateUser(),
+                  districtContactEntity.getUpdateUser(),
                   JsonUtil.getJsonStringFromObject(DistrictContactMapper.mapper.toStructure(districtContactEntity)),
-                  DELETE_DISTRICT_CONTACT, DISTRICT_CONTACT_DELETED
+                  DELETE_DISTRICT_CONTACT,
+                  DISTRICT_CONTACT_DELETED
           );
           instituteEventRepository.save(instituteEvent);
           return instituteEvent;

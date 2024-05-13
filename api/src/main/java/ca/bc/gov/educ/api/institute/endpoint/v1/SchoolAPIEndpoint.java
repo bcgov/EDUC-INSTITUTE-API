@@ -95,7 +95,7 @@ public interface SchoolAPIEndpoint {
   @PreAuthorize("hasAuthority('SCOPE_DELETE_SCHOOL_CONTACT')")
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
   @Tag(name = "School Contact Entity", description = "Endpoints for school contact entity.")
-  ResponseEntity<Void> deleteSchoolContact(@PathVariable UUID schoolId, @PathVariable UUID contactId);
+  ResponseEntity<Void> deleteSchoolContact(@PathVariable UUID schoolId, @PathVariable UUID contactId) throws JsonProcessingException;
 
   @GetMapping("/{schoolId}/note/{noteId}")
   @PreAuthorize("hasAuthority('SCOPE_READ_SCHOOL_NOTE')")

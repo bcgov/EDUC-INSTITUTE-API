@@ -34,10 +34,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static ca.bc.gov.educ.api.institute.constants.v1.EventOutcome.AUTHORITY_CREATED;
-import static ca.bc.gov.educ.api.institute.constants.v1.EventOutcome.AUTHORITY_UPDATED;
-import static ca.bc.gov.educ.api.institute.constants.v1.EventType.CREATE_AUTHORITY;
-import static ca.bc.gov.educ.api.institute.constants.v1.EventType.UPDATE_AUTHORITY;
+import static ca.bc.gov.educ.api.institute.constants.v1.EventOutcome.*;
+import static ca.bc.gov.educ.api.institute.constants.v1.EventType.*;
 
 @Service
 public class IndependentAuthorityService {
@@ -156,7 +154,7 @@ public class IndependentAuthorityService {
   }
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)
-  public AuthorityContactEntity createIndependentAuthorityContact(AuthorityContact contact, UUID independentAuthorityId) {
+  public Pair<AuthorityContactEntity, InstituteEvent> createIndependentAuthorityContact(AuthorityContact contact, UUID independentAuthorityId) throws JsonProcessingException {
     var contactEntity = AuthorityContactMapper.mapper.toModel(contact);
     Optional<IndependentAuthorityEntity> curIndependentAuthorityEntityOptional = independentAuthorityRepository.findById(independentAuthorityId);
 
@@ -164,7 +162,15 @@ public class IndependentAuthorityService {
       contactEntity.setIndependentAuthorityEntity(curIndependentAuthorityEntityOptional.get());
       TransformUtil.uppercaseFields(contactEntity);
       authorityContactRepository.save(contactEntity);
-      return contactEntity;
+      final InstituteEvent instituteEvent = EventUtil.createInstituteEvent(
+              contact.getCreateUser(),
+              contact.getUpdateUser(),
+              JsonUtil.getJsonStringFromObject(AuthorityContactMapper.mapper.toStructure(contactEntity)),
+              CREATE_AUTHORITY_CONTACT,
+              AUTHORITY_CONTACT_CREATED
+              );
+      instituteEventRepository.save(instituteEvent);
+      return Pair.of(contactEntity, instituteEvent);
     } else {
       throw new EntityNotFoundException(IndependentAuthorityEntity.class, INDEPENDENT_AUTHORITY_ID_ATTR, String.valueOf(independentAuthorityId));
     }
