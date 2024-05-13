@@ -4,7 +4,6 @@ import ca.bc.gov.educ.api.institute.exception.EntityNotFoundException;
 import ca.bc.gov.educ.api.institute.mapper.v1.DistrictContactMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.DistrictMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.NoteMapper;
-import ca.bc.gov.educ.api.institute.mapper.v1.SchoolContactMapper;
 import ca.bc.gov.educ.api.institute.messaging.jetstream.Publisher;
 import ca.bc.gov.educ.api.institute.model.v1.*;
 import ca.bc.gov.educ.api.institute.repository.v1.*;
@@ -221,6 +220,7 @@ public class DistrictService {
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public InstituteEvent deleteDistrictContact(UUID districtId, UUID contactId) throws JsonProcessingException {
     Optional<DistrictEntity> curDistrictEntityOptional = districtRepository.findById(districtId);
+
     if (curDistrictEntityOptional.isPresent()) {
       final DistrictEntity currentDistrictEntity = curDistrictEntityOptional.get();
       final Optional<DistrictContactEntity> districtContactEntityOptional = currentDistrictEntity.getContacts()

@@ -9,6 +9,7 @@ import ca.bc.gov.educ.api.institute.mapper.v1.IndependentAuthorityMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.NoteMapper;
 import ca.bc.gov.educ.api.institute.messaging.jetstream.Publisher;
 import ca.bc.gov.educ.api.institute.model.v1.IndependentAuthorityEntity;
+import ca.bc.gov.educ.api.institute.model.v1.InstituteEvent;
 import ca.bc.gov.educ.api.institute.service.v1.AuthoritySearchService;
 import ca.bc.gov.educ.api.institute.service.v1.IndependentAuthorityHistoryService;
 import ca.bc.gov.educ.api.institute.service.v1.IndependentAuthorityService;
@@ -166,8 +167,11 @@ public class IndependentAuthorityAPIController implements IndependentAuthorityAP
   }
 
   @Override
-  public ResponseEntity<Void> deleteIndependentAuthorityContact(UUID independentAuthorityId, UUID contactId) {
-    this.independentAuthorityService.deleteIndependentAuthorityContact(independentAuthorityId, contactId);
+  public ResponseEntity<Void> deleteIndependentAuthorityContact(UUID independentAuthorityId, UUID contactId) throws JsonProcessingException {
+    InstituteEvent instituteEvent = this.independentAuthorityService.deleteIndependentAuthorityContact(independentAuthorityId, contactId);
+    if(instituteEvent != null){
+      publisher.dispatchChoreographyEvent(instituteEvent);
+    }
     return ResponseEntity.noContent().build();
   }
 

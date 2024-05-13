@@ -20,7 +20,6 @@ import ca.bc.gov.educ.api.institute.util.JsonUtil;
 import ca.bc.gov.educ.api.institute.util.RequestUtil;
 import ca.bc.gov.educ.api.institute.util.TransformUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import io.swagger.v3.core.util.Json;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.val;
@@ -208,6 +207,7 @@ public class IndependentAuthorityService {
               UPDATE_AUTHORITY_CONTACT,
               AUTHORITY_CONTACT_UPDATED
       );
+      instituteEventRepository.save(instituteEvent);
       return Pair.of(currentContactEntity, instituteEvent);
     } else {
       throw new EntityNotFoundException(AuthorityContactEntity.class, CONTACT_ID_ATTR, String.valueOf(contactId));
@@ -215,16 +215,33 @@ public class IndependentAuthorityService {
   }
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)
-  public void deleteIndependentAuthorityContact(UUID independentAuthorityId, UUID contactId) {
+  public InstituteEvent deleteIndependentAuthorityContact(UUID independentAuthorityId, UUID contactId) throws JsonProcessingException {
     Optional<IndependentAuthorityEntity> curIndependentAuthorityEntityOptional = independentAuthorityRepository.findById(independentAuthorityId);
 
     if (curIndependentAuthorityEntityOptional.isPresent()) {
       final IndependentAuthorityEntity currentIndependentAuthorityEntity = curIndependentAuthorityEntityOptional.get();
-      authorityContactRepository.deleteByAuthorityContactIdAndIndependentAuthorityEntity(contactId, currentIndependentAuthorityEntity);
+      final Optional<AuthorityContactEntity> authorityContactEntityOptional = currentIndependentAuthorityEntity.getContacts()
+                      .stream()
+                      .filter(e -> e.getAuthorityContactId().equals(contactId))
+                      .findFirst();
+      if(authorityContactEntityOptional.isPresent()){
+        authorityContactRepository.deleteByAuthorityContactIdAndIndependentAuthorityEntity(contactId, currentIndependentAuthorityEntity);
+        AuthorityContactEntity authorityContactEntity = authorityContactEntityOptional.get();
+        final InstituteEvent instituteEvent = EventUtil.createInstituteEvent(
+          authorityContactEntity.getCreateUser(),
+          authorityContactEntity.getUpdateUser(),
+          JsonUtil.getJsonStringFromObject(AuthorityContactMapper.mapper.toStructure(authorityContactEntity)),
+          DELETE_AUTHORITY_CONTACT,
+                AUTHORITY_CONTACT_DELETED
+        );
+        instituteEventRepository.save(instituteEvent);
+        return instituteEvent;
+      }
+
     } else {
       throw new EntityNotFoundException(IndependentAuthorityEntity.class, INDEPENDENT_AUTHORITY_ID_ATTR, String.valueOf(independentAuthorityId));
     }
-
+    return null;
   }
 
   public Optional<NoteEntity> getIndependentAuthorityNote(UUID independentAuthorityId, UUID noteId) {

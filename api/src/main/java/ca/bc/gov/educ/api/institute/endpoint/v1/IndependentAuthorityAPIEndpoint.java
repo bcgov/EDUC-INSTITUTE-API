@@ -98,7 +98,7 @@ public interface IndependentAuthorityAPIEndpoint {
   @PreAuthorize("hasAuthority('SCOPE_DELETE_INDEPENDENT_AUTHORITY_CONTACT')")
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
   @Tag(name = "Independent Authority Contact Entity", description = "Endpoints for independent authority contact entity.")
-  ResponseEntity<Void> deleteIndependentAuthorityContact(@PathVariable UUID independentAuthorityId, @PathVariable UUID contactId);
+  ResponseEntity<Void> deleteIndependentAuthorityContact(@PathVariable UUID independentAuthorityId, @PathVariable UUID contactId) throws JsonProcessingException;
 
   @GetMapping("/{independentAuthorityId}/note/{noteId}")
   @PreAuthorize("hasAuthority('SCOPE_READ_INDEPENDENT_AUTHORITY_NOTE')")
