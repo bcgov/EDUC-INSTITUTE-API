@@ -215,7 +215,7 @@ public class DistrictService {
   }
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)
-  public void deleteDistrictContact(UUID districtId, UUID contactId) {
+  public InstituteEvent deleteDistrictContact(UUID districtId, UUID contactId) throws JsonProcessingException {
     Optional<DistrictEntity> curDistrictEntityOptional = districtRepository.findById(districtId);
     if (curDistrictEntityOptional.isPresent()) {
       final DistrictEntity currentDistrictEntity = curDistrictEntityOptional.get();
@@ -226,24 +226,20 @@ public class DistrictService {
       if (districtContactEntityOptional.isPresent()){
         districtContactRepository.deleteByDistrictContactIdAndDistrictEntity(contactId, currentDistrictEntity);
         DistrictContactEntity districtContactEntity = districtContactEntityOptional.get();
-        final InstituteEvent instituteEvent;
-        try {
-          instituteEvent = EventUtil.createInstituteEvent(
+        final InstituteEvent instituteEvent = EventUtil.createInstituteEvent(
                   districtContactEntity.getCreateUser(), districtContactEntity.getUpdateUser(),
                   JsonUtil.getJsonStringFromObject(DistrictContactMapper.mapper.toStructure(districtContactEntity)),
                   DELETE_DISTRICT_CONTACT, DISTRICT_CONTACT_DELETED
           );
           instituteEventRepository.save(instituteEvent);
-          publisher.dispatchChoreographyEvent(instituteEvent);
-        } catch (JsonProcessingException e) {
-          log.error(String.format("Exception encountered while attempting to DELETE District Contact id: %s", contactId), e);
-        }
+          return instituteEvent;
       }
 
     } else {
       throw new EntityNotFoundException(DistrictEntity.class, DISTRICT_ID_ATTR, String.valueOf(districtId));
     }
-
+    // Contact not found, so return null, no event. Intention is to DELETE.
+    return null;
   }
 
   public Optional<NoteEntity> getDistrictNote(UUID districtId, UUID noteId) {

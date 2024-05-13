@@ -11,6 +11,7 @@ import ca.bc.gov.educ.api.institute.mapper.v1.NoteMapper;
 import ca.bc.gov.educ.api.institute.messaging.jetstream.Publisher;
 import ca.bc.gov.educ.api.institute.model.v1.DistrictContactTombstoneEntity;
 import ca.bc.gov.educ.api.institute.model.v1.DistrictEntity;
+import ca.bc.gov.educ.api.institute.model.v1.InstituteEvent;
 import ca.bc.gov.educ.api.institute.service.v1.DistrictContactSearchService;
 import ca.bc.gov.educ.api.institute.service.v1.DistrictHistoryService;
 import ca.bc.gov.educ.api.institute.service.v1.DistrictSearchService;
@@ -183,8 +184,11 @@ public class DistrictAPIController implements DistrictAPIEndpoint {
   }
 
   @Override
-  public ResponseEntity<Void> deleteDistrictContact(UUID districtId, UUID contactId) {
-    this.districtService.deleteDistrictContact(districtId, contactId);
+  public ResponseEntity<Void> deleteDistrictContact(UUID districtId, UUID contactId) throws JsonProcessingException {
+    InstituteEvent instituteEvent = this.districtService.deleteDistrictContact(districtId, contactId);
+    if(instituteEvent != null){
+      publisher.dispatchChoreographyEvent(instituteEvent);
+    }
     return ResponseEntity.noContent().build();
   }
 

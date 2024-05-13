@@ -118,7 +118,7 @@ public interface DistrictAPIEndpoint {
   @PreAuthorize("hasAuthority('SCOPE_DELETE_DISTRICT_CONTACT')")
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
   @Tag(name = "District Contact Entity", description = "Endpoints for district contact entity.")
-  ResponseEntity<Void> deleteDistrictContact(@PathVariable UUID districtId, @PathVariable UUID contactId);
+  ResponseEntity<Void> deleteDistrictContact(@PathVariable UUID districtId, @PathVariable UUID contactId) throws JsonProcessingException;
 
   @GetMapping("/{districtId}/note/{noteId}")
   @PreAuthorize("hasAuthority('SCOPE_READ_DISTRICT_NOTE')")
