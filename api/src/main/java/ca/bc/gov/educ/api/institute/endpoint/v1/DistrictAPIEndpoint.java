@@ -105,20 +105,20 @@ public interface DistrictAPIEndpoint {
   @Tag(name = "District Contact Entity", description = "Endpoints for district contact entity.")
   @Schema(name = "DistrictContact", implementation = DistrictContact.class)
   @ResponseStatus(CREATED)
-  DistrictContact createDistrictContact(@PathVariable UUID districtId, @Validated @RequestBody DistrictContact contact);
+  DistrictContact createDistrictContact(@PathVariable UUID districtId, @Validated @RequestBody DistrictContact contact) throws JsonProcessingException;
 
   @PutMapping("/{districtId}/contact/{contactId}")
   @PreAuthorize("hasAuthority('SCOPE_WRITE_DISTRICT_CONTACT')")
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
   @Tag(name = "District Contact Entity", description = "Endpoints for district contact entity.")
   @Schema(name = "DistrictContact", implementation = DistrictContact.class)
-  DistrictContact updateDistrictContact(@PathVariable UUID districtId, @PathVariable UUID contactId, @Validated @RequestBody DistrictContact contact);
+  DistrictContact updateDistrictContact(@PathVariable UUID districtId, @PathVariable UUID contactId, @Validated @RequestBody DistrictContact contact) throws JsonProcessingException;
 
   @DeleteMapping("/{districtId}/contact/{contactId}")
   @PreAuthorize("hasAuthority('SCOPE_DELETE_DISTRICT_CONTACT')")
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
   @Tag(name = "District Contact Entity", description = "Endpoints for district contact entity.")
-  ResponseEntity<Void> deleteDistrictContact(@PathVariable UUID districtId, @PathVariable UUID contactId);
+  ResponseEntity<Void> deleteDistrictContact(@PathVariable UUID districtId, @PathVariable UUID contactId) throws JsonProcessingException;
 
   @GetMapping("/{districtId}/note/{noteId}")
   @PreAuthorize("hasAuthority('SCOPE_READ_DISTRICT_NOTE')")

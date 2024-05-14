@@ -9,6 +9,7 @@ import ca.bc.gov.educ.api.institute.mapper.v1.IndependentAuthorityMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.NoteMapper;
 import ca.bc.gov.educ.api.institute.messaging.jetstream.Publisher;
 import ca.bc.gov.educ.api.institute.model.v1.IndependentAuthorityEntity;
+import ca.bc.gov.educ.api.institute.model.v1.InstituteEvent;
 import ca.bc.gov.educ.api.institute.service.v1.AuthoritySearchService;
 import ca.bc.gov.educ.api.institute.service.v1.IndependentAuthorityHistoryService;
 import ca.bc.gov.educ.api.institute.service.v1.IndependentAuthorityService;
@@ -148,22 +149,26 @@ public class IndependentAuthorityAPIController implements IndependentAuthorityAP
   }
 
   @Override
-  public AuthorityContact createIndependentAuthorityContact(UUID independentAuthorityId, AuthorityContact contact) {
+  public AuthorityContact createIndependentAuthorityContact(UUID independentAuthorityId, AuthorityContact contact) throws JsonProcessingException {
     validatePayload(() -> this.authorityContactPayloadValidator.validateCreatePayload(contact));
     RequestUtil.setAuditColumnsForCreate(contact);
-    return authorityContactMapper.toStructure(independentAuthorityService.createIndependentAuthorityContact(contact, independentAuthorityId));
+    var pair = independentAuthorityService.createIndependentAuthorityContact(contact, independentAuthorityId);
+    publisher.dispatchChoreographyEvent(pair.getRight());
+    return authorityContactMapper.toStructure(pair.getLeft());
   }
 
   @Override
-  public AuthorityContact updateIndependentAuthorityContact(UUID independentAuthorityId, UUID contactId, AuthorityContact contact) {
+  public AuthorityContact updateIndependentAuthorityContact(UUID independentAuthorityId, UUID contactId, AuthorityContact contact) throws JsonProcessingException {
     validatePayload(() -> this.authorityContactPayloadValidator.validateUpdatePayload(contact));
     RequestUtil.setAuditColumnsForUpdate(contact);
-    return authorityContactMapper.toStructure(independentAuthorityService.updateIndependentAuthorityContact(contact, independentAuthorityId, contactId));
+    var pair = independentAuthorityService.updateIndependentAuthorityContact(contact, independentAuthorityId, contactId);
+    publisher.dispatchChoreographyEvent(pair.getRight());
+    return authorityContactMapper.toStructure(pair.getLeft());
   }
 
   @Override
-  public ResponseEntity<Void> deleteIndependentAuthorityContact(UUID independentAuthorityId, UUID contactId) {
-    this.independentAuthorityService.deleteIndependentAuthorityContact(independentAuthorityId, contactId);
+  public ResponseEntity<Void> deleteIndependentAuthorityContact(UUID independentAuthorityId, UUID contactId) throws JsonProcessingException {
+    publisher.dispatchChoreographyEvent(this.independentAuthorityService.deleteIndependentAuthorityContact(contactId));
     return ResponseEntity.noContent().build();
   }
 

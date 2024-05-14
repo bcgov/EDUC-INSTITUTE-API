@@ -11,6 +11,7 @@ import ca.bc.gov.educ.api.institute.mapper.v1.NoteMapper;
 import ca.bc.gov.educ.api.institute.messaging.jetstream.Publisher;
 import ca.bc.gov.educ.api.institute.model.v1.DistrictContactTombstoneEntity;
 import ca.bc.gov.educ.api.institute.model.v1.DistrictEntity;
+import ca.bc.gov.educ.api.institute.model.v1.InstituteEvent;
 import ca.bc.gov.educ.api.institute.service.v1.DistrictContactSearchService;
 import ca.bc.gov.educ.api.institute.service.v1.DistrictHistoryService;
 import ca.bc.gov.educ.api.institute.service.v1.DistrictSearchService;
@@ -44,7 +45,6 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
@@ -165,22 +165,26 @@ public class DistrictAPIController implements DistrictAPIEndpoint {
   }
 
   @Override
-  public DistrictContact createDistrictContact(UUID districtId, DistrictContact contact) {
+  public DistrictContact createDistrictContact(UUID districtId, DistrictContact contact) throws JsonProcessingException {
     validatePayload(() -> this.districtContactPayloadValidator.validateCreatePayload(contact));
     RequestUtil.setAuditColumnsForCreate(contact);
-    return districtContactMapper.toStructure(districtService.createDistrictContact(contact, districtId));
+    var pair = districtService.createDistrictContact(contact, districtId);
+    publisher.dispatchChoreographyEvent(pair.getRight());
+    return districtContactMapper.toStructure(pair.getLeft());
   }
 
   @Override
-  public DistrictContact updateDistrictContact(UUID districtId, UUID contactId, DistrictContact contact) {
+  public DistrictContact updateDistrictContact(UUID districtId, UUID contactId, DistrictContact contact) throws JsonProcessingException {
     validatePayload(() -> this.districtContactPayloadValidator.validateUpdatePayload(contact));
     RequestUtil.setAuditColumnsForUpdate(contact);
-    return districtContactMapper.toStructure(districtService.updateDistrictContact(contact, districtId, contactId));
+    var pair = districtService.updateDistrictContact(contact, districtId, contactId);
+    publisher.dispatchChoreographyEvent(pair.getRight());
+    return districtContactMapper.toStructure(pair.getLeft());
   }
 
   @Override
-  public ResponseEntity<Void> deleteDistrictContact(UUID districtId, UUID contactId) {
-    this.districtService.deleteDistrictContact(districtId, contactId);
+  public ResponseEntity<Void> deleteDistrictContact(UUID districtId, UUID contactId) throws JsonProcessingException {
+    publisher.dispatchChoreographyEvent(this.districtService.deleteDistrictContact(contactId));
     return ResponseEntity.noContent().build();
   }
 

@@ -34,10 +34,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static ca.bc.gov.educ.api.institute.constants.v1.EventOutcome.AUTHORITY_CREATED;
-import static ca.bc.gov.educ.api.institute.constants.v1.EventOutcome.AUTHORITY_UPDATED;
-import static ca.bc.gov.educ.api.institute.constants.v1.EventType.CREATE_AUTHORITY;
-import static ca.bc.gov.educ.api.institute.constants.v1.EventType.UPDATE_AUTHORITY;
+import static ca.bc.gov.educ.api.institute.constants.v1.EventOutcome.*;
+import static ca.bc.gov.educ.api.institute.constants.v1.EventType.*;
 
 @Service
 public class IndependentAuthorityService {
@@ -156,7 +154,7 @@ public class IndependentAuthorityService {
   }
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)
-  public AuthorityContactEntity createIndependentAuthorityContact(AuthorityContact contact, UUID independentAuthorityId) {
+  public Pair<AuthorityContactEntity, InstituteEvent> createIndependentAuthorityContact(AuthorityContact contact, UUID independentAuthorityId) throws JsonProcessingException {
     var contactEntity = AuthorityContactMapper.mapper.toModel(contact);
     Optional<IndependentAuthorityEntity> curIndependentAuthorityEntityOptional = independentAuthorityRepository.findById(independentAuthorityId);
 
@@ -164,14 +162,22 @@ public class IndependentAuthorityService {
       contactEntity.setIndependentAuthorityEntity(curIndependentAuthorityEntityOptional.get());
       TransformUtil.uppercaseFields(contactEntity);
       authorityContactRepository.save(contactEntity);
-      return contactEntity;
+      final InstituteEvent instituteEvent = EventUtil.createInstituteEvent(
+              contact.getCreateUser(),
+              contact.getUpdateUser(),
+              JsonUtil.getJsonStringFromObject(AuthorityContactMapper.mapper.toStructure(contactEntity)),
+              CREATE_AUTHORITY_CONTACT,
+              AUTHORITY_CONTACT_CREATED
+              );
+      instituteEventRepository.save(instituteEvent);
+      return Pair.of(contactEntity, instituteEvent);
     } else {
       throw new EntityNotFoundException(IndependentAuthorityEntity.class, INDEPENDENT_AUTHORITY_ID_ATTR, String.valueOf(independentAuthorityId));
     }
   }
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)
-  public AuthorityContactEntity updateIndependentAuthorityContact(AuthorityContact contact, UUID independentAuthorityId, UUID contactId) {
+  public Pair<AuthorityContactEntity, InstituteEvent> updateIndependentAuthorityContact(AuthorityContact contact, UUID independentAuthorityId, UUID contactId) throws JsonProcessingException {
     var contactEntity = AuthorityContactMapper.mapper.toModel(contact);
     if (contactId == null || !contactId.equals(contactEntity.getAuthorityContactId())) {
       throw new EntityNotFoundException(AuthorityContactEntity.class, CONTACT_ID_ATTR, String.valueOf(contactId));
@@ -194,23 +200,39 @@ public class IndependentAuthorityService {
       TransformUtil.uppercaseFields(currentContactEntity); // convert the input to upper case.
       currentContactEntity.setIndependentAuthorityEntity(curIndependentAuthorityEntityOptional.get());
       authorityContactRepository.save(currentContactEntity);
-      return currentContactEntity;
+      final InstituteEvent instituteEvent = EventUtil.createInstituteEvent(
+             contact.getCreateUser(),
+             contact.getUpdateUser(),
+              JsonUtil.getJsonStringFromObject(AuthorityContactMapper.mapper.toStructure(contactEntity)),
+              UPDATE_AUTHORITY_CONTACT,
+              AUTHORITY_CONTACT_UPDATED
+      );
+      instituteEventRepository.save(instituteEvent);
+      return Pair.of(currentContactEntity, instituteEvent);
     } else {
       throw new EntityNotFoundException(AuthorityContactEntity.class, CONTACT_ID_ATTR, String.valueOf(contactId));
     }
   }
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)
-  public void deleteIndependentAuthorityContact(UUID independentAuthorityId, UUID contactId) {
-    Optional<IndependentAuthorityEntity> curIndependentAuthorityEntityOptional = independentAuthorityRepository.findById(independentAuthorityId);
-
-    if (curIndependentAuthorityEntityOptional.isPresent()) {
-      final IndependentAuthorityEntity currentIndependentAuthorityEntity = curIndependentAuthorityEntityOptional.get();
-      authorityContactRepository.deleteByAuthorityContactIdAndIndependentAuthorityEntity(contactId, currentIndependentAuthorityEntity);
-    } else {
-      throw new EntityNotFoundException(IndependentAuthorityEntity.class, INDEPENDENT_AUTHORITY_ID_ATTR, String.valueOf(independentAuthorityId));
+  public InstituteEvent deleteIndependentAuthorityContact(UUID contactId) throws JsonProcessingException {
+    Optional<AuthorityContactEntity> authorityContactEntityOptional = authorityContactRepository.findById(contactId);
+      if(authorityContactEntityOptional.isPresent()){
+        AuthorityContactEntity authorityContactEntity = authorityContactEntityOptional.get();
+        authorityContactRepository.delete(authorityContactEntity);
+        final InstituteEvent instituteEvent = EventUtil.createInstituteEvent(
+          authorityContactEntity.getCreateUser(),
+          authorityContactEntity.getUpdateUser(),
+          JsonUtil.getJsonStringFromObject(AuthorityContactMapper.mapper.toStructure(authorityContactEntity)),
+          DELETE_AUTHORITY_CONTACT,
+                AUTHORITY_CONTACT_DELETED
+        );
+        instituteEventRepository.save(instituteEvent);
+        return instituteEvent;
+      }
+      else {
+      throw new EntityNotFoundException(AuthorityContactEntity.class, CONTACT_ID_ATTR, String.valueOf(contactId));
     }
-
   }
 
   public Optional<NoteEntity> getIndependentAuthorityNote(UUID independentAuthorityId, UUID noteId) {
