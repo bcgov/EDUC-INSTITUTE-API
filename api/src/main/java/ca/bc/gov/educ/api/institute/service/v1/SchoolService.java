@@ -308,11 +308,11 @@ public class SchoolService {
       schoolContactRepository.save(currentContactEntity);
       final InstituteEvent instituteEvent = EventUtil.createInstituteEvent(
               contact.getCreateUser(), contact.getUpdateUser(),
-              JsonUtil.getJsonStringFromObject(SchoolContactMapper.mapper.toStructure(contactEntity)),
+              JsonUtil.getJsonStringFromObject(SchoolContactMapper.mapper.toStructure(currentContactEntity)),
               UPDATE_SCHOOL_CONTACT, SCHOOL_CONTACT_UPDATED
       );
       instituteEventRepository.save(instituteEvent);
-      return Pair.of(contactEntity, instituteEvent);
+      return Pair.of(currentContactEntity, instituteEvent);
     } else {
       throw new EntityNotFoundException(SchoolContactEntity.class, CONTACT_ID_ATTR,
           String.valueOf(contactId));
