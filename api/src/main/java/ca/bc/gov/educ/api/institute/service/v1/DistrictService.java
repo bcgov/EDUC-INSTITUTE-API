@@ -206,7 +206,7 @@ public class DistrictService {
       final InstituteEvent instituteEvent = EventUtil.createInstituteEvent(
               contact.getCreateUser(),
               contact.getUpdateUser(),
-              JsonUtil.getJsonStringFromObject(DistrictContactMapper.mapper.toStructure(contactEntity)),
+              JsonUtil.getJsonStringFromObject(DistrictContactMapper.mapper.toStructure(currentContactEntity)),
               UPDATE_DISTRICT_CONTACT,
               DISTRICT_CONTACT_UPDATED
       );
