@@ -462,6 +462,7 @@ public class SchoolService {
     final InstituteEvent instituteEvent = EventUtil.createInstituteEvent(
         movedSchool.getUpdateUser(), movedSchool.getUpdateUser(),
         JsonUtil.getJsonStringFromObject(moveSchoolData), MOVE_SCHOOL, SCHOOL_MOVED);
+    instituteEventRepository.save(instituteEvent);
     return Pair.of(moveSchoolData, instituteEvent);
   }
 
