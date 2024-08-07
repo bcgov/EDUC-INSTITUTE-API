@@ -118,6 +118,9 @@ public class SchoolControllerTest {
   @Autowired
   SchoolFundingGroupCodeRepository schoolFundingGroupCodeRepository;
 
+  @Autowired
+  IndependentSchoolFundingGroupRepository independentSchoolFundingGroupRepository;
+
   @BeforeEach
   public void before(){
     MockitoAnnotations.openMocks(this);
@@ -151,6 +154,7 @@ public class SchoolControllerTest {
     this.schoolOrganizationCodeRepository.deleteAll();
     this.schoolReportingRequirementCodeRepository.deleteAll();
     this.facilityTypeCodeRepository.deleteAll();
+    this.independentSchoolFundingGroupRepository.deleteAll();
   }
 
   @Test
@@ -164,6 +168,30 @@ public class SchoolControllerTest {
     this.mockMvc.perform(get(URL.BASE_URL_SCHOOL).with(mockAuthority))
       .andDo(print()).andExpect(status().isOk()).andExpect(MockMvcResultMatchers.jsonPath("$.[0].schoolId")
         .value(entity.getSchoolId().toString()));
+  }
+
+  @Test
+  void testAllSchoolsFundingGroups_ShouldReturnStatusOK() throws Exception {
+    final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_SCHOOL";
+    final var mockAuthority = oidcLogin().authorities(grantedAuthority);
+    final DistrictTombstoneEntity dist = this.districtTombstoneRepository.save(this.createDistrictData());
+    var schoolEntity = this.createSchoolData();
+    schoolEntity.setDistrictEntity(dist);
+    final SchoolEntity entity = this.schoolRepository.save(schoolEntity);
+
+    IndependentSchoolFundingGroupEntity fundingGroup = new IndependentSchoolFundingGroupEntity();
+    fundingGroup.setSchoolFundingGroupCode("GROUP01");
+    fundingGroup.setSchoolGradeCode("01");
+    fundingGroup.setCreateUser("ABC");
+    fundingGroup.setUpdateUser("ABC");
+    fundingGroup.setCreateDate(LocalDateTime.now());
+    fundingGroup.setUpdateDate(LocalDateTime.now());
+    fundingGroup.setSchoolEntity(entity);
+    this.independentSchoolFundingGroupRepository.save(fundingGroup);
+
+    this.mockMvc.perform(get(URL.BASE_URL_SCHOOL + "/funding-groups").with(mockAuthority))
+            .andDo(print()).andExpect(status().isOk()).andExpect(MockMvcResultMatchers.jsonPath("$.[0].schoolID")
+                    .value(entity.getSchoolId().toString()));
   }
 
   @Test
@@ -188,20 +216,6 @@ public class SchoolControllerTest {
     var schoolEntity = this.createSchoolData();
     schoolEntity.setDistrictEntity(dist);
     final SchoolEntity entity = this.schoolRepository.save(schoolEntity);
-    this.mockMvc.perform(get(URL.BASE_URL_SCHOOL + "/" + entity.getSchoolId()).with(mockAuthority))
-      .andDo(print()).andExpect(status().isOk()).andExpect(MockMvcResultMatchers.jsonPath("$.schoolId")
-        .value(entity.getSchoolId().toString()));
-  }
-
-  @Test
-  void testRetrieveSchoolWithAddress_GivenValidID_ShouldReturnStatusOK() throws Exception {
-    final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_SCHOOL";
-    final var mockAuthority = oidcLogin().authorities(grantedAuthority);
-    final DistrictTombstoneEntity dist = this.districtTombstoneRepository.save(this.createDistrictData());
-    var schoolEntity = this.createSchoolData();
-    schoolEntity.setDistrictEntity(dist);
-    final SchoolEntity entity = this.schoolRepository.save(schoolEntity);
-
     this.mockMvc.perform(get(URL.BASE_URL_SCHOOL + "/" + entity.getSchoolId()).with(mockAuthority))
       .andDo(print()).andExpect(status().isOk()).andExpect(MockMvcResultMatchers.jsonPath("$.schoolId")
         .value(entity.getSchoolId().toString()));
@@ -266,7 +280,7 @@ public class SchoolControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .accept(MediaType.APPLICATION_JSON)
         .content(asJsonString(entity))
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_SCHOOL"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "DELETE_SCHOOL"))))
       .andDo(print())
       .andExpect(status().isNoContent());
 
@@ -276,7 +290,7 @@ public class SchoolControllerTest {
 
   @Test
   void testUpdateSchool_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
-    final var school = this.createSchoolData();
+    this.createSchoolData();
     final DistrictTombstoneEntity dist = this.districtTombstoneRepository.save(this.createDistrictData());
     var schoolEntity = this.createSchoolData();
     schoolEntity.setDistrictEntity(dist);
@@ -293,7 +307,7 @@ public class SchoolControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .accept(MediaType.APPLICATION_JSON)
         .content(asJsonString(schoolStruct))
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SCHOOL"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_SCHOOL"))))
       .andDo(print())
       .andExpect(status().isOk())
       .andExpect(MockMvcResultMatchers.jsonPath("$.displayName").value(entity.getDisplayName()));
@@ -301,7 +315,7 @@ public class SchoolControllerTest {
 
   @Test
   void testUpdateSchool_GivenValidPayloadWithNoSpecCharDisplayName_ShouldReturnStatusCreated() throws Exception {
-    final var school = this.createSchoolData();
+    this.createSchoolData();
     final DistrictTombstoneEntity dist = this.districtTombstoneRepository.save(this.createDistrictData());
     var schoolEntity = this.createSchoolData();
     schoolEntity.setDistrictEntity(dist);
@@ -319,7 +333,7 @@ public class SchoolControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .accept(MediaType.APPLICATION_JSON)
         .content(asJsonString(schoolStruct))
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SCHOOL"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_SCHOOL"))))
       .andDo(print())
       .andExpect(status().isOk())
       .andExpect(MockMvcResultMatchers.jsonPath("$.displayNameNoSpecialChars").value(entity.getDisplayNameNoSpecialChars()));
@@ -327,7 +341,7 @@ public class SchoolControllerTest {
 
   @Test
   void testUpdateSchool_GivenInvalidURLSchoolId_ShouldReturnNotFound() throws Exception {
-    final var school = this.createSchoolData();
+    this.createSchoolData();
     final DistrictTombstoneEntity dist = this.districtTombstoneRepository.save(this.createDistrictData());
     var schoolEntity = this.createSchoolData();
     schoolEntity.setDistrictEntity(dist);
@@ -343,7 +357,7 @@ public class SchoolControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON)
             .content(asJsonString(schoolStruct))
-            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SCHOOL"))))
+            .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_SCHOOL"))))
         .andDo(print())
         .andExpect(status().isNotFound());
   }
@@ -351,7 +365,7 @@ public class SchoolControllerTest {
   @Test
   void testUpdateSchool_GivenInvalidPayload_ShouldReturnNotFound() throws Exception {
     UUID badSchoolId = UUID.randomUUID();
-    final var school = this.createSchoolData();
+    this.createSchoolData();
     final DistrictTombstoneEntity dist = this.districtTombstoneRepository.save(this.createDistrictData());
     var schoolEntity = this.createSchoolData();
     schoolEntity.setDistrictEntity(dist);
@@ -368,13 +382,13 @@ public class SchoolControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON)
             .content(asJsonString(schoolStruct))
-            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SCHOOL"))))
+            .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_SCHOOL"))))
         .andDo(print())
         .andExpect(status().isNotFound());
   }
   @Test
   void testUpdateSchoolWithAddress_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
-    final var school = this.createSchoolData();
+    this.createSchoolData();
     final DistrictTombstoneEntity dist = this.districtTombstoneRepository.save(this.createDistrictData());
     var schoolEntity = this.createSchoolData();
     schoolEntity.setDistrictEntity(dist);
@@ -397,7 +411,7 @@ public class SchoolControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .accept(MediaType.APPLICATION_JSON)
         .content(asJsonString(schoolStruct))
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SCHOOL"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_SCHOOL"))))
       .andDo(print())
       .andExpect(status().isOk())
       .andExpect(MockMvcResultMatchers.jsonPath("$.displayName").value(entity.getDisplayName()));
@@ -425,7 +439,7 @@ public class SchoolControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .accept(MediaType.APPLICATION_JSON)
         .content(asJsonString(auth))
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SCHOOL"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_SCHOOL"))))
       .andDo(print())
       .andExpect(status().isOk())
       .andExpect(MockMvcResultMatchers.jsonPath("$.addresses.[1].addressLine1").value("123 TESTING"));
@@ -453,7 +467,7 @@ public class SchoolControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .accept(MediaType.APPLICATION_JSON)
         .content(asJsonString(mappedSchool))
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SCHOOL"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_SCHOOL"))))
       .andDo(print())
       .andExpect(status().isOk())
       .andExpect(MockMvcResultMatchers.jsonPath("$.grades[0].schoolGradeCode").value("01"));
@@ -481,7 +495,7 @@ public class SchoolControllerTest {
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON)
                     .content(asJsonString(mappedSchool))
-                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SCHOOL"))))
+                    .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_SCHOOL"))))
             .andDo(print())
             .andExpect(status().isOk())
             .andExpect(MockMvcResultMatchers.jsonPath("$.schoolFundingGroups[0].schoolFundingGroupCode").value("GROUP01"));
@@ -515,7 +529,7 @@ public class SchoolControllerTest {
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON)
                     .content(asJsonString(mappedSchool))
-                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SCHOOL"))))
+                    .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_SCHOOL"))))
             .andDo(print())
             .andExpect(status().isOk())
             .andExpect(MockMvcResultMatchers.jsonPath("$.schoolFundingGroups[0].schoolFundingGroupCode").value("GROUP01"));
@@ -535,7 +549,7 @@ public class SchoolControllerTest {
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON)
                     .content(asJsonString(mappedSchool2))
-                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SCHOOL"))))
+                    .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_SCHOOL"))))
             .andDo(print())
             .andExpect(status().isOk())
             .andExpect(MockMvcResultMatchers.jsonPath("$.schoolFundingGroups", hasSize(2)));
@@ -559,7 +573,7 @@ public class SchoolControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .accept(MediaType.APPLICATION_JSON)
         .content(asJsonString(school))
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SCHOOL"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_SCHOOL"))))
       .andDo(print())
       .andExpect(status().isOk())
       .andExpect(MockMvcResultMatchers.jsonPath("$.neighborhoodLearning[0].neighborhoodLearningTypeCode").value("COMM_USE"));
@@ -583,7 +597,7 @@ public class SchoolControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .accept(MediaType.APPLICATION_JSON)
         .content(asJsonString(school))
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SCHOOL"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_SCHOOL"))))
       .andDo(print())
       .andExpect(status().isOk())
       .andExpect(MockMvcResultMatchers.jsonPath("$.neighborhoodLearning[0].neighborhoodLearningTypeCode").value("COMM_USE"));
@@ -600,7 +614,7 @@ public class SchoolControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .accept(MediaType.APPLICATION_JSON)
         .content(asJsonString(schoolReturn))
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SCHOOL"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_SCHOOL"))))
       .andDo(print())
       .andExpect(status().isOk())
       .andExpect(MockMvcResultMatchers.jsonPath("$.neighborhoodLearning[0].neighborhoodLearningId").value(schoolReturn.getNeighborhoodLearning().get(0).getNeighborhoodLearningId()));
@@ -630,7 +644,7 @@ public class SchoolControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .accept(MediaType.APPLICATION_JSON)
         .content(asJsonString(mappedSchool))
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SCHOOL"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_SCHOOL"))))
       .andDo(print())
       .andExpect(status().isCreated())
       .andExpect(MockMvcResultMatchers.jsonPath("$.schoolNumber").exists())
@@ -652,7 +666,7 @@ public class SchoolControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .accept(MediaType.APPLICATION_JSON)
         .content(asJsonString(school))
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SCHOOL"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_SCHOOL"))))
       .andDo(print())
       .andExpect(status().isBadRequest());
   }
@@ -665,7 +679,7 @@ public class SchoolControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .accept(MediaType.APPLICATION_JSON)
         .content(asJsonString(contactEntity))
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SCHOOL_CONTACT"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_SCHOOL_CONTACT"))))
       .andDo(print())
       .andExpect(status().isCreated())
       .andExpect(MockMvcResultMatchers.jsonPath("$.lastName").value(contactEntity.getLastName()));
@@ -681,7 +695,7 @@ public class SchoolControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .accept(MediaType.APPLICATION_JSON)
         .content(asJsonString(contactEntity))
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SCHOOL_CONTACT"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_SCHOOL_CONTACT"))))
       .andDo(print())
       .andExpect(status().isCreated())
       .andExpect(MockMvcResultMatchers.jsonPath("$.lastName").value(contactEntity.getLastName()));
@@ -702,7 +716,7 @@ public class SchoolControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .accept(MediaType.APPLICATION_JSON)
         .content(asJsonString(contactEntity))
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SCHOOL_CONTACT"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_SCHOOL_CONTACT"))))
       .andDo(print())
       .andExpect(status().isCreated())
       .andExpect(MockMvcResultMatchers.jsonPath("$.lastName").value(contactEntity.getLastName()))
@@ -724,7 +738,7 @@ public class SchoolControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .accept(MediaType.APPLICATION_JSON)
         .content(asJsonString(contactEntity))
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SCHOOL_CONTACT"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_SCHOOL_CONTACT"))))
       .andDo(print())
       .andExpect(status().isBadRequest());
   }
@@ -739,7 +753,7 @@ public class SchoolControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .accept(MediaType.APPLICATION_JSON)
         .content(asJsonString(contactEntity))
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SCHOOL_CONTACT"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_SCHOOL_CONTACT"))))
       .andDo(print())
       .andExpect(status().isBadRequest());
   }
@@ -753,7 +767,7 @@ public class SchoolControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON)
             .content(asJsonString(contactEntity))
-            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SCHOOL_CONTACT"))))
+            .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_SCHOOL_CONTACT"))))
         .andDo(print())
         .andExpect(status().isNotFound());
   }
@@ -769,7 +783,7 @@ public class SchoolControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .accept(MediaType.APPLICATION_JSON)
         .content(asJsonString(schoolEntity))
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_SCHOOL_CONTACT"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "DELETE_SCHOOL_CONTACT"))))
       .andDo(print())
       .andExpect(status().isNoContent());
 
@@ -802,7 +816,7 @@ public class SchoolControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .accept(MediaType.APPLICATION_JSON)
         .content(asJsonString(contact))
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SCHOOL_CONTACT"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_SCHOOL_CONTACT"))))
       .andDo(print())
       .andExpect(status().isOk())
       .andExpect(MockMvcResultMatchers.jsonPath("$.firstName").value(contact.getFirstName()));
@@ -820,7 +834,7 @@ public class SchoolControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON)
             .content(asJsonString(contact))
-            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SCHOOL_CONTACT"))))
+            .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_SCHOOL_CONTACT"))))
         .andDo(print())
         .andExpect(status().isNotFound());
   }
@@ -837,7 +851,7 @@ public class SchoolControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON)
             .content(asJsonString(contact))
-            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SCHOOL_CONTACT"))))
+            .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_SCHOOL_CONTACT"))))
         .andDo(print())
         .andExpect(status().isNotFound());
   }
@@ -862,7 +876,7 @@ public class SchoolControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .accept(MediaType.APPLICATION_JSON)
         .content(asJsonString(noteEntity))
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SCHOOL_NOTE"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_SCHOOL_NOTE"))))
       .andDo(print())
       .andExpect(status().isCreated())
       .andExpect(MockMvcResultMatchers.jsonPath("$.content").value(noteEntity.getContent()));
@@ -877,7 +891,7 @@ public class SchoolControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON)
             .content(asJsonString(noteEntity))
-            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SCHOOL_NOTE"))))
+            .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_SCHOOL_NOTE"))))
         .andDo(print())
         .andExpect(status().isNotFound());
   }
@@ -893,7 +907,7 @@ public class SchoolControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .accept(MediaType.APPLICATION_JSON)
         .content(asJsonString(schoolEntity))
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_SCHOOL_NOTE"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "DELETE_SCHOOL_NOTE"))))
       .andDo(print())
       .andExpect(status().isNoContent());
 
@@ -939,7 +953,7 @@ public class SchoolControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .accept(MediaType.APPLICATION_JSON)
         .content(asJsonString(note))
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SCHOOL_NOTE"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_SCHOOL_NOTE"))))
       .andDo(print())
       .andExpect(status().isOk())
       .andExpect(MockMvcResultMatchers.jsonPath("$.content").value(note.getContent()));
@@ -951,13 +965,12 @@ public class SchoolControllerTest {
     final var mockAuthority = oidcLogin().authorities(grantedAuthority);
 
     this.schoolRepository.save(createSchoolData());
-    val entitiesFromDB = this.schoolRepository.findAll();
+    this.schoolRepository.findAll();
     final SearchCriteria criteria = SearchCriteria.builder().key("website").operation(FilterOperation.EQUAL).value(null).valueType(ValueType.STRING).build();
     final List<SearchCriteria> criteriaList = new ArrayList<>();
     criteriaList.add(criteria);
     final List<Search> searches = new LinkedList<>();
     searches.add(Search.builder().searchCriteriaList(criteriaList).build());
-    final ObjectMapper objectMapper = new ObjectMapper();
     final String criteriaJSON = objectMapper.writeValueAsString(searches);
     this.mockMvc.perform(get(URL.BASE_URL_SCHOOL + "/paginated").with(mockAuthority).param("searchCriteriaList", criteriaJSON)
       .contentType(APPLICATION_JSON)).andDo(print()).andExpect(status().isOk());
@@ -968,7 +981,6 @@ public class SchoolControllerTest {
     final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_SCHOOL";
     final var mockAuthority = oidcLogin().authorities(grantedAuthority);
 
-    final ObjectMapper objectMapper = new ObjectMapper();
     final DistrictTombstoneEntity dist = this.districtTombstoneRepository.save(this.createDistrictData());
 
     var schoolData = createSchoolData();
@@ -1024,7 +1036,7 @@ public class SchoolControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .accept(MediaType.APPLICATION_JSON)
         .content(updatedSchool)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SCHOOL"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_SCHOOL"))))
       .andDo(print())
       .andExpect(status().isOk())
       .andExpect(MockMvcResultMatchers.jsonPath("$.displayName").value(entity.getDisplayName()));
@@ -1051,7 +1063,6 @@ public class SchoolControllerTest {
     criteriaList.add(criteria);
     final List<Search> searches = new LinkedList<>();
     searches.add(Search.builder().searchCriteriaList(criteriaList).build());
-    final ObjectMapper objectMapper = new ObjectMapper();
     final String criteriaJSON = objectMapper.writeValueAsString(searches);
     final MvcResult result = this.mockMvc.perform(get(URL.BASE_URL_SCHOOL + "/history/paginated").with(mockAuthority).param("searchCriteriaList", criteriaJSON)
         .contentType(APPLICATION_JSON)).andReturn();
@@ -1070,7 +1081,6 @@ public class SchoolControllerTest {
     criteriaList.add(criteria);
     final List<Search> searches = new LinkedList<>();
     searches.add(Search.builder().searchCriteriaList(criteriaList).build());
-    final ObjectMapper objectMapper = new ObjectMapper();
     final String criteriaJSON = objectMapper.writeValueAsString(searches);
     final ResultActions result =  this.mockMvc.perform(get(URL.BASE_URL_SCHOOL + "/history/paginated").with(mockAuthority).param("searchCriteriaList", criteriaJSON)
         .contentType(APPLICATION_JSON)).andDo(print());
@@ -1097,7 +1107,6 @@ public class SchoolControllerTest {
     criteriaList.add(criteriaSchoolPhoneNumber);
     final List<Search> searches = new LinkedList<>();
     searches.add(Search.builder().searchCriteriaList(criteriaList).build());
-    final ObjectMapper objectMapper = new ObjectMapper();
     final String criteriaJSON = objectMapper.writeValueAsString(searches);
     final MvcResult result = this.mockMvc.perform(get(URL.BASE_URL_SCHOOL + "/history/paginated").with(mockAuthority).param("searchCriteriaList", criteriaJSON)
         .contentType(APPLICATION_JSON)).andReturn();
@@ -1115,7 +1124,6 @@ public class SchoolControllerTest {
     criteriaList.add(invalidCriteria);
     final List<Search> searches = new LinkedList<>();
     searches.add(Search.builder().searchCriteriaList(criteriaList).build());
-    final ObjectMapper objectMapper = new ObjectMapper();
     final String criteriaJSON = objectMapper.writeValueAsString(searches);
     this.mockMvc.perform(get(URL.BASE_URL_SCHOOL + "/history/paginated").with(mockAuthority).param("searchCriteriaList", criteriaJSON)
         .contentType(APPLICATION_JSON)).andDo(print()).andExpect(status().isBadRequest());
@@ -1133,7 +1141,6 @@ public class SchoolControllerTest {
     criteriaList.add(criteria);
     final List<Search> searches = new LinkedList<>();
     searches.add(Search.builder().searchCriteriaList(criteriaList).build());
-    final ObjectMapper objectMapper = new ObjectMapper();
     final String criteriaJSON = objectMapper.writeValueAsString(searches);
     final MvcResult result = this.mockMvc
             .perform(get(URL.BASE_URL_SCHOOL + "/contact/paginated").with(mockAuthority).param("searchCriteriaList", criteriaJSON)
@@ -1155,7 +1162,6 @@ public class SchoolControllerTest {
     criteriaList.add(criteria);
     final List<Search> searches = new LinkedList<>();
     searches.add(Search.builder().searchCriteriaList(criteriaList).build());
-    final ObjectMapper objectMapper = new ObjectMapper();
     final String criteriaJSON = objectMapper.writeValueAsString(searches);
     final MvcResult result = this.mockMvc
             .perform(get(URL.BASE_URL_SCHOOL + "/contact/paginated").with(mockAuthority).param("searchCriteriaList", criteriaJSON)
@@ -1310,11 +1316,6 @@ public class SchoolControllerTest {
 
   private NeighborhoodLearningEntity createNeighborhoodLearningData(SchoolEntity entity) {
     return NeighborhoodLearningEntity.builder().schoolEntity(entity).neighborhoodLearningTypeCode("COMM_USE").createUser("TEST").updateUser("TEST").build();
-  }
-
-  private SchoolAddressEntity createAddressData(SchoolEntity entity) {
-    return SchoolAddressEntity.builder().schoolEntity(entity).addressTypeCode("MAILING").addressLine1("123 This Street").city("Compton")
-      .provinceCode("BC").countryCode("CA").postal("V1B9H2").build();
   }
 
   private NoteEntity createNoteData(SchoolEntity entity) {

@@ -166,4 +166,12 @@ public interface SchoolAPIEndpoint {
                                                            @RequestParam(name = "sort", defaultValue = "") String sortCriteriaJson,
                                                            @RequestParam(name = "searchCriteriaList", required = false) String searchCriteriaListJson);
 
+  @GetMapping("/funding-groups")
+  @PreAuthorize("hasAuthority('SCOPE_READ_SCHOOL')")
+  @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
+  @Transactional(readOnly = true)
+  @Tag(name = "School Entity", description = "Endpoints for school entity.")
+  @Schema(name = "IndependentSchoolFundingGroup", implementation = IndependentSchoolFundingGroup.class)
+  List<IndependentSchoolFundingGroup> getAllSchoolFundingGroups();
+
 }
