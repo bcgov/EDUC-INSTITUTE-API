@@ -1,4 +1,5 @@
 ca.bc.gov.educ.api.institute.InstituteApiResourceApplication=org.springframework.stereotype.Component,org.springframework.boot.SpringBootConfiguration
+ca.bc.gov.educ.api.institute.InstituteApiResourceApplication$WebSecurityConfiguration=org.springframework.stereotype.Component
 ca.bc.gov.educ.api.institute.adapter.CustomRequestBodyAdviceAdapter=org.springframework.stereotype.Component
 ca.bc.gov.educ.api.institute.config.AsyncConfiguration=org.springframework.stereotype.Component
 ca.bc.gov.educ.api.institute.config.InstituteAPIMVCConfig=org.springframework.stereotype.Component
@@ -119,6 +120,7 @@ ca.bc.gov.educ.api.institute.service.v1.IndependentAuthorityHistoryService=org.s
 ca.bc.gov.educ.api.institute.service.v1.IndependentAuthorityService=org.springframework.stereotype.Component
 ca.bc.gov.educ.api.institute.service.v1.JetStreamEventHandlerService=org.springframework.stereotype.Component
 ca.bc.gov.educ.api.institute.service.v1.SchoolContactSearchService=org.springframework.stereotype.Component
+ca.bc.gov.educ.api.institute.service.v1.SchoolFundingGroupService=org.springframework.stereotype.Component
 ca.bc.gov.educ.api.institute.service.v1.SchoolHistorySearchService=org.springframework.stereotype.Component
 ca.bc.gov.educ.api.institute.service.v1.SchoolHistoryService=org.springframework.stereotype.Component
 ca.bc.gov.educ.api.institute.service.v1.SchoolNumberGenerationService=org.springframework.stereotype.Component

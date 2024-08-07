@@ -4,12 +4,8 @@ import ca.bc.gov.educ.api.institute.endpoint.v1.SchoolAPIEndpoint;
 import ca.bc.gov.educ.api.institute.exception.EntityNotFoundException;
 import ca.bc.gov.educ.api.institute.exception.InvalidPayloadException;
 import ca.bc.gov.educ.api.institute.exception.errors.ApiError;
-import ca.bc.gov.educ.api.institute.mapper.v1.NoteMapper;
-import ca.bc.gov.educ.api.institute.mapper.v1.SchoolContactMapper;
-import ca.bc.gov.educ.api.institute.mapper.v1.SchoolMapper;
-import ca.bc.gov.educ.api.institute.mapper.v1.SchoolTombstoneMapper;
+import ca.bc.gov.educ.api.institute.mapper.v1.*;
 import ca.bc.gov.educ.api.institute.messaging.jetstream.Publisher;
-import ca.bc.gov.educ.api.institute.model.v1.InstituteEvent;
 import ca.bc.gov.educ.api.institute.model.v1.SchoolContactTombstoneEntity;
 import ca.bc.gov.educ.api.institute.model.v1.SchoolEntity;
 import ca.bc.gov.educ.api.institute.model.v1.SchoolHistoryEntity;
@@ -55,12 +51,17 @@ public class SchoolAPIController implements SchoolAPIEndpoint {
 
   private static final SchoolTombstoneMapper tombstoneMapper = SchoolTombstoneMapper.mapper;
 
+  private static final IndependentSchoolFundingGroupMapper independentSchoolFundingGroupMapper = IndependentSchoolFundingGroupMapper.mapper;
+
   private static final SchoolContactMapper schoolContactMapper = SchoolContactMapper.mapper;
 
   private static final NoteMapper noteMapper = NoteMapper.mapper;
 
   @Getter(AccessLevel.PRIVATE)
   private final SchoolService schoolService;
+
+  @Getter(AccessLevel.PRIVATE)
+  private final SchoolFundingGroupService schoolFundingGroupService;
 
   @Getter(AccessLevel.PRIVATE)
   private final SchoolContactSearchService schoolContactSearchService;
@@ -79,9 +80,10 @@ public class SchoolAPIController implements SchoolAPIEndpoint {
 
   private final NotePayloadValidator notePayloadValidator;
   @Autowired
-  public SchoolAPIController(Publisher publisher, final SchoolService schoolService, SchoolContactSearchService schoolContactSearchService, final SchoolHistoryService schoolHistoryService, SchoolSearchService schoolSearchService, SchoolHistorySearchService schoolHistorySearchService, final SchoolPayloadValidator payloadValidator, SchoolContactPayloadValidator contactPayloadValidator, NotePayloadValidator notePayloadValidator) {
+  public SchoolAPIController(Publisher publisher, final SchoolService schoolService, SchoolFundingGroupService schoolFundingGroupService, SchoolContactSearchService schoolContactSearchService, final SchoolHistoryService schoolHistoryService, SchoolSearchService schoolSearchService, SchoolHistorySearchService schoolHistorySearchService, final SchoolPayloadValidator payloadValidator, SchoolContactPayloadValidator contactPayloadValidator, NotePayloadValidator notePayloadValidator) {
     this.publisher = publisher;
     this.schoolService = schoolService;
+    this.schoolFundingGroupService = schoolFundingGroupService;
     this.schoolContactSearchService = schoolContactSearchService;
     this.schoolHistoryService = schoolHistoryService;
     this.schoolSearchService = schoolSearchService;
@@ -143,7 +145,7 @@ public class SchoolAPIController implements SchoolAPIEndpoint {
 
   @Override
   public List<SchoolTombstone> getAllSchools() {
-    return getSchoolService().getAllSchoolsList().stream().map(tombstoneMapper::toStructure).collect(Collectors.toList());
+    return getSchoolService().getAllSchoolsList().stream().map(tombstoneMapper::toStructure).toList();
   }
 
   @Override
@@ -209,6 +211,11 @@ public class SchoolAPIController implements SchoolAPIEndpoint {
     final List<Sort.Order> sorts = new ArrayList<>();
     Specification<SchoolContactTombstoneEntity> schoolSpecs = schoolContactSearchService.setSpecificationAndSortCriteria(sortCriteriaJson, searchCriteriaListJson, JsonUtil.mapper, sorts);
     return this.schoolContactSearchService.findAll(schoolSpecs, pageNumber, pageSize, sorts).thenApplyAsync(schoolEntities -> schoolEntities.map(schoolContactMapper::toStructure));
+  }
+
+  @Override
+  public List<IndependentSchoolFundingGroup> getAllSchoolFundingGroups() {
+    return getSchoolFundingGroupService().getAllSchoolFundingGroups().stream().map(independentSchoolFundingGroupMapper::toStructure).toList();
   }
 
   @Override
