@@ -18,7 +18,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 @DecoratedWith(SchoolDecorator.class)
-@Mapper(uses = {UUIDMapper.class, LocalDateTimeMapper.class, StringMapper.class, SchoolContactMapper.class, SchoolGradeMapper.class, NeighborhoodLearningMapper.class, NoteMapper.class, SchoolAddressMapper.class})
+@Mapper(uses = {UUIDMapper.class, LocalDateTimeMapper.class, StringMapper.class, SchoolContactMapper.class, SchoolGradeMapper.class, NeighborhoodLearningMapper.class, NoteMapper.class, SchoolAddressMapper.class, IndependentSchoolFundingGroupMapper.class})
 @SuppressWarnings("squid:S1214")
 public interface SchoolMapper {
 
