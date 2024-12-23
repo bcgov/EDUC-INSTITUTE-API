@@ -3,6 +3,7 @@ package ca.bc.gov.educ.api.institute.model.v1;
 import ca.bc.gov.educ.api.institute.util.UpperCase;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.PastOrPresent;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -57,6 +58,10 @@ public class SchoolTombstoneEntity {
   @Basic
   @Column(name = "display_name")
   private String displayName;
+
+  @Basic
+  @Column(name = "display_name_no_spec_chars")
+  private String displayNameNoSpecialChars;
 
   @Basic
   @Column(name = "school_organization_code")
