@@ -24,6 +24,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.test.context.ActiveProfiles;
@@ -977,6 +978,24 @@ public class SchoolControllerTest {
   }
 
   @Test
+  void testReadSchoolPaginated_givenTranscriptValue_ShouldReturnStatusOk() throws Exception {
+    final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_SCHOOL";
+    final var mockAuthority = oidcLogin().authorities(grantedAuthority);
+
+    var school = createSchoolData();
+    this.schoolRepository.save(school);
+    this.schoolRepository.findAll();
+    final SearchCriteria criteria = SearchCriteria.builder().key("canIssueTranscripts").operation(FilterOperation.EQUAL).value("true").valueType(ValueType.BOOLEAN).build();
+    final List<SearchCriteria> criteriaList = new ArrayList<>();
+    criteriaList.add(criteria);
+    final List<Search> searches = new LinkedList<>();
+    searches.add(Search.builder().searchCriteriaList(criteriaList).build());
+    final String criteriaJSON = objectMapper.writeValueAsString(searches);
+    var resultActions = this.mockMvc.perform(get(URL.BASE_URL_SCHOOL + "/paginated").with(mockAuthority).param("searchCriteriaList", criteriaJSON)
+            .contentType(APPLICATION_JSON)).andDo(print()).andExpect(status().isOk());
+  }
+
+  @Test
   void testReadStudentPaginated_GivenSchoolNameFilter_ShouldReturnStatusOk() throws Exception {
     final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_SCHOOL";
     final var mockAuthority = oidcLogin().authorities(grantedAuthority);
@@ -1177,6 +1196,8 @@ public class SchoolControllerTest {
       .displayName("School Name")
       .openedDate(LocalDateTime.now().minusDays(1).withNano(0))
       .schoolCategoryCode("PUBLIC")
+      .canIssueTranscripts(true)
+      .canIssueCertificates(true)
       .schoolOrganizationCode("TWO_SEM")
       .schoolReportingRequirementCode("REGULAR")
       .facilityTypeCode("DISTONLINE")

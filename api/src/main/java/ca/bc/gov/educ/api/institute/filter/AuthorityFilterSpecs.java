@@ -12,7 +12,7 @@ import java.util.UUID;
 @Slf4j
 public class AuthorityFilterSpecs extends BaseFilterSpecs<IndependentAuthorityEntity> {
 
-  public AuthorityFilterSpecs(FilterSpecifications<IndependentAuthorityEntity, ChronoLocalDate> dateFilterSpecifications, FilterSpecifications<IndependentAuthorityEntity, ChronoLocalDateTime<?>> dateTimeFilterSpecifications, FilterSpecifications<IndependentAuthorityEntity, Integer> integerFilterSpecifications, FilterSpecifications<IndependentAuthorityEntity, String> stringFilterSpecifications, FilterSpecifications<IndependentAuthorityEntity, Long> longFilterSpecifications, FilterSpecifications<IndependentAuthorityEntity, UUID> uuidFilterSpecifications, Converters converters) {
-    super(dateFilterSpecifications, dateTimeFilterSpecifications, integerFilterSpecifications, stringFilterSpecifications, longFilterSpecifications, uuidFilterSpecifications, converters);
+  public AuthorityFilterSpecs(FilterSpecifications<IndependentAuthorityEntity, ChronoLocalDate> dateFilterSpecifications, FilterSpecifications<IndependentAuthorityEntity, ChronoLocalDateTime<?>> dateTimeFilterSpecifications, FilterSpecifications<IndependentAuthorityEntity, Integer> integerFilterSpecifications, FilterSpecifications<IndependentAuthorityEntity, String> stringFilterSpecifications, FilterSpecifications<IndependentAuthorityEntity, Long> longFilterSpecifications, FilterSpecifications<IndependentAuthorityEntity, UUID> uuidFilterSpecifications, FilterSpecifications<IndependentAuthorityEntity, Boolean> booleanFilterSpecifications, Converters converters) {
+    super(dateFilterSpecifications, dateTimeFilterSpecifications, integerFilterSpecifications, stringFilterSpecifications, longFilterSpecifications, uuidFilterSpecifications, booleanFilterSpecifications, converters);
   }
 }

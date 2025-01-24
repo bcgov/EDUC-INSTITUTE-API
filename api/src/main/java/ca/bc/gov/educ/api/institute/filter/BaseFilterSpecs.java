@@ -21,6 +21,7 @@ public abstract class BaseFilterSpecs<R> {
   private final FilterSpecifications<R, String> stringFilterSpecifications;
   private final FilterSpecifications<R, Long> longFilterSpecifications;
   private final FilterSpecifications<R, UUID> uuidFilterSpecifications;
+  private final FilterSpecifications<R, Boolean> booleanFilterSpecifications;
   private final Converters converters;
 
   /**
@@ -34,13 +35,14 @@ public abstract class BaseFilterSpecs<R> {
    * @param uuidFilterSpecifications     the uuid filter specifications
    * @param converters                   the converters
    */
-  protected BaseFilterSpecs(FilterSpecifications<R, ChronoLocalDate> dateFilterSpecifications, FilterSpecifications<R, ChronoLocalDateTime<?>> dateTimeFilterSpecifications, FilterSpecifications<R, Integer> integerFilterSpecifications, FilterSpecifications<R, String> stringFilterSpecifications, FilterSpecifications<R, Long> longFilterSpecifications, FilterSpecifications<R, UUID> uuidFilterSpecifications, Converters converters) {
+  protected BaseFilterSpecs(FilterSpecifications<R, ChronoLocalDate> dateFilterSpecifications, FilterSpecifications<R, ChronoLocalDateTime<?>> dateTimeFilterSpecifications, FilterSpecifications<R, Integer> integerFilterSpecifications, FilterSpecifications<R, String> stringFilterSpecifications, FilterSpecifications<R, Long> longFilterSpecifications, FilterSpecifications<R, UUID> uuidFilterSpecifications, FilterSpecifications<R, Boolean> booleanFilterSpecifications, Converters converters) {
     this.dateFilterSpecifications = dateFilterSpecifications;
     this.dateTimeFilterSpecifications = dateTimeFilterSpecifications;
     this.integerFilterSpecifications = integerFilterSpecifications;
     this.stringFilterSpecifications = stringFilterSpecifications;
     this.longFilterSpecifications = longFilterSpecifications;
     this.uuidFilterSpecifications = uuidFilterSpecifications;
+    this.booleanFilterSpecifications = booleanFilterSpecifications;
     this.converters = converters;
   }
 
@@ -114,6 +116,18 @@ public abstract class BaseFilterSpecs<R> {
    */
   public Specification<R> getUUIDTypeSpecification(String fieldName, String filterValue, FilterOperation filterOperation) {
     return getSpecification(fieldName, filterValue, filterOperation, converters.getFunction(UUID.class), uuidFilterSpecifications);
+  }
+
+  /**
+   * Gets boolean type specification.
+   *
+   * @param fieldName       the field name
+   * @param filterValue     the filter value
+   * @param filterOperation the filter operation
+   * @return the string type specification
+   */
+  public Specification<R> getBooleanTypeSpecification(String fieldName, String filterValue, FilterOperation filterOperation) {
+    return getSpecification(fieldName, filterValue, filterOperation, converters.getFunction(Boolean.class), booleanFilterSpecifications);
   }
 
   private <T extends Comparable<T>> Specification<R> getSpecification(String fieldName,

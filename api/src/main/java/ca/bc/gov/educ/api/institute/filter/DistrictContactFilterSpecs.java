@@ -12,7 +12,7 @@ import java.util.UUID;
 @Slf4j
 public class DistrictContactFilterSpecs extends BaseFilterSpecs<DistrictContactTombstoneEntity> {
 
-  public DistrictContactFilterSpecs(FilterSpecifications<DistrictContactTombstoneEntity, ChronoLocalDate> dateFilterSpecifications, FilterSpecifications<DistrictContactTombstoneEntity, ChronoLocalDateTime<?>> dateTimeFilterSpecifications, FilterSpecifications<DistrictContactTombstoneEntity, Integer> integerFilterSpecifications, FilterSpecifications<DistrictContactTombstoneEntity, String> stringFilterSpecifications, FilterSpecifications<DistrictContactTombstoneEntity, Long> longFilterSpecifications, FilterSpecifications<DistrictContactTombstoneEntity, UUID> uuidFilterSpecifications, Converters converters) {
-    super(dateFilterSpecifications, dateTimeFilterSpecifications, integerFilterSpecifications, stringFilterSpecifications, longFilterSpecifications, uuidFilterSpecifications, converters);
+  public DistrictContactFilterSpecs(FilterSpecifications<DistrictContactTombstoneEntity, ChronoLocalDate> dateFilterSpecifications, FilterSpecifications<DistrictContactTombstoneEntity, ChronoLocalDateTime<?>> dateTimeFilterSpecifications, FilterSpecifications<DistrictContactTombstoneEntity, Integer> integerFilterSpecifications, FilterSpecifications<DistrictContactTombstoneEntity, String> stringFilterSpecifications, FilterSpecifications<DistrictContactTombstoneEntity, Long> longFilterSpecifications, FilterSpecifications<DistrictContactTombstoneEntity, UUID> uuidFilterSpecifications, FilterSpecifications<DistrictContactTombstoneEntity, Boolean> booleanFilterSpecifications, Converters converters) {
+    super(dateFilterSpecifications, dateTimeFilterSpecifications, integerFilterSpecifications, stringFilterSpecifications, longFilterSpecifications, uuidFilterSpecifications, booleanFilterSpecifications, converters);
   }
 }

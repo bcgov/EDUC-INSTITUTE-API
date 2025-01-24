@@ -142,6 +142,9 @@ public class SchoolHistorySearchService {
       case UUID:
         schoolHistoryEntitySpecification = schoolHistoryFilterSpecs.getUUIDTypeSpecification(key, value, filterOperation);
         break;
+      case BOOLEAN:
+        schoolHistoryEntitySpecification = schoolHistoryFilterSpecs.getBooleanTypeSpecification(key, value, filterOperation);
+        break;
       default:
         break;
     }

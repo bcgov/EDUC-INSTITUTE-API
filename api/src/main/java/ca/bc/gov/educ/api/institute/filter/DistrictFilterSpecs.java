@@ -12,7 +12,7 @@ import java.util.UUID;
 @Slf4j
 public class DistrictFilterSpecs extends BaseFilterSpecs<DistrictEntity> {
 
-  public DistrictFilterSpecs(FilterSpecifications<DistrictEntity, ChronoLocalDate> dateFilterSpecifications, FilterSpecifications<DistrictEntity, ChronoLocalDateTime<?>> dateTimeFilterSpecifications, FilterSpecifications<DistrictEntity, Integer> integerFilterSpecifications, FilterSpecifications<DistrictEntity, String> stringFilterSpecifications, FilterSpecifications<DistrictEntity, Long> longFilterSpecifications, FilterSpecifications<DistrictEntity, UUID> uuidFilterSpecifications, Converters converters) {
-    super(dateFilterSpecifications, dateTimeFilterSpecifications, integerFilterSpecifications, stringFilterSpecifications, longFilterSpecifications, uuidFilterSpecifications, converters);
+  public DistrictFilterSpecs(FilterSpecifications<DistrictEntity, ChronoLocalDate> dateFilterSpecifications, FilterSpecifications<DistrictEntity, ChronoLocalDateTime<?>> dateTimeFilterSpecifications, FilterSpecifications<DistrictEntity, Integer> integerFilterSpecifications, FilterSpecifications<DistrictEntity, String> stringFilterSpecifications, FilterSpecifications<DistrictEntity, Long> longFilterSpecifications, FilterSpecifications<DistrictEntity, UUID> uuidFilterSpecifications, FilterSpecifications<DistrictEntity, Boolean> booleanFilterSpecifications, Converters converters) {
+    super(dateFilterSpecifications, dateTimeFilterSpecifications, integerFilterSpecifications, stringFilterSpecifications, longFilterSpecifications, uuidFilterSpecifications, booleanFilterSpecifications, converters);
   }
 }

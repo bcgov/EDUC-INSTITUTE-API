@@ -12,7 +12,7 @@ import java.util.UUID;
 @Slf4j
 public class SchoolHistoryFilterSpecs extends BaseFilterSpecs<SchoolHistoryEntity> {
 
-  public SchoolHistoryFilterSpecs(FilterSpecifications<SchoolHistoryEntity, ChronoLocalDate> dateFilterSpecifications, FilterSpecifications<SchoolHistoryEntity, ChronoLocalDateTime<?>> dateTimeFilterSpecifications, FilterSpecifications<SchoolHistoryEntity, Integer> integerFilterSpecifications, FilterSpecifications<SchoolHistoryEntity, String> stringFilterSpecifications, FilterSpecifications<SchoolHistoryEntity, Long> longFilterSpecifications, FilterSpecifications<SchoolHistoryEntity, UUID> uuidFilterSpecifications, Converters converters) {
-    super(dateFilterSpecifications, dateTimeFilterSpecifications, integerFilterSpecifications, stringFilterSpecifications, longFilterSpecifications, uuidFilterSpecifications, converters);
+  public SchoolHistoryFilterSpecs(FilterSpecifications<SchoolHistoryEntity, ChronoLocalDate> dateFilterSpecifications, FilterSpecifications<SchoolHistoryEntity, ChronoLocalDateTime<?>> dateTimeFilterSpecifications, FilterSpecifications<SchoolHistoryEntity, Integer> integerFilterSpecifications, FilterSpecifications<SchoolHistoryEntity, String> stringFilterSpecifications, FilterSpecifications<SchoolHistoryEntity, Long> longFilterSpecifications, FilterSpecifications<SchoolHistoryEntity, UUID> uuidFilterSpecifications, FilterSpecifications<SchoolHistoryEntity, Boolean> booleanFilterSpecifications, Converters converters) {
+    super(dateFilterSpecifications, dateTimeFilterSpecifications, integerFilterSpecifications, stringFilterSpecifications, longFilterSpecifications, uuidFilterSpecifications, booleanFilterSpecifications, converters);
   }
 }

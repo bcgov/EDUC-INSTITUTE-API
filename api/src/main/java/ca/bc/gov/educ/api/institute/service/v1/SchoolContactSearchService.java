@@ -139,6 +139,9 @@ public class SchoolContactSearchService {
       case UUID:
         schoolEntitySpecification = schoolContactFilterSpecs.getUUIDTypeSpecification(key, value, filterOperation);
         break;
+      case BOOLEAN:
+        schoolEntitySpecification = schoolContactFilterSpecs.getBooleanTypeSpecification(key, value, filterOperation);
+        break;
       default:
         break;
     }

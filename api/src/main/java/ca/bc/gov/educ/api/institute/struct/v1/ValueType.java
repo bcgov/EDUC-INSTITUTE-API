@@ -25,6 +25,10 @@ public enum ValueType {
    */
   DATE_TIME,
   /**
+   * Boolean value type.
+   */
+  BOOLEAN,
+  /**
    * Uuid value type.
    */
   UUID

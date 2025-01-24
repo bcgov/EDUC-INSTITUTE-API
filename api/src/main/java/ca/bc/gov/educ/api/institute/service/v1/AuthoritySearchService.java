@@ -134,6 +134,9 @@ public class AuthoritySearchService {
       case UUID:
         authorityEntitySpecification = authorityFilterSpecs.getUUIDTypeSpecification(key, value, filterOperation);
         break;
+      case BOOLEAN:
+        authorityEntitySpecification = authorityFilterSpecs.getBooleanTypeSpecification(key, value, filterOperation);
+        break;
       default:
         break;
     }
