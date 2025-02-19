@@ -3,7 +3,6 @@ package ca.bc.gov.educ.api.institute.controller.v1;
 import ca.bc.gov.educ.api.institute.InstituteApiResourceApplication;
 import ca.bc.gov.educ.api.institute.constants.v1.URL;
 import ca.bc.gov.educ.api.institute.filter.FilterOperation;
-import ca.bc.gov.educ.api.institute.mapper.v1.CodeTableMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.DistrictMapper;
 import ca.bc.gov.educ.api.institute.model.v1.*;
 import ca.bc.gov.educ.api.institute.repository.v1.*;
@@ -14,7 +13,6 @@ import ca.bc.gov.educ.api.institute.struct.v1.ValueType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import lombok.val;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -49,7 +47,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 public class DistrictControllerTest {
 
-  private static final CodeTableMapper mapper = CodeTableMapper.mapper;
   @Autowired
   private MockMvc mockMvc;
 
@@ -193,7 +190,7 @@ public class DistrictControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .accept(MediaType.APPLICATION_JSON)
         .content(asJsonString(entity))
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_DISTRICT"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "DELETE_DISTRICT"))))
       .andDo(print())
       .andExpect(status().isNoContent());
 
@@ -213,7 +210,7 @@ public class DistrictControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .accept(MediaType.APPLICATION_JSON)
         .content(asJsonString(entity))
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_DISTRICT"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_DISTRICT"))))
       .andDo(print())
       .andExpect(status().isOk())
       .andExpect(MockMvcResultMatchers.jsonPath("$.displayName").value(entity.getDisplayName()));
@@ -238,7 +235,7 @@ public class DistrictControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .accept(MediaType.APPLICATION_JSON)
         .content(asJsonString(entity))
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_DISTRICT"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_DISTRICT"))))
       .andDo(print())
       .andExpect(status().isOk())
       .andExpect(MockMvcResultMatchers.jsonPath("$.displayName").value(entity.getDisplayName()));
@@ -266,7 +263,7 @@ public class DistrictControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .accept(MediaType.APPLICATION_JSON)
         .content(asJsonString(auth))
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_DISTRICT"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_DISTRICT"))))
       .andDo(print())
       .andExpect(status().isOk())
       .andExpect(MockMvcResultMatchers.jsonPath("$.addresses.[1].addressLine1").value("123 TESTING"));
@@ -281,7 +278,7 @@ public class DistrictControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .accept(MediaType.APPLICATION_JSON)
         .content(asJsonString(district))
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_DISTRICT"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_DISTRICT"))))
       .andDo(print())
       .andExpect(status().isCreated())
       .andExpect(MockMvcResultMatchers.jsonPath("$.displayName").value(district.getDisplayName()));
@@ -300,7 +297,7 @@ public class DistrictControllerTest {
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON)
                     .content(asJsonString(district))
-                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_DISTRICT"))))
+                    .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_DISTRICT"))))
             .andDo(print())
             .andExpect(status().isCreated())
             .andExpect(MockMvcResultMatchers.jsonPath("$.displayName").value(district.getDisplayName()));
@@ -318,7 +315,7 @@ public class DistrictControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .accept(MediaType.APPLICATION_JSON)
         .content(asJsonString(district))
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_DISTRICT"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_DISTRICT"))))
       .andDo(print())
       .andExpect(status().isBadRequest());
   }
@@ -337,7 +334,7 @@ public class DistrictControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .accept(MediaType.APPLICATION_JSON)
         .content(asJsonString(contactEntity))
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_DISTRICT_CONTACT"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_DISTRICT_CONTACT"))))
       .andDo(print())
       .andExpect(status().isCreated())
       .andExpect(MockMvcResultMatchers.jsonPath("$.lastName").value(contactEntity.getLastName()))
@@ -363,7 +360,7 @@ public class DistrictControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .accept(MediaType.APPLICATION_JSON)
         .content(asJsonString(contactEntity))
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_DISTRICT_CONTACT"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_DISTRICT_CONTACT"))))
       .andDo(print())
       .andExpect(status().isCreated())
       .andExpect(MockMvcResultMatchers.jsonPath("$.lastName").value(contactEntity.getLastName()))
@@ -383,7 +380,7 @@ public class DistrictControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .accept(MediaType.APPLICATION_JSON)
         .content(asJsonString(contactEntity))
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_DISTRICT_CONTACT"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_DISTRICT_CONTACT"))))
       .andDo(print())
       .andExpect(status().isCreated())
       .andExpect(MockMvcResultMatchers.jsonPath("$.lastName").value(contactEntity.getLastName()));
@@ -399,7 +396,7 @@ public class DistrictControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .accept(MediaType.APPLICATION_JSON)
         .content(asJsonString(contactEntity))
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_DISTRICT_CONTACT"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_DISTRICT_CONTACT"))))
       .andDo(print())
       .andExpect(status().isBadRequest());
   }
@@ -414,7 +411,7 @@ public class DistrictControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .accept(MediaType.APPLICATION_JSON)
         .content(asJsonString(contactEntity))
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_DISTRICT_CONTACT"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_DISTRICT_CONTACT"))))
       .andDo(print())
       .andExpect(status().isBadRequest());
   }
@@ -430,7 +427,7 @@ public class DistrictControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .accept(MediaType.APPLICATION_JSON)
         .content(asJsonString(districtEntity))
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_DISTRICT_CONTACT"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "DELETE_DISTRICT_CONTACT"))))
       .andDo(print())
       .andExpect(status().isNoContent());
 
@@ -474,7 +471,7 @@ public class DistrictControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .accept(MediaType.APPLICATION_JSON)
         .content(asJsonString(contact))
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_DISTRICT_CONTACT"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_DISTRICT_CONTACT"))))
       .andDo(print())
       .andExpect(status().isOk())
       .andExpect(MockMvcResultMatchers.jsonPath("$.firstName").value(contact.getFirstName()));
@@ -489,7 +486,7 @@ public class DistrictControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .accept(MediaType.APPLICATION_JSON)
         .content(asJsonString(noteEntity))
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_DISTRICT_NOTE"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_DISTRICT_NOTE"))))
       .andDo(print())
       .andExpect(status().isCreated())
       .andExpect(MockMvcResultMatchers.jsonPath("$.content").value(noteEntity.getContent()));
@@ -506,7 +503,7 @@ public class DistrictControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .accept(MediaType.APPLICATION_JSON)
         .content(asJsonString(districtEntity))
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_DISTRICT_NOTE"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "DELETE_DISTRICT_NOTE"))))
       .andDo(print())
       .andExpect(status().isNoContent());
 
@@ -552,10 +549,29 @@ public class DistrictControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .accept(MediaType.APPLICATION_JSON)
         .content(asJsonString(note))
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_DISTRICT_NOTE"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_DISTRICT_NOTE"))))
       .andDo(print())
       .andExpect(status().isOk())
       .andExpect(MockMvcResultMatchers.jsonPath("$.content").value(note.getContent()));
+  }
+
+  @Test
+  void testReadDistrictHistoryPaginated_givenValueDistrictNumber_ShouldReturnStatusOk() throws Exception {
+    final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_DISTRICT";
+    final var mockAuthority = oidcLogin().authorities(grantedAuthority);
+
+    var districtEntity = this.districtRepository.save(createDistrictData());
+    this.districtHistoryRepository.save(createHistoryDistrictData(districtEntity.getDistrictId()));
+    final SearchCriteria criteria = SearchCriteria.builder().key("districtNumber").operation(FilterOperation.EQUAL).value("003").valueType(ValueType.STRING).build();
+    final List<SearchCriteria> criteriaList = new ArrayList<>();
+    criteriaList.add(criteria);
+    final List<Search> searches = new LinkedList<>();
+    searches.add(Search.builder().searchCriteriaList(criteriaList).build());
+    final ObjectMapper objectMapper = new ObjectMapper();
+    final String criteriaJSON = objectMapper.writeValueAsString(searches);
+    var result = this.mockMvc.perform(get(URL.BASE_URL_DISTRICT + "/history/paginated").with(mockAuthority).param("searchCriteriaList", criteriaJSON)
+            .contentType(APPLICATION_JSON)).andReturn();
+    this.mockMvc.perform(asyncDispatch(result)).andDo(print()).andExpect(status().isOk());
   }
 
   @Test
@@ -563,7 +579,7 @@ public class DistrictControllerTest {
     final GrantedAuthority grantedAuthority = () -> "SCOPE_READ_DISTRICT";
     final var mockAuthority = oidcLogin().authorities(grantedAuthority);
 
-    var districtEntity = this.districtRepository.save(createDistrictData());
+    this.districtRepository.save(createDistrictData());
     final SearchCriteria criteria = SearchCriteria.builder().key("districtNumber").operation(FilterOperation.EQUAL).value("003").valueType(ValueType.STRING).build();
     final List<SearchCriteria> criteriaList = new ArrayList<>();
     criteriaList.add(criteria);
@@ -582,7 +598,7 @@ public class DistrictControllerTest {
     final var mockAuthority = oidcLogin().authorities(grantedAuthority);
 
     this.districtRepository.save(createDistrictData());
-    val entitiesFromDB = this.districtRepository.findAll();
+    this.districtRepository.findAll();
     final SearchCriteria criteria = SearchCriteria.builder().key("districtStatusCode").operation(FilterOperation.EQUAL).value("OPEN").valueType(ValueType.STRING).build();
     final List<SearchCriteria> criteriaList = new ArrayList<>();
     criteriaList.add(criteria);
@@ -601,7 +617,7 @@ public class DistrictControllerTest {
 
     var districtEntity = this.districtRepository.save(createDistrictData());
     this.districtContactRepository.save(createContactData(districtEntity));
-    val entitiesFromDB = this.districtRepository.findAll();
+    this.districtRepository.findAll();
     final SearchCriteria criteria = SearchCriteria.builder().key("firstName").operation(FilterOperation.EQUAL).value("JOHN").valueType(ValueType.STRING).build();
     final List<SearchCriteria> criteriaList = new ArrayList<>();
     criteriaList.add(criteria);
@@ -620,7 +636,7 @@ public class DistrictControllerTest {
 
     var districtEntity = this.districtRepository.save(createDistrictData());
     this.districtContactRepository.save(createContactData(districtEntity));
-    val entitiesFromDB = this.districtRepository.findAll();
+    this.districtRepository.findAll();
     final SearchCriteria criteria = SearchCriteria.builder().key("districtId").operation(FilterOperation.EQUAL).value(districtEntity.getDistrictId().toString()).valueType(ValueType.UUID).build();
     final List<SearchCriteria> criteriaList = new ArrayList<>();
     criteriaList.add(criteria);

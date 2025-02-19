@@ -80,6 +80,17 @@ public interface DistrictAPIEndpoint {
                                           @RequestParam(name = "sort", defaultValue = "") String sortCriteriaJson,
                                           @RequestParam(name = "searchCriteriaList", required = false) String searchCriteriaListJson);
 
+  @GetMapping("/history/paginated")
+  @Async
+  @PreAuthorize("hasAuthority('SCOPE_READ_DISTRICT')")
+  @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR.")})
+  @Transactional(readOnly = true)
+  @Tag(name = "District History Entity", description = "Endpoints for district history entity.")
+  CompletableFuture<Page<DistrictHistory>> districtHistoryFindAll(@RequestParam(name = "pageNumber", defaultValue = "0") Integer pageNumber,
+                                            @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
+                                            @RequestParam(name = "sort", defaultValue = "") String sortCriteriaJson,
+                                            @RequestParam(name = "searchCriteriaList", required = false) String searchCriteriaListJson);
+
   @GetMapping("/contact/paginated")
   @Async
   @PreAuthorize("hasAuthority('SCOPE_READ_DISTRICT_CONTACT')")

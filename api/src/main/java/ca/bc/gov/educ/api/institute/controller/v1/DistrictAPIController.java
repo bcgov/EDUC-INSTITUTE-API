@@ -11,11 +11,8 @@ import ca.bc.gov.educ.api.institute.mapper.v1.NoteMapper;
 import ca.bc.gov.educ.api.institute.messaging.jetstream.Publisher;
 import ca.bc.gov.educ.api.institute.model.v1.DistrictContactTombstoneEntity;
 import ca.bc.gov.educ.api.institute.model.v1.DistrictEntity;
-import ca.bc.gov.educ.api.institute.model.v1.InstituteEvent;
-import ca.bc.gov.educ.api.institute.service.v1.DistrictContactSearchService;
-import ca.bc.gov.educ.api.institute.service.v1.DistrictHistoryService;
-import ca.bc.gov.educ.api.institute.service.v1.DistrictSearchService;
-import ca.bc.gov.educ.api.institute.service.v1.DistrictService;
+import ca.bc.gov.educ.api.institute.model.v1.DistrictHistoryEntity;
+import ca.bc.gov.educ.api.institute.service.v1.*;
 import ca.bc.gov.educ.api.institute.struct.v1.District;
 import ca.bc.gov.educ.api.institute.struct.v1.DistrictContact;
 import ca.bc.gov.educ.api.institute.struct.v1.DistrictHistory;
@@ -63,6 +60,7 @@ public class DistrictAPIController implements DistrictAPIEndpoint {
   private static final NoteMapper noteMapper = NoteMapper.mapper;
   private final DistrictService districtService;
   private final DistrictSearchService districtSearchService;
+  private final DistrictHistorySearchService districtHistorySearchService;
   private final DistrictContactSearchService districtContactSearchService;
   private final DistrictHistoryService districtHistoryService;
 
@@ -73,10 +71,11 @@ public class DistrictAPIController implements DistrictAPIEndpoint {
   private final NotePayloadValidator notePayloadValidator;
 
   @Autowired
-  public DistrictAPIController(Publisher publisher, final DistrictService districtService, DistrictSearchService districtSearchService, DistrictContactSearchService districtContactSearchService, final DistrictHistoryService districtHistoryService, final DistrictPayloadValidator districtPayloadValidator, DistrictContactPayloadValidator districtContactPayloadValidator, NotePayloadValidator notePayloadValidator) {
+  public DistrictAPIController(Publisher publisher, final DistrictService districtService, DistrictSearchService districtSearchService, DistrictHistorySearchService districtHistorySearchService, DistrictContactSearchService districtContactSearchService, final DistrictHistoryService districtHistoryService, final DistrictPayloadValidator districtPayloadValidator, DistrictContactPayloadValidator districtContactPayloadValidator, NotePayloadValidator notePayloadValidator) {
     this.publisher = publisher;
     this.districtService = districtService;
     this.districtSearchService = districtSearchService;
+    this.districtHistorySearchService = districtHistorySearchService;
     this.districtContactSearchService = districtContactSearchService;
     this.districtHistoryService = districtHistoryService;
     this.districtPayloadValidator = districtPayloadValidator;
@@ -144,6 +143,13 @@ public class DistrictAPIController implements DistrictAPIEndpoint {
     final List<Sort.Order> sorts = new ArrayList<>();
     Specification<DistrictEntity> districtSpecs = districtSearchService.setSpecificationAndSortCriteria(sortCriteriaJson, searchCriteriaListJson, JsonUtil.mapper, sorts);
     return this.districtSearchService.findAll(districtSpecs, pageNumber, pageSize, sorts).thenApplyAsync(districtEntities -> districtEntities.map(mapper::toStructure));
+  }
+
+  @Override
+  public CompletableFuture<Page<DistrictHistory>> districtHistoryFindAll(Integer pageNumber, Integer pageSize, String sortCriteriaJson, String searchCriteriaListJson) {
+    final List<Sort.Order> sorts = new ArrayList<>();
+    Specification<DistrictHistoryEntity> districtHistorySpecs = districtHistorySearchService.setSpecificationAndSortCriteria(sortCriteriaJson, searchCriteriaListJson, JsonUtil.mapper, sorts);
+    return this.districtHistorySearchService.findAll(districtHistorySpecs, pageNumber, pageSize, sorts).thenApplyAsync(districtHistoryEntities -> districtHistoryEntities.map(mapper::toStructure));
   }
 
   @Override
