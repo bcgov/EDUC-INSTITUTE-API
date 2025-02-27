@@ -155,16 +155,16 @@ public class SchoolSearchService {
 
   @Transactional(propagation = Propagation.SUPPORTS)
   public CompletableFuture<Page<SchoolEntity>> findAll(Specification<SchoolEntity> schoolSpecs, final Integer pageNumber, final Integer pageSize, final List<Sort.Order> sorts) {
-    log.trace("In find all query: {}", schoolSpecs);
+    log.info("In find all query: {}", schoolSpecs);
     return CompletableFuture.supplyAsync(() -> {
       Pageable paging = PageRequest.of(pageNumber, pageSize, Sort.by(sorts));
       try {
-        log.trace("Running paginated query: {}", schoolSpecs);
+        log.info("Running paginated query: {}", schoolSpecs);
         var results = this.schoolRepository.findAll(schoolSpecs, paging);
-        log.trace("Paginated query returned with results: {}", results);
+        log.info("Paginated query returned with results: {}", results);
         return results;
       } catch (final Throwable ex) {
-        log.error("Failure querying for paginated schools: {}", ex.getMessage());
+        log.info("Failure querying for paginated schools: {}", ex.getMessage());
         throw new CompletionException(ex);
       }
     }, paginatedQueryExecutor);

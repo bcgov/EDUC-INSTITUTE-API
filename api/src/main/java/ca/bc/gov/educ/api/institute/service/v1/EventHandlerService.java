@@ -132,6 +132,8 @@ public class EventHandlerService {
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public CompletableFuture<byte[]> handleGetPaginatedSchools(Event event) {
+    log.info("Started handling GET_PAGINATED_SCHOOLS event for sagaId: {}", event.getSagaId());
+
     String sortCriteriaJson = null;
     String searchCriteriaListJson = null;
     var pageNumber = 0;
@@ -154,25 +156,25 @@ public class EventHandlerService {
 
     final List<Sort.Order> sorts = new ArrayList<>();
     Specification<SchoolEntity> schoolSpecs = schoolSearchService.setSpecificationAndSortCriteria(sortCriteriaJson, searchCriteriaListJson, obMapper, sorts);
-    log.trace("Running query for paginated schools: {}", schoolSpecs);
+    log.info("Running query for paginated schools: {}", schoolSpecs);
     return schoolSearchService
       .findAll(schoolSpecs, pageNumber, pageSize, sorts)
       .thenApplyAsync(schoolEntities -> {
-        log.trace("Performing paginated school mapping: {}", schoolSpecs);
+        log.info("Performing paginated school mapping: {}", schoolSpecs);
         var schoolMap = schoolEntities.map(schoolMapper::toStructure);
-        log.trace("Mapping complete");
+        log.info("Mapping complete");
         return schoolMap;
       })
       .thenApplyAsync(schoolEntities -> {
         try {
-          log.trace("Found {} schools for {}", schoolEntities.getContent().size(), event.getSagaId());
+          log.info("Found {} schools for {}", schoolEntities.getContent().size(), event.getSagaId());
           val resBytes = obMapper.writeValueAsBytes(schoolEntities.getContent());
-          log.trace("Response prepared for {}, response length {}", event.getSagaId(), resBytes.length);
+          log.info("Response prepared for {}, response length {}", event.getSagaId(), resBytes.length);
           return resBytes;
         } catch (JsonProcessingException e) {
           log.error("Error during get paginated schools :: {} {}", event, e);
         }
-        log.trace("Found no schools for paginated query with saga {}", event.getSagaId());
+        log.info("Found no schools for paginated query with saga {}", event.getSagaId());
         return new byte[0];
       });
 

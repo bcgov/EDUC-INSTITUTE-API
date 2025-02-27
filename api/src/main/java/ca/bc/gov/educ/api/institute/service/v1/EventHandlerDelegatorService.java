@@ -63,7 +63,7 @@ public class EventHandlerDelegatorService {
           break;
         case GET_PAGINATED_SCHOOLS:
           log.info("Received GET_PAGINATED_SCHOOLS event :: {}", event.getSagaId());
-          log.trace(PAYLOAD_LOG, event.getEventPayload());
+          log.info(PAYLOAD_LOG, event.getEventPayload());
           eventHandlerService
             .handleGetPaginatedSchools(event)
             .thenAcceptAsync(resBytes -> {
