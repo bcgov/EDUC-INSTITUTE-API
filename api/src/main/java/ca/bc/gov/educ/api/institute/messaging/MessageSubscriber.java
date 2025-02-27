@@ -72,9 +72,11 @@ public class MessageSubscriber {
           }
           //place holder to have different versions
           if ("V1".equalsIgnoreCase(event.getPayloadVersion())) {
+            log.info("message sub handling: {}, {}", event, message);
             messageProcessingThreads.execute(() -> eventHandlerDelegatorServiceV1.handleEvent(event, message));
           }
         } catch (final Exception e) {
+          log.info("on message error: {}", e.getMessage());
           log.error("Exception ", e);
         }
       }

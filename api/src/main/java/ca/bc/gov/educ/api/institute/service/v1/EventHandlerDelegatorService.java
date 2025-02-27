@@ -53,6 +53,7 @@ public class EventHandlerDelegatorService {
     byte[] response;
     boolean isSynchronous = message.getReplyTo() != null;
     try {
+      log.info("Handling event {}, in try block", event.getEventType());
       switch (event.getEventType()) {
         case GET_AUTHORITY:
           log.info("Received GET_AUTHORITY event :: {}", event.getSagaId());
