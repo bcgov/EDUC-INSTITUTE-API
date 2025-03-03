@@ -53,7 +53,7 @@ public class EventHandlerDelegatorService {
     byte[] response;
     boolean isSynchronous = message.getReplyTo() != null;
     try {
-      log.info("Handling event {}, in try block", event.getEventType());
+      log.trace("Handling event {}, in try block", event.getEventType());
       switch (event.getEventType()) {
         case GET_AUTHORITY:
           log.info("Received GET_AUTHORITY event :: {}", event.getSagaId());
@@ -64,7 +64,7 @@ public class EventHandlerDelegatorService {
           break;
         case GET_PAGINATED_SCHOOLS:
           log.info("Received GET_PAGINATED_SCHOOLS event :: {}", event.getSagaId());
-          log.info(PAYLOAD_LOG, event.getEventPayload());
+          log.trace(PAYLOAD_LOG, event.getEventPayload());
           eventHandlerService
             .handleGetPaginatedSchools(event)
             .thenAcceptAsync(resBytes -> {
