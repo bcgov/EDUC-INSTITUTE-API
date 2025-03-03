@@ -30,7 +30,7 @@ jobs:
       - uses: actions/setup-java@v1
         with:
           java-version: 18
-      - uses: actions/cache@v1
+      - uses: actions/cache@v3
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-5Jun-${{ hashFiles('**/pom.xml') }}
