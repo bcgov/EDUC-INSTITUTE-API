@@ -4,7 +4,7 @@ kind: Template
 labels:
     template: "${REPO_NAME}-template"
 metadata:
-    name: "${REPO_NAME}-${BRANCH}-dc"
+    name: "${REPO_NAME}-${BRANCH}-deployment"
 objects:
 - apiVersion: apps/v1
   kind: Deployment
