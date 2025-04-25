@@ -52,7 +52,7 @@ public class Subscriber {
 
     private void initializeStreamTopicMap() {
         final List<String> gradSchoolEventsTopics = new ArrayList<>();
-        gradSchoolEventsTopics.add("PEN_SERVICES_EVENTS_TOPIC");
+        gradSchoolEventsTopics.add("GRAD_SCHOOL_EVENTS_TOPIC");
         final List<String> instituteEventsTopics = new ArrayList<>();
         instituteEventsTopics.add("INSTITUTE_EVENTS_TOPIC");
         this.streamTopicsMap.put("GRAD_SCHOOL_EVENTS", gradSchoolEventsTopics);
