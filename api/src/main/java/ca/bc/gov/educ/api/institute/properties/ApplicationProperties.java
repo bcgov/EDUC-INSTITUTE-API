@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 public class ApplicationProperties {
 
   public static final String INSTITUTE_API = "INSTITUTE-API";
+  public static final String API_NAME = "INSTITUTE_API";
   public static final String STREAM_NAME= "INSTITUTE_EVENTS";
   public static final String CORRELATION_ID = "correlationID";
   /**

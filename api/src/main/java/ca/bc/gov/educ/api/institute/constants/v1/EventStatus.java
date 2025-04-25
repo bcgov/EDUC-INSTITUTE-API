@@ -7,5 +7,7 @@ public enum EventStatus {
 
   DB_COMMITTED,
 
-  MESSAGE_PUBLISHED
+  MESSAGE_PUBLISHED,
+
+  PROCESSED
 }

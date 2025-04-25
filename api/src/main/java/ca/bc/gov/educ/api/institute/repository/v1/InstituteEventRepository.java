@@ -12,6 +12,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface InstituteEventRepository extends JpaRepository<InstituteEvent, UUID> {
+
+  Optional<InstituteEvent> findByEventId(UUID eventId);
   /**
    * Find by saga id optional.
    *
