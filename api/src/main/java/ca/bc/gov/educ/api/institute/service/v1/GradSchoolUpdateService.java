@@ -10,6 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 
 /**
  * The type School update service.
@@ -41,6 +43,8 @@ public class GradSchoolUpdateService extends BaseService<GradSchool> {
             var school = optSchool.get();
             school.setCanIssueTranscripts(StringUtils.isNotBlank(gradSchool.getCanIssueTranscripts()) && gradSchool.getCanIssueTranscripts().equalsIgnoreCase("Y"));
             school.setCanIssueCertificates(StringUtils.isNotBlank(gradSchool.getCanIssueCertificates()) && gradSchool.getCanIssueCertificates().equalsIgnoreCase("Y"));
+            school.setUpdateDate(LocalDateTime.now());
+            school.setUpdateUser(gradSchool.getUpdateUser());
             schoolRepository.save(school);
         }
         this.updateEvent(event);
