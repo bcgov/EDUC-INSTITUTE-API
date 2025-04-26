@@ -43,4 +43,6 @@ public enum EventOutcome {
 
   AUTHORITY_CONTACT_DELETED,
 
+  GRAD_SCHOOL_UPDATED
+
 }
