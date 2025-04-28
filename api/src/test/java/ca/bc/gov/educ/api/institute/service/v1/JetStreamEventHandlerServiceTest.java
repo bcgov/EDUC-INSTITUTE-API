@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.institute.service.v1;
 
+import ca.bc.gov.educ.api.institute.constants.v1.EventType;
 import ca.bc.gov.educ.api.institute.repository.v1.InstituteEventRepository;
 import ca.bc.gov.educ.api.institute.model.v1.InstituteEvent;
 import ca.bc.gov.educ.api.institute.struct.v1.ChoreographedEvent;
@@ -15,6 +16,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import static org.assertj.core.api.Assertions.assertThat;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.UUID;
 
 import static ca.bc.gov.educ.api.institute.constants.v1.EventOutcome.SCHOOL_UPDATED;
@@ -46,7 +48,7 @@ public class JetStreamEventHandlerServiceTest {
     choreographedEvent.setEventType(UPDATE_SCHOOL);
     choreographedEvent.setEventPayload(JsonUtil.getJsonStringFromObject(new School()));
     jetStreamEventHandlerService.updateEventStatus(choreographedEvent);
-    var results = instituteEventRepository.findByEventStatus(MESSAGE_PUBLISHED.toString());
+    var results = instituteEventRepository.findByEventStatusAndEventTypeNotIn(MESSAGE_PUBLISHED.toString(), Arrays.asList(EventType.UPDATE_GRAD_SCHOOL.toString()));
     assertThat(results).isEmpty();
   }
 
@@ -57,14 +59,14 @@ public class JetStreamEventHandlerServiceTest {
     choreographedEvent.setEventType(UPDATE_SCHOOL);
     choreographedEvent.setEventPayload(JsonUtil.getJsonStringFromObject(new School()));
     jetStreamEventHandlerService.updateEventStatus(choreographedEvent);
-    var results = instituteEventRepository.findByEventStatus(MESSAGE_PUBLISHED.toString());
+    var results = instituteEventRepository.findByEventStatusAndEventTypeNotIn(MESSAGE_PUBLISHED.toString(), Arrays.asList(EventType.UPDATE_GRAD_SCHOOL.toString()));
     assertThat(results).isEmpty();
   }
 
   @Test
   public void testUpdateEventStatus_givenChoreographedEventNull_shouldDONothing() {
     jetStreamEventHandlerService.updateEventStatus(null);
-    var results = instituteEventRepository.findByEventStatus(MESSAGE_PUBLISHED.toString());
+    var results = instituteEventRepository.findByEventStatusAndEventTypeNotIn(MESSAGE_PUBLISHED.toString(),Arrays.asList(EventType.UPDATE_GRAD_SCHOOL.toString()));
     assertThat(results).isEmpty();
   }
 
@@ -77,7 +79,7 @@ public class JetStreamEventHandlerServiceTest {
     choreographedEvent.setEventType(UPDATE_SCHOOL);
     choreographedEvent.setEventPayload(JsonUtil.getJsonStringFromObject(new School()));
     jetStreamEventHandlerService.updateEventStatus(choreographedEvent);
-    var results = instituteEventRepository.findByEventStatus(MESSAGE_PUBLISHED.toString());
+    var results = instituteEventRepository.findByEventStatusAndEventTypeNotIn(MESSAGE_PUBLISHED.toString(), Arrays.asList(EventType.UPDATE_GRAD_SCHOOL.toString()));
     assertThat(results).hasSize(1);
     assertThat(results.get(0)).isNotNull();
   }

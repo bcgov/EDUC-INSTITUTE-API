@@ -66,6 +66,5 @@ public class JetStreamEventScheduler {
       log.info("Found {} grad school choreographed events which needs to be processed.", resultsForIncoming.size());
       resultsForIncoming.forEach(this.choreographer::handleEvent);
     }
-
   }
 }
