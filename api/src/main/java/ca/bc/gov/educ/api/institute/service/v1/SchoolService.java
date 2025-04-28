@@ -182,7 +182,7 @@ public class SchoolService {
       final SchoolEntity currentSchoolEntity = curSchoolEntityOptional.get();
       BeanUtils.copyProperties(school, currentSchoolEntity, CREATE_DATE, CREATE_USER, "grades",
           "neighborhoodLearning", "districtEntity", "schoolFundingGroups",
-          "addresses"); // update current student entity with incoming payload ignoring the fields.
+          "addresses", "canIssueTranscripts", "canIssueCertificates"); // update current student entity with incoming payload ignoring the fields.
 
       setGradesAndNeighborhoodLearning(currentSchoolEntity, school);
       setAddresses(currentSchoolEntity, school);

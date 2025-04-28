@@ -3,9 +3,11 @@ package ca.bc.gov.educ.api.institute.service.v1;
 
 import ca.bc.gov.educ.api.institute.constants.v1.EventType;
 import ca.bc.gov.educ.api.institute.model.v1.InstituteEvent;
+import ca.bc.gov.educ.api.institute.model.v1.SchoolEntity;
 import ca.bc.gov.educ.api.institute.repository.v1.InstituteEventRepository;
 import ca.bc.gov.educ.api.institute.repository.v1.SchoolRepository;
 import ca.bc.gov.educ.api.institute.struct.v1.external.gradschool.GradSchool;
+import ca.bc.gov.educ.api.institute.util.TransformUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -22,11 +24,13 @@ public class GradSchoolUpdateService extends BaseService<GradSchool> {
 
     private final InstituteEventRepository instituteEventRepository;
     private final SchoolRepository schoolRepository;
+    private final SchoolHistoryService schoolHistoryService;
 
-    public GradSchoolUpdateService(InstituteEventRepository instituteEventRepository, SchoolRepository schoolRepository) {
+    public GradSchoolUpdateService(InstituteEventRepository instituteEventRepository, SchoolRepository schoolRepository, SchoolHistoryService schoolHistoryService) {
         super(instituteEventRepository);
         this.instituteEventRepository = instituteEventRepository;
         this.schoolRepository = schoolRepository;
+        this.schoolHistoryService = schoolHistoryService;
     }
 
     /**
@@ -45,7 +49,9 @@ public class GradSchoolUpdateService extends BaseService<GradSchool> {
             school.setCanIssueCertificates(StringUtils.isNotBlank(gradSchool.getCanIssueCertificates()) && gradSchool.getCanIssueCertificates().equalsIgnoreCase("Y"));
             school.setUpdateDate(LocalDateTime.now());
             school.setUpdateUser(gradSchool.getUpdateUser());
-            schoolRepository.save(school);
+            TransformUtil.uppercaseFields(school); // convert the input to upper case.
+            SchoolEntity savedSchool = schoolRepository.save(school);
+            schoolHistoryService.createSchoolHistory(savedSchool, savedSchool.getUpdateUser());
         }
         this.updateEvent(event);
     }
