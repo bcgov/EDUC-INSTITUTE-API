@@ -1,14 +1,18 @@
 package ca.bc.gov.educ.api.institute.schedulers;
 
+import ca.bc.gov.educ.api.institute.choreographer.ChoreographEventHandler;
+import ca.bc.gov.educ.api.institute.constants.v1.EventType;
 import ca.bc.gov.educ.api.institute.messaging.jetstream.Publisher;
 import ca.bc.gov.educ.api.institute.repository.v1.InstituteEventRepository;
 import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.core.LockAssert;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
+import org.apache.logging.log4j.core.Core;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 
 import static ca.bc.gov.educ.api.institute.constants.v1.EventStatus.DB_COMMITTED;
 
@@ -22,6 +26,7 @@ public class JetStreamEventScheduler {
 
   private final InstituteEventRepository instituteEventRepository;
   private final Publisher publisher;
+  private final ChoreographEventHandler choreographer;
 
   /**
    * Instantiates a new Stan event scheduler.
@@ -29,9 +34,10 @@ public class JetStreamEventScheduler {
    * @param instituteEventRepository the student event repository
    * @param publisher              the publisher
    */
-  public JetStreamEventScheduler(InstituteEventRepository instituteEventRepository, Publisher publisher) {
+  public JetStreamEventScheduler(InstituteEventRepository instituteEventRepository, Publisher publisher, ChoreographEventHandler choreographer) {
     this.instituteEventRepository = instituteEventRepository;
     this.publisher = publisher;
+    this.choreographer = choreographer;
   }
 
   /**
@@ -40,8 +46,9 @@ public class JetStreamEventScheduler {
   @Scheduled(cron = "0 0/5 * * * *") // every 5 minutes
   @SchedulerLock(name = "PUBLISH_INSTITUTE_EVENTS_TO_JET_STREAM", lockAtLeastFor = "PT4M", lockAtMostFor = "PT4M")
   public void findAndPublishStudentEventsToJetStream() {
+    var gradSchoolEventTypes = Arrays.asList(EventType.UPDATE_GRAD_SCHOOL.toString());
     LockAssert.assertLocked();
-    var results = instituteEventRepository.findByEventStatus(DB_COMMITTED.toString());
+    var results = instituteEventRepository.findByEventStatusAndEventTypeNotIn(DB_COMMITTED.toString(), gradSchoolEventTypes);
     if (!results.isEmpty()) {
       results.forEach(el -> {
         if (el.getUpdateDate().isBefore(LocalDateTime.now().minusMinutes(5))) {
@@ -52,6 +59,12 @@ public class JetStreamEventScheduler {
           }
         }
       });
+    }
+
+    final var resultsForIncoming = this.instituteEventRepository.findAllByEventStatusAndCreateDateBeforeAndEventTypeInOrderByCreateDate(DB_COMMITTED.toString(), LocalDateTime.now().minusMinutes(1), 500, gradSchoolEventTypes);
+    if (!results.isEmpty()) {
+      log.info("Found {} grad school choreographed events which needs to be processed.", resultsForIncoming.size());
+      resultsForIncoming.forEach(this.choreographer::handleEvent);
     }
 
   }

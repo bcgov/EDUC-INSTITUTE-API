@@ -31,13 +31,15 @@ public interface InstituteEventRepository extends JpaRepository<InstituteEvent, 
    */
   Optional<InstituteEvent> findBySagaIdAndEventType(UUID sagaId, String eventType);
 
-  /**
-   * Find by event status list.
-   *
-   * @param eventStatus the event status
-   * @return the list
-   */
-  List<InstituteEvent> findByEventStatus(String eventStatus);
+
+  List<InstituteEvent> findByEventStatusAndEventTypeNotIn(String eventStatus, List<String> eventTypes);
+
+  @Query(value = "select event.* from INSTITUTE_EVENT event where event.EVENT_STATUS = :eventStatus " +
+          "AND event.CREATE_DATE < :createDate " +
+          "AND event.EVENT_TYPE in :eventTypes " +
+          "ORDER BY event.CREATE_DATE asc " +
+          "FETCH FIRST :limit ROWS ONLY", nativeQuery=true)
+  List<InstituteEvent> findAllByEventStatusAndCreateDateBeforeAndEventTypeInOrderByCreateDate(String eventStatus, LocalDateTime createDate, int limit, List<String> eventTypes);
 
   @Transactional
   @Modifying
