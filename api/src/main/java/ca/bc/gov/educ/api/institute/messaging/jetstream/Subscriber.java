@@ -1,8 +1,10 @@
 package ca.bc.gov.educ.api.institute.messaging.jetstream;
 
+import ca.bc.gov.educ.api.institute.constants.v1.EventType;
 import ca.bc.gov.educ.api.institute.helpers.LogHelper;
 import ca.bc.gov.educ.api.institute.properties.ApplicationProperties;
 import ca.bc.gov.educ.api.institute.service.v1.EventHandlerDelegatorService;
+import ca.bc.gov.educ.api.institute.service.v1.JetStreamEventHandlerService;
 import ca.bc.gov.educ.api.institute.struct.v1.ChoreographedEvent;
 import ca.bc.gov.educ.api.institute.util.JsonUtil;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -41,12 +43,14 @@ public class Subscriber {
     private final Connection natsConnection;
     private final EventHandlerDelegatorService eventHandlerDelegatorService;
     private final Map<String, List<String>> streamTopicsMap = new HashMap<>();
+    private final JetStreamEventHandlerService jetStreamEventHandlerService;
 
 
     @Autowired
-    public Subscriber(final Connection natsConnection, EventHandlerDelegatorService eventHandlerDelegatorService) {
+    public Subscriber(final Connection natsConnection, EventHandlerDelegatorService eventHandlerDelegatorService, JetStreamEventHandlerService jetStreamEventHandlerService) {
         this.natsConnection = natsConnection;
         this.eventHandlerDelegatorService = eventHandlerDelegatorService;
+        this.jetStreamEventHandlerService = jetStreamEventHandlerService;
         initializeStreamTopicMap();
     }
 
@@ -95,7 +99,12 @@ public class Subscriber {
                 }
                 this.subscriberExecutor.execute(() -> {
                     try {
-                        this.eventHandlerDelegatorService.handleChoreographyEvent(event, message);
+                        if(event.getEventType().equals(EventType.UPDATE_GRAD_SCHOOL)) {
+                            this.eventHandlerDelegatorService.handleChoreographyEvent(event, message);
+                        }else{
+                            jetStreamEventHandlerService.updateEventStatus(event);
+                            log.info("Received event :: {} ", event);
+                        }
                     } catch (final IOException e) {
                         log.error("IOException ", e);
                     }
