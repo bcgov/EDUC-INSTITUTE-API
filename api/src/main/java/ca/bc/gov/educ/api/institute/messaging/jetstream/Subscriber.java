@@ -103,6 +103,7 @@ public class Subscriber {
                             this.eventHandlerDelegatorService.handleChoreographyEvent(event, message);
                         }else{
                             jetStreamEventHandlerService.updateEventStatus(event);
+                            message.ack();
                             log.info("Received event :: {} ", event);
                         }
                     } catch (final IOException e) {
