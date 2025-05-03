@@ -47,7 +47,6 @@ public class JetStreamEventScheduler {
    */
   @Scheduled(cron = "0 0/5 * * * *") // every 5 minutes
   @SchedulerLock(name = "PUBLISH_INSTITUTE_EVENTS_TO_JET_STREAM", lockAtLeastFor = "PT4M", lockAtMostFor = "PT4M")
-  @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void findAndPublishStudentEventsToJetStream() {
     var gradSchoolEventTypes = Arrays.asList(EventType.UPDATE_GRAD_SCHOOL.toString());
     LockAssert.assertLocked();
