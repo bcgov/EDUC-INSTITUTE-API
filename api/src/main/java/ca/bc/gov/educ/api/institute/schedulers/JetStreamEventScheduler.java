@@ -10,6 +10,8 @@ import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.apache.logging.log4j.core.Core;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -45,6 +47,7 @@ public class JetStreamEventScheduler {
    */
   @Scheduled(cron = "0 0/5 * * * *") // every 5 minutes
   @SchedulerLock(name = "PUBLISH_INSTITUTE_EVENTS_TO_JET_STREAM", lockAtLeastFor = "PT4M", lockAtMostFor = "PT4M")
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void findAndPublishStudentEventsToJetStream() {
     var gradSchoolEventTypes = Arrays.asList(EventType.UPDATE_GRAD_SCHOOL.toString());
     LockAssert.assertLocked();

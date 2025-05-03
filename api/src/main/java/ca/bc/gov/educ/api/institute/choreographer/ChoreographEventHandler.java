@@ -52,7 +52,7 @@ public class ChoreographEventHandler {
    *
    * @param event the event
    */
-  @Transactional(propagation = Propagation.REQUIRED)
+  @Transactional(propagation = Propagation.MANDATORY)
   public void handleEvent(@NonNull final InstituteEvent event) {
     this.singleTaskExecutor.execute(() -> {
       val eventFromDBOptional = this.eventRepository.findById(event.getEventId());
