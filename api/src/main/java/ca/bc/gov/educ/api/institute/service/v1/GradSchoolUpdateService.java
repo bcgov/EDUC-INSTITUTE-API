@@ -11,6 +11,8 @@ import ca.bc.gov.educ.api.institute.util.TransformUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
@@ -39,6 +41,7 @@ public class GradSchoolUpdateService extends BaseService<GradSchool> {
      * @param event the event
      */
     @Override
+    @Transactional(propagation = Propagation.MANDATORY)
     public void processEvent(final GradSchool gradSchool, final InstituteEvent event) {
         log.info("Received and processing event: " + event.getEventId());
 

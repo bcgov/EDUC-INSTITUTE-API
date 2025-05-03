@@ -13,6 +13,8 @@ import lombok.val;
 import org.jboss.threads.EnhancedQueueExecutor;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -50,6 +52,7 @@ public class ChoreographEventHandler {
    *
    * @param event the event
    */
+  @Transactional(propagation = Propagation.REQUIRED)
   public void handleEvent(@NonNull final InstituteEvent event) {
     this.singleTaskExecutor.execute(() -> {
       val eventFromDBOptional = this.eventRepository.findById(event.getEventId());
