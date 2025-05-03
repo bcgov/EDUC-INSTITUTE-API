@@ -62,7 +62,7 @@ public class JetStreamEventScheduler {
     }
 
     final var resultsForIncoming = this.instituteEventRepository.findAllByEventStatusAndCreateDateBeforeAndEventTypeInOrderByCreateDate(DB_COMMITTED.toString(), LocalDateTime.now().minusMinutes(1), 500, gradSchoolEventTypes);
-    if (!results.isEmpty()) {
+    if (!resultsForIncoming.isEmpty()) {
       log.info("Found {} grad school choreographed events which needs to be processed.", resultsForIncoming.size());
       resultsForIncoming.forEach(this.choreographer::handleEvent);
     }
