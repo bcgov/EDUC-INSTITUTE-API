@@ -53,8 +53,7 @@ public class GradSchoolUpdateService extends BaseService<GradSchool> {
             school.setUpdateDate(LocalDateTime.now());
             school.setUpdateUser(gradSchool.getUpdateUser());
             TransformUtil.uppercaseFields(school); // convert the input to upper case.
-            SchoolEntity savedSchool = schoolRepository.save(school);
-            schoolHistoryService.createSchoolHistory(savedSchool, savedSchool.getUpdateUser());
+            schoolRepository.save(school);
         }
         this.updateEvent(event);
     }
