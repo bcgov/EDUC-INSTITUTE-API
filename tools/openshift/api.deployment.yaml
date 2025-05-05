@@ -26,7 +26,7 @@ objects:
     template:
       metadata:
         annotations:
-          openshift.io/generated-by: schoolapi
+          openshift.io/generated-by: instituteapi
           prometheus.io/path: /actuator/prometheus
           prometheus.io/port: '8080'
           prometheus.io/scrape: 'true'
@@ -111,7 +111,7 @@ objects:
         volumes:
         - name: tls-certs
           secret:
-            secretName: school-api-cert
+            secretName: institute-api-cert
         - name: log-storage
           emptyDir: {}
         - name: flb-sc-config-volume
@@ -124,7 +124,7 @@ objects:
   kind: Service
   metadata:
     annotations:
-      service.alpha.openshift.io/serving-cert-secret-name: "school-api-cert"
+      service.alpha.openshift.io/serving-cert-secret-name: "institute-api-cert"
     labels:
       app: "${APP_NAME}-${BRANCH}"
     name: "${APP_NAME}-${BRANCH}"
