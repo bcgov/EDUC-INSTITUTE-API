@@ -127,13 +127,6 @@ public class SchoolAPIController implements SchoolAPIEndpoint {
     return mapper.toStructure(pair.getLeft());
   }
 
-  @Override
-  @Transactional
-  public ResponseEntity<Void> deleteSchool(UUID id) {
-    getSchoolService().deleteSchool(id);
-    return ResponseEntity.noContent().build();
-  }
-
   private void validatePayload(Supplier<List<FieldError>> validator) {
     val validationResult = validator.get();
     if (!validationResult.isEmpty()) {

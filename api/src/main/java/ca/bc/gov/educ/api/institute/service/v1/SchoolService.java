@@ -144,19 +144,9 @@ public class SchoolService {
     return schoolEntity;
   }
 
-  @Transactional(propagation = Propagation.REQUIRES_NEW)
-  public void deleteSchool(UUID schoolId) {
-    val entityOptional = schoolRepository.findById(schoolId);
-    val entity = entityOptional.orElseThrow(
-        () -> new EntityNotFoundException(SchoolEntity.class, SCHOOL_ID_ATTR, schoolId.toString()));
-    schoolHistoryService.deleteBySchoolID(schoolId);
-    schoolRepository.delete(entity);
-  }
-
   @Transactional(propagation = Propagation.REQUIRES_NEW, noRollbackFor = {
       EntityNotFoundException.class})
-  public Pair<SchoolEntity, InstituteEvent> updateSchool(School schoolUpdate, UUID schoolId)
-      throws JsonProcessingException {
+  public Pair<SchoolEntity, InstituteEvent> updateSchool(School schoolUpdate, UUID schoolId) throws JsonProcessingException {
     var school = SchoolMapper.mapper.toModel(schoolUpdate);
     if (schoolId == null || !schoolId.equals(school.getSchoolId())) {
       throw new EntityNotFoundException(SchoolEntity.class, SCHOOL_ID_ATTR,
@@ -175,8 +165,7 @@ public class SchoolService {
   }
 
   private SchoolEntity updateSchoolHelper(SchoolEntity school) {
-    Optional<SchoolEntity> curSchoolEntityOptional = schoolRepository.findById(
-        school.getSchoolId());
+    Optional<SchoolEntity> curSchoolEntityOptional = schoolRepository.findById(school.getSchoolId());
 
     if (curSchoolEntityOptional.isPresent()) {
       final SchoolEntity currentSchoolEntity = curSchoolEntityOptional.get();

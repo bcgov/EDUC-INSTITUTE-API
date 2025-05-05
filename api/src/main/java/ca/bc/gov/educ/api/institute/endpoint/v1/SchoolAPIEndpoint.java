@@ -55,12 +55,6 @@ public interface SchoolAPIEndpoint {
   @Schema(name = "School", implementation = School.class)
   School updateSchool(@PathVariable UUID id, @Validated @RequestBody School school) throws JsonProcessingException;
 
-  @DeleteMapping("/{id}")
-  @PreAuthorize("hasAuthority('SCOPE_DELETE_SCHOOL')")
-  @ApiResponses(value = {@ApiResponse(responseCode = "204", description = "NO CONTENT"), @ApiResponse(responseCode = "404", description = "NOT FOUND."), @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR.")})
-  @Tag(name = "School Entity", description = "Endpoints for school entity.")
-  ResponseEntity<Void> deleteSchool(@PathVariable UUID id);
-
   @GetMapping
   @PreAuthorize("hasAuthority('SCOPE_READ_SCHOOL')")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})

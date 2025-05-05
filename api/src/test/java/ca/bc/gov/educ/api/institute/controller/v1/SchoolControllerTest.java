@@ -273,23 +273,6 @@ public class SchoolControllerTest {
   }
 
   @Test
-  void testDeleteSchool_GivenValidID_ShouldReturnStatusOK() throws Exception {
-    final var school = this.createSchoolData();
-    var entity = this.schoolRepository.save(school);
-
-    this.mockMvc.perform(delete(URL.BASE_URL_SCHOOL + "/" + entity.getSchoolId())
-        .contentType(MediaType.APPLICATION_JSON)
-        .accept(MediaType.APPLICATION_JSON)
-        .content(asJsonString(entity))
-        .with(jwt().jwt(jwt -> jwt.claim("scope", "DELETE_SCHOOL"))))
-      .andDo(print())
-      .andExpect(status().isNoContent());
-
-    var deletedEntity = this.schoolRepository.findById(entity.getSchoolId());
-    Assertions.assertTrue(deletedEntity.isEmpty());
-  }
-
-  @Test
   void testUpdateSchool_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
     this.createSchoolData();
     final DistrictTombstoneEntity dist = this.districtTombstoneRepository.save(this.createDistrictData());
