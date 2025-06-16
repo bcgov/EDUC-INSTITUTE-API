@@ -51,6 +51,9 @@ public class School extends BaseRequest implements Serializable {
   @NotNull(message = "schoolReportingRequirementCode cannot be null")
   private String schoolReportingRequirementCode;
 
+  @Size(max = 10)
+  private String vendorCode;
+
   @Size(max = 255)
   @NotNull(message = "displayName cannot be null")
   private String displayName;

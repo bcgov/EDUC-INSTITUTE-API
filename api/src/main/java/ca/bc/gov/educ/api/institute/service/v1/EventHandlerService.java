@@ -16,6 +16,7 @@ import ca.bc.gov.educ.api.institute.repository.v1.InstituteEventRepository;
 import ca.bc.gov.educ.api.institute.struct.v1.Event;
 import ca.bc.gov.educ.api.institute.struct.v1.MoveSchoolData;
 import ca.bc.gov.educ.api.institute.struct.v1.School;
+import ca.bc.gov.educ.api.institute.struct.v1.SchoolTombstone;
 import ca.bc.gov.educ.api.institute.util.JsonUtil;
 import ca.bc.gov.educ.api.institute.util.RequestUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -249,6 +250,29 @@ public class EventHandlerService {
       schoolEvent.setUpdateDate(LocalDateTime.now());
     }
 
+    getInstituteEventRepository().save(schoolEvent);
+    return Pair.of(createResponseEvent(schoolEvent), choreographyEvent);
+  }
+
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
+  public Pair<byte[], InstituteEvent> handleGetSchoolFromSchoolTombstoneEvent(Event event) throws JsonProcessingException {
+    InstituteEvent choreographyEvent = null;
+    log.trace(EVENT_PAYLOAD, event);
+    SchoolTombstone schoolTombstone = JsonUtil.getJsonObjectFromString(SchoolTombstone.class, event.getEventPayload());
+
+    try {
+      Pair<SchoolEntity, InstituteEvent> schoolPair = getSchoolService().getSchool(UUID.fromString(schoolTombstone.getSchoolId()))
+              .map(schoolEntity -> Pair.of(schoolEntity, createInstituteEventRecord(event)))
+              .orElseThrow(EntityNotFoundException::new);
+      choreographyEvent = schoolPair.getRight();
+      event.setEventOutcome(EventOutcome.SCHOOL_FOUND);
+      event.setEventPayload(JsonUtil.getJsonStringFromObject(schoolMapper.toStructure(schoolPair.getLeft())));
+    } catch (EntityNotFoundException e) {
+      event.setEventOutcome(EventOutcome.SCHOOL_NOT_FOUND);
+      event.setEventPayload(null);
+    }
+
+    InstituteEvent schoolEvent = createInstituteEventRecord(event);
     getInstituteEventRepository().save(schoolEvent);
     return Pair.of(createResponseEvent(schoolEvent), choreographyEvent);
   }
