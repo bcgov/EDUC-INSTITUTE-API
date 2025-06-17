@@ -826,6 +826,18 @@ public class EventHandlerServiceTest {
     assertThat(response).isNull();
   }
 
+  @Test
+  public void testHandleGetSchoolFromSchoolTombstoneEvent_invalidJson_returnsNull() throws JsonProcessingException {
+    var sagaId = UUID.randomUUID();
+    final Event event = Event.builder()
+                           .eventType(GET_SCHOOL_FROM_SCHOOL_TOMBSTONE)
+                           .sagaId(sagaId)
+                           .eventPayload("invalid json")
+                           .build();
+    byte[] response = eventHandlerServiceUnderTest.handleGetSchoolFromSchoolTombstoneEvent(event);
+    assertThat(response).isNull();
+  }
+
   private IndependentAuthorityEntity createIndependentAuthorityData() {
     return IndependentAuthorityEntity.builder().authorityNumber(003).displayName("IndependentAuthority Name").email("fake@email.com").openedDate(LocalDateTime.now().minusDays(1))
       .authorityTypeCode("INDEPEND").createDate(LocalDateTime.now()).updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
