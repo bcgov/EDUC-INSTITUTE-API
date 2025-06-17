@@ -9,8 +9,6 @@ public enum EventOutcome {
 
   SCHOOL_CREATED,
 
-  SCHOOL_FOUND,
-
   DISTRICT_UPDATED,
 
   DISTRICT_CREATED,
