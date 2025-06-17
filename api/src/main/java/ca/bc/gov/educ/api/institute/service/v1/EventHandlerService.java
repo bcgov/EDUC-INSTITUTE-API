@@ -32,6 +32,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.commons.lang3.tuple.Pair;
@@ -254,27 +255,25 @@ public class EventHandlerService {
     return Pair.of(createResponseEvent(schoolEvent), choreographyEvent);
   }
 
-  @Transactional(propagation = Propagation.REQUIRES_NEW)
-  public Pair<byte[], InstituteEvent> handleGetSchoolFromSchoolTombstoneEvent(Event event) throws JsonProcessingException {
-    InstituteEvent choreographyEvent = null;
-    log.trace(EVENT_PAYLOAD, event);
-    SchoolTombstone schoolTombstone = JsonUtil.getJsonObjectFromString(SchoolTombstone.class, event.getEventPayload());
-
+  public byte[] handleGetSchoolFromSchoolTombstoneEvent(Event event) {
     try {
-      Pair<SchoolEntity, InstituteEvent> schoolPair = getSchoolService().getSchool(UUID.fromString(schoolTombstone.getSchoolId()))
-              .map(schoolEntity -> Pair.of(schoolEntity, createInstituteEventRecord(event)))
-              .orElseThrow(EntityNotFoundException::new);
-      choreographyEvent = schoolPair.getRight();
-      event.setEventOutcome(EventOutcome.SCHOOL_FOUND);
-      event.setEventPayload(JsonUtil.getJsonStringFromObject(schoolMapper.toStructure(schoolPair.getLeft())));
-    } catch (EntityNotFoundException e) {
-      event.setEventOutcome(EventOutcome.SCHOOL_NOT_FOUND);
-      event.setEventPayload(null);
+      SchoolTombstone schoolTombstone = JsonUtil.getJsonObjectFromString(SchoolTombstone.class, event.getEventPayload());
+      return getSchoolService()
+              .getSchool(UUID.fromString(schoolTombstone.getSchoolId()))
+              .map(schoolMapper::toStructure)
+              .map(school -> {
+                 try {
+                   return JsonUtil.getJsonBytesFromObject(school);
+                 } catch (JsonProcessingException e) {
+                   log.error("Error converting school to JSON in handleGetSchoolFromSchoolTombstoneEvent", e);
+                   return null;
+                 }
+              })
+              .orElse(null);
+    } catch (JsonProcessingException ex) {
+      log.error("Error processing JSON in handleGetSchoolFromSchoolTombstoneEvent", ex);
+      return null;
     }
-
-    InstituteEvent schoolEvent = createInstituteEventRecord(event);
-    getInstituteEventRepository().save(schoolEvent);
-    return Pair.of(createResponseEvent(schoolEvent), choreographyEvent);
   }
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)

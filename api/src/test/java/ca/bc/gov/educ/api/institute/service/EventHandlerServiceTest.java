@@ -5,6 +5,7 @@ import ca.bc.gov.educ.api.institute.exception.EntityNotFoundException;
 import ca.bc.gov.educ.api.institute.filter.FilterOperation;
 import ca.bc.gov.educ.api.institute.mapper.v1.IndependentAuthorityMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.SchoolMapper;
+import ca.bc.gov.educ.api.institute.mapper.v1.SchoolTombstoneMapper;
 import ca.bc.gov.educ.api.institute.model.v1.*;
 import ca.bc.gov.educ.api.institute.repository.v1.*;
 import ca.bc.gov.educ.api.institute.service.v1.EventHandlerService;
@@ -58,6 +59,9 @@ public class EventHandlerServiceTest {
   private SchoolRepository schoolRepository;
   @Autowired
   private SchoolMoveRepository schoolMoveRepository;
+  @Autowired
+  private SchoolTombstoneRepository schoolTombstoneRepository;
+
 
   public static final String SEARCH_CRITERIA_LIST = "searchCriteriaList";
   public static final String PAGE_SIZE = "pageSize";
@@ -75,6 +79,7 @@ public class EventHandlerServiceTest {
     independentAuthorityRepository.deleteAll();
     instituteEventRepository.deleteAll();
     schoolRepository.deleteAll();
+    schoolTombstoneRepository.deleteAll();
     schoolMoveRepository.deleteAll();
   }
 
@@ -776,6 +781,51 @@ public class EventHandlerServiceTest {
     }
   }
 
+  @Test
+  public void testHandleEvent_givenEventTypeGET_SCHOOL_FROM_TOMBSTONE__whenSchoolExists_shouldHaveEventOutcomeSCHOOL_FOUND() throws JsonProcessingException, IOException {
+    var schoolEntity = this.createNewSchoolData("99000", "PUBLIC", "DISTONLINE");
+    schoolRepository.save(schoolEntity);
+    var schoolTombstoneEntity = this.createNewSchoolTombstoneData(schoolEntity.getSchoolId(), "99000", "PUBLIC", "DISTONLINE");
+    schoolTombstoneRepository.save(schoolTombstoneEntity);
+
+    SchoolTombstone toSchoolTombstone = new SchoolTombstone();
+    SchoolTombstoneMapper map = SchoolTombstoneMapper.mapper;
+    BeanUtils.copyProperties(map.toStructure(schoolTombstoneEntity), toSchoolTombstone);
+
+    var sagaId = UUID.randomUUID();
+    final Event event = Event.builder()
+        .eventType(GET_SCHOOL_FROM_SCHOOL_TOMBSTONE)
+        .sagaId(sagaId)
+        .eventPayload(JsonUtil.getJsonStringFromObject(toSchoolTombstone))
+        .build();
+
+    byte[] response = eventHandlerServiceUnderTest.handleGetSchoolFromSchoolTombstoneEvent(event);
+    assertThat(response).isNotNull();
+    School school = JsonUtil.getObjectFromJsonBytes(School.class, response);
+    assertThat(school).isNotNull();
+    assertThat(school.getSchoolId()).isEqualTo(schoolEntity.getSchoolId().toString());
+  }
+
+  @Test
+  public void testHandleEvent_givenEventTypeGET_SCHOOL_FROM_TOMBSTONE__whenSchoolDoesNotExist_shouldHaveEventOutcomeSCHOOL_NOT_FOUND() throws JsonProcessingException {
+    var schoolTombstoneEntity = this.createNewSchoolTombstoneData(UUID.randomUUID(), "99000", "PUBLIC", "DISTONLINE");
+    schoolTombstoneRepository.save(schoolTombstoneEntity);
+
+    SchoolTombstone toSchoolTombstone = new SchoolTombstone();
+    SchoolTombstoneMapper map = SchoolTombstoneMapper.mapper;
+    BeanUtils.copyProperties(map.toStructure(schoolTombstoneEntity), toSchoolTombstone);
+
+    var sagaId = UUID.randomUUID();
+    final Event event = Event.builder()
+        .eventType(GET_SCHOOL_FROM_SCHOOL_TOMBSTONE)
+        .sagaId(sagaId)
+        .eventPayload(JsonUtil.getJsonStringFromObject(toSchoolTombstone))
+        .build();
+
+    byte[] response = eventHandlerServiceUnderTest.handleGetSchoolFromSchoolTombstoneEvent(event);
+    assertThat(response).isNull();
+  }
+
   private IndependentAuthorityEntity createIndependentAuthorityData() {
     return IndependentAuthorityEntity.builder().authorityNumber(003).displayName("IndependentAuthority Name").email("fake@email.com").openedDate(LocalDateTime.now().minusDays(1))
       .authorityTypeCode("INDEPEND").createDate(LocalDateTime.now()).updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
@@ -785,6 +835,12 @@ public class EventHandlerServiceTest {
     return SchoolEntity.builder().schoolNumber(schoolNumber).displayName("School Name").openedDate(LocalDateTime.now().minusDays(1).withNano(0)).schoolCategoryCode(schoolCategory)
       .schoolOrganizationCode("TWO_SEM").facilityTypeCode(facilityTypeCode).website("abc@sd99.edu").createDate(LocalDateTime.now().withNano(0))
       .updateDate(LocalDateTime.now().withNano(0)).createUser("TEST").updateUser("TEST").build();
+  }
+
+  private SchoolTombstoneEntity createNewSchoolTombstoneData(UUID schoolId, String schoolNumber, String schoolCategory, String facilityTypeCode) {
+    return SchoolTombstoneEntity.builder().schoolId(schoolId).schoolNumber(schoolNumber).displayName("School Name").openedDate(LocalDateTime.now().minusDays(1).withNano(0)).schoolCategoryCode(schoolCategory)
+            .schoolOrganizationCode("TWO_SEM").facilityTypeCode(facilityTypeCode).website("abc@sd99.edu").createDate(LocalDateTime.now().withNano(0))
+            .updateDate(LocalDateTime.now().withNano(0)).createUser("TEST").updateUser("TEST").build();
   }
   private DistrictTombstoneEntity createDistrictData() {
     return DistrictTombstoneEntity.builder().districtNumber("003").displayName("District Name").districtStatusCode("OPEN").districtRegionCode("KOOTENAYS")

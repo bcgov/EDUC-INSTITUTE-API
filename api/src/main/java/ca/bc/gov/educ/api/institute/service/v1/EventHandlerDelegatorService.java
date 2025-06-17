@@ -13,8 +13,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 
@@ -117,10 +115,9 @@ public class EventHandlerDelegatorService {
                 case GET_SCHOOL_FROM_SCHOOL_TOMBSTONE:
                     log.info("Received GET_SCHOOL event :: {}", event.getSagaId());
                     log.trace(PAYLOAD_LOG, event.getEventPayload());
-                    Pair<byte[], InstituteEvent> getPair = eventHandlerService.handleGetSchoolFromSchoolTombstoneEvent(event);
+                    byte[] school = eventHandlerService.handleGetSchoolFromSchoolTombstoneEvent(event);
                     log.info(RESPONDING_BACK_TO_NATS_ON_CHANNEL, message.getReplyTo() != null ? message.getReplyTo() : event.getReplyTo());
-                    publishToNATS(event, message, isSynchronous, getPair.getLeft());
-                    publishToJetStream(getPair.getRight());
+                    publishToNATS(event, message, true, school);
                     break;
                 case UPDATE_SCHOOL:
                     log.info("Received UPDATE_SCHOOL event :: {}", event.getSagaId());
