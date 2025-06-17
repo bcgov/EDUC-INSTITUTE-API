@@ -214,7 +214,7 @@ public class SchoolService {
   }
 
   private void setVendorCode(SchoolEntity currentSchoolEntity, SchoolEntity school) {
-    if (school.getVendorCode().equalsIgnoreCase("M")) {
+    if ("M".equalsIgnoreCase(school.getVendorCode())) {
       currentSchoolEntity.setVendorCode("MYED");
     } else {
       currentSchoolEntity.setVendorCode("OTHER");
