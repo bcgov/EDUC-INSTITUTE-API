@@ -169,13 +169,14 @@ public class SchoolService {
 
     if (curSchoolEntityOptional.isPresent()) {
       final SchoolEntity currentSchoolEntity = curSchoolEntityOptional.get();
-      BeanUtils.copyProperties(school, currentSchoolEntity, CREATE_DATE, CREATE_USER, "grades",
-          "neighborhoodLearning", "districtEntity", "schoolFundingGroups",
-          "addresses", "canIssueTranscripts", "canIssueCertificates"); // update current student entity with incoming payload ignoring the fields.
+      BeanUtils.copyProperties(school, currentSchoolEntity, CREATE_DATE, CREATE_USER,
+          "grades", "neighborhoodLearning", "districtEntity", "schoolFundingGroups",
+          "addresses", "canIssueTranscripts", "canIssueCertificates", "vendorCode"); // update current student entity with incoming payload ignoring the fields.
 
       setGradesAndNeighborhoodLearning(currentSchoolEntity, school);
       setAddresses(currentSchoolEntity, school);
       setSchoolFundingGroups(currentSchoolEntity, school);
+      setVendorCode(currentSchoolEntity, school);
 
       return saveSchoolWithHistory(currentSchoolEntity);
     } else {
@@ -210,6 +211,14 @@ public class SchoolService {
       TransformUtil.uppercaseFields(group);
       currentSchoolEntity.getSchoolFundingGroups().add(group);
     });
+  }
+
+  private void setVendorCode(SchoolEntity currentSchoolEntity, SchoolEntity school) {
+    if (school.getVendorCode().equalsIgnoreCase("M")) {
+      currentSchoolEntity.setVendorCode("MYED");
+    } else {
+      currentSchoolEntity.setVendorCode("OTHER");
+    }
   }
 
   private void setGradesAndNeighborhoodLearning(SchoolEntity currentSchoolEntity, SchoolEntity school) {
