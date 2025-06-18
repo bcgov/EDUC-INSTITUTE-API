@@ -2,6 +2,7 @@ package ca.bc.gov.educ.api.institute.service.v1;
 
 import ca.bc.gov.educ.api.institute.model.v1.*;
 import ca.bc.gov.educ.api.institute.repository.v1.*;
+import ca.bc.gov.educ.api.institute.repository.v1.VendorSourceSystemCodeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -44,6 +45,8 @@ public class CodeTableService {
 
   private final SchoolFundingGroupCodeRepository schoolFundingGroupCodeRepository;
 
+  private final VendorSourceSystemCodeRepository vendorSourceSystemCodeRepository;
+
   /**
    * Instantiates a new Code table service.
    *
@@ -78,8 +81,8 @@ public class CodeTableService {
           SchoolOrganizationCodeRepository schoolOrganizationCodeRepository,
           SchoolCategoryCodeRepository schoolCategoryCodeRepository,
           SchoolReportingRequirementCodeRepository schoolReportingRequirementCodeRepository,
-          SchoolFundingGroupCodeRepository schoolFundingGroupCodeRepository
-  ) {
+          SchoolFundingGroupCodeRepository schoolFundingGroupCodeRepository,
+          VendorSourceSystemCodeRepository vendorSourceSystemCodeRepository) {
     this.addressTypeCodeRepository = addressTypeCodeRepository;
     this.authorityTypeCodeRepository = authorityTypeCodeRepository;
     this.districtContactTypeCodeRepository = districtContactTypeCodeRepository;
@@ -96,6 +99,7 @@ public class CodeTableService {
     this.schoolReportingRequirementCodeRepository = schoolReportingRequirementCodeRepository;
     this.schoolCategoryCodeRepository = schoolCategoryCodeRepository;
     this.schoolFundingGroupCodeRepository = schoolFundingGroupCodeRepository;
+    this.vendorSourceSystemCodeRepository = vendorSourceSystemCodeRepository;
   }
 
   @Cacheable("addressTypeCodes")
@@ -208,6 +212,10 @@ public class CodeTableService {
 
   public Optional<FacilityTypeCodeEntity> getFacilityTypeCode(String facilityTypeCode) {
     return facilityTypeCodeRepository.findById(facilityTypeCode);
+  }
+
+  public Optional<VendorSourceSystemCodeEntity> getVendorSourceSystemCode(String vendorSourceSystemCode) {
+    return vendorSourceSystemCodeRepository.findById(vendorSourceSystemCode);
   }
 
   public Optional<NeighborhoodLearningTypeCodeEntity> getNeighborhoodLearningTypeCode(String neighborhoodLearningTypeCode) {

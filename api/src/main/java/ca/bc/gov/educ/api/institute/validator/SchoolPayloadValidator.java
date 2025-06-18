@@ -24,6 +24,7 @@ public class SchoolPayloadValidator {
   public static final String SCHOOL_ORGANIZATION_CODE = "schoolOrganizationCode";
   public static final String SCHOOL_CATEGORY_CODE = "schoolCategoryCode";
   public static final String FACILITY_TYPE_CODE = "facilityTypeCode";
+  public static final String VENDOR_SOURCE_SYSTEM_CODE = "vendorSourceSystemCode";
   public static final String DISTRICT_ID = "districtID";
 
   @Getter(AccessLevel.PRIVATE)
@@ -58,6 +59,7 @@ public class SchoolPayloadValidator {
     validateSchoolOrganizationCode(school, apiValidationErrors);
     validateSchoolCategoryCode(school, apiValidationErrors);
     validateFacilityTypeCode(school, apiValidationErrors);
+    validateVendorSourceSystemCode(school, apiValidationErrors);
     validateSchoolFundingCodes(school, apiValidationErrors);
     Optional.ofNullable(school.getAddresses()).orElse(Collections.emptyList()).stream().forEach(address -> addressPayloadValidator.validatePayload(address, apiValidationErrors));
     return apiValidationErrors;
@@ -129,6 +131,15 @@ public class SchoolPayloadValidator {
         apiValidationErrors.add(createFieldError(FACILITY_TYPE_CODE, school.getFacilityTypeCode(), "Facility type code provided is not yet effective."));
       } else if (schoolCategoryCodeEntity.get().getExpiryDate() != null && schoolCategoryCodeEntity.get().getExpiryDate().isBefore(LocalDateTime.now())) {
         apiValidationErrors.add(createFieldError(FACILITY_TYPE_CODE, school.getFacilityTypeCode(), "Facility type code provided has expired."));
+      }
+    }
+  }
+
+  protected void validateVendorSourceSystemCode(School school, List<FieldError> apiValidationErrors) {
+    if (school.getVendorSourceSystemCode() != null) {
+      Optional<VendorSourceSystemCodeEntity> vendorSourceSystemCode = codeTableService.getVendorSourceSystemCode(school.getVendorSourceSystemCode());
+      if (vendorSourceSystemCode.isEmpty()) {
+        apiValidationErrors.add(createFieldError(VENDOR_SOURCE_SYSTEM_CODE, school.getVendorSourceSystemCode(), "Invalid vendor source system code."));
       }
     }
   }
