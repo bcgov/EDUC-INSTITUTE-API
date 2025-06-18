@@ -8,6 +8,7 @@ import ca.bc.gov.educ.api.institute.mapper.v1.SchoolMapper;
 import ca.bc.gov.educ.api.institute.mapper.v1.SchoolTombstoneMapper;
 import ca.bc.gov.educ.api.institute.model.v1.*;
 import ca.bc.gov.educ.api.institute.repository.v1.*;
+import ca.bc.gov.educ.api.institute.service.v1.CodeTableService;
 import ca.bc.gov.educ.api.institute.service.v1.EventHandlerService;
 import ca.bc.gov.educ.api.institute.struct.v1.*;
 import ca.bc.gov.educ.api.institute.util.JsonUtil;
@@ -40,6 +41,7 @@ import static ca.bc.gov.educ.api.institute.constants.v1.EventOutcome.*;
 import static ca.bc.gov.educ.api.institute.constants.v1.EventStatus.MESSAGE_PUBLISHED;
 import static ca.bc.gov.educ.api.institute.constants.v1.EventType.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 
 @RunWith(SpringRunner.class)
 @ActiveProfiles("test")
@@ -61,7 +63,14 @@ public class EventHandlerServiceTest {
   private SchoolMoveRepository schoolMoveRepository;
   @Autowired
   private SchoolTombstoneRepository schoolTombstoneRepository;
-
+  @Autowired
+  FacilityTypeCodeRepository facilityTypeCodeRepository;
+  @Autowired
+  SchoolOrganizationCodeRepository schoolOrganizationCodeRepository;
+  @Autowired
+  SchoolCategoryCodeRepository schoolCategoryCodeRepository;
+  @Autowired
+    VendorSourceSystemCodeRepository vendorSourceSystemCodeRepository;
 
   public static final String SEARCH_CRITERIA_LIST = "searchCriteriaList";
   public static final String PAGE_SIZE = "pageSize";
@@ -72,6 +81,10 @@ public class EventHandlerServiceTest {
   @Before
   public void setUp() {
     MockitoAnnotations.openMocks(this);
+    this.schoolCategoryCodeRepository.save(this.createSchoolCategoryCodeData());
+    this.schoolOrganizationCodeRepository.save(this.createSchoolOrganizationCodeData());
+    this.facilityTypeCodeRepository.save(this.createFacilityTypeCodeData());
+    this.vendorSourceSystemCodeRepository.save(this.createVendorSourceSystemCodeData());
   }
 
   @After
@@ -81,6 +94,10 @@ public class EventHandlerServiceTest {
     schoolRepository.deleteAll();
     schoolTombstoneRepository.deleteAll();
     schoolMoveRepository.deleteAll();
+    this.schoolCategoryCodeRepository.deleteAll();
+    this.schoolOrganizationCodeRepository.deleteAll();
+    this.facilityTypeCodeRepository.deleteAll();
+    this.vendorSourceSystemCodeRepository.deleteAll();
   }
 
   @Test
@@ -263,6 +280,57 @@ public class EventHandlerServiceTest {
     assertThat(schoolCreatedEvent.get().getEventStatus()).isEqualTo(MESSAGE_PUBLISHED.toString());
     assertThat(schoolCreatedEvent.get().getEventOutcome()).isEqualTo(SCHOOL_CREATED.toString());
   }
+
+  @Test
+  public void testHandleEvent_givenEventTypeUPDATE_SCHOOL__DoesExistPassVendorSourceSystemCodeAndSynchronousNatsMessage_shouldRespondWithData() throws IOException {
+    final DistrictTombstoneEntity dist = this.districtTombstoneRepository.save(this.createDistrictData());
+    var schoolEntity = this.createNewSchoolData("99000", "PUBLIC", "DISTONLINE");
+    schoolEntity.setDistrictEntity(dist);
+    schoolEntity.setVendorSourceSystemCode("MYED");
+    schoolRepository.save(schoolEntity);
+
+    School school = new School();
+    SchoolMapper map = SchoolMapper.mapper;
+    school.setSchoolId(schoolEntity.getSchoolId().toString());
+
+    BeanUtils.copyProperties(map.toStructure(schoolEntity), school);
+    ObjectMapper objectMapper = new ObjectMapper();
+    objectMapper.registerModule(new JavaTimeModule()).configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+
+    var sagaId = UUID.randomUUID();
+    final Event event = Event.builder().eventType(UPDATE_SCHOOL).sagaId(sagaId).eventPayload(objectMapper.writeValueAsString(school)).build();
+    eventHandlerServiceUnderTest.handleUpdateSchoolEvent(event).getLeft();
+    var schoolUpdatedEvent = instituteEventRepository.findBySagaIdAndEventType(sagaId, UPDATE_SCHOOL.toString());
+    assertThat(schoolUpdatedEvent).isPresent();
+    assertThat(schoolUpdatedEvent.get().getEventStatus()).isEqualTo(MESSAGE_PUBLISHED.toString());
+    assertThat(schoolUpdatedEvent.get().getEventOutcome()).isEqualTo(SCHOOL_UPDATED.toString());
+  }
+
+  @Test
+  public void testHandleEvent_givenEventTypeUPDATE_SCHOOL__DoesExistFailsValidationAndSynchronousNatsMessage_shouldRespondWithValidationIssues() throws IOException {
+    final DistrictTombstoneEntity dist = this.districtTombstoneRepository.save(this.createDistrictData());
+    var schoolEntity = this.createNewSchoolData("99000", "PUBLIC", "DISTONLINE");
+    schoolEntity.setDistrictEntity(dist);
+    schoolEntity.setVendorSourceSystemCode("invalidCode");
+    schoolRepository.save(schoolEntity);
+
+    School school = new School();
+    SchoolMapper map = SchoolMapper.mapper;
+    school.setSchoolId(schoolEntity.getSchoolId().toString());
+
+    BeanUtils.copyProperties(map.toStructure(schoolEntity), school);
+    ObjectMapper objectMapper = new ObjectMapper();
+    objectMapper.registerModule(new JavaTimeModule()).configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+
+    var sagaId = UUID.randomUUID();
+    final Event event = Event.builder().eventType(UPDATE_SCHOOL).sagaId(sagaId).eventPayload(objectMapper.writeValueAsString(school)).build();
+    eventHandlerServiceUnderTest.handleUpdateSchoolEvent(event).getLeft();
+    var schoolUpdatedEvent = instituteEventRepository.findBySagaIdAndEventType(sagaId, UPDATE_SCHOOL.toString());
+    assertThat(schoolUpdatedEvent).isPresent();
+    assertThat(schoolUpdatedEvent.get().getEventStatus()).isEqualTo(MESSAGE_PUBLISHED.toString());
+    assertThat(schoolUpdatedEvent.get().getEventOutcome()).isEqualTo(SCHOOL_VALIDATION_ERRORS.toString());
+  }
+
   @Test
   public void testHandleEvent_givenEventTypeUPDATE_SCHOOL__DoesExistAndSynchronousNatsMessage_shouldRespondWithData() throws IOException {
     final DistrictTombstoneEntity dist = this.districtTombstoneRepository.save(this.createDistrictData());
@@ -874,5 +942,29 @@ public class EventHandlerServiceTest {
 
   private MoveSchoolData createMoveSchoolData(School toSchool, UUID fromSchoolId, LocalDateTime moveDate) {
     return MoveSchoolData.builder().toSchool(toSchool).fromSchoolId(fromSchoolId.toString()).moveDate(moveDate.toString()).build();
+  }
+
+  private SchoolOrganizationCodeEntity createSchoolOrganizationCodeData() {
+    return SchoolOrganizationCodeEntity.builder().schoolOrganizationCode("TWO_SEM").description("Two Semesters")
+            .effectiveDate(LocalDateTime.now()).expiryDate(LocalDateTime.MAX).displayOrder(1).label("Two Semesters").createDate(LocalDateTime.now())
+            .updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
+  }
+
+  private SchoolCategoryCodeEntity createSchoolCategoryCodeData() {
+    return SchoolCategoryCodeEntity.builder().schoolCategoryCode("PUBLIC").description("Public School")
+            .effectiveDate(LocalDateTime.now()).expiryDate(LocalDateTime.MAX).displayOrder(1).label("Public School").createDate(LocalDateTime.now())
+            .updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
+  }
+
+  private FacilityTypeCodeEntity createFacilityTypeCodeData() {
+    return FacilityTypeCodeEntity.builder().facilityTypeCode("DISTONLINE").description("Standard School")
+            .effectiveDate(LocalDateTime.now()).expiryDate(LocalDateTime.MAX).displayOrder(1).label("Standard School").createDate(LocalDateTime.now())
+            .updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
+  }
+
+  private VendorSourceSystemCodeEntity createVendorSourceSystemCodeData() {
+    return VendorSourceSystemCodeEntity.builder().vendorSourceSystemCode("MYED").description("MyED")
+            .effectiveDate(LocalDateTime.now()).expiryDate(LocalDateTime.MAX).displayOrder(1).label("MyED").createDate(LocalDateTime.now())
+            .updateDate(LocalDateTime.now()).createUser("TEST").updateUser("TEST").build();
   }
 }
