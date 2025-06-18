@@ -254,23 +254,23 @@ public class EventHandlerService {
     return Pair.of(createResponseEvent(schoolEvent), choreographyEvent);
   }
 
-  public byte[] handleGetSchoolFromSchoolTombstoneEvent(Event event) {
+  public byte[] handleGetSchoolFromIdEvent(Event event) {
     try {
-      SchoolTombstone schoolTombstone = JsonUtil.getJsonObjectFromString(SchoolTombstone.class, event.getEventPayload());
+      UUID schoolId = UUID.fromString(event.getEventPayload());
       return getSchoolService()
-              .getSchool(UUID.fromString(schoolTombstone.getSchoolId()))
+              .getSchool(schoolId)
               .map(schoolMapper::toStructure)
               .map(school -> {
-                 try {
-                   return JsonUtil.getJsonBytesFromObject(school);
-                 } catch (JsonProcessingException e) {
-                   log.error("Error converting school to JSON in handleGetSchoolFromSchoolTombstoneEvent", e);
-                   return null;
-                 }
+                try {
+                  return JsonUtil.getJsonBytesFromObject(school);
+                } catch (JsonProcessingException e) {
+                  log.error("Error converting school to JSON in handleGetSchoolFromIdEvent", e);
+                  return null;
+                }
               })
               .orElse(null);
-    } catch (JsonProcessingException ex) {
-      log.error("Error processing JSON in handleGetSchoolFromSchoolTombstoneEvent", ex);
+    } catch (IllegalArgumentException e) {
+      log.error("Invalid UUID string in handleGetSchoolFromIdEvent: {}", event.getEventPayload(), e);
       return null;
     }
   }

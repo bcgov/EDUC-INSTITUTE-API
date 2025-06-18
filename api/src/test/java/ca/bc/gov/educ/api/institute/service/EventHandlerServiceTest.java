@@ -782,24 +782,18 @@ public class EventHandlerServiceTest {
   }
 
   @Test
-  public void testHandleEvent_givenEventTypeGET_SCHOOL_FROM_TOMBSTONE__whenSchoolExists_shouldHaveEventOutcomeSCHOOL_FOUND() throws JsonProcessingException, IOException {
+  public void testHandleEvent_givenEventTypeGET_SCHOOL__whenSchoolExists_shouldHaveEventOutcomeSCHOOL_FOUND() throws IOException {
     var schoolEntity = this.createNewSchoolData("99000", "PUBLIC", "DISTONLINE");
     schoolRepository.save(schoolEntity);
-    var schoolTombstoneEntity = this.createNewSchoolTombstoneData(schoolEntity.getSchoolId(), "99000", "PUBLIC", "DISTONLINE");
-    schoolTombstoneRepository.save(schoolTombstoneEntity);
-
-    SchoolTombstone toSchoolTombstone = new SchoolTombstone();
-    SchoolTombstoneMapper map = SchoolTombstoneMapper.mapper;
-    BeanUtils.copyProperties(map.toStructure(schoolTombstoneEntity), toSchoolTombstone);
 
     var sagaId = UUID.randomUUID();
     final Event event = Event.builder()
-        .eventType(GET_SCHOOL_FROM_SCHOOL_TOMBSTONE)
+        .eventType(GET_SCHOOL)
         .sagaId(sagaId)
-        .eventPayload(JsonUtil.getJsonStringFromObject(toSchoolTombstone))
+        .eventPayload(String.valueOf(schoolEntity.getSchoolId()))
         .build();
 
-    byte[] response = eventHandlerServiceUnderTest.handleGetSchoolFromSchoolTombstoneEvent(event);
+    byte[] response = eventHandlerServiceUnderTest.handleGetSchoolFromIdEvent(event);
     assertThat(response).isNotNull();
     School school = JsonUtil.getObjectFromJsonBytes(School.class, response);
     assertThat(school).isNotNull();
@@ -807,34 +801,27 @@ public class EventHandlerServiceTest {
   }
 
   @Test
-  public void testHandleEvent_givenEventTypeGET_SCHOOL_FROM_TOMBSTONE__whenSchoolDoesNotExist_shouldHaveEventOutcomeSCHOOL_NOT_FOUND() throws JsonProcessingException {
-    var schoolTombstoneEntity = this.createNewSchoolTombstoneData(UUID.randomUUID(), "99000", "PUBLIC", "DISTONLINE");
-    schoolTombstoneRepository.save(schoolTombstoneEntity);
-
-    SchoolTombstone toSchoolTombstone = new SchoolTombstone();
-    SchoolTombstoneMapper map = SchoolTombstoneMapper.mapper;
-    BeanUtils.copyProperties(map.toStructure(schoolTombstoneEntity), toSchoolTombstone);
-
+  public void testHandleEvent_givenEventTypeGET_SCHOOL__whenSchoolDoesNotExist_shouldHaveEventOutcomeSCHOOL_NOT_FOUND() throws JsonProcessingException {
     var sagaId = UUID.randomUUID();
     final Event event = Event.builder()
-        .eventType(GET_SCHOOL_FROM_SCHOOL_TOMBSTONE)
+        .eventType(GET_SCHOOL)
         .sagaId(sagaId)
-        .eventPayload(JsonUtil.getJsonStringFromObject(toSchoolTombstone))
+        .eventPayload(String.valueOf(UUID.randomUUID()))
         .build();
 
-    byte[] response = eventHandlerServiceUnderTest.handleGetSchoolFromSchoolTombstoneEvent(event);
+    byte[] response = eventHandlerServiceUnderTest.handleGetSchoolFromIdEvent(event);
     assertThat(response).isNull();
   }
 
   @Test
-  public void testHandleGetSchoolFromSchoolTombstoneEvent_invalidJson_returnsNull() throws JsonProcessingException {
+  public void testHandleGetSchoolFromSchoolTombstoneEvent_invalidJson_returnsNull() {
     var sagaId = UUID.randomUUID();
     final Event event = Event.builder()
-                           .eventType(GET_SCHOOL_FROM_SCHOOL_TOMBSTONE)
+                           .eventType(GET_SCHOOL)
                            .sagaId(sagaId)
                            .eventPayload("invalid json")
                            .build();
-    byte[] response = eventHandlerServiceUnderTest.handleGetSchoolFromSchoolTombstoneEvent(event);
+    byte[] response = eventHandlerServiceUnderTest.handleGetSchoolFromIdEvent(event);
     assertThat(response).isNull();
   }
 

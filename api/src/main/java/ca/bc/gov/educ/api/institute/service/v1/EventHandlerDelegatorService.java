@@ -112,10 +112,10 @@ public class EventHandlerDelegatorService {
                     publishToNATS(event, message, isSynchronous, pair.getLeft());
                     publishToJetStream(pair.getRight());
                     break;
-                case GET_SCHOOL_FROM_SCHOOL_TOMBSTONE:
+                case GET_SCHOOL:
                     log.info("Received GET_SCHOOL event :: {}", event.getSagaId());
                     log.trace(PAYLOAD_LOG, event.getEventPayload());
-                    byte[] school = eventHandlerService.handleGetSchoolFromSchoolTombstoneEvent(event);
+                    byte[] school = eventHandlerService.handleGetSchoolFromIdEvent(event);
                     log.info(RESPONDING_BACK_TO_NATS_ON_CHANNEL, message.getReplyTo() != null ? message.getReplyTo() : event.getReplyTo());
                     publishToNATS(event, message, true, school);
                     break;

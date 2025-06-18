@@ -8,7 +8,7 @@ public enum EventType {
 
   CREATE_SCHOOL,
 
-  GET_SCHOOL_FROM_SCHOOL_TOMBSTONE,
+  GET_SCHOOL,
 
   UPDATE_DISTRICT,
 
