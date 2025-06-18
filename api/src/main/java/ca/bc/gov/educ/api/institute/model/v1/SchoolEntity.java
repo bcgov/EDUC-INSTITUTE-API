@@ -92,8 +92,8 @@ public class SchoolEntity {
   @UpperCase
   private Boolean canIssueCertificates;
 
-  @Column(name = "VENDOR_CODE")
-  private String vendorCode;
+  @Column(name = "VENDOR_SOURCE_SYSTEM_CODE")
+  private String vendorSourceSystemCode;
 
   @Basic
   @Column(name = "opened_date")
