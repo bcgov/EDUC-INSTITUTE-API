@@ -18,6 +18,7 @@ import ca.bc.gov.educ.api.institute.struct.v1.MoveSchoolData;
 import ca.bc.gov.educ.api.institute.struct.v1.School;
 import ca.bc.gov.educ.api.institute.util.JsonUtil;
 import ca.bc.gov.educ.api.institute.util.RequestUtil;
+import ca.bc.gov.educ.api.institute.validator.SchoolPayloadValidator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -87,6 +88,8 @@ public class EventHandlerService {
 
   private final AuthoritySearchService authoritySearchService;
 
+  private final SchoolPayloadValidator schoolPayloadValidator;
+
   private static final SchoolMapper schoolMapper = SchoolMapper.mapper;
 
   private static final IndependentAuthorityMapper authorityMapper = IndependentAuthorityMapper.mapper;
@@ -94,14 +97,15 @@ public class EventHandlerService {
   private final ObjectMapper obMapper = new ObjectMapper();
 
   private static final IndependentAuthorityMapper independentAuthorityMapper = IndependentAuthorityMapper.mapper;
-
+  
   @Autowired
-  public EventHandlerService(IndependentAuthorityRepository independentAuthorityRepository, InstituteEventRepository instituteEventRepository, SchoolService schoolService, SchoolSearchService schoolSearchService, AuthoritySearchService authoritySearchService){
+  public EventHandlerService(IndependentAuthorityRepository independentAuthorityRepository, InstituteEventRepository instituteEventRepository, SchoolService schoolService, SchoolSearchService schoolSearchService, AuthoritySearchService authoritySearchService, SchoolPayloadValidator schoolPayloadValidator){
     this.independentAuthorityRepository = independentAuthorityRepository;
     this.instituteEventRepository = instituteEventRepository;
     this.schoolService = schoolService;
     this.schoolSearchService = schoolSearchService;
     this.authoritySearchService = authoritySearchService;
+    this.schoolPayloadValidator = schoolPayloadValidator;
   }
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -253,24 +257,61 @@ public class EventHandlerService {
     return Pair.of(createResponseEvent(schoolEvent), choreographyEvent);
   }
 
+  public byte[] handleGetSchoolFromIdEvent(Event event) {
+    try {
+      UUID schoolId = UUID.fromString(event.getEventPayload());
+      return getSchoolService()
+              .getSchool(schoolId)
+              .map(schoolMapper::toStructure)
+              .map(school -> {
+                try {
+                  return JsonUtil.getJsonBytesFromObject(school);
+                } catch (JsonProcessingException e) {
+                  log.error("Error converting school to JSON in handleGetSchoolFromIdEvent", e);
+                  return null;
+                }
+              })
+              .orElse(null);
+    } catch (IllegalArgumentException e) {
+      log.error("Invalid UUID string in handleGetSchoolFromIdEvent: {}", event.getEventPayload(), e);
+      return null;
+    }
+  }
+
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public Pair<byte[], InstituteEvent> handleUpdateSchoolEvent(Event event) throws JsonProcessingException {
     InstituteEvent choreographyEvent = null;
     log.trace(EVENT_PAYLOAD, event);
     School school = JsonUtil.getJsonObjectFromString(School.class, event.getEventPayload());
+
+    val validationErrors = schoolPayloadValidator.validateUpdatePayload(school);
+    if (!validationErrors.isEmpty()) {
+      log.debug("Validation errors found for school update: {}", validationErrors);
+      event.setEventOutcome(EventOutcome.SCHOOL_VALIDATION_ERRORS);
+      event.setEventPayload(JsonUtil.getJsonStringFromObject(validationErrors));
+      
+      InstituteEvent validationEvent = createInstituteEventRecord(event);
+      getInstituteEventRepository().save(validationEvent);
+      return Pair.of(createResponseEvent(validationEvent), null);
+    }
+
     RequestUtil.setAuditColumnsForCreate(school);
     try {
       Pair<SchoolEntity, InstituteEvent> schoolPair = getSchoolService().updateSchool(school, UUID.fromString(school.getSchoolId()));
       choreographyEvent = schoolPair.getRight();
       event.setEventOutcome(EventOutcome.SCHOOL_UPDATED);
       event.setEventPayload(JsonUtil.getJsonStringFromObject(schoolMapper.toStructure(schoolPair.getLeft())));
+
+      InstituteEvent schoolEvent = createInstituteEventRecord(event);
+      getInstituteEventRepository().save(schoolEvent);
+      return Pair.of(createResponseEvent(schoolEvent), choreographyEvent);
     } catch (EntityNotFoundException ex) {
       event.setEventOutcome(EventOutcome.SCHOOL_NOT_FOUND);
-    }
 
-    InstituteEvent schoolEvent = createInstituteEventRecord(event);
-    getInstituteEventRepository().save(schoolEvent);
-    return Pair.of(createResponseEvent(schoolEvent), choreographyEvent);
+      InstituteEvent notFoundEvent = createInstituteEventRecord(event);
+      getInstituteEventRepository().save(notFoundEvent);
+      return Pair.of(createResponseEvent(notFoundEvent), null);
+    }
   }
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)

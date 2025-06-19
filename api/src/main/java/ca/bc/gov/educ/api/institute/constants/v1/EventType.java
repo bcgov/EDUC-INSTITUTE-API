@@ -8,6 +8,8 @@ public enum EventType {
 
   CREATE_SCHOOL,
 
+  GET_SCHOOL,
+
   UPDATE_DISTRICT,
 
   CREATE_DISTRICT,
