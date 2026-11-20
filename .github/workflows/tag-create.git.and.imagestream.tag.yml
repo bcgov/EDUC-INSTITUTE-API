@@ -23,8 +23,13 @@ on:
         description: 'Version Number'
         required: true
 
+permissions:
+  contents: read
+
 jobs:
   openshift-ci-cd:
+    permissions:
+      contents: write
     name: Tag Image
     # ubuntu-20.04 can also be used.
     runs-on: ubuntu-22.04
